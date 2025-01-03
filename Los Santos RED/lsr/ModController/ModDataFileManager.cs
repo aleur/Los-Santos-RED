@@ -239,6 +239,7 @@ public class ModDataFileManager
         SetupFullExpandedJurisdiction();
         SetupLosSantos2008();
         SetupLibertyCity();
+        SetupLPP();
         SetupSunshineDream();
         SetupSimple();
         SetupFullModernTraffic();
@@ -300,7 +301,7 @@ public class ModDataFileManager
     private void SetupAddonPlatesConfig()
     {
         Directory.CreateDirectory("Plugins\\LosSantosRED\\AlternateConfigs\\FullModernLicensePlates");
-        string Description = "A pack of lore friendly license plates designed to work with Los Santos RED. Includes lore friendly states and agencies. " + Environment.NewLine + Environment.NewLine + Environment.NewLine +
+        string Description = "A pack of lore friendly license plates designed to work with Los Santos RED. Includes lore friendly versions of ALL states and select state/government agencies. " + Environment.NewLine + Environment.NewLine + Environment.NewLine +
            "Installation: "
            + Environment.NewLine +
            "1. Install greskfullmodernlicenseplates.oiv using OpenIV"
@@ -421,6 +422,29 @@ public class ModDataFileManager
             "";
         File.WriteAllText("Plugins\\LosSantosRED\\AlternateConfigs\\LosSantos2008\\readme.txt", Description);
     }
+    private void SetupLPP()
+    {
+        Directory.CreateDirectory($"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LPPConfigFolder}");
+        string Description = "For use with Liberty City Preservation Project. "
+            + Environment.NewLine + Environment.NewLine +
+            "1. Install 'Liberty City Preservation Project' according to instructions supplied in the download. Make sure you can load into the map on vanilla GTA before proceeding."
+            + Environment.NewLine +
+            "2. Install 'Full Expanded Jurisdiction Liberty'. Adds Lore-Friendly local police and service vehicles. Install the greskfejlcinstaller.oiv from the 'Files' folder"
+            + Environment.NewLine +
+            //"2a. OPTIONAL: Install 'Full Modern Traffic'. Updates traffic to be more modern and adds some lore friendly vehicles. Follow the readme in the 'AlternateConfigs\\FullModernTraffic' folder"
+            //+ Environment.NewLine +
+            $"3. Copy all of the .xml files from the AlternateConfigs\\{StaticStrings.LPPConfigFolder} folder into the top level LosSantosRED folder and restart the mod. You can leave the vanilla configs, alternate configs will be loaded first (if they exist). Be sure to get the variations for any optional installs."
+            + Environment.NewLine + Environment.NewLine + Environment.NewLine +
+            ""
+            + Environment.NewLine + Environment.NewLine + Environment.NewLine +
+            "Credits:"
+            + Environment.NewLine +
+            "box"
+            + Environment.NewLine +
+            "Peter Badoingy";
+        File.WriteAllText($"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LPPConfigFolder}\\readme.txt", Description);
+    }
+
     private void SetupLibertyCity()
     {
         Directory.CreateDirectory("Plugins\\LosSantosRED\\AlternateConfigs\\LibertyCity");

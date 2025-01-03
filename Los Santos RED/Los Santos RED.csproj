@@ -185,6 +185,7 @@
     <Compile Include="lsr\Data\Vehicles\eServiceVehicleType.cs" />
     <Compile Include="lsr\Data\Vehicles\OldDispatchableVehicles.cs" />
     <Compile Include="lsr\Data\Vehicles\Variations\DispatchableVehicles_FEJ_Stanier.cs" />
+    <Compile Include="lsr\Data\Vehicles\Variations\DispatchableVehicles_LPP.cs" />
     <Compile Include="lsr\Dispatcher\Items\eSpawnAdjustment.cs" />
     <Compile Include="lsr\Dispatcher\Items\SpawnAdjustmentAmount.cs" />
     <Compile Include="lsr\Dispatcher\LE\MarshalDispatcher.cs" />
@@ -653,6 +654,7 @@
     <Compile Include="lsr\Tasker\Taxi\TaxiGeneralIdle.cs" />
     <Compile Include="lsr\Tasker\Taxi\TaxiService.cs" />
     <Compile Include="lsr\UI\LowerRightDisplay.cs" />
+    <Compile Include="lsr\UI\Menu\Customize Ped\BlacklistedPedComponent.cs" />
     <Compile Include="lsr\UI\Menu\Customize Ped\CameraCycler.cs" />
     <Compile Include="lsr\UI\Menu\Customize Ped\CameraCyclerPosition.cs" />
     <Compile Include="lsr\UI\Menu\Customize Ped\CustomizeAffiliationMenu.cs" />
