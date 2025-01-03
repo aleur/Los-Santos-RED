@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 public class Cellphones : ICellphones
 {
     private readonly string ConfigFileName = "Plugins\\LosSantosRED\\Cellphones.xml";
-    private List<CellphoneData> CellphoneList;
+    public List<CellphoneData> CellphoneList { get; set; }
     public void ReadConfig()
     {
         DirectoryInfo LSRDirectory = new DirectoryInfo("Plugins\\LosSantosRED");

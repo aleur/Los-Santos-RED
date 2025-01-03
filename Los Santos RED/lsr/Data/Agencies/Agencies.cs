@@ -11,7 +11,7 @@ using System.Linq;
 public class Agencies : IAgencies
 {
     private readonly string ConfigFileName = "Plugins\\LosSantosRED\\Agencies.xml";
-    private List<Agency> AgenciesList;
+    public List<Agency> AgenciesList { get; set; }
     private Agency DefaultAgency;
     private Agency LSPD;
     private Agency LSPDVW;

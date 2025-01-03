@@ -1,4 +1,5 @@
-﻿using Rage;
+﻿using LosSantosRED.lsr.Interface;
+using Rage;
 using RAGENativeUI;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ public class ModDataFileManager
     public Agencies Agencies;
     public Crimes Crimes;
     public GameSaves GameSaves;
+    //public WorldSaves WorldSaves;
     public Gangs Gangs;
     public GangTerritories GangTerritories;
     public Interiors Interiors;
@@ -130,15 +132,17 @@ public class ModDataFileManager
         Gangs.ReadConfig();
         Gangs.Setup(Heads, DispatchableVehicles, DispatchablePeople, IssueableWeapons, Contacts);
         GameFiber.Yield();
-        PlacesOfInterest = new PlacesOfInterest(ShopMenus, Gangs);
+        PlacesOfInterest = new PlacesOfInterest();
         PlacesOfInterest.ReadConfig();
         PlacesOfInterest.Setup();
         GameFiber.Yield();
-        Jurisdictions = new Jurisdictions(Agencies);
+        Jurisdictions = new Jurisdictions();
         Jurisdictions.ReadConfig();
+        Jurisdictions.Setup(Agencies);
         GameFiber.Yield();
-        GangTerritories = new GangTerritories(Gangs);
+        GangTerritories = new GangTerritories();
         GangTerritories.ReadConfig();
+        GangTerritories.Setup(Gangs);
         Gangs.CheckTerritory(GangTerritories);
         GameFiber.Yield();
         RadioStations = new RadioStations();
@@ -219,6 +223,13 @@ public class ModDataFileManager
 
         SpawnBlocks = new SpawnBlocks();
         SpawnBlocks.ReadConfig();
+
+    }
+    private void SetupWorlds()
+    {
+        Directory.CreateDirectory("Plugins\\LosSantosRED\\Worlds");
+        string Description = "Will remove all vanilla gang popgroups and spawning from the world.";
+        File.WriteAllText("Plugins\\LosSantosRED\\AlternateConfigs\\RemoveVanillaGangs\\readme.txt", Description);
     }
     private void SetupAlternateConfigs()
     {

@@ -10,6 +10,7 @@ namespace LosSantosRED.lsr.Interface
 {
     public interface ILocationTypes
     {
+        LocationTypeManager LocationTypeNames { get; set; }
         GameCounty GetCounty(string InternalGameName);
         GameState GetState(string stateID);
     }

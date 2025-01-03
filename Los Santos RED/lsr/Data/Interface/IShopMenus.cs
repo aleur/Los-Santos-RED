@@ -9,6 +9,7 @@ namespace LosSantosRED.lsr.Interface
 {
     public interface IShopMenus
     {
+        ShopMenuTypes PossibleShopMenus { get; set; }
         ShopMenuGroupContainer GetSpecificGroupContainer(string containerID);
         ShopMenu GetSpecificMenu(string menuID);
         ShopMenu GetVendingMenu(string modelName);
@@ -20,5 +21,6 @@ namespace LosSantosRED.lsr.Interface
         ShopMenuGroup GetSpecificMenuGroup(string shopMenuGroupID);
         List<MedicalTreatment> GetMedicalTreatments(string treatmentOptionsID);
         PedVariationShopMenu GetPedVariationMenu(string pedVariationShopMenuID);
+        void Setup(IModItems modItems);
     }
 }

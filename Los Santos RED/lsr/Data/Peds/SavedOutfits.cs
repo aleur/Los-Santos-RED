@@ -12,7 +12,7 @@ public class SavedOutfits : ISavedOutfits
     public SavedOutfits()
     {
     }
-    public List<SavedOutfit> SavedOutfitList { get; private set; } = new List<SavedOutfit>();
+    public List<SavedOutfit> SavedOutfitList { get; set; } = new List<SavedOutfit>();
     public void ReadConfig()
     {
         DirectoryInfo LSRDirectory = new DirectoryInfo("Plugins\\LosSantosRED");

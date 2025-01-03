@@ -21,7 +21,7 @@ public class Interiors : IInteriors
         PossibleInteriors = new PossibleInteriors();
     }
 
-    public PossibleInteriors PossibleInteriors { get; private set; }
+    public PossibleInteriors PossibleInteriors { get; set; }
     public void ReadConfig()
     {
         DirectoryInfo LSRDirectory = new DirectoryInfo("Plugins\\LosSantosRED");

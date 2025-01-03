@@ -7,6 +7,6 @@ using System.Threading.Tasks;
 
     public interface ISpawnBlocks
     {
-    PossibleSpawnBlocks PossibleSpawnBlocks { get; }
+    PossibleSpawnBlocks PossibleSpawnBlocks { get; set;  }
 }
 

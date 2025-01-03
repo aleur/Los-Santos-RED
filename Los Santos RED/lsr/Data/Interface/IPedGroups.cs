@@ -8,6 +8,7 @@ namespace LosSantosRED.lsr.Interface
 {
     public interface IPedGroups
     {
+        List<PedGroup> PedGroupList { get; set; }
         PedGroup GetPedGroup(string name);
     }
 }

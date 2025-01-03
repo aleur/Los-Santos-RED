@@ -50,7 +50,7 @@ public abstract class ConsumableItem : ModItem
     public bool ChangesSleep => SleepChangeAmount != 0.0f;
     public string SleepChangeDescription => ChangesSleep ? $"{(SleepChangeAmount > 0.0f ? "~g~+" : "~r~") + SleepChangeAmount.ToString() + "~s~ Sleep"}" : "";
 
-    public override void Setup(PhysicalItems physicalItems, IWeapons weapons, IIntoxicants intoxicants)
+    public override void Setup(IPropItems physicalItems, IWeapons weapons, IIntoxicants intoxicants)
     {
         if(!string.IsNullOrEmpty(IntoxicantName))
         {

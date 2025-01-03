@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 public class Streets : IStreets
 {
     private readonly string ConfigFileName = "Plugins\\LosSantosRED\\Streets.xml";
-    public List<Street> StreetsList { get; private set; }
+    public List<Street> StreetsList { get; set; }
     public void ReadConfig()
     {
         DirectoryInfo LSRDirectory = new DirectoryInfo("Plugins\\LosSantosRED");

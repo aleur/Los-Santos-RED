@@ -9,7 +9,7 @@ namespace LosSantosRED.lsr.Interface
 {
     public interface ISavedOutfits
     {
-        List<SavedOutfit> SavedOutfitList { get; }
+        List<SavedOutfit> SavedOutfitList { get; set; }
         void AddOutfit(SavedOutfit outfit);
         void RemoveOutfit(SavedOutfit so);
     }

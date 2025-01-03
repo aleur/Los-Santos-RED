@@ -16,7 +16,7 @@ using System.Threading.Tasks;
 public class PlateTypes : IPlateTypes
 {
     private readonly string ConfigFileName = "Plugins\\LosSantosRED\\PlateTypes.xml";
-    public PlateTypeManager PlateTypeManager { get; private set; }
+    public PlateTypeManager PlateTypeManager { get; set; }
 
     public void ReadConfig()
     {

@@ -14,7 +14,7 @@ using static System.Windows.Forms.AxHost;
 public class LocationTypes : ILocationTypes
 {
     private readonly string ConfigFileName = "Plugins\\LosSantosRED\\LocationTypes.xml";
-    public LocationTypeManager LocationTypeNames { get; private set; }
+    public LocationTypeManager LocationTypeNames { get; set; }
     public void ReadConfig()
     {
         DirectoryInfo LSRDirectory = new DirectoryInfo("Plugins\\LosSantosRED");

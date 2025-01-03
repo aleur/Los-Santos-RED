@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 public class DispatchablePeople : IDispatchablePeople
 {
     private readonly string ConfigFileName = "Plugins\\LosSantosRED\\DispatchablePeople.xml";
-    private List<DispatchablePersonGroup> PeopleGroupLookup = new List<DispatchablePersonGroup>();
+    public List<DispatchablePersonGroup> PeopleGroupLookup { get; set; } = new List<DispatchablePersonGroup>();
     private List<DispatchablePerson> StandardCops;
     private List<DispatchablePerson> SheriffPeds;
     private List<DispatchablePerson> NOOSEPeds;

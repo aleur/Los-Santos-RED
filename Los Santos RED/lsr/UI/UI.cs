@@ -59,6 +59,8 @@ public class UI : IMenuProvideable
 
     public AboutMenu AboutMenu { get; private set; }
     public PlayerInfoMenu PlayerInfoMenu { get; private set; }
+    public WorldPauseMenu WorldPauseMenu { get; private set; }
+    public TemplatePauseMenu TemplatePauseMenu { get; private set; }
     public SavePauseMenu SavePauseMenu { get; private set; }
     public MessagesMenu MessagesMenu { get; private set; }
 
@@ -73,7 +75,7 @@ public class UI : IMenuProvideable
     public UI(IDisplayable displayablePlayer, ISettingsProvideable settings, IJurisdictions jurisdictions, IPedSwap pedSwap, IPlacesOfInterest placesOfInterest, IRespawning respawning, IActionable actionablePlayer, ISaveable saveablePlayer, IWeapons weapons, 
         RadioStations radioStations, IGameSaves gameSaves, IEntityProvideable world, IRespawnable player, IPoliceRespondable policeRespondable, ITaskerable tasker, IInventoryable playerinventory, IModItems modItems, ITimeControllable time, IGangRelateable gangRelateable, 
         IGangs gangs, IGangTerritories gangTerritories, IZones zones, IStreets streets, IInteriors interiors, Dispatcher dispatcher, IAgencies agencies, ILocationInteractable locationInteractableplayer, IDances dances, IGestures gestures, IShopMenus shopMenus, 
-        IActivityPerformable activityPerformable, ICrimes crimes, ILocationTypes locationTypes, IIntoxicants intoxicants, IPlateTypes plateTypes, INameProvideable names, ModDataFileManager modDataFileManager, IInteractionable interactionable)
+        IActivityPerformable activityPerformable, ICrimes crimes, ILocationTypes locationTypes, IIntoxicants intoxicants, IPlateTypes plateTypes, INameProvideable names, ModDataFileManager modDataFileManager, IInteractionable interactionable, WorldTemplates worldTemplates)
     {
         DisplayablePlayer = displayablePlayer;
         ActionablePlayer = actionablePlayer;
@@ -93,6 +95,8 @@ public class UI : IMenuProvideable
         MenuList = new List<ModUIMenu>() { DeathMenu, BustedMenu, MainMenu, DebugMenu };
         PlayerInfoMenu = new PlayerInfoMenu(gangRelateable, Time, placesOfInterest, gangs, gangTerritories, zones, streets, interiors, World, shopMenus,modItems, weapons, Settings, LocationTypes);
         SavePauseMenu = new SavePauseMenu(saveablePlayer, Time, placesOfInterest, gangs, gangTerritories, zones, streets, interiors, World, shopMenus, modItems, weapons, Settings, gameSaves, pedSwap,playerinventory, saveablePlayer, agencies, modDataFileManager.Contacts, interactionable);
+        //WorldPauseMenu = new WorldPauseMenu(saveablePlayer, Time, placesOfInterest, gangs, gangTerritories, zones, streets, interiors, World, shopMenus, modItems, weapons, Settings, pedSwap, playerinventory, saveablePlayer, agencies, modDataFileManager.Contacts, interactionable);
+        TemplatePauseMenu = new TemplatePauseMenu(saveablePlayer, Time, Settings, worldTemplates, World);
         MessagesMenu = new MessagesMenu(gangRelateable, Time, placesOfInterest, gangs, gangTerritories, zones, streets, interiors, World, Settings, modDataFileManager.Contacts);
         AboutMenu = new AboutMenu(gangRelateable, Time, Settings);
         ActionPopUpMenu = new PopUpMenu(actionablePlayer, Settings, this, gestures, dances);
@@ -109,6 +113,8 @@ public class UI : IMenuProvideable
         MainMenu.Setup();
         PlayerInfoMenu.Setup();
         SavePauseMenu.Setup();
+        //WorldPauseMenu.Setup();
+        TemplatePauseMenu.Setup();
         MessagesMenu.Setup();
         AboutMenu.Setup();
         ActionPopUpMenu.Setup();
@@ -154,6 +160,7 @@ public class UI : IMenuProvideable
             TopRightMenu.Display();
         }
         MenuUpdate();
+
         //MarkerManager.Update();
     }
     public void Tick2()
@@ -258,6 +265,8 @@ public class UI : IMenuProvideable
         MenuPool.ProcessMenus();
         PlayerInfoMenu.Update();
         SavePauseMenu.Update();
+        //WorldPauseMenu.Update();
+        TemplatePauseMenu.Update();
         MessagesMenu.Update();
         AboutMenu.Update();
     }

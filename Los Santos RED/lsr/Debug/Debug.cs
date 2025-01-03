@@ -3061,59 +3061,59 @@ GameFiber.Sleep(1000);
     }
     private void SpawnAttachedRagdoll()
     {
-    //GameFiber.StartNew(delegate
-    //{
-    //    Ped coolguy = new Ped(Game.LocalPlayer.Character.GetOffsetPositionFront(2f).Around2D(2f));
-    //    Rage.Object leftHandObject = new Rage.Object("ng_proc_cigarette01a", Game.LocalPlayer.Character.GetOffsetPositionFront(2f).Around2D(2f));
-    //    GameFiber.Yield();
-    //    if (coolguy.Exists())
-    //    {
-    //        coolguy.BlockPermanentEvents = true;
-    //        coolguy.KeepTasks = true;
-    //        coolguy.Kill();
-    //        GameFiber.Sleep(500);
-    //        if (coolguy.Exists() && leftHandObject.Exists())
-    //        {
-    //            AnimationDictionary.RequestAnimationDictionay("combat@drag_ped@");
-    //            NativeFunction.Natives.TASK_PLAY_ANIM(Player.Character, "combat@drag_ped@", "injured_drag_plyr", 2.0f, -2.0f, -1, (int)AnimationFlags.Loop, 0, false, false, false);
+        //GameFiber.StartNew(delegate
+        //{
+        //    Ped coolguy = new Ped(Game.LocalPlayer.Character.GetOffsetPositionFront(2f).Around2D(2f));
+        //    Rage.Object leftHandObject = new Rage.Object("ng_proc_cigarette01a", Game.LocalPlayer.Character.GetOffsetPositionFront(2f).Around2D(2f));
+        //    GameFiber.Yield();
+        //    if (coolguy.Exists())
+        //    {
+        //        coolguy.BlockPermanentEvents = true;
+        //        coolguy.KeepTasks = true;
+        //        coolguy.Kill();
+        //        GameFiber.Sleep(500);
+        //        if (coolguy.Exists() && leftHandObject.Exists())
+        //        {
+        //            AnimationDictionary.RequestAnimationDictionay("combat@drag_ped@");
+        //            NativeFunction.Natives.TASK_PLAY_ANIM(Player.Character, "combat@drag_ped@", "injured_drag_plyr", 2.0f, -2.0f, -1, (int)AnimationFlags.Loop, 0, false, false, false);
 
-    //            NativeFunction.Natives.SET_ENTITY_NO_COLLISION_ENTITY(coolguy, Player.Character, false);
-    //            leftHandObject.AttachTo(Player.Character, NativeFunction.CallByName<int>("GET_ENTITY_BONE_INDEX_BY_NAME", Player.Character, "BONETAG_PELVIS"), Vector3.Zero, Rotator.Zero);
-    //            NativeFunction.Natives.ATTACH_ENTITY_TO_ENTITY_PHYSICALLY(coolguy, leftHandObject, 
-    //                NativeFunction.CallByName<int>("GET_ENTITY_BONE_INDEX_BY_NAME", coolguy, "BONETAG_SPINE3"), //bone 1
-    //                NativeFunction.CallByName<int>("GET_ENTITY_BONE_INDEX_BY_NAME", coolguy, "BONETAG_SPINE3"),// bone 2
-    //                Settings.SettingsManager.DragSettings.Attach1X, Settings.SettingsManager.DragSettings.Attach1Y, Settings.SettingsManager.DragSettings.Attach1Z,
-    //                Settings.SettingsManager.DragSettings.Attach2X, Settings.SettingsManager.DragSettings.Attach2Y, Settings.SettingsManager.DragSettings.Attach2Z,
-    //                Settings.SettingsManager.DragSettings.Attach3X, Settings.SettingsManager.DragSettings.Attach3Y, Settings.SettingsManager.DragSettings.Attach3Z,
-    //                100000.0f,//break force
-    //                Settings.SettingsManager.DragSettings.FixedRotation, //fixed rotation
-    //                true, //DoInitialWarp
-    //                false, //collision
-    //                false, //teleport
-    //                1 //RotationORder
-    //                );
+        //            NativeFunction.Natives.SET_ENTITY_NO_COLLISION_ENTITY(coolguy, Player.Character, false);
+        //            leftHandObject.AttachTo(Player.Character, NativeFunction.CallByName<int>("GET_ENTITY_BONE_INDEX_BY_NAME", Player.Character, "BONETAG_PELVIS"), Vector3.Zero, Rotator.Zero);
+        //            NativeFunction.Natives.ATTACH_ENTITY_TO_ENTITY_PHYSICALLY(coolguy, leftHandObject, 
+        //                NativeFunction.CallByName<int>("GET_ENTITY_BONE_INDEX_BY_NAME", coolguy, "BONETAG_SPINE3"), //bone 1
+        //                NativeFunction.CallByName<int>("GET_ENTITY_BONE_INDEX_BY_NAME", coolguy, "BONETAG_SPINE3"),// bone 2
+        //                Settings.SettingsManager.DragSettings.Attach1X, Settings.SettingsManager.DragSettings.Attach1Y, Settings.SettingsManager.DragSettings.Attach1Z,
+        //                Settings.SettingsManager.DragSettings.Attach2X, Settings.SettingsManager.DragSettings.Attach2Y, Settings.SettingsManager.DragSettings.Attach2Z,
+        //                Settings.SettingsManager.DragSettings.Attach3X, Settings.SettingsManager.DragSettings.Attach3Y, Settings.SettingsManager.DragSettings.Attach3Z,
+        //                100000.0f,//break force
+        //                Settings.SettingsManager.DragSettings.FixedRotation, //fixed rotation
+        //                true, //DoInitialWarp
+        //                false, //collision
+        //                false, //teleport
+        //                1 //RotationORder
+        //                );
 
-    //            //"BONETAG_SPINE3"
-    //            //"BONETAG_PELVIS"
-    //            //0.1,0.3,-0.1
-    //            //0,0,0
-    //            //180.90,0
-    //        }
-    //    }
-    //    while (coolguy.Exists() && leftHandObject.Exists() && !Game.IsKeyDownRightNow(Keys.Q) && ModController.IsRunning)
-    //    {
-    //        Game.DisplayHelp("Press Q to Stop");
-    //        GameFiber.Yield();
-    //    }
-    //    if (coolguy.Exists())
-    //    {
-    //        coolguy.Delete();
-    //    }
-    //    if (leftHandObject.Exists())
-    //    {
-    //        leftHandObject.Delete();
-    //    }
-    //}, "Run Debug Logic");
+        //            //"BONETAG_SPINE3"
+        //            //"BONETAG_PELVIS"
+        //            //0.1,0.3,-0.1
+        //            //0,0,0
+        //            //180.90,0
+        //        }
+        //    }
+        //    while (coolguy.Exists() && leftHandObject.Exists() && !Game.IsKeyDownRightNow(Keys.Q) && ModController.IsRunning)
+        //    {
+        //        Game.DisplayHelp("Press Q to Stop");
+        //        GameFiber.Yield();
+        //    }
+        //    if (coolguy.Exists())
+        //    {
+        //        coolguy.Delete();
+        //    }
+        //    if (leftHandObject.Exists())
+        //    {
+        //        leftHandObject.Delete();
+        //    }
+        //}, "Run Debug Logic");
     }
 
 

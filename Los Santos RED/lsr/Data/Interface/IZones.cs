@@ -10,8 +10,8 @@ namespace LosSantosRED.lsr.Interface
 {
     public interface IZones
     {
-        List<Zone> ZoneList { get; }
-
+        List<Zone> ZoneList { get; set; }
+        void Setup(ILocationTypes locationTypes);
         Zone GetZone(Vector3 ZonePosition);
         Zone GetZone(string InternalGameName);
         List<Zone> GetZoneByItem(ModItem selectedItem, IShopMenus shopMenus, bool v);

@@ -10,7 +10,7 @@ using System.Linq;
 public class PhysicalItems : IPropItems
 {
     private readonly string ConfigFileName = "Plugins\\LosSantosRED\\PhysicalItems.xml";
-    private List<PhysicalItem> PhysicalItemsList;
+    public List<PhysicalItem> PhysicalItemsList { get; set; }
 
     public PhysicalItems()
     {

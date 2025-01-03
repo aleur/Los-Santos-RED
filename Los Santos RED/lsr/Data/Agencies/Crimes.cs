@@ -68,7 +68,7 @@ public class Crimes : ICrimes
     public Crimes()
     {
     }
-    public List<Crime> CrimeList { get; private set; } = new List<Crime>();
+    public List<Crime> CrimeList { get; set; } = new List<Crime>();
 
     [XmlIgnore]
     public bool IsBackendChanged { get; set; } = false;

@@ -17,7 +17,7 @@ using System.Xml.Serialization;
 public class Weapons : IWeapons
 {
     private readonly string ConfigFileName = "Plugins\\LosSantosRED\\Weapons.xml";
-    private List<WeaponInformation> WeaponsList;
+    public List<WeaponInformation> WeaponsList { get; set; }
     public void ReadConfig()
     {
         DirectoryInfo LSRDirectory = new DirectoryInfo("Plugins\\LosSantosRED");

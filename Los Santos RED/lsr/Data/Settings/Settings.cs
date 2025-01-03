@@ -7,7 +7,7 @@ using System.Xml.Serialization;
 public class Settings : ISettingsProvideable
 {
     private readonly string ConfigFileName = "Plugins\\LosSantosRED\\Settings.xml";
-    public SettingsManager SettingsManager { get; private set; }
+    public SettingsManager SettingsManager { get; set; }
 
 
 

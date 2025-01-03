@@ -11,7 +11,7 @@ using System.Linq;
 public class WantedLevels : IWantedLevels
 {
     private readonly string ConfigFileName = "Plugins\\LosSantosRED\\WantedLevels.xml";
-    private List<WantedLevel> WantedLevelList;
+    public List<WantedLevel> WantedLevelList { get; set; }
     private WantedLevel wantedLevelOne;
     private WantedLevel wantedLevelTwo;
     private WantedLevel wantedLevelThree;

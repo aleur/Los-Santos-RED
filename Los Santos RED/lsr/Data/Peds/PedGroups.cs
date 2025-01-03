@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 public class PedGroups : IPedGroups
 {
     private readonly string ConfigFileName = "Plugins\\LosSantosRED\\PedGroups.xml";
-    private List<PedGroup> PedGroupList;
+    public List<PedGroup> PedGroupList { get; set; }
     public PedGroups()
     {
 

@@ -19,7 +19,7 @@ public class Contacts : IContacts
     private CorruptCopContact corruptCopContact;
     private GunDealerContact gunDealerContact;
 
-    public PossibleContacts PossibleContacts { get; private set; }
+    public PossibleContacts PossibleContacts { get; set; }
     public Contacts()
     {
         PossibleContacts = new PossibleContacts();

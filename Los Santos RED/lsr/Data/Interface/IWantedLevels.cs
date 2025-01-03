@@ -8,5 +8,7 @@ namespace LosSantosRED.lsr.Interface
 {
     public interface IWantedLevels
     {
+        List<WantedLevel> WantedLevelList { get; set; }
+        void Setup(IHeads heads, IDispatchableVehicles dispatchableVehicles, IDispatchablePeople dispatchablePeople, IIssuableWeapons issuableWeapons);
     }
 }

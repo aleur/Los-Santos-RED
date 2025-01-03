@@ -8,7 +8,7 @@ namespace LosSantosRED.lsr.Interface
 {
     public interface IModItems
     {
-        PossibleItems PossibleItems { get; }
+        PossibleItems PossibleItems { get; set; }
         WeaponItem GetWeapon(string modelName);
         WeaponItem GetWeapon(uint modelHash);
         ModItem Get(string text);
@@ -16,6 +16,7 @@ namespace LosSantosRED.lsr.Interface
         List<ModItem> AllItems();
         List<ModItem> InventoryItems();
         void WriteToFile();
+        void Setup(IPropItems physicalItems, IWeapons weapons, IIntoxicants intoxicants, ICellphones cellphones);
         WeaponItem GetRandomWeapon(bool allowIllegal);
         VehicleItem GetVehicle(string modelName);
         VehicleItem GetVehicle(uint modelHash);

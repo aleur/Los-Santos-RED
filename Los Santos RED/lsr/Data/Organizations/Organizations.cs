@@ -22,7 +22,7 @@ public class Organizations : IOrganizations
     private TaxiFirm RydeMe;
     private TaxiFirm Schlecht;
 
-    public PossibleOrganizations PossibleOrganizations { get; private set; }
+    public PossibleOrganizations PossibleOrganizations { get; set; }
 
     public Organizations()
     {

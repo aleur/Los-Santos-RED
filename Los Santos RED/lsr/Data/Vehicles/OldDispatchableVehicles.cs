@@ -32,7 +32,7 @@ public class OldDispatchableVehicles : IDispatchableVehicles
 
 
     private readonly string ConfigFileName = "Plugins\\LosSantosRED\\DispatchableVehicles.xml";
-    private List<DispatchableVehicleGroup> VehicleGroupLookup = new List<DispatchableVehicleGroup>();
+    public List<DispatchableVehicleGroup> VehicleGroupLookup { get; set; } = new List<DispatchableVehicleGroup>();
     private List<DispatchableVehicle> GenericGangVehicles;
     private List<DispatchableVehicle> AllGangVehicles;
     private List<DispatchableVehicle> LostMCVehicles;
@@ -130,6 +130,16 @@ public class OldDispatchableVehicles : IDispatchableVehicles
     public List<DispatchableVehicle> GetVehicleData(string dispatchableVehicleGroupID)
     {
         return VehicleGroupLookup.FirstOrDefault(x => x.DispatchableVehicleGroupID == dispatchableVehicleGroupID)?.DispatchableVehicles;
+    }
+    public void Setup(IPlateTypes plateTypes)
+    {
+        foreach (DispatchableVehicleGroup dvg in VehicleGroupLookup)
+        {
+            foreach (DispatchableVehicle dv in dvg.DispatchableVehicles)
+            {
+                dv.Setup(plateTypes);
+            }
+        }
     }
     private void SetupDefaults()
     {

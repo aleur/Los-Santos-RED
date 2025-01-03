@@ -13,14 +13,15 @@ public class Jurisdictions : IJurisdictions
     private IAgencies AgencyProvider;
     private readonly string ZoneConfigFileName = "Plugins\\LosSantosRED\\ZoneJurisdictions.xml";
     private readonly string CountyConfigFileName = "Plugins\\LosSantosRED\\CountyJurisdictions.xml";
-    private List<ZoneJurisdiction> ZoneJurisdictionsList = new List<ZoneJurisdiction>();
-    private List<CountyJurisdiction> CountyJurisdictionList = new List<CountyJurisdiction>();
+    public List<ZoneJurisdiction> ZoneJurisdictionsList { get; set; } = new List<ZoneJurisdiction>();
+    public List<CountyJurisdiction> CountyJurisdictionList { get; set; } = new List<CountyJurisdiction>();
 
 
     public List<ZoneJurisdiction> ZoneJurisdictions => ZoneJurisdictionsList;
-    public Jurisdictions(IAgencies agencyProvider)
+    public List<CountyJurisdiction> CountyJurisdictions => CountyJurisdictionList;
+    public Jurisdictions()
     {
-        AgencyProvider = agencyProvider;
+
     }
     public void ReadConfig()
     {
@@ -70,6 +71,10 @@ public class Jurisdictions : IJurisdictions
             DefaultCountyConfig_Simple();
             DefaultCountyConfig();
         }
+    }
+    public void Setup (IAgencies agencyProvider)
+    {
+        AgencyProvider = agencyProvider;
     }
     public Agency GetMainAgency(string ZoneName, ResponseType responseType)
     {

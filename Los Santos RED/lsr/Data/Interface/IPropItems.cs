@@ -8,5 +8,7 @@ namespace LosSantosRED.lsr.Interface
 {
     public interface IPropItems
     {
+        List<PhysicalItem> PhysicalItemsList { get; set; }
+        PhysicalItem Get(string ID);
     }
 }

@@ -50,7 +50,7 @@ public class ModItems : IModItems
     {
         PossibleItems = new PossibleItems();
     }
-    public PossibleItems PossibleItems { get; private set; }
+    public PossibleItems PossibleItems { get; set; }
     public ModItem Get(string name)
     {
         return AllItems().FirstOrDefault(x => x.Name == name);
@@ -382,7 +382,7 @@ public class ModItems : IModItems
         AllItems.AddRange(PossibleItems.RadarDetectorItems);
         return AllItems;
     }
-    public void Setup(PhysicalItems physicalItems, IWeapons weapons, IIntoxicants intoxicants, ICellphones cellphones)
+    public void Setup(IPropItems physicalItems, IWeapons weapons, IIntoxicants intoxicants, ICellphones cellphones)
     {
         foreach(ModItem modItem in AllItems())
         {

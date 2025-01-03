@@ -11,7 +11,7 @@ public class Heads : IHeads
 {
 
     private readonly string ConfigFileName = "Plugins\\LosSantosRED\\Heads.xml";
-    private List<HeadDataGroup> RandomHeadDataLookup;
+    public List<HeadDataGroup> RandomHeadDataLookup { get; set; }
     public void ReadConfig()
     {
         DirectoryInfo LSRDirectory = new DirectoryInfo("Plugins\\LosSantosRED");
@@ -32,7 +32,7 @@ public class Heads : IHeads
             DefaultConfig();
         }
     }
-    private void DefaultConfig()
+    public void DefaultConfig()
     {
         RandomHeadDataLookup = new List<HeadDataGroup>();
 

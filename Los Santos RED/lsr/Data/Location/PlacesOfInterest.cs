@@ -20,8 +20,6 @@ using System.Windows.Media;
 public class PlacesOfInterest : IPlacesOfInterest
 {
     private readonly string ConfigFileName = "Plugins\\LosSantosRED\\Locations.xml";
-    private IShopMenus ShopMenus;
-    private IGangs Gangs;
     private List<DeadDrop> DeadDrops;
     private List<CarCrusher> CarCrushers;
     private List<ScrapYard> ScrapYards;
@@ -70,11 +68,9 @@ public class PlacesOfInterest : IPlacesOfInterest
     private List<BarberShop> BarberShopPlaces;
     private PedCustomizerLocation DefaultPedCustomizerLocation;
 
-    public PossibleLocations PossibleLocations { get; private set; }
-    public PlacesOfInterest(IShopMenus shopMenus, IGangs gangs)
+    public PossibleLocations PossibleLocations { get; set; }
+    public PlacesOfInterest()
     {
-        ShopMenus = shopMenus;
-        Gangs = gangs;
         PossibleLocations = new PossibleLocations();
     }
     public void ReadConfig()

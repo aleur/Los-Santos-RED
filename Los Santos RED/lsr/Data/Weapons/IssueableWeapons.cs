@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 public class IssueableWeapons : IIssuableWeapons
 {
     private readonly string ConfigFileName = "Plugins\\LosSantosRED\\IssuableWeapons.xml";
-    private List<IssuableWeaponsGroup> IssuableWeaponsGroupLookup = new List<IssuableWeaponsGroup>();
+    public List<IssuableWeaponsGroup> IssuableWeaponsGroupLookup { get; set; } = new List<IssuableWeaponsGroup>();
     private List<IssuableWeapon> AllSidearms;
     private List<IssuableWeapon> AllLongGuns;
     private List<IssuableWeapon> BestSidearms;

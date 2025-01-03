@@ -6,6 +6,7 @@ namespace LosSantosRED.lsr.Interface
     public interface IAgencies
     {
         Agency GetAgency(string agencyInitials);
+        List<Agency> AgenciesList { get; set; }
         List<Agency> GetAgencies(Ped cop);
         List<Agency> GetAgencies(Vehicle CopCar);
         List<Agency> GetSpawnableAgencies(int WantedLevel, ResponseType responseType);
@@ -13,5 +14,6 @@ namespace LosSantosRED.lsr.Interface
         Agency GetRandomAgency(ResponseType lawEnforcement);
         List<Agency> GetAgencies();
         List<Agency> GetAgenciesByResponse(ResponseType responseType);
+        void Setup(IHeads heads, IDispatchableVehicles dispatchableVehicles, IDispatchablePeople dispatchablePeople, IIssuableWeapons issuableWeapons);
     }
 }

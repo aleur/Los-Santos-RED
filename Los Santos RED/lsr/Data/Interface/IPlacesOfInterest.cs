@@ -9,7 +9,7 @@ namespace LosSantosRED.lsr.Interface
 {
     public interface IPlacesOfInterest
     {
-        PossibleLocations PossibleLocations { get; }
+        PossibleLocations PossibleLocations { get; set;  }
         List<GameLocation> InteractableLocations();
         List<GameLocation> AllLocations();
         List<ILocationRespawnable> BustedRespawnLocations();
@@ -20,5 +20,6 @@ namespace LosSantosRED.lsr.Interface
         GangDen GetMainDen(string iD, bool isMPMapLoaded);
         List<ILocationAreaRestrictable> RestrictedAreaLocations();
         List<ILEDispatchableLocation> LEDispatchLocations();
+        void Setup();
     }
 }

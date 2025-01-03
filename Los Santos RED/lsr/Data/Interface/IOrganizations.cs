@@ -8,12 +8,13 @@ namespace LosSantosRED.lsr.Interface
 {
     public interface IOrganizations
     {
-        PossibleOrganizations PossibleOrganizations { get; }
+        PossibleOrganizations PossibleOrganizations { get; set; }
 
         TaxiFirm GetDefaultTaxiFirm();
         Organization GetOrganizationByContact(string contactName);
         TaxiFirm GetRandomTaxiFirm(bool includeRideShare);
         TaxiFirm GetTaxiFirmFromVehicle(string v, int liveryID);
         List<Organization> GetOrganizations();
+        void Setup(IHeads heads, IDispatchableVehicles dispatchableVehicles, IDispatchablePeople dispatchablePeople, IIssuableWeapons issuableWeapons, IContacts contacts);
     }
 }

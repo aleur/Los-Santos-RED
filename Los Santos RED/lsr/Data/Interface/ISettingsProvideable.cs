@@ -8,7 +8,7 @@ namespace LosSantosRED.lsr.Interface
 {
     public interface ISettingsProvideable
     {
-        SettingsManager SettingsManager { get; }
+        SettingsManager SettingsManager { get; set; }
         //SettingsManager EasySettingsManager { get; }
         SettingsManager DefaultSettingsManager { get; }
         bool IsBackendChanged { get; set; }

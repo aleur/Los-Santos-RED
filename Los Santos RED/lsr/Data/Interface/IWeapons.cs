@@ -10,6 +10,7 @@ namespace LosSantosRED.lsr.Interface
 {
     public interface IWeapons
     {
+        List<WeaponInformation> WeaponsList { get; set; }
         WeaponInformation GetWeapon(string modelName);
         WeaponInformation GetWeapon(ulong WeaponHash);
         WeaponVariation GetWeaponVariation(Ped character, uint hash);

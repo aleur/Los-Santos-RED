@@ -21,7 +21,7 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement.StartPanel;
 public class ShopMenus : IShopMenus
 {
     private readonly string ConfigFileName = "Plugins\\LosSantosRED\\ShopMenus.xml";
-    public ShopMenuTypes PossibleShopMenus { get; private set; }
+    public ShopMenuTypes PossibleShopMenus { get; set; }
     public ShopMenus()
     {
         PossibleShopMenus = new ShopMenuTypes();

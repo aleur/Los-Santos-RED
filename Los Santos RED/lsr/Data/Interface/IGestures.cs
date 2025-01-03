@@ -5,7 +5,7 @@ namespace LosSantosRED.lsr.Interface
 {
     public interface IGestures
     {
-        List<GestureData> GestureLookups { get; }
+        List<GestureData> GestureLookups { get; set; }
 
         GestureData GetRandomGesture();
     }

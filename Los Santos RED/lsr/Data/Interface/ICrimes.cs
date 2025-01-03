@@ -5,7 +5,7 @@ namespace LosSantosRED.lsr.Interface
 {
     public interface ICrimes
     {
-        List<Crime> CrimeList { get; }
+        List<Crime> CrimeList { get; set; }
         bool IsBackendChanged { get; set; }
 
         Crime GetCrime(string v);

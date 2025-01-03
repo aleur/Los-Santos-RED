@@ -8,6 +8,7 @@ namespace LosSantosRED.lsr.Interface
 {
     public interface ICellphones
     {
+        List<CellphoneData> CellphoneList { get; set; }
         CellphoneData GetDefault();
         CellphoneData GetPhone(string name);
         CellphoneData GetRandomRegular();

@@ -30,7 +30,8 @@ namespace LosSantosRED.lsr
         private NAudioPlayer NAudioPlayer2;
         private WeatherReporting Weather;
         private Mod.World World;
-        
+        private WorldTemplates WorldTemplates;
+
         public ModDataFileManager ModDataFileManager { get; private set; }
         private WeatherManager WeatherManager;
 
@@ -39,6 +40,7 @@ namespace LosSantosRED.lsr
             ModDataFileManager = new ModDataFileManager();//test
         }
         public bool IsRunning { get; private set; }
+        public bool IsLoadingWorld { get; set; } = false;
         public bool RunUI { get; set; } = true;
         public bool RunInput { get; set; } = true;
         public bool RunOther { get; set; } = true;
@@ -52,14 +54,12 @@ namespace LosSantosRED.lsr
             {
                 GameFiber.Yield();
             }
+
             ModDataFileManager = new ModDataFileManager();
             ModDataFileManager.Setup();
             GameFiber.Yield();
-
-
-
-
-
+            WorldTemplates = new WorldTemplates(ModDataFileManager.Agencies, ModDataFileManager.Cellphones, ModDataFileManager.Contacts, ModDataFileManager.Jurisdictions, ModDataFileManager.Crimes, ModDataFileManager.DanceList, ModDataFileManager.DispatchablePeople, ModDataFileManager.DispatchableVehicles, ModDataFileManager.GangTerritories, ModDataFileManager.Gangs, ModDataFileManager.GestureList, ModDataFileManager.Heads, ModDataFileManager.Interiors, ModDataFileManager.IssueableWeapons, ModDataFileManager.Intoxicants, ModDataFileManager.LocationTypes, ModDataFileManager.PlacesOfInterest, ModDataFileManager.ModItems, ModDataFileManager.Names, ModDataFileManager.Organizations, ModDataFileManager.RelationshipGroups, ModDataFileManager.PhysicalItems, ModDataFileManager.PlateTypes, ModDataFileManager.GameSaves, ModDataFileManager.SavedOutfits, ModDataFileManager.Settings, ModDataFileManager.ShopMenus, ModDataFileManager.SpawnBlocks, ModDataFileManager.SpeechList, ModDataFileManager.Streets, ModDataFileManager.WantedLevels, ModDataFileManager.Weapons, ModDataFileManager.Jurisdictions, ModDataFileManager.Zones);
+            WorldTemplates.Setup();
 
             NAudioPlayer = new NAudioPlayer(ModDataFileManager.Settings);
             NAudioPlayer.Setup();
@@ -104,7 +104,7 @@ namespace LosSantosRED.lsr
             GameFiber.Yield();
             UI = new UI(Player, ModDataFileManager.Settings, ModDataFileManager.Jurisdictions, PedSwap, ModDataFileManager.PlacesOfInterest, Player, Player, Player, ModDataFileManager.Weapons, ModDataFileManager.RadioStations, ModDataFileManager.GameSaves, World, Player, Player, Tasker, Player, 
                 ModDataFileManager.ModItems, Time, Player, ModDataFileManager.Gangs, ModDataFileManager.GangTerritories, ModDataFileManager.Zones, ModDataFileManager.Streets, ModDataFileManager.Interiors, Dispatcher, ModDataFileManager.Agencies, Player, ModDataFileManager.DanceList, ModDataFileManager.GestureList, 
-                ModDataFileManager.ShopMenus, Player, ModDataFileManager.Crimes, ModDataFileManager.LocationTypes, ModDataFileManager.Intoxicants, ModDataFileManager.PlateTypes, ModDataFileManager.Names, ModDataFileManager, Player);
+                ModDataFileManager.ShopMenus, Player, ModDataFileManager.Crimes, ModDataFileManager.LocationTypes, ModDataFileManager.Intoxicants, ModDataFileManager.PlateTypes, ModDataFileManager.Names, ModDataFileManager, Player, WorldTemplates);
             UI.Setup();
             GameFiber.Yield();
             Input = new Input(Player, ModDataFileManager.Settings, UI, PedSwap);
@@ -161,8 +161,11 @@ namespace LosSantosRED.lsr
             Weather.Dispose();
             Debug.Dispose();
             WeatherManager.Dispose();
-            Game.DisplayNotification("~s~Los Santos ~r~RED ~s~Deactivated");
-            EntryPoint.WriteToConsole($"Has Been Deactivated",0);
+            if (!IsLoadingWorld)
+            {
+                Game.DisplayNotification("~s~Los Santos ~r~RED ~s~Deactivated");
+                EntryPoint.WriteToConsole($"Has Been Deactivated", 0);
+            }
         }
         public void CrashUnload()
         {

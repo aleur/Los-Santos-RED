@@ -28,7 +28,7 @@ public class DispatchableVehicles : IDispatchableVehicles
     private string ServiceDilettante = "dilettante2";
 
     private readonly string ConfigFileName = "Plugins\\LosSantosRED\\DispatchableVehicles.xml";
-    private List<DispatchableVehicleGroup> VehicleGroupLookup = new List<DispatchableVehicleGroup>();
+    public List<DispatchableVehicleGroup> VehicleGroupLookup { get; set; } = new List<DispatchableVehicleGroup>();
 
 
     private DispatchableVehicles_Gangs DispatchableVehicles_Gangs;

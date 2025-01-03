@@ -2,6 +2,7 @@
 using LosSantosRED.lsr.Helper;
 using LosSantosRED.lsr.Interface;
 using Rage;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -13,7 +14,7 @@ public class GameSaves : IGameSaves
     public GameSaves()
     {
     }
-    public List<GameSave> GameSaveList { get; private set; } = new List<GameSave>();
+    public List<GameSave> GameSaveList { get; set; } = new List<GameSave>();
     public int NextSaveGameNumber => GameSaveList.Count + 1;
     public void ReadConfig()
     {

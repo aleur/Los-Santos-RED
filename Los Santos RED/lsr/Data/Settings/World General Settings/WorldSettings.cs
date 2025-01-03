@@ -93,6 +93,9 @@ public class WorldSettings : ISettingsDefaultable
     public bool ExtendedVehicleCleanup { get;  set; }
     public bool SuppressFEJVehiclesFromGenerators { get; set; }
     public bool SetMissionFlagOn { get; set; }
+
+    [Description("~r~WIP~s~ Dynamic events pertaining the politics and interactions between gangs. Affects xml files.")]
+    public bool EnableDynamicGangEvents { get; set; }
     //public int MaxPedsBeforeDispatchPause { get; set; }
     //public int MaxVehiclesBeforeDispatchPause { get; set; }
 
@@ -174,6 +177,7 @@ public class WorldSettings : ISettingsDefaultable
 
         SuppressFEJVehiclesFromGenerators = true;
         SetMissionFlagOn = true;
+        EnableDynamicGangEvents = true;
 
         //MaxPedsBeforeDispatchPause = 120;
         //MaxVehiclesBeforeDispatchPause = 180;

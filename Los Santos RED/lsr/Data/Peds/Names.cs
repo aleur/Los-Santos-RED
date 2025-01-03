@@ -14,7 +14,7 @@ public class Names : INameProvideable
     private readonly string ConfigFileName = "Plugins\\LosSantosRED\\Names.xml";
 
 
-    public PossibleNames PossibleNames { get; private set; }
+    public PossibleNames PossibleNames { get; set; }
 
   //  private List<PedName> NameList;
     public void ReadConfig()

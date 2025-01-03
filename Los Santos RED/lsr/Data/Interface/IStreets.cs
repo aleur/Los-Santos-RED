@@ -9,6 +9,7 @@ namespace LosSantosRED.lsr.Interface
 {
     public interface IStreets
     {
+        List<Street> StreetsList { get; set; }
         Street GetStreet(string currentCrossStreetName);
         Street GetStreet(int nodeID);
         Street GetStreet(Vector3 position);

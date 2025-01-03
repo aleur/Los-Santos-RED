@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 public class Intoxicants : IIntoxicants
 {
     private readonly string ConfigFileName = "Plugins\\LosSantosRED\\Itoxicants.xml";
-    private List<Intoxicant> IntoxicantList;
+    public List<Intoxicant> IntoxicantList { get; set; }
     public List<Intoxicant> Items => IntoxicantList;
     public void ReadConfig()
     {

@@ -12,10 +12,9 @@ public class GangTerritories : IGangTerritories
 {
     private IGangs GangProvider;
     private readonly string ZoneConfigFileName = "Plugins\\LosSantosRED\\GangTerritories.xml";
-    private List<ZoneJurisdiction> ZoneJurisdictionsList = new List<ZoneJurisdiction>();
-    public GangTerritories(IGangs gangProvider)
+    public List<ZoneJurisdiction> ZoneJurisdictionsList { get; set; } = new List<ZoneJurisdiction>();
+    public GangTerritories()
     {
-        GangProvider = gangProvider;
     }
     public void ReadConfig()
     {
@@ -41,6 +40,10 @@ public class GangTerritories : IGangTerritories
             DefaultConfig_LibertyCity();
             DefaultConfig_SunshineDream();
         }
+    }
+    public void Setup (IGangs gangProvider)
+    {
+        GangProvider = gangProvider;
     }
     public Gang GetMainGang(string ZoneName)
     {

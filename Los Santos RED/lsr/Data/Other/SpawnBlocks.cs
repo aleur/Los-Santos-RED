@@ -16,7 +16,7 @@ public class SpawnBlocks : ISpawnBlocks
     {
         PossibleSpawnBlocks = new PossibleSpawnBlocks();
     }
-    public PossibleSpawnBlocks PossibleSpawnBlocks { get; private set; }
+    public PossibleSpawnBlocks PossibleSpawnBlocks { get; set; }
     public void ReadConfig()
     {
         DirectoryInfo LSRDirectory = new DirectoryInfo("Plugins\\LosSantosRED");

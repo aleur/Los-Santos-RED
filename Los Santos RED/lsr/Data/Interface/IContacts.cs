@@ -12,6 +12,7 @@ namespace LosSantosRED.lsr.Interface
         PhoneContact GetContactData(string contactName);
         List<PhoneContact> GetDefaultContacts();
         PhoneContact GetContactByNumber(string numpadString);
-        PossibleContacts PossibleContacts { get; }
+        PossibleContacts PossibleContacts { get; set;  }
+        void Setup(IOrganizations organizations);
     }
 }

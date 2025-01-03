@@ -13,7 +13,7 @@ public class Gangs : IGangs
 {
     private readonly string ConfigFileName = "Plugins\\LosSantosRED\\Gangs.xml";
     private bool UseVanillaConfig = true;
-    private List<Gang> GangsList;
+    public List<Gang> GangsList { get; set; }
     private Gang DefaultGang;
     private Gang LOST;
     private Gang Vagos;
@@ -1061,7 +1061,7 @@ public class Gangs : IGangs
         };
         Serialization.SerializeParams(LCGangsList, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LibertyConfigFolder}\\Gangs_{StaticStrings.LibertyConfigSuffix}.xml");
     }
-    public void CheckTerritory(GangTerritories gangTerritories)
+    public void CheckTerritory(IGangTerritories gangTerritories)
     {
         foreach(Gang gang in GangsList)
         {

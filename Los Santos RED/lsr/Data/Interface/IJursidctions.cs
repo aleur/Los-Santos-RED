@@ -9,6 +9,8 @@ namespace LosSantosRED.lsr.Interface
 {
     public interface IJurisdictions
     {
+        List<ZoneJurisdiction> ZoneJurisdictionsList { get; set; }
+        List<CountyJurisdiction> CountyJurisdictionList { get; set; }
         Agency GetRandomAgency(string internalGameName, int wantedLevel, ResponseType responseType);
         Agency GetRandomCountyAgency(string countyID, int wantedLevel, ResponseType responseType);
         List<Agency> GetAgencies(string internalGameName, int wantedLevel, ResponseType responseType);
@@ -19,5 +21,6 @@ namespace LosSantosRED.lsr.Interface
         ZoneJurisdiction GetJurisdiction(string internalGameName, Agency agency);
         Agency GetRespondingAgency(string internalGameName, string countyID, ResponseType fire);
         // bool CanSpawnPedestrianAtZone(string v, string iD);
+        void Setup(IAgencies agencyProvider);
     }
 }

@@ -95,7 +95,7 @@ public class CanineUnit : Cop
             try
             {
                 EntryPoint.WriteToConsole("Move Rate Override STARTED ON ANIMAL PED");
-                while (Pedestrian.Exists() && EntryPoint.ModController.IsRunning && !IsDead && !IsUnconscious)
+                while (Pedestrian.Exists() && EntryPoint.ModController.IsRunning && !EntryPoint.ModController.IsLoadingWorld && !IsDead && !IsUnconscious)
                 {
                     if (Pedestrian.Exists())
                     {

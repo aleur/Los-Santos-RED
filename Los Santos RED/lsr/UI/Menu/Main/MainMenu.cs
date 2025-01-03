@@ -1,4 +1,5 @@
 ﻿using LosSantosRED.lsr.Interface;
+using Rage.Native;
 using RAGENativeUI;
 using RAGENativeUI.Elements;
 using System.Linq;
@@ -14,6 +15,7 @@ public class MainMenu : ModUIMenu
     private PedSwapMenu PedSwapMenu;
    // private SaveMenu SaveMenu;
     private SettingsMenu SettingsMenu;
+    private WorldMenu WorldMenu;
 
     private IGangs Gangs;
     private IActionable ActionablePlayer;
@@ -59,6 +61,7 @@ public class MainMenu : ModUIMenu
         ActivityPerformable = activityPerformable;
         Main = new UIMenu("Los Santos RED", "Select an Option");
         SettingsMenu = new SettingsMenu(MenuPool, Main, Settings, Crimes, intoxicants, shopMenus);
+        WorldMenu = new WorldMenu(MenuPool, Main, Settings, Crimes, intoxicants, shopMenus, ui);
         PedSwapMenu = new PedSwapMenu(MenuPool, Main, PedSwap, Gangs, agencies, ActionablePlayer);
     }
 
@@ -67,7 +70,11 @@ public class MainMenu : ModUIMenu
         Main.SetBannerType(EntryPoint.LSRedColor);
         MenuPool.Add(Main);
         SettingsMenu.Setup();    
-        PedSwapMenu.Setup();    
+        PedSwapMenu.Setup();
+        if (Settings.SettingsManager.WorldSettings.EnableDynamicGangEvents)
+        {
+            WorldMenu.Setup();
+        }
         CreateMainMenu();
     }
 
