@@ -90,6 +90,5 @@ public class GangTerritory
         if (FightPercentage < 0) FightPercentage = gang.FightPercentage;
         if (FightPolicePercentage < 0) FightPolicePercentage = gang.FightPolicePercentage;
         if (AlwaysFightPolicePercentage < 0) AlwaysFightPolicePercentage = gang.AlwaysFightPolicePercentage;
-        EntryPoint.WriteToConsole($"{ZoneInternalGameName}{GangID}{DrugDealerPercentage}{PercentageWithLongGuns}{PercentageWithSidearms}{PercentageWithMelee}{FightPercentage}{FightPolicePercentage}{AlwaysFightPolicePercentage}");
     }
 }

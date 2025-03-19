@@ -49,13 +49,7 @@ public class GangTerritories : IGangTerritories
         foreach (Gang gang in GangProvider.AllGangs)
         {
             List<GangTerritory> totalTerritory = GangTerritoriesList.Where(x => x.GangID.Equals(gang.ID)).ToList();
-            if (totalTerritory?.Any() == true)
-            {
-                foreach (GangTerritory gt in totalTerritory)
-                {
-                    gt.Setup(gang);
-                }
-            }
+            if (totalTerritory?.Any() == true) foreach (GangTerritory gt in totalTerritory) gt.Setup(gang);
         }
     }
     public Gang GetMainGang(string ZoneName)
@@ -64,10 +58,10 @@ public class GangTerritories : IGangTerritories
         {
             foreach (GangTerritory gt in GangTerritoriesList.Where(x => x.ZoneInternalGameName.ToLower() == ZoneName.ToLower()).OrderBy(x => x.Priority))
             {
-                Gang Agency = GangProvider.GetGang(gt.GangID);
-                if (Agency != null)
+                Gang Gang = GangProvider.GetGang(gt.GangID);
+                if (Gang != null)
                 {
-                    return Agency;
+                    return Gang;
                 }
             }
             return null;
@@ -105,12 +99,12 @@ public class GangTerritories : IGangTerritories
             }
             int Total = ToPickFrom.Sum(x => x.CurrentSpawnChance(WantedLevel));
             int RandomPick = RandomItems.MyRand.Next(0, Total);
-            foreach (GangTerritory MyJurisdiction in ToPickFrom)
+            foreach (GangTerritory gt in ToPickFrom)
             {
-                int SpawnChance = MyJurisdiction.CurrentSpawnChance(WantedLevel);
+                int SpawnChance = gt.CurrentSpawnChance(WantedLevel);
                 if (RandomPick < SpawnChance)
                 {
-                    return GangProvider.GetGang(MyJurisdiction.GangID);
+                    return GangProvider.GetGang(gt.GangID);
                 }
                 RandomPick -= SpawnChance;
             }
