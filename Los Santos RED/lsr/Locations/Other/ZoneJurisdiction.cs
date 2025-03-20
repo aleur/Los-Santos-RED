@@ -13,7 +13,6 @@ public class ZoneJurisdiction
     public int Priority { get; set; } = 99;
     public int AmbientSpawnChance { get; set; } = 0;
     public int WantedSpawnChance { get; set; } = 0;
-    public float CorruptSpawnChance { get; set; } = -1;
     public bool CanSpawnPedestrianOfficers { get; set; } = false;
     public bool CanSpawnBicycleOfficers { get; set; } = false;
     public bool CanSpawnDirtBikeOfficers { get; set; } = false;
@@ -50,9 +49,5 @@ public class ZoneJurisdiction
         {
             return AmbientSpawnChance;
         }
-    }
-    public void Setup(Agency agency)
-    {
-        if (CorruptSpawnChance < 0) CorruptSpawnChance = agency.CorruptMemberPercentage;
     }
 }

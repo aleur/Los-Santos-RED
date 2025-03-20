@@ -4,7 +4,6 @@ using Mod;
 using Rage;
 using Rage.Native;
 using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
@@ -219,7 +218,7 @@ public class Cop : PedExt, IWeaponIssuable, IPlayerChaseable, IAIChaseable
     //    Voice.ResetSpeech();
     //    Voice.Speak(currentPlayer);
     //}
-    public void SetStats(DispatchablePerson dispatchablePerson, IWeapons Weapons, bool addBlip, string forceGroupName, float sightDistance, IShopMenus shopMenus, Zone zone, List<ZoneJurisdiction> zoneJurisdictions)
+    public void SetStats(DispatchablePerson dispatchablePerson, IWeapons Weapons, bool addBlip, string forceGroupName, float sightDistance, IShopMenus shopMenus)
     {
         if (!Pedestrian.Exists())
         {
@@ -258,15 +257,12 @@ public class Cop : PedExt, IWeaponIssuable, IPlayerChaseable, IAIChaseable
             GroupName = "Cop";
         }
         Money = RandomItems.GetRandomNumberInt(AssignedAgency.MoneyMin, AssignedAgency.MoneyMax);
-
-        ZoneJurisdiction zj = zoneJurisdictions == null ? null : zoneJurisdictions.FirstOrDefault(x => x.ZoneInternalGameName.Equals(zone.InternalGameName));
-        IsCorrupt = RandomItems.RandomPercent(zj == null ? zj.CorruptSpawnChance : AssignedAgency.CorruptMemberPercentage);
-
-        if (IsCorrupt)
+        if (RandomItems.RandomPercent(AssignedAgency.CorruptMemberPercentage))
         {
+            IsCorrupt = true;
             SetupTransactionItems(shopMenus.GetWeightedRandomMenuFromGroup(AssignedAgency.CorruptMenuGroup), false);
             Money = RandomItems.GetRandomNumberInt(AssignedAgency.CorruptMoneyMin, AssignedAgency.CorruptMoneyMax);
-            EntryPoint.WriteToConsole($"COP IS MARKED AS CORRUPT {AssignedAgency.CorruptMenuGroup}");
+            EntryPoint.WriteToConsole($"{AssignedAgency.ID}: {AssignedAgency.MemberName} IS MARKED AS CORRUPT {AssignedAgency.CorruptMenuGroup}");
         }
         GameFiber.Yield();
         if (!Pedestrian.Exists())
