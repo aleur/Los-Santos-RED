@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -73,6 +74,14 @@ public class Jurisdictions : IJurisdictions
             DefaultCountyConfig_Simple();
             DefaultCountyConfig();
             DefaultCountyConfig_LibertyPP();
+        }
+    }
+    public void Setup()
+    {
+        foreach (Agency agency in AgencyProvider.GetAgencies())
+        {
+            List<ZoneJurisdiction> agencyZoneJurisdiction = ZoneJurisdictionsList.Where(x => x.AgencyID.Equals(agency.ID)).ToList();  // only for ZoneJurisdictions
+            if (agencyZoneJurisdiction?.Any() == true) foreach (ZoneJurisdiction zj in agencyZoneJurisdiction) zj.Setup(agency);
         }
     }
     public Agency GetMainAgency(string ZoneName, ResponseType responseType)

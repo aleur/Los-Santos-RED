@@ -138,6 +138,7 @@ public class ModDataFileManager
         GameFiber.Yield();
         Jurisdictions = new Jurisdictions(Agencies);
         Jurisdictions.ReadConfig(config.ZoneJurisdictionsConfig,config.CountyJurisdictionsConfig);
+        Jurisdictions.Setup();
         GameFiber.Yield();
         GangTerritories = new GangTerritories(Gangs);
         GangTerritories.ReadConfig(config.GangTerritoriesConfig);
