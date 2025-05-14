@@ -320,6 +320,7 @@ public class GangSettings : ISettingsDefaultable
 
         // RemoveNonSpawnedGangMembersOnFoot_Extra = false;
         AllowFlyThroughWindshield = true;
+        FlyThroughWindshieldPercent = 13;
 
 
     }

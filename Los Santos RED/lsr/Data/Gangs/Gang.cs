@@ -112,6 +112,7 @@ public class Gang : IPlatePrefixable, IGeneratesDispatchables
     public int HitPaymentMax { get; set; } = 3500;//12000;
     public int DeliveryPaymentMin { get; set; } = 1000;
     public int DeliveryPaymentMax { get; set; } = 3000;//4000;
+    public List<string> DeliveryItems { get; set; } = new List<string>();
     public int WheelmanPaymentMin { get; set; } = 7500;//15000;
     public int WheelmanPaymentMax { get; set; } = 12000;//35000;
     public int ImpoundTheftPaymentMin { get; set; } = 3000;

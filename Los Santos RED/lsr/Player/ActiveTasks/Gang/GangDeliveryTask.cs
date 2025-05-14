@@ -36,6 +36,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private PhoneContact PhoneContact;
         private GangTasks GangTasks;
         private string ModItemNameToDeliver;
+        private List<MenuItem> HiddenItems;
         private bool HasDen => HiringGangDen != null;
 
         public GangDeliveryTask(ITaskAssignable player, ITimeReportable time, IGangs gangs, PlayerTasks playerTasks, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, IModItems modItems, 
@@ -104,6 +105,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                     {
                         if (CurrentTask == null || !CurrentTask.IsActive)
                         {
+                            HiringGangDen.Menu.Items.AddRange(HiddenItems);
                             break;
                         }
                         GameFiber.Sleep(1000);
@@ -125,10 +127,10 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         {
             int PaymentAmount = RandomItems.GetRandomNumberInt(HiringGang.DeliveryPaymentMin, HiringGang.DeliveryPaymentMax).Round(100);
             ItemToDeliver = null;
-            if(HiringGangDen.Menu.Items.Any(x => x.Purchaseable && x.ModItemName == ModItemNameToDeliver))
+            /*if(HiringGangDen.Menu.Items.Any(x => x.Purchaseable && x.ModItemName == ModItemNameToDeliver))
             {
                 return;
-            }
+            }*/
             if (ModItemNameToDeliver != "")
             {
                 ItemToDeliver = ModItems.Get(ModItemNameToDeliver);
@@ -152,6 +154,9 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             PlayerTasks.AddTask(HiringGang.Contact, MoneyToRecieve, 500, 0, -1000, 4, "Pickup for Gang");
             HiringGangDen.ExpectedItem = ItemToDeliver;
             HiringGangDen.ExpectedItemAmount = NumberOfItemsToDeliver;
+
+            HiddenItems = HiringGangDen.Menu.Items.Where(x => x.Purchaseable && x.ModItemName == ModItemNameToDeliver).ToList();
+            HiringGangDen.Menu.Items.RemoveAll(x => x.Purchaseable && x.ModItemName == ModItemNameToDeliver);
 
             CurrentTask = PlayerTasks.GetTask(HiringGang.ContactName);
             CurrentTask.OnReadyForPayment(false);

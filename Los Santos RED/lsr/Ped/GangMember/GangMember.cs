@@ -15,6 +15,7 @@ public class GangMember : PedExt, IWeaponIssuable
     private bool WillHaveLongGuns = false;
     private bool WillHaveSidearms = false;
     private bool WillHaveMelee = false;
+    private bool WillFlyThroughWindshield = false;
     public GangMember(Ped _Pedestrian, ISettingsProvideable settings, Gang gang, bool wasModSpawned, string _Name, ICrimes crimes, IWeapons weapons, IEntityProvideable world) : base(_Pedestrian, settings, crimes, weapons, _Name,gang.MemberName, world)
     {
         Gang = gang;
@@ -161,6 +162,8 @@ public class GangMember : PedExt, IWeaponIssuable
         WillHaveSidearms = RandomItems.RandomPercent(gt == null ? Gang.PercentageWithSidearms : gt.PercentageWithSidearms);
         WillHaveMelee = RandomItems.RandomPercent(gt == null ? Gang.PercentageWithMelee : gt.PercentageWithMelee);
 
+        WillFlyThroughWindshield = RandomItems.RandomPercent(Settings.SettingsManager.GangSettings.FlyThroughWindshieldPercent);
+
         if (IsHitSquad || IsBackupSquad || IsGeneralBackup)
         {
             WillFight = true;
@@ -190,7 +193,7 @@ public class GangMember : PedExt, IWeaponIssuable
         {
             NativeFunction.Natives.SET_PED_SEEING_RANGE(Pedestrian, Settings.SettingsManager.CivilianSettings.SightDistance);
         }
-        if (Pedestrian.Exists() && Settings.SettingsManager.GangSettings.AllowFlyThroughWindshield)
+        if (Pedestrian.Exists() && Settings.SettingsManager.GangSettings.AllowFlyThroughWindshield && WillFlyThroughWindshield)
         {
             NativeFunction.Natives.SET_PED_CONFIG_FLAG(Pedestrian, (int)32, true);
         }

@@ -476,18 +476,21 @@ public class GangInteraction : IContactMenuInteraction
         JobsSubMenu.MenuItems[JobsSubMenu.MenuItems.Count() - 1].Description = $"Source some items for the gang.";
         JobsSubMenu.MenuItems[JobsSubMenu.MenuItems.Count() - 1].RightLabel = $"~HUD_COLOUR_GREENDARK~{ActiveGang.DeliveryPaymentMin:C0}-{ActiveGang.DeliveryPaymentMax:C0}~s~";
         GangDeliverySubMenu.RemoveBanner();
-        List<string> PossibleItems = ModItems.AllItems().Where(x => x.ItemSubType == ItemSubType.Narcotic).Select(x => x.Name).ToList();
-        GangDen ActiveGangGangDen = PlacesOfInterest.GetMainDen(ActiveGang.ID, World.IsMPMapLoaded, Player.CurrentLocation);
+        List<string> PossibleItems = ModItems.AllItems().Where(x => ActiveGang.DeliveryItems.Contains(x.Name)).Select(x => x.Name).ToList();
+
+        if (!PossibleItems.Any()) PossibleItems = ModItems.AllItems().Where(x => x.ItemSubType == ItemSubType.Narcotic).Select(x => x.Name).ToList();
+
+        GangDen ActiveGangDen = PlacesOfInterest.GetMainDen(ActiveGang.ID, World.IsMPMapLoaded, Player.CurrentLocation);
 
         List<string> AvailableItems = new List<string>();
         foreach(string item in PossibleItems)
         {
-            if(ActiveGangGangDen != null && (ActiveGangGangDen.Menu == null || ActiveGangGangDen.Menu.Items == null || !ActiveGangGangDen.Menu.Items.Any(x => x.Purchaseable && x.ModItemName == item)))
+            if(ActiveGangDen != null && (ActiveGangDen.Menu == null || ActiveGangDen.Menu.Items == null /*|| !ActiveGangDen.Menu.Items.Any(x => x.Purchaseable && x.ModItemName == item)*/))
             {
                 AvailableItems.Add(item);
             }
         }
-        UIMenuListScrollerItem<string> GangDeliveryItems = new UIMenuListScrollerItem<string>("Item To Source", $"Choose an item to source for the gang.", AvailableItems);
+        UIMenuListScrollerItem<string> GangDeliveryItems = new UIMenuListScrollerItem<string>("Item To Source", $"Choose an item to source for the gang.", PossibleItems);
         UIMenuItem GangDeliveryStart = new UIMenuItem("Start", "Start the task.") { RightLabel = $"~HUD_COLOUR_GREENDARK~{ActiveGang.DeliveryPaymentMin:C0}-{ActiveGang.DeliveryPaymentMax:C0}~s~" };
         GangDeliveryStart.Activated += (sender, selectedItem) =>
         {
