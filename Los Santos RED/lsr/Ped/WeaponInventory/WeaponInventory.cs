@@ -18,7 +18,7 @@ public class WeaponInventory
     private IPoliceRespondable Player;
     private IWeaponIssuable WeaponOwner;
     private uint GameTimeLastWeaponCheck;
-    private bool IsHolsterFull;
+    private bool IsHolsterFull = true;
     private PedComponent EmptyHolster;
     private PedComponent FullHolster;
     private uint CurrentWeapon;
@@ -290,8 +290,48 @@ public class WeaponInventory
             {
                 UpdateSettings();
             }
-        }   
+        }
+        MatchHolster();
     }
+
+    private void MatchHolster()
+    {
+        if(WeaponOwner == null || !WeaponOwner.Pedestrian.Exists())
+        { 
+            return;  
+        }
+        WeaponDescriptor currentWeapon = WeaponOwner.Pedestrian.Inventory.EquippedWeapon;
+        if(currentWeapon == null)
+        {
+            if(!IsHolsterFull)
+            {
+                HolsterPistol();
+                EntryPoint.WriteToConsole($"{WeaponOwner.Handle} SET UPDATE HOLSTER PISTOL 1");
+            }
+            return;
+        }
+        if(Sidearm == null || currentWeapon == null)
+        {
+            return;
+        }
+        if ((uint)currentWeapon.Hash == Sidearm.ModelHash)
+        {
+            if (IsHolsterFull)
+            {
+                UnHolsterPistol();
+                EntryPoint.WriteToConsole($"{WeaponOwner.Handle} SET UPDATE UNHOLSTER PISTOL");
+            }
+        }
+        else
+        {
+            if (!IsHolsterFull)
+            {
+                HolsterPistol();
+                EntryPoint.WriteToConsole($"{WeaponOwner.Handle} SET UPDATE HOLSTER PISTOL 2");
+            }
+        }
+    }
+
     private void AutoSetWeapons_AI(IEntityProvideable world)
     {
         
@@ -535,14 +575,17 @@ public class WeaponInventory
         if (LongGun != null && HasHeavyWeaponOnPerson)
         {
             NativeFunction.Natives.SET_CURRENT_PED_WEAPON(WeaponOwner.Pedestrian, LongGun.GetHash(), true);
+            HolsterPistol();
         }
         else if (Sidearm != null)
         {
             NativeFunction.Natives.SET_CURRENT_PED_WEAPON(WeaponOwner.Pedestrian, Sidearm.GetHash(), true);
+            UnHolsterPistol();
         }
         else if (Melee != null)
         {
             NativeFunction.Natives.SET_CURRENT_PED_WEAPON(WeaponOwner.Pedestrian, Melee.GetHash(), true);
+            HolsterPistol();
         }
     }
     public void SetDeadly(bool ForceLong)
@@ -611,11 +654,11 @@ public class WeaponInventory
         }
         NativeFunction.Natives.SET_PED_CAN_SWITCH_WEAPON(WeaponOwner.Pedestrian, true);
         NativeFunction.Natives.SET_PED_COMBAT_ATTRIBUTES(WeaponOwner.Pedestrian, (int)eCombat_Attribute.CA_DO_DRIVEBYS, true);
-        if (HasHeavyWeaponOnPerson && !IsHolsterFull)
+        if (HasHeavyWeaponOnPerson)// && !IsHolsterFull)
         {
             HolsterPistol();
         }
-        else if (!HasHeavyWeaponOnPerson && IsHolsterFull)
+        else //if (!HasHeavyWeaponOnPerson && IsHolsterFull)
         {
             UnHolsterPistol();
         }
@@ -741,6 +784,7 @@ public class WeaponInventory
             NativeFunction.Natives.SET_PED_CAN_SWITCH_WEAPON(WeaponOwner.Pedestrian, false);
         }
         NativeFunction.Natives.SET_PED_COMBAT_ATTRIBUTES(WeaponOwner.Pedestrian, (int)eCombat_Attribute.CA_DO_DRIVEBYS, true);
+        HolsterPistol();
     }
     public void SetSimpleArmed()
     {
