@@ -45,7 +45,7 @@ public class ModDataFileManager
     public WeatherForecasts WeatherForecasts;
     public ClothesNames ClothesNames;
     public LanguageStrings LanguageStrings;
-    public WantedLevels WantedLevels;
+    //public WantedLevels WantedLevels;
     public TattooNames TattooNames;
     public SavedOutfits SavedOutfits;
     public VehicleSeatAndDoorLookup VehicleSeatDoorData;
@@ -190,16 +190,16 @@ public class ModDataFileManager
         CraftableItems.ReadConfig(config.CraftableItemsConfig);
         GameFiber.Yield();
 
-#if DEBUG
-        WantedLevels = new WantedLevels();
-        WantedLevels.ReadConfig(config.WantedLevelsConfig);
-        WantedLevels.Setup(Heads, DispatchableVehicles, DispatchablePeople, IssueableWeapons);
-        GameFiber.Yield();
+//#if DEBUG
+//        WantedLevels = new WantedLevels();
+//        WantedLevels.ReadConfig(config.WantedLevelsConfig);
+//        WantedLevels.Setup(Heads, DispatchableVehicles, DispatchablePeople, IssueableWeapons);
+//        GameFiber.Yield();
 
 
 
 
-#endif
+//#endif
 
         TestAnimations = new TestAnimations();
         TestAnimations.ReadConfig(); // no config file for now
@@ -265,7 +265,16 @@ public class ModDataFileManager
     private void SetupFullExpandedWeapons()
     {
         Directory.CreateDirectory($"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.FEWConfigFolder}");
-        string Description = "TBA.";
+        string Description = "" +
+            "Adds some lore friendly weapon replacements." + Environment.NewLine + Environment.NewLine +
+            "Installation:" + Environment.NewLine +
+            "Install the greskfewinstaller.oiv and move the .xml files into the main directory." + Environment.NewLine + Environment.NewLine +
+            "Credits" + Environment.NewLine + Environment.NewLine +
+            "Reference/Knowledge" + Environment.NewLine +
+            "HeySlickThatsMe, AllenKennedy" + Environment.NewLine + Environment.NewLine +
+            "Models" + Environment.NewLine +
+            "EUP Holster Glock - Alex_Ashford and the EUP Team" + Environment.NewLine + 
+            "Other 3d Models - IVA, romunql, rwroclav" + Environment.NewLine + Environment.NewLine;
         File.WriteAllText($"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.FEWConfigFolder}\\readme.txt", Description);
     }
     private void SetupFullModernTraffic()
@@ -285,6 +294,7 @@ public class ModDataFileManager
             "Also adds some new vehicles and includes some edits to DLC vehicles to allow them to blend in better with traffic." + Environment.NewLine +
             "Incompatible with Los Santos 2008 config." + Environment.NewLine +
             "Install the greskfullmoderntraffic_novanillagang_addon.oiv after greskfullmoderntraffic.oiv to remove all vanilla gang spawns." + Environment.NewLine +
+            "Scout - Gabriele Cappellano - original sketch       Da7k - 3D model      Nacho - 3D model - porting, assets, mapping, bugfixes     Dani02 - bugfixes, glass shards     11john11 - model improvements, dlcpack, police rims, interior assets        Eddlm - custom handling" + Environment.NewLine +
             "Merit - Model by Rockstar Games, converted to GTA V by _CP_, HQ interior by _CP_, template by Lt.Caine, UV-Map, thin LED lightbar, assembly and skins by Yard1." + Environment.NewLine +
             "PMP 600 - _CP_, Vanillaworks Team, Thundersmacker, RM76, TheAdmiester, Killatomate, GTA5Korn, Yard1, Lundy, CDemapp, PhilBellic, I'm Not MentaL, sparky66, Insincere." + Environment.NewLine +
             "Presidente - _CP_, Vanillaworks Team, Thundersmacker, RM76, TheAdmiester, Killatomate, GTA5Korn, Yard1, Lundy, CDemapp, PhilBellic, I'm Not MentaL, sparky66, Insincere.";
@@ -364,6 +374,8 @@ public class ModDataFileManager
             + Environment.NewLine + Environment.NewLine + Environment.NewLine +
             "Model Credits:"
             + Environment.NewLine +
+            "Scout - Gabriele Cappellano - original sketch       Da7k - 3D model      Nacho - 3D model - porting, assets, mapping, bugfixes     Dani02 - bugfixes, glass shards     11john11 - model improvements, dlcpack, police rims, interior assets        Eddlm - custom handling" + Environment.NewLine +
+            "BeaverRam - Original Model by Stan." + Environment.NewLine +
             "Modern Police Steel Wheel - Adapted from Megarobloxfr";
         File.WriteAllText("Plugins\\LosSantosRED\\AlternateConfigs\\FullExpandedJurisdiction\\readme.txt", Description);      
         string Description2 = "Want to use the built in peds along with the FEJ vehicles? This is the config for you. Be sure to install the FEJ OIV without EUP. Copys over the xmls to the main directory.";

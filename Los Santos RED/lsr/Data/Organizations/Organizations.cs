@@ -21,6 +21,7 @@ public class Organizations : IOrganizations
     private Organization LSRGuns;
     private TaxiFirm RydeMe;
     private TaxiFirm Schlecht;
+    private Organization WezelNews;
 
     public PossibleOrganizations PossibleOrganizations { get; private set; }
 
@@ -30,7 +31,7 @@ public class Organizations : IOrganizations
     }
     public void ReadConfig(string configName)
     {
-        string fileName = string.IsNullOrEmpty(configName) ? "Organizations*.xml" : $"Organizations_{configName}.xml";
+        string fileName = string.IsNullOrEmpty(configName) ? "Organizations_*.xml" : $"Organizations_{configName}.xml";
 
         DirectoryInfo taskDirectory = new DirectoryInfo("Plugins\\LosSantosRED");
         FileInfo ConfigFile = taskDirectory.GetFiles(fileName).OrderByDescending(x => x.Name).FirstOrDefault();
@@ -51,6 +52,21 @@ public class Organizations : IOrganizations
             DefaultConfig_FullExpanded();
             DefaultConfig_LibertyCity();
             DefaultConfig();
+        }
+        foreach (FileInfo fileInfo in taskDirectory.GetFiles("Organizations+_*.xml").OrderByDescending(x => x.Name))
+        {
+            EntryPoint.WriteToConsole($"Loaded ADDITIVE Organizations config  {fileInfo.FullName}", 0);
+            PossibleOrganizations additivePossibleItems = Serialization.DeserializeParam<PossibleOrganizations>(fileInfo.FullName);
+            foreach (Organization newItem in additivePossibleItems.GeneralOrganizations)
+            {
+                PossibleOrganizations.GeneralOrganizations.RemoveAll(x => x.ID == newItem.ID);
+                PossibleOrganizations.GeneralOrganizations.Add(newItem);
+            }
+            foreach (TaxiFirm newItem in additivePossibleItems.TaxiFirms)
+            {
+                PossibleOrganizations.TaxiFirms.RemoveAll(x => x.ID == newItem.ID);
+                PossibleOrganizations.TaxiFirms.Add(newItem);
+            }
         }
     }
     public void Setup(IHeads heads, IDispatchableVehicles dispatchableVehicles, IDispatchablePeople dispatchablePeople, IIssuableWeapons issuableWeapons, IContacts contacts)
@@ -89,6 +105,14 @@ public class Organizations : IOrganizations
             return null;
         }
         return PossibleOrganizations.AllOrganizations().Where(x => x.ID.ToLower() == AgencyInitials.ToLower()).FirstOrDefault();
+    }
+    public Organization GetOrganization(string orgID)
+    {
+        if (string.IsNullOrEmpty(orgID))
+        {
+            return null;
+        }
+        return PossibleOrganizations.AllOrganizations().Where(x => x.ID.ToLower() == orgID.ToLower()).FirstOrDefault();
     }
     public Organization GetOrganizationByContact(string contactName)
     {
@@ -170,6 +194,12 @@ public class Organizations : IOrganizations
             CrazySpeedFee = 300,
             IsRideShare = true,
         };
+
+        WezelNews = new Organization("~r~","weazel","Weazel","Weazel News","Red","NewsPeds","WeazelVehicles","WN ","","","","Weazel Reporter")
+        {
+            Description = "Reporting the Right News",
+            HeadDataGroupID = "AllHeads",
+        };
     }
     private void DefaultConfig()
     {
@@ -179,6 +209,7 @@ public class Organizations : IOrganizations
         {     
             VehicleExports,
             UndergroundGuns,
+            WezelNews,
         };
         PossibleOrganizations.TaxiFirms = new List<TaxiFirm>
         {
@@ -235,6 +266,7 @@ public class Organizations : IOrganizations
         {
             VehicleExports,
             UndergroundGuns,
+            WezelNews,
         };
         PossibleOrganizations_FullExpanded.TaxiFirms = new List<TaxiFirm>
         {
@@ -270,6 +302,7 @@ public class Organizations : IOrganizations
         {
             VehicleExports,
             UndergroundGuns,
+            WezelNews,
         };
         PossibleOrganizations_LibertyCity.TaxiFirms = new List<TaxiFirm>
         {
@@ -285,6 +318,7 @@ public class Organizations : IOrganizations
         {
             VehicleExports,
             UndergroundGuns,
+            WezelNews,
         };
         PossibleOrganizations_LibertyCityPP.TaxiFirms = new List<TaxiFirm>
         {

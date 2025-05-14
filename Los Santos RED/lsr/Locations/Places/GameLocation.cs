@@ -306,6 +306,9 @@ public class GameLocation : ILocationDispatchable
     public bool VendorAbandoned { get; set; } = false;
     [XmlIgnore]
     public Agency AssignedAgency { get; set; }
+
+    [XmlIgnore]
+    public Organization AssignedOrganization { get; set; }
     [XmlIgnore]
     public bool IsDispatchFilled { get; set; } = false;
     [XmlIgnore]
@@ -530,6 +533,10 @@ public class GameLocation : ILocationDispatchable
         if (AssignedAssociationID != null)
         {
             AssignedAgency = agencies.GetAgency(AssignedAssociationID);
+            if(AssignedAgency == null)
+            {
+                AssignedOrganization = Associations.GetOrganization(AssignedAssociationID);
+            }
         }
         Menu = shopMenus.GetSpecificMenu(MenuID);
         if (HasInterior)
@@ -596,7 +603,7 @@ public class GameLocation : ILocationDispatchable
         if (IsOwnable && !IsOwned && PurchasePrice > 0)
         {
             UIMenu subMenu = MenuPool.AddSubMenu(InteractionMenu, $"Inquire about {Name}");
-            UIMenuItem businessManagementButton = new UIMenuItem("Buy Property") { RightLabel = $"{PurchasePrice:C0}", Description = $"Earn between {PayoutMin:C0} and {PayoutMax:C0} every {PayoutFrequency} day(s)" };
+            UIMenuItem businessManagementButton = new UIMenuItem("Buy Property") { RightLabel = $"{PurchasePrice:C0}", Description = GetInquireDescription() };
             businessManagementButton.Activated += (s, i) =>
             {
                 if (Purchase())
@@ -617,7 +624,7 @@ public class GameLocation : ILocationDispatchable
             subMenu.AddItem(businessManagementButton);
         }
     }
-    public virtual bool Purchase()
+    protected virtual bool Purchase()
     {
         bool hasEnoughMoney = CashPurchaseOnly ? Player.BankAccounts.GetMoney(false) >= PurchasePrice : Player.BankAccounts.GetMoney(true) >= PurchasePrice;
         if (hasEnoughMoney)
@@ -629,7 +636,7 @@ public class GameLocation : ILocationDispatchable
         DisplayMessage("~r~Purchase Failed", "We are sorry, we are unable to complete this purchase. Please make sure you have the funds.");
         return false;
     }
-    public virtual void OnPurchased()
+    protected virtual void OnPurchased()
     {
         Player.Properties.AddPayoutProperty(this);
         EntryPoint.WriteToConsole($"cashpurchaseonly: {CashPurchaseOnly}");
@@ -639,7 +646,7 @@ public class GameLocation : ILocationDispatchable
         DatePayoutDue = DatePayoutPaid.AddDays(PayoutFrequency);
         CurrentSalesPrice = SalesPrice;
     }
-    public virtual void OnSold()
+    protected virtual void OnSold()
     {
         Player.Properties.RemovePayoutProperty(this);
         Player.BankAccounts.GiveMoney(CurrentSalesPrice, true);
@@ -1404,7 +1411,7 @@ public class GameLocation : ILocationDispatchable
     {
         if (IsOwnable && !IsOwned && PurchasePrice > 0)
         {
-            UIMenuItem businessManagementButton = new UIMenuItem("Buy Property") { RightLabel = $"{PurchasePrice:C0}", Description = $"Earn between {PayoutMin:C0} and {PayoutMax:C0} every {PayoutFrequency} day(s)" };
+            UIMenuItem businessManagementButton = new UIMenuItem("Buy Property") { RightLabel = $"{PurchasePrice:C0}", Description = GetInquireDescription() };
             businessManagementButton.Activated += (s, i) =>
             {
                 Purchase();
@@ -1426,6 +1433,14 @@ public class GameLocation : ILocationDispatchable
             headerMenu.AddItem(businessManagementButton);
         }
     }
+
+
+
+    public virtual string GetInquireDescription()
+    {
+        return $"Earn between {PayoutMin:C0} and {PayoutMax:C0} every {PayoutFrequency} day(s)";
+    }
+
     //public virtual void UpdatePrompts()
     //{
 

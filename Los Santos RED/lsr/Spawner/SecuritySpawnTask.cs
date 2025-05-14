@@ -203,8 +203,12 @@ public class SecurityGuardSpawnTask : SpawnTask
         else
         {
             primarySecurityGuard = new SecurityGuard(ped, Settings, ped.Health, Agency, true, Crimes, Weapons, Names.GetRandomName(isMale), PersonType.ModelName, World);
-        }      
-        //World.Pedestrians.AddEntity(primarySecurityGuard);
+        }
+        if (SpawnRequirement != TaskRequirements.None)
+        {
+            primarySecurityGuard.LocationTaskRequirements.TaskRequirements = SpawnRequirement;
+        }
+        World.Pedestrians.AddEntity(primarySecurityGuard);
         primarySecurityGuard.SetStats(PersonType, Weapons, AddBlip, ShopMenus);
         if (ped.Exists())
         {
