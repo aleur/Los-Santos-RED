@@ -19,19 +19,6 @@ public class PoliceSpawnSettings : ISettingsDefaultable
     public int LocationSpawnedPedLimit { get; set; }
     [Description("Vehicle limit on how many location police can spawn.")]
     public int LocationSpawnedVehicleLimit { get; set; }
-
-    [Description("Maximum distance (in meters) that police Helis can spawn when you are wanted and seen.")]
-    public float MaxDistanceToSpawn_WantedSeenHeli { get; set; }
-    [Description("Maximum distance (in meters) that police Helis can spawn when you are wanted and not seen.")]
-    public float MaxDistanceToSpawn_WantedUnseenHeli { get; set; }
-    [Description("Maximum distance (in meters) that police Helis can spawn when you are not wanted.")]
-    public float MaxDistanceToSpawn_NotWantedHeli { get; set; }
-    [Description("Minimum distance (in meters) that police Helis can spawn when you are wanted and not seen.")]
-    public float MinDistanceToSpawn_WantedUnseenHeli { get; set; }
-    [Description("Minimum distance (in meters) that police Helis can spawn when you are wanted and seen.")]
-    public float MinDistanceToSpawn_WantedSeenHeli { get; set; }
-    [Description("Minimum distance (in meters) that police Helis can spawn when you are not wanted.")]
-    public float MinDistanceToSpawn_NotWantedHeli { get; set; }
     [Description("Maximum distance (in meters) that police can spawn when you are wanted and seen by police.")]
     public float MaxDistanceToSpawn_WantedSeen { get; set; }
     [Description("Maximum distance (in meters) that police can spawn when you are wanted and not seen by police.")]
@@ -469,13 +456,6 @@ public class PoliceSpawnSettings : ISettingsDefaultable
         // AddK9Percentage = 30;
 
 
-
-        MaxDistanceToSpawn_WantedSeenHeli = 550f;// 550f;// 650f;//550f
-        MaxDistanceToSpawn_WantedUnseenHeli = 450f;// 450f;//350f
-        MaxDistanceToSpawn_NotWantedHeli = 850f;// 900f;
-        MinDistanceToSpawn_WantedUnseenHeli = 350f;// 350f;//250f
-        MinDistanceToSpawn_WantedSeenHeli = 400f;// 400f;// 500f;//400f
-        MinDistanceToSpawn_NotWantedHeli = 250f;// 200f;//350f;//150f
 
         MaxDistanceToSpawn_WantedSeen = 450f;// 550f;// 650f;//550f
         MaxDistanceToSpawn_WantedUnseen = 350f;// 450f;//350f

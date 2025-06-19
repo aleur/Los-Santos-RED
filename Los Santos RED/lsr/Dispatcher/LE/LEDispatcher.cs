@@ -423,9 +423,9 @@ public class LEDispatcher
     {
         get
         {
-            float MaxWantedUnseen = HasNeedToSpawnHeli ? Settings.SettingsManager.PoliceSpawnSettings.MaxDistanceToSpawn_WantedUnseenHeli : Settings.SettingsManager.PoliceSpawnSettings.MaxDistanceToSpawn_WantedUnseen;
-            float MaxWantedSeen = HasNeedToSpawnHeli ? Settings.SettingsManager.PoliceSpawnSettings.MaxDistanceToSpawn_WantedSeenHeli : Settings.SettingsManager.PoliceSpawnSettings.MaxDistanceToSpawn_WantedSeen;
-            float MaxNotWanted = HasNeedToSpawnHeli ? Settings.SettingsManager.PoliceSpawnSettings.MaxDistanceToSpawn_NotWantedHeli : Settings.SettingsManager.PoliceSpawnSettings.MaxDistanceToSpawn_NotWanted;
+            float MaxWantedUnseen = Settings.SettingsManager.PoliceSpawnSettings.MaxDistanceToSpawn_WantedUnseen;
+            float MaxWantedSeen = Settings.SettingsManager.PoliceSpawnSettings.MaxDistanceToSpawn_WantedSeen;
+            float MaxNotWanted = Settings.SettingsManager.PoliceSpawnSettings.MaxDistanceToSpawn_NotWanted;
             if(World.TotalWantedLevel > Player.WantedLevel)
             {
                 return MaxWantedUnseen;
@@ -455,9 +455,9 @@ public class LEDispatcher
     {
         get
         {
-            float MinWantedUnseen = HasNeedToSpawnHeli ? Settings.SettingsManager.PoliceSpawnSettings.MinDistanceToSpawn_WantedUnseenHeli : Settings.SettingsManager.PoliceSpawnSettings.MinDistanceToSpawn_WantedUnseen;
-            float MinWantedSeen = HasNeedToSpawnHeli ? Settings.SettingsManager.PoliceSpawnSettings.MinDistanceToSpawn_WantedSeenHeli : Settings.SettingsManager.PoliceSpawnSettings.MinDistanceToSpawn_WantedSeen;
-            float MinNotWanted = HasNeedToSpawnHeli ? Settings.SettingsManager.PoliceSpawnSettings.MinDistanceToSpawn_NotWantedHeli : Settings.SettingsManager.PoliceSpawnSettings.MinDistanceToSpawn_NotWanted;
+            float MinWantedUnseen = Settings.SettingsManager.PoliceSpawnSettings.MinDistanceToSpawn_WantedUnseen;
+            float MinWantedSeen = Settings.SettingsManager.PoliceSpawnSettings.MinDistanceToSpawn_WantedSeen;
+            float MinNotWanted = Settings.SettingsManager.PoliceSpawnSettings.MinDistanceToSpawn_NotWanted;
             float MinScalerUnseen = Settings.SettingsManager.PoliceSpawnSettings.MinDistanceToSpawn_WantedUnseenScalar; //40f;
             float MinScalerSeen = Settings.SettingsManager.PoliceSpawnSettings.MinDistanceToSpawn_WantedSeenScalar; //40f;
             if (World.TotalWantedLevel > Player.WantedLevel)
@@ -1302,28 +1302,40 @@ public class LEDispatcher
         //EntryPoint.WriteToConsole($"AMBIENT COP SPAWN RunAmbientDispatch ShouldRunAmbientDispatch{ShouldRunAmbientDispatch}: %{PercentageOfAmbientSpawn} TimeBetween:{TimeBetweenSpawn} SpawnedCopLimit:{SpawnedCopLimit}");
         bool getspawnLocation = GetSpawnLocation();
         GameFiber.Yield();
-        bool getSpawnTypes = GetSpawnTypes();
+
+
+        if (!getspawnLocation)
+        {
+            EntryPoint.WriteToConsole("LE DISPATCHER CAN NOT GET SPAWN LOCATION");
+            return;
+        }
+        
+        if (!GetSpawnTypes())
+        {
+            EntryPoint.WriteToConsole("LE DISPATCHER CAN NOT GET SPAWN TYPES");
+            return;
+        }
+
         //EntryPoint.WriteToConsole($"Attempt {Agency?.ShortName}  {VehicleType?.ModelName} {VehicleType?.DebugName} HasNeedToSpawnBoat {HasNeedToSpawnBoat} {getspawnLocation} {getSpawnTypes}");
         //EntryPoint.WriteToConsole($"getspawnLocation:{getspawnLocation} getSpawnTypes:{getSpawnTypes}");
-        if (getspawnLocation && getSpawnTypes)
+
+        GameFiber.Yield();
+        GameTimeAttemptedDispatch = Game.GameTime;
+        //EntryPoint.WriteToConsoleTestLong($"AMBIENT COP CALLED SPAWN TASK");
+
+        bool allowAny = false;
+        if (IsTunnelSpawn)
         {
-            GameFiber.Yield();
-            GameTimeAttemptedDispatch = Game.GameTime;
-            //EntryPoint.WriteToConsoleTestLong($"AMBIENT COP CALLED SPAWN TASK");
-
-            bool allowAny = false;
-            if(IsTunnelSpawn)
-            {
-                allowAny = true;
-            }
-
-            if (CallSpawnTask(allowAny, true, false, false, TaskRequirements.None, false, IsOffDutySpawn, false))
-            {
-                //EntryPoint.WriteToConsoleTestLong($"AMBIENT COP SPAWN TASK RAN");
-                ShouldRunAmbientDispatch = false;
-                //GameTimeAttemptedDispatch = Game.GameTime;
-            }
+            allowAny = true;
         }
+
+        if (CallSpawnTask(allowAny, true, false, false, TaskRequirements.None, false, IsOffDutySpawn, false))
+        {
+            //EntryPoint.WriteToConsoleTestLong($"AMBIENT COP SPAWN TASK RAN");
+            ShouldRunAmbientDispatch = false;
+            //GameTimeAttemptedDispatch = Game.GameTime;
+        }
+
     }
     private void HandleRoadblockSpawns()
     {
@@ -1766,7 +1778,7 @@ public class LEDispatcher
     }
     private bool AreSpawnsValidSpawn(SpawnLocation spawnLocation)
     {
-        if (spawnLocation.FinalPosition.DistanceTo2D(Player.Position) < ClosestPoliceSpawnToSuspectAllowed || World.Pedestrians.AnyCopsNearPosition(spawnLocation.FinalPosition, ClosestPoliceSpawnToOtherPoliceAllowed))
+        if (spawnLocation.FinalPosition.DistanceTo2D(Player.Position) < ClosestPoliceSpawnToSuspectAllowed)// || World.Pedestrians.AnyCopsNearPosition(spawnLocation.FinalPosition, ClosestPoliceSpawnToOtherPoliceAllowed))
         {
             return false;
         }
@@ -1778,7 +1790,7 @@ public class LEDispatcher
     }
     private bool IsValidSpawn(Vector3 location)
     {
-        if (location.DistanceTo2D(Player.Position) < ClosestPoliceSpawnToSuspectAllowed || World.Pedestrians.AnyCopsNearPosition(location, ClosestPoliceSpawnToOtherPoliceAllowed))
+        if (location.DistanceTo2D(Player.Position) < ClosestPoliceSpawnToSuspectAllowed)// || World.Pedestrians.AnyCopsNearPosition(location, ClosestPoliceSpawnToOtherPoliceAllowed))
         {
             return false;
         }
