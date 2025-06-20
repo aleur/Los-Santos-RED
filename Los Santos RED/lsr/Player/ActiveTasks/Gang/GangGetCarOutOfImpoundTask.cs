@@ -12,28 +12,10 @@ using System.Threading.Tasks;
 
 namespace LosSantosRED.lsr.Player.ActiveTasks
 {
-    public class GangGetCarOutOfImpoundTask : IPlayerTask
+    public class GangGetCarOutOfImpoundTask : GangTask, IPlayerTask
     {
         private bool SpawnedVehicle = false;
-        private ITaskAssignable Player;
-        private ITimeReportable Time;
-        private IGangs Gangs;
-        private IPlacesOfInterest PlacesOfInterest;
-        private ISettingsProvideable Settings;
-        private IEntityProvideable World;
-        private ICrimes Crimes;
-        private PlayerTasks PlayerTasks;
-        private IWeapons Weapons;
-        private INameProvideable Names;
-        private IPedGroups PedGroups;
-        private IShopMenus ShopMenus;
-        private IModItems ModItems;
-        private GangTasks GangTasks;
-        private Gang HiringGang;
         private GangDen HiringGangDen;
-        private PlayerTask CurrentTask;
-        private PhoneContact PhoneContact;
-        private int MoneyToRecieve;
         private PoliceStation ImpoundLocation;
         private VehicleExt ImpoundedVehicle;
         private bool HasEnteredVehicle;
@@ -42,30 +24,16 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private uint GameTimeShownHealthWarning;
 
         private bool HasTaskData => HiringGangDen != null && ImpoundLocation != null && SpawnedVehicle;
-        public GangGetCarOutOfImpoundTask(ITaskAssignable player, ITimeReportable time, IGangs gangs, PlayerTasks playerTasks, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, IEntityProvideable world, 
-            ICrimes crimes,IWeapons weapons, INameProvideable names, IPedGroups pedGroups, IShopMenus shopMenus, IModItems modItems, GangTasks gangTasks, PhoneContact phoneContact)
-        {
-            Player = player;
-            Time = time;
-            Gangs = gangs;
-            PlayerTasks = playerTasks;
-            PlacesOfInterest = placesOfInterest;
-            Settings = settings;
-            World = world;
-            Crimes = crimes;
-            Weapons = weapons;
-            Names = names;
-            PedGroups = pedGroups;
-            ShopMenus = shopMenus;
-            ModItems = modItems;
-            GangTasks = gangTasks;
-            PhoneContact = phoneContact;
-        }
-        public void Setup()
+        public GangGetCarOutOfImpoundTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups,
+            IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, Gang hiringGang) : base(player, time, gangs, placesOfInterest, settings, world, crimes, weapons, names, pedGroups, shopMenus, modItems, playerTasks, gangTasks, hiringContact, hiringGang)
         {
 
         }
-        public void Dispose()
+        public override void Setup()
+        {
+
+        }
+        public override void Dispose()
         {
             if (ImpoundLocation != null)
             {
@@ -79,19 +47,17 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             ImpoundedVehicle.IsManualCleanup = false;
             ImpoundedVehicle.Vehicle.IsPersistent = false;
         }
-        public void Start(Gang ActiveGang)
+        public override void Start()
         {
-            HiringGang = ActiveGang;
-            //Contact = new GangContact(HiringGang.ContactName, HiringGang.ContactIcon);
-            if(!PlayerTasks.CanStartNewTask(ActiveGang?.ContactName))
+            if(!PlayerTasks.CanStartNewTask(HiringContact?.Name))
             {
-                GangTasks.SendGenericTooSoonMessage(PhoneContact);
+                GangTasks.SendGenericTooSoonMessage(HiringContact);
                 return;
             }
-            GetTaskData();
+            GetTaskLocations();
             if (!HasTaskData)
             {
-                Game.DisplayHelp($"Error Setting Up Task for {PhoneContact.Name}.");
+                Game.DisplayHelp($"Error Setting Up Task for {HiringContact?.Name}.");
                 return;
             }
             GetPayment();
@@ -111,11 +77,11 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 }
             }, "PayoffFiber");       
         }
-        private void Loop()
+        protected override void Loop()
         {
             while (true)
             {
-                CurrentTask = PlayerTasks.GetTask(HiringGang.ContactName);
+                CurrentTask = PlayerTasks.GetTask(HiringContact?.Name);
                 if (CurrentTask == null || !CurrentTask.IsActive)
                 {
                     break;
@@ -166,7 +132,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             HasEnteredVehicle = true;
             SendReturnToBaseMessage();
         }
-        private void FinishTask()
+        protected override void FinishTask()
         {
             if (CurrentTask != null && CurrentTask.IsActive && CurrentTask.IsReadyForPayment)
             {
@@ -181,15 +147,15 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 Dispose();
             }
         }
-        private void SetReadyToPickupMoney()
+        protected override void SetReadyToPickupMoney()
         {
             OnCompletedOrFailed();
         }
-        private void SetFailed()
+        protected override void SetFailed()
         {
             OnCompletedOrFailed();
-            GangTasks.SendGenericFailMessage(PhoneContact);
-            PlayerTasks.FailTask(HiringGang.Contact);
+            GangTasks.SendGenericFailMessage(HiringContact);
+            PlayerTasks.FailTask(HiringContact);
         }
         private void OnCompletedOrFailed()
         {
@@ -206,7 +172,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             ImpoundedVehicle.Vehicle.LockStatus = (VehicleLockStatus)10;
             //ImpoundedVehicle.Vehicle.IsPersistent = false;
         }
-        private void GetTaskData()
+        private void GetTaskLocations()
         {
             HiringGangDen = PlacesOfInterest.GetMainDen(HiringGang.ID, World.IsMPMapLoaded, Player.CurrentLocation);
             ImpoundLocation = PlacesOfInterest.PossibleLocations.PoliceStations.Where(x => x.HasImpoundLot && x.IsCorrectMap(World.IsMPMapLoaded) && x.IsSameState(Player.CurrentLocation?.CurrentZone?.GameState)).PickRandom();
@@ -215,38 +181,38 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 SpawnedVehicle = true;
             }
         }
-        private void GetPayment()
+        protected override void GetPayment()
         {
-            MoneyToRecieve = RandomItems.GetRandomNumberInt(HiringGang.ImpoundTheftPaymentMin, HiringGang.ImpoundTheftPaymentMax).Round(500);
-            if (MoneyToRecieve <= 0)
+            PaymentAmount = RandomItems.GetRandomNumberInt(HiringGang.ImpoundTheftPaymentMin, HiringGang.ImpoundTheftPaymentMax).Round(500);
+            if (PaymentAmount <= 0)
             {
-                MoneyToRecieve = 500;
+                PaymentAmount = 500;
             }
         }
-        private void AddTask()
+        protected override void AddTask()
         {
             if (ImpoundLocation != null)
             {
                 ImpoundLocation.IsPlayerInterestedInLocation = true;
             }
-            PlayerTasks.AddTask(HiringGang.Contact, MoneyToRecieve, 2000, 0, -500, 3, "Lockup Theft", false);
+            PlayerTasks.AddTask(HiringContact, PaymentAmount, 2000, 0, -500, 3, "Lockup Theft", false);
         }
-        private void SendInitialInstructionsMessage()
+        protected override void SendInitialInstructionsMessage()
         {
             List<string> Replies = new List<string>() {
                 $"Need you to get my {ImpoundedVehicle.FullName(false)} Plate # {ImpoundedVehicle.CarPlate.PlateNumber} out of the impound lot at " +
                 $"~p~{ImpoundLocation.Name}~s~ and bring it back to {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} " +
-                $"for your payment of ${MoneyToRecieve}. " +
+                $"for your payment of ${PaymentAmount}. " +
                 $"Better be in great shape.",
                     };
-            Player.CellPhone.AddPhoneResponse(HiringGang.Contact.Name, HiringGang.Contact.IconName, Replies.PickRandom());
+            Player.CellPhone.AddPhoneResponse(HiringContact?.Name, HiringContact?.IconName, Replies.PickRandom());
         }
         private void SendReturnToBaseMessage()
         {
             List<string> Replies = new List<string>() {
                 $"Heard that thing was moving along. Bring it back to {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} and make sure it is pristine!"
                     };
-            Player.CellPhone.AddScheduledText(PhoneContact, Replies.PickRandom(),1, false);
+            Player.CellPhone.AddScheduledText(HiringContact, Replies.PickRandom(),1, false);
         }
         private bool SpawnCar()
         {

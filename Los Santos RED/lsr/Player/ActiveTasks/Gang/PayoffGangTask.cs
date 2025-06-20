@@ -35,7 +35,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
 
         private bool HasDeadDrop => DeadDrop != null;
 
-        public PayoffGangTask(ITaskAssignable player, ITimeReportable time, IGangs gangs, PlayerTasks playerTasks, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, 
+        public PayoffGangTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, PlayerTasks playerTasks, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, 
             ICrimes crimes, PhoneContact phoneContact, GangTasks gangTasks)
         {
             Player = player;

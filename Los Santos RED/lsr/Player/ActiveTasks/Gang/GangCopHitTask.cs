@@ -20,7 +20,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         public int KillRequirement { get; set; } = 1;
         private bool HasTargetAgencyAndDen => TargetAgency != null && HiringGangDen != null;
 
-        public GangCopHitTask(ITaskAssignable player, ITimeReportable time, IGangs gangs, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, IEntityProvideable world,
+        public GangCopHitTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, IEntityProvideable world,
     ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups, IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, 
     Gang hiringGang, Agency targetAgency, IAgencies agencies, int killRequirement) : base(player, time, gangs, placesOfInterest, settings, world, crimes, weapons, names, pedGroups, shopMenus, modItems, playerTasks, gangTasks, hiringContact, hiringGang)
         {
@@ -77,7 +77,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         {
             while (true)
             {
-                CurrentTask = PlayerTasks.GetTask(HiringGang.ContactName);
+                CurrentTask = PlayerTasks.GetTask(HiringContact?.Name);
                 if (CurrentTask == null || !CurrentTask.IsActive)
                 {
                     break;

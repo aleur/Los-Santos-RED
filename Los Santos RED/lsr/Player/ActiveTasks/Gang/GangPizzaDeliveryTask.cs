@@ -38,7 +38,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private GangTasks GangTasks;
         private bool HasDen => HiringGangDen != null;
 
-        public GangPizzaDeliveryTask(ITaskAssignable player, ITimeReportable time, IGangs gangs, PlayerTasks playerTasks, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, 
+        public GangPizzaDeliveryTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, PlayerTasks playerTasks, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, 
             IModItems modItems, IShopMenus shopMenus, PhoneContact phoneContact, GangTasks gangTasks)
         {
             Player = player;

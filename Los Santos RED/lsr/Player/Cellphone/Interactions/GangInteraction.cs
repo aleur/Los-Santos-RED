@@ -45,6 +45,7 @@ public class GangInteraction : IContactMenuInteraction
     private UIMenuItem GangJoinMenu;
     private UIMenuItem GangImpoundTheft;
     private UIMenuItem GangBodyDisposal;
+    private UIMenuItem GangRandomTask;
     private UIMenu WheelManSubMenu;
     private UIMenu CopHitSubMenu;
     private UIMenu GangHitSubMenu;
@@ -217,6 +218,13 @@ public class GangInteraction : IContactMenuInteraction
     {
         JobsSubMenu = MenuPool.AddSubMenu(GangMenu, "Jobs");
         JobsSubMenu.RemoveBanner();
+        GangRandomTask = new UIMenuItem("Get Random Job", "Random job.") { RightLabel = $"~HUD_COLOUR_GREENDARK~???~s~" };
+        GangRandomTask.Activated += (sender, selectedItem) =>
+        {
+            Player.PlayerTasks.GangTasks.SetupRandom(ActiveGang, GangContact);
+            sender.Visible = false;
+        };
+        JobsSubMenu.AddItem(GangRandomTask);
         AddGangHitSubMenu();
         AddGangAmbushSubMenu();
         AddCopHitSubMenu();

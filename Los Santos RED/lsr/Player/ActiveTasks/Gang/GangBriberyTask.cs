@@ -14,26 +14,15 @@ using System.Windows.Forms;
 
 namespace LosSantosRED.lsr.Player.ActiveTasks
 {
-    public class GangBriberyTask : IPlayerTask
+    public class GangBriberyTask : GangTask, IPlayerTask
     {
-        private ITaskAssignable Player;
-        private IGangs Gangs;
-        private PlayerTasks PlayerTasks;
-        private IPlacesOfInterest PlacesOfInterest;
-        private ISettingsProvideable Settings;
-        private IEntityProvideable World;
-        private ICrimes Crimes;
-        private Gang HiringGang;
         private GangDen HiringGangDen;
-        private PlayerTask CurrentTask;
         private int GameTimeToWaitBeforeComplications;
         private int MoneyToRecieve;
         private int HushMoney;
         private bool HasAddedComplications;
         private bool WillAddComplications;
         private int KilledMembersAtStart;
-        private PhoneContact PhoneContact;
-        private GangTasks GangTasks;
         private IGangTerritories GangTerritories;
         private IZones Zones;
         private UIMenuItem depositMoney;
@@ -44,34 +33,24 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
 
         public PlayerTask PlayerTask => CurrentTask;
 
-        public GangBriberyTask(ITaskAssignable player, IGangs gangs, PlayerTasks playerTasks, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes
-            , PhoneContact phoneContact, GangTasks gangTasks, IGangTerritories gangTerritories, IZones zones)
+        public GangBriberyTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups,
+            IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, Gang hiringGang, IGangTerritories gangTerritories, IZones zones) : base(player, time, gangs, placesOfInterest, settings, world, crimes, weapons, names, pedGroups, shopMenus, modItems, playerTasks, gangTasks, hiringContact, hiringGang)
         {
-            Player = player;
-            Gangs = gangs;
-            PlayerTasks = playerTasks;
-            PlacesOfInterest = placesOfInterest;
-            Settings = settings;
-            World = world;
-            Crimes = crimes;
-            PhoneContact = phoneContact;
-            GangTasks = gangTasks;
             GangTerritories = gangTerritories;
             Zones = zones;
         }
-        public void Setup()
+        public override void Setup()
         {
 
         }
-        public void Dispose()
+        public override void Dispose()
         {
             if (DepositLocation != null) { DepositLocation.IsPlayerInterestedInLocation = false; }
             if (HiringGangDen != null) { HiringGangDen.PickupMoney = 0; }
         }
-        public void Start(Gang ActiveGang)
+        public override void Start()
         {
-            HiringGang = ActiveGang;
-            if (PlayerTasks.CanStartNewTask(ActiveGang?.ContactName))
+            if (PlayerTasks.CanStartNewTask(HiringContact?.Name))
             {
                 GetTargetBank();
                 GetHiringDen();
@@ -97,7 +76,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 }
                 else
                 {
-                    GangTasks.SendGenericTooSoonMessage(PhoneContact);
+                    GangTasks.SendGenericTooSoonMessage(HiringContact);
                 }
             }
         }
@@ -105,10 +84,10 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         {
             while (true)
             {
-                CurrentTask = PlayerTasks.GetTask(HiringGang.ContactName);
+                CurrentTask = PlayerTasks.GetTask(HiringContact?.Name);
                 if (CurrentTask == null || !CurrentTask.IsActive)
                 {
-                    //EntryPoint.WriteToConsoleTestLong($"Task Inactive for {HiringGang.ContactName}");
+                    //EntryPoint.WriteToConsoleTestLong($"Task Inactive for {HiringContactName}");
                     break;
                 }
                 if (HiringGangDen.PickupMoney == 0)
@@ -120,11 +99,11 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 GameFiber.Sleep(1000);
             }
         }
-        private void Loop()
+        protected override void Loop()
         {
             while (true)
             {
-                CurrentTask = PlayerTasks.GetTask(HiringGang.ContactName);
+                CurrentTask = PlayerTasks.GetTask(HiringContact?.Name);
                 if (CurrentTask == null || !CurrentTask.IsActive || HushMoney == 0)
                 {
                     CurrentTask.OnReadyForPayment(false);
@@ -133,7 +112,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 GameFiber.Sleep(1000);
             }
         }
-        private void FinishTask()
+        protected override void FinishTask()
         {
             if (CurrentTask != null && CurrentTask.IsActive && CurrentTask.IsReadyForPayment)
             {
@@ -179,7 +158,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         {
             HiringGangDen = PlacesOfInterest.GetMainDen(HiringGang.ID, World.IsMPMapLoaded, Player.CurrentLocation);
         }
-        private void GetPayment()
+        protected override void GetPayment()
         {
             MoneyToRecieve = RandomItems.GetRandomNumberInt(HiringGang.BriberyPaymentMin, HiringGang.BriberyPaymentMax).Round(500);
             if (MoneyToRecieve <= 0)
@@ -189,13 +168,13 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             HushMoney = MoneyToRecieve * 5;
             HiringGangDen.PickupMoney = HushMoney;
         }
-        private void AddTask()
+        protected override void AddTask()
         {
-            PlayerTasks.AddTask(HiringGang.Contact, MoneyToRecieve, 2000, HiringGangDen.PickupMoney * -5, -2500, 7, "Gang Bribery");
-            CurrentTask = PlayerTasks.GetTask(HiringGang.ContactName);
+            PlayerTasks.AddTask(HiringContact, MoneyToRecieve, 2000, HiringGangDen.PickupMoney * -5, -2500, 7, "Gang Bribery");
+            CurrentTask = PlayerTasks.GetTask(HiringContact?.Name);
             CurrentTask.FailOnStandardRespawn = true;
         }
-        private void SendInitialInstructionsMessage()
+        protected override void SendInitialInstructionsMessage()
         {
             List<string> Replies = new List<string>() {
             $"Pick up ~g~{HushMoney:C0}~s~ at {HiringGang.DenName} at {HiringGangDen.FullStreetAddress}. Need you to make a quick deposit.",
@@ -208,7 +187,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             $"Pick up ~g~{HushMoney:C0}~s~ at {HiringGang.DenName}, {HiringGangDen.FullStreetAddress}. Then, take care of the deposit." 
             };
 
-            Player.CellPhone.AddPhoneResponse(HiringGang.Contact.Name, HiringGang.Contact.IconName, Replies.PickRandom());
+            Player.CellPhone.AddPhoneResponse(HiringContact.Name, HiringContact.IconName, Replies.PickRandom());
         }
         private void SendDropOffMessage()
         {
@@ -224,7 +203,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             $"Too much noise from the {SelectedZone.AssignedLEAgency.ColorPrefix}{SelectedZone.AssignedLEAgency.ShortName}~s~ chief. Make a discreet deposit at {DepositLocation.Name} in {SelectedZone.DisplayName}, leave ~g~{HushMoney:C0}~s~ and everything will be fine.",
             $"The chief in {SelectedZone.DisplayName} is causing trouble. A quick stop at {DepositLocation.Name} with ~g~{HushMoney:C0}~s~ will smooth things over.",
             };
-            Player.CellPhone.AddPhoneResponse(HiringGang.Contact.Name, HiringGang.Contact.IconName, Replies.PickRandom());
+            Player.CellPhone.AddPhoneResponse(HiringContact.Name, HiringContact.IconName, Replies.PickRandom());
         }
         private void SendMoneyPickupMessage()
         {
@@ -235,7 +214,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                                 $"{HiringGangDen.FullStreetAddress} for ${MoneyToRecieve}",
                                 $"Heard you were done, see you at the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress}. We owe you ${MoneyToRecieve}",
                                 };
-            Player.CellPhone.AddScheduledText(PhoneContact, Replies.PickRandom(), 1, false);
+            Player.CellPhone.AddScheduledText(HiringContact, Replies.PickRandom(), 1, false);
         }
         public void OnInteractionMenuCreated(GameLocation gameLocation, MenuPool menuPool, UIMenu interactionMenu)
         {

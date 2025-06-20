@@ -12,7 +12,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
     {
         protected ITaskAssignable Player;
 
-        protected ITimeReportable Time;
+        protected ITimeControllable Time;
         protected IGangs Gangs;
         protected IPlacesOfInterest PlacesOfInterest;
         protected ISettingsProvideable Settings;
@@ -38,7 +38,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         protected int DaysToComplete;
         protected string DebugName;
 
-        public GangTask(ITaskAssignable player, ITimeReportable time, IGangs gangs, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, IEntityProvideable world,ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups, 
+        public GangTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, IEntityProvideable world,ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups, 
             IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, Gang hiringGang)
         {
             Player = player;
