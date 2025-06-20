@@ -10,58 +10,40 @@ using System.Threading.Tasks;
 
 namespace LosSantosRED.lsr.Player.ActiveTasks
 {
-    public class PayoffGangTask : IPlayerTask
+    public class PayoffGangTask : GangTask, IPlayerTask
     {
-        private ITaskAssignable Player;
-        private ITimeReportable Time;
-        private IGangs Gangs;
-        private PlayerTasks PlayerTasks;
-        private IPlacesOfInterest PlacesOfInterest;
         private List<DeadDrop> ActiveDrops = new List<DeadDrop>();
-        private ISettingsProvideable Settings;
-        private IEntityProvideable World;
-        private ICrimes Crimes;
-        private Gang HiringGang;
         private DeadDrop DeadDrop;
-        private PlayerTask CurrentTask;
         private int GameTimeToWaitBeforeComplications;
         private GangReputation HiringGangReputation;
         private int CostToPayoff;
-        private int RepToNextLevel;
         private bool HasAddedComplications;
         private bool WillAddComplications;
-        private PhoneContact PhoneContact;
-        private GangTasks GangTasks;
 
         private bool HasDeadDrop => DeadDrop != null;
 
-        public PayoffGangTask(ITaskAssignable player, ITimeReportable time, IGangs gangs, PlayerTasks playerTasks, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, 
-            ICrimes crimes, PhoneContact phoneContact, GangTasks gangTasks)
+        public PayoffGangTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups,
+            IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, Gang hiringGang, List<DeadDrop> activeDrops) : base(player, time, gangs, placesOfInterest, settings, world, crimes, weapons, names, pedGroups, shopMenus, modItems, playerTasks, gangTasks, hiringContact, hiringGang)
         {
-            Player = player;
-            Time = time;
-            Gangs = gangs;
-            PlayerTasks = playerTasks;
-            PlacesOfInterest = placesOfInterest;
             ActiveDrops = activeDrops;
-            Settings = settings;
-            World = world;
-            Crimes = crimes;
-            PhoneContact = phoneContact;
-            GangTasks = gangTasks;
         }
-        public void Setup()
+        public override void Setup()
         {
+            PaymentAmount = 0;
+            RepOnCompletion = 2000;
+            DebtOnFail = 0;
+            RepOnFail = -500;
+            DaysToComplete = 7;
+            DebugName = "Gun Transport";
         }
-        public void Dispose()
+        public override void Dispose()
         {
             DeadDrop?.Reset();
             DeadDrop?.Deactivate(true);
         }
-        public void Start(Gang ActiveGang)
+        public override void Start()
         {
-            HiringGang = ActiveGang;
-            if (PlayerTasks.CanStartNewTask(HiringGang?.ContactName))
+            if (PlayerTasks.CanStartNewTask(HiringContact?.Name))
             {
                 GetDeadDrop();
                 if (HasDeadDrop)
@@ -85,11 +67,11 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 }
                 else
                 {
-                    GangTasks.SendGenericTooSoonMessage(PhoneContact);
+                    GangTasks.SendGenericTooSoonMessage(HiringContact);
                 }
             }
         }
-        private void Loop()
+        protected override void Loop()
         {
             while (true)
             {
@@ -111,7 +93,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 GameFiber.Sleep(1000);
             }
         }
-        private void FinishTask()
+        protected override void FinishTask()
         {
             if (CurrentTask != null && CurrentTask.IsActive && CurrentTask.IsReadyForPayment)
             {
@@ -144,23 +126,23 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 if(HiringGangReputation.PlayerDebt > 0)
                 {
                     CostToPayoff = HiringGangReputation.PlayerDebt;
-                    RepToNextLevel = 0;
+                    RepOnCompletion = 0;
                 }
                 else
                 {
                     CostToPayoff = HiringGangReputation.CostToPayoff;
-                    RepToNextLevel = HiringGangReputation.RepToNextLevel;
+                    RepOnCompletion = HiringGangReputation.RepToNextLevel;
                 }
             }
             else
             {
                 CostToPayoff = 0;
-                RepToNextLevel = 0;
+                RepOnCompletion = 0;
             }
         }
-        private void AddTask()
+        protected override void AddTask()
         {
-            PlayerTasks.AddTask(HiringGang.Contact, 0, RepToNextLevel, 0, -200, 2, "Dead Drop");
+            PlayerTasks.AddTask(HiringContact, PaymentAmount, RepOnCompletion, 0, -200, 2, "Dead Drop");
             DeadDrop.SetupDrop(CostToPayoff, true);
             ActiveDrops.Add(DeadDrop);
             GameTimeToWaitBeforeComplications = RandomItems.GetRandomNumberInt(3000, 10000);
@@ -201,9 +183,9 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                                 "Ah you got me my favorite thing! I owe you a thing or two",
                                 };
             }
-            Player.CellPhone.AddScheduledText(PhoneContact, Replies.PickRandom(), 0, false);
+            Player.CellPhone.AddScheduledText(HiringContact, Replies.PickRandom(), 0, false);
         }
-        private void SendInitialInstructionsMessage()
+        protected override void SendInitialInstructionsMessage()
         {
             List<string> Replies = new List<string>() {
                 $"Drop ${CostToPayoff} on {DeadDrop.FullStreetAddress}, its {DeadDrop.Description}. My guy won't pick it up if you are around.",

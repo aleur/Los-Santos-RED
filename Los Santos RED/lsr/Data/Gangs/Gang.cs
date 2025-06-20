@@ -143,6 +143,7 @@ public class Gang : IPlatePrefixable, IGeneratesDispatchables
 
 
     public float DrugDealerPercentage { get; set; } = 45f;
+    public float WillGiveMissionPercentage { get; set; } = 100f;
 
 
 

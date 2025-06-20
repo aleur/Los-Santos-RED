@@ -26,11 +26,15 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private int GameTimeToWaitBeforeComplications;
         private ContactRelationship HiringContactReputation;
         private int CostToPayoff;
-        private int RepToNextLevel;
         private bool HasAddedComplications;
         private bool WillAddComplications;
         private PhoneContact PhoneContact;
-
+        public int PaymentAmount { get; set; }
+        public int RepOnCompletion { get; set; }
+        public int DebtOnFail { get; set; }
+        public int RepOnFail { get; set; }
+        public int DaysToComplete { get; set; }
+        public string DebugName { get; set; }
         private bool HasDeadDrop => DeadDrop != null;
 
         public PayoffContactTask(ITaskAssignable player, ITimeReportable time, IGangs gangs, PlayerTasks playerTasks, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world,
@@ -49,6 +53,11 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         public void Setup()
         {
+            PaymentAmount = 0;
+            DebtOnFail = 0;
+            RepOnFail = -200;
+            DaysToComplete = 2;
+            DebugName = "Dead Drop";
         }
         public void Dispose()
         {
@@ -136,23 +145,23 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 if (HiringContactReputation.PlayerDebt > 0)
                 {
                     CostToPayoff = HiringContactReputation.PlayerDebt;
-                    RepToNextLevel = 0;
+                    RepOnCompletion = 0;
                 }
                 else
                 {
                     CostToPayoff = HiringContactReputation.CostToPayoff;
-                    RepToNextLevel = Math.Abs(HiringContactReputation.ReputationLevel);
+                    RepOnCompletion = Math.Abs(HiringContactReputation.ReputationLevel);
                 }
             }
             else
             {
                 CostToPayoff = 0;
-                RepToNextLevel = 0;
+                RepOnCompletion = 0;
             }
         }
         private void AddTask()
         {
-            PlayerTasks.AddTask(PhoneContact, 0, RepToNextLevel, 0, -200, 2, "Dead Drop");
+            PlayerTasks.AddTask(PhoneContact, 0, RepOnCompletion, 0, -200, 2, "Dead Drop");
             DeadDrop.SetupDrop(CostToPayoff, true);
             ActiveDrops.Add(DeadDrop);
             GameTimeToWaitBeforeComplications = RandomItems.GetRandomNumberInt(3000, 10000);

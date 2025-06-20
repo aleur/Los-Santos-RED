@@ -12,29 +12,11 @@ using System.Threading.Tasks;
 
 namespace LosSantosRED.lsr.Player.ActiveTasks
 {
-    public class GangWheelmanTask : IPlayerTask
+    public class GangWheelmanTask : GangTask, IPlayerTask
     {
-        private ITaskAssignable Player;
-        private ITimeControllable Time;
-        private IGangs Gangs;
-        private PlayerTasks PlayerTasks;
-        private IPlacesOfInterest PlacesOfInterest;
-        private List<DeadDrop> ActiveDrops = new List<DeadDrop>();
-        private ISettingsProvideable Settings;
-        private IEntityProvideable World;
-        private ICrimes Crimes;
-        private IModItems ModItems;
-
-        private IWeapons Weapons;
-        private INameProvideable Names;
-        private IPedGroups PedGroups;
-        private IShopMenus ShopMenus;
-        private Gang HiringGang;
         private GangDen HiringGangDen;
         private GameLocation RobberyLocation;
-        private PlayerTask CurrentTask;
         private int GameTimeToWaitBeforeComplications;
-        private int MoneyToRecieve;
         private bool HasAddedComplications;
         private bool WillAddComplications;
 
@@ -59,40 +41,26 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private Vector3 EgressCamPosition;
         private float EgressCamFOV;
         private bool hasAddedButtonPrompt;
-        private PhoneContact PhoneContact;
-        private GangTasks GangTasks;
         private string ForcedLocationType;
         private bool RequireAllMembersToFinish;
         private string ButtonPromptIdentifier => "RobberyStart" + RobberyLocation?.Name + HiringGang?.ID;
         private bool HasLocations => RobberyLocation != null && HiringGangDen != null;
-        public GangWheelmanTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, PlayerTasks playerTasks, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes,
-            IWeapons weapons, INameProvideable names, IPedGroups pedGroups, IShopMenus shopMenus, IModItems modItems, PhoneContact phoneContact, GangTasks gangTasks, int robbersToSpawn, string locationType, bool requireAllMembersToFinish)
+        public GangWheelmanTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups,
+            IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, Gang hiringGang, int robbersToSpawn, string locationType, bool requireAllMembersToFinish) : base(player, time, gangs, placesOfInterest, settings, world, crimes, weapons, names, pedGroups, shopMenus, modItems, playerTasks, gangTasks, hiringContact, hiringGang)
         {
-            Player = player;
-            Time = time;
-            Gangs = gangs;
-            PlayerTasks = playerTasks;
-            PlacesOfInterest = placesOfInterest;
-            ActiveDrops = activeDrops;
-            Settings = settings;
-            World = world;
-            Crimes = crimes;
-            Weapons = weapons;
-            Names = names;
-            PedGroups = pedGroups;
-            ShopMenus = shopMenus;
-            ModItems = modItems;
-            PhoneContact = phoneContact;
-            GangTasks = gangTasks;
             RobbersToSpawn = robbersToSpawn;
             ForcedLocationType = locationType;
             RequireAllMembersToFinish = requireAllMembersToFinish;
         }
-        public void Setup()
-        {
-            
+        public override void Setup()
+        { 
+            RepOnCompletion = 2000;
+            DebtOnFail = 0;
+            RepOnFail = -500;
+            DaysToComplete = 7;
+            DebugName = "Gang Wheelman";
         }
-        public void Dispose()
+        public override void Dispose()
         {
             if(RobberyLocation != null)
             {
@@ -101,10 +69,9 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             Player.ButtonPrompts.RemovePrompts("RobberyStart");
             CleanupRobbers();
         }
-        public void Start(Gang ActiveGang)
+        public override void Start()
         {
-            HiringGang = ActiveGang;
-            if (PlayerTasks.CanStartNewTask(ActiveGang?.ContactName))
+            if (PlayerTasks.CanStartNewTask(HiringContact?.Name))
             {
                 GetRobberyInformation();
                 if (HasLocations)
@@ -128,15 +95,15 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 }
                 else
                 {
-                    GangTasks.SendGenericTooSoonMessage(PhoneContact);
+                    GangTasks.SendGenericTooSoonMessage(HiringContact);
                 }
             }
         }
-        private void Loop()
+        protected override void Loop()
         {
             while (true)
             {
-                CurrentTask = PlayerTasks.GetTask(HiringGang.ContactName);
+                CurrentTask = PlayerTasks.GetTask(HiringContact?.Name);
                 if (CurrentTask == null || !CurrentTask.IsActive)
                 {
                     break;
@@ -472,7 +439,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             }
             return false;
         }
-        private void SetFailed()
+        protected override void SetFailed()
         {
             if (RobberyLocation != null)
             {
@@ -492,8 +459,8 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                     }
                 }
             }
-            GangTasks.SendGenericFailMessage(PhoneContact);
-            PlayerTasks.FailTask(HiringGang.Contact);
+            GangTasks.SendGenericFailMessage(HiringContact);
+            PlayerTasks.FailTask(HiringContact);
         }
         private void SetCompleted()
         {
@@ -528,7 +495,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 }
             }
         }
-        private void FinishTask()
+        protected override void FinishTask()
         {
             Player.ButtonPrompts.RemovePrompts("RobberyStart");
             if (CurrentTask != null && CurrentTask.WasCompleted)
@@ -570,15 +537,15 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             RobberyTime = Time.CurrentDateTime.AddHours(HoursToRobbery);
             //RobbersToSpawn = RandomItems.GetRandomNumberInt(1, 3);
         }
-        private void GetPayment()
+        protected override void GetPayment()
         {
-            MoneyToRecieve = RandomItems.GetRandomNumberInt(HiringGang.WheelmanPaymentMin, HiringGang.WheelmanPaymentMax).Round(500);
-            if (MoneyToRecieve <= 0)
+            PaymentAmount = RandomItems.GetRandomNumberInt(HiringGang.WheelmanPaymentMin, HiringGang.WheelmanPaymentMax).Round(500);
+            if (PaymentAmount <= 0)
             {
-                MoneyToRecieve = 500;
+                PaymentAmount = 500;
             }
         }
-        private void AddTask()
+        protected override void AddTask()
         {
             GameTimeToWaitBeforeComplications = RandomItems.GetRandomNumberInt(3000, 10000);
             HasAddedComplications = false;
@@ -595,11 +562,11 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             {
                 RobberyLocation.IsPlayerInterestedInLocation = true;
             }
-            PlayerTasks.AddTask(HiringGang.Contact, MoneyToRecieve, 2000, 2000, -500, 7, "Gang Wheelman");
-            CurrentTask = PlayerTasks.GetTask(HiringGang.ContactName);
+            PlayerTasks.AddTask(HiringContact, PaymentAmount, RepOnCompletion, DebtOnFail, RepOnFail, DaysToComplete, DebugName);
+            CurrentTask = PlayerTasks.GetTask(HiringContact?.Name);
             CurrentTask.FailOnStandardRespawn = true;
         }
-        private void SendInitialInstructionsMessage()
+        protected override void SendInitialInstructionsMessage()
         {
             string NumberToSpawnString = "";
             if(RobbersToSpawn == 1)
@@ -612,12 +579,12 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             }
             
             List<string> Replies = new List<string>() {
-                $"We need a wheelman for a score that is going down. Location is the {RobberyLocation.Name} {RobberyLocation.FullStreetAddress} in {HoursToRobbery} hours. {NumberToSpawnString}. Once you are done come back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress}. ${MoneyToRecieve} to you",
-                $"Get a car and head to the {RobberyLocation.Name} {RobberyLocation.FullStreetAddress}. It will go down in {HoursToRobbery} hours. {NumberToSpawnString}. When you are finished, get back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress}. I'll have ${MoneyToRecieve} waiting for you.",
-                $"We need a driver for a job that we got planned. Get to the {RobberyLocation.Name} {RobberyLocation.FullStreetAddress}. Scheduled for {HoursToRobbery} hours. {NumberToSpawnString}. Afterwards, come back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} for your payment of ${MoneyToRecieve}",
-                $"Sombody said you can drive, we'll see. Need you at the {RobberyLocation.Name} {RobberyLocation.FullStreetAddress}. We get going in {HoursToRobbery} hours. {NumberToSpawnString}. When you are finished, get back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} for your payment of ${MoneyToRecieve}",
-                $"Need someone good behind the wheel. Location is {RobberyLocation.Name} {RobberyLocation.FullStreetAddress}. The fun starts in {HoursToRobbery} hours. {NumberToSpawnString}. Afterwards, come back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} for your payment of ${MoneyToRecieve}",
-                $"Need a quick taxi service for a job. Get your ass to the {RobberyLocation.Name} {RobberyLocation.FullStreetAddress}. You have {HoursToRobbery} hours before the job. {NumberToSpawnString}. When you are finished, get back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} for your payment of ${MoneyToRecieve}",
+                $"We need a wheelman for a score that is going down. Location is the {RobberyLocation.Name} {RobberyLocation.FullStreetAddress} in {HoursToRobbery} hours. {NumberToSpawnString}. Once you are done come back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress}. ${PaymentAmount} to you",
+                $"Get a car and head to the {RobberyLocation.Name} {RobberyLocation.FullStreetAddress}. It will go down in {HoursToRobbery} hours. {NumberToSpawnString}. When you are finished, get back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress}. I'll have ${PaymentAmount} waiting for you.",
+                $"We need a driver for a job that we got planned. Get to the {RobberyLocation.Name} {RobberyLocation.FullStreetAddress}. Scheduled for {HoursToRobbery} hours. {NumberToSpawnString}. Afterwards, come back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} for your payment of ${PaymentAmount}",
+                $"Sombody said you can drive, we'll see. Need you at the {RobberyLocation.Name} {RobberyLocation.FullStreetAddress}. We get going in {HoursToRobbery} hours. {NumberToSpawnString}. When you are finished, get back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} for your payment of ${PaymentAmount}",
+                $"Need someone good behind the wheel. Location is {RobberyLocation.Name} {RobberyLocation.FullStreetAddress}. The fun starts in {HoursToRobbery} hours. {NumberToSpawnString}. Afterwards, come back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} for your payment of ${PaymentAmount}",
+                $"Need a quick taxi service for a job. Get your ass to the {RobberyLocation.Name} {RobberyLocation.FullStreetAddress}. You have {HoursToRobbery} hours before the job. {NumberToSpawnString}. When you are finished, get back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} for your payment of ${PaymentAmount}",
 
 
             };
@@ -626,13 +593,13 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private void SendMoneyPickupMessage()
         {
             List<string> Replies = new List<string>() {
-                                $"Seems like that thing we discussed is done? Come by the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} to collect the ${MoneyToRecieve}",
-                                $"Word got around that you are done with that thing for us, Come back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} for your payment of ${MoneyToRecieve}",
-                                $"Get back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} for your payment of ${MoneyToRecieve}",
-                                $"{HiringGangDen.FullStreetAddress} for ${MoneyToRecieve}",
-                                $"Heard you were done, see you at the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress}. We owe you ${MoneyToRecieve}",
+                                $"Seems like that thing we discussed is done? Come by the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} to collect the ${PaymentAmount}",
+                                $"Word got around that you are done with that thing for us, Come back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} for your payment of ${PaymentAmount}",
+                                $"Get back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} for your payment of ${PaymentAmount}",
+                                $"{HiringGangDen.FullStreetAddress} for ${PaymentAmount}",
+                                $"Heard you were done, see you at the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress}. We owe you ${PaymentAmount}",
                                 };
-            Player.CellPhone.AddScheduledText(PhoneContact, Replies.PickRandom(), 1, false);
+            Player.CellPhone.AddScheduledText(HiringContact, Replies.PickRandom(), 1, false);
         }
     }
 }

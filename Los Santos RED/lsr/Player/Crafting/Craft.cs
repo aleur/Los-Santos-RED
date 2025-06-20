@@ -36,6 +36,10 @@ namespace Mod
             SetupCraftableLookup();
             Player.Crafting = this;
         }
+        public void Reset()
+        {
+            UnfinishedCrafts.Clear();
+        }
         private void SetupCraftableLookup()
         {
             CraftableItems.CraftablesLookup = new System.Collections.Generic.Dictionary<string, CraftableItemLookupModel>();

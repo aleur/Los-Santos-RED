@@ -83,9 +83,9 @@ namespace LosSantosRED.lsr
             GameFiber.Yield();
             Player.Setup();
             GameFiber.Yield();
-            Police = new Police(World, Player, Player, ModDataFileManager.Settings, Player, Time);
+            Police = new Police(World, Player, Player, Player, ModDataFileManager.Settings, Player, Time);
             GameFiber.Yield();
-            Civilians = new Civilians(World, Player, Player, ModDataFileManager.Settings, ModDataFileManager.Gangs);
+            Civilians = new Civilians(World, Player, Player, Player, ModDataFileManager.Settings, ModDataFileManager.Gangs);
             GameFiber.Yield();
             PedSwap = new PedSwap(Time, Player, ModDataFileManager.Settings, World, ModDataFileManager.Weapons, ModDataFileManager.Crimes, ModDataFileManager.Names, ModDataFileManager.ModItems, World, ModDataFileManager.RelationshipGroups,
                 ModDataFileManager.ShopMenus, ModDataFileManager.DispatchablePeople, ModDataFileManager.Heads, ModDataFileManager.ClothesNames, ModDataFileManager.Gangs, ModDataFileManager.Agencies, ModDataFileManager.TattooNames, ModDataFileManager.GameSaves, ModDataFileManager.SavedOutfits, Player);

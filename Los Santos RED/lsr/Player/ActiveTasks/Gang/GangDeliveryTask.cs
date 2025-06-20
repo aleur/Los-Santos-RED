@@ -11,57 +11,32 @@ using System.Threading.Tasks;
 
 namespace LosSantosRED.lsr.Player.ActiveTasks
 {
-    public class GangDeliveryTask : IPlayerTask
+    public class GangDeliveryTask : GangTask, IPlayerTask
     {
-        private ITaskAssignable Player;
-        private ITimeReportable Time;
-        private IGangs Gangs;
-        private PlayerTasks PlayerTasks;
-        private IPlacesOfInterest PlacesOfInterest;
-        private List<DeadDrop> ActiveDrops = new List<DeadDrop>();
-        private ISettingsProvideable Settings;
-        private IEntityProvideable World;
-        private ICrimes Crimes;
-        private IModItems ModItems;
-        private IShopMenus ShopMenus;
-        private Gang HiringGang;
-        private PlayerTask CurrentTask;
         private int GameTimeToWaitBeforeComplications;
         private bool HasAddedComplications;
         private bool WillAddComplications;
-        private int MoneyToRecieve;
         private GangDen HiringGangDen;
         private ModItem ItemToDeliver;
         private int NumberOfItemsToDeliver;
-        private PhoneContact PhoneContact;
-        private GangTasks GangTasks;
         private string ModItemNameToDeliver;
         private List<MenuItem> HiddenItems;
         private bool HasDen => HiringGangDen != null;
 
-        public GangDeliveryTask(ITaskAssignable player, ITimeReportable time, IGangs gangs, PlayerTasks playerTasks, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, IModItems modItems, 
-            IShopMenus shopMenus, PhoneContact phoneContact, GangTasks gangTasks, string modItemNameToDeliver)
+        public GangDeliveryTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups,
+            IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, Gang hiringGang, string modItemNameToDeliver) : base(player, time, gangs, placesOfInterest, settings, world, crimes, weapons, names, pedGroups, shopMenus, modItems, playerTasks, gangTasks, hiringContact, hiringGang)
         {
-            Player = player;
-            Time = time;
-            Gangs = gangs;
-            PlayerTasks = playerTasks;
-            PlacesOfInterest = placesOfInterest;
-            ActiveDrops = activeDrops;
-            Settings = settings;
-            World = world;
-            Crimes = crimes;
-            ModItems = modItems;
-            ShopMenus = shopMenus;
-            PhoneContact = phoneContact;
-            GangTasks = gangTasks;
             ModItemNameToDeliver = modItemNameToDeliver;
         }
-        public void Setup()
+        public override void Setup()
         {
-
+            RepOnCompletion = 500;
+            DebtOnFail = 0;
+            RepOnFail = -1000;
+            DaysToComplete = 4;
+            DebugName = "Delivery for Gang";
         }
-        public void Dispose()
+        public override void Dispose()
         {
             if (HiringGangDen != null)
             {
@@ -69,9 +44,8 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 HiringGangDen.ExpectedItemAmount = 0;
             }
         }
-        public void Start(Gang ActiveGang)
+        public override void Start()
         {
-            HiringGang = ActiveGang;
             if (PlayerTasks.CanStartNewTask(HiringGang?.ContactName))
             {
                 GetHiringDen();
@@ -91,7 +65,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 }
                 else
                 {
-                    GangTasks.SendGenericTooSoonMessage(PhoneContact);
+                    GangTasks.SendGenericTooSoonMessage(HiringContact);
                 }
             }
         }
@@ -125,7 +99,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         private void GetRequiredPayment()
         {
-            int PaymentAmount = RandomItems.GetRandomNumberInt(HiringGang.DeliveryPaymentMin, HiringGang.DeliveryPaymentMax).Round(100);
+            int DeliveryPayment = RandomItems.GetRandomNumberInt(HiringGang.DeliveryPaymentMin, HiringGang.DeliveryPaymentMax).Round(100);
             ItemToDeliver = null;
             /*if(HiringGangDen.Menu.Items.Any(x => x.Purchaseable && x.ModItemName == ModItemNameToDeliver))
             {
@@ -139,19 +113,19 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             {
                 Tuple<int, int> Prices = ShopMenus.GetPrices(ItemToDeliver.Name);
                 float MoreThaMax = (float)Prices.Item2 * 1.5f;
-                NumberOfItemsToDeliver = (int)(PaymentAmount / MoreThaMax);
-                MoneyToRecieve = PaymentAmount;
-                //EntryPoint.WriteToConsoleTestLong($"GANG DELIVERY Item: {ItemToDeliver.Name} Number: {NumberOfItemsToDeliver} Lowest: {Prices.Item1}  Highest {Prices.Item2} Payment: {MoneyToRecieve}");
+                NumberOfItemsToDeliver = (int)(DeliveryPayment / MoreThaMax);
+                PaymentAmount = DeliveryPayment;
+                //EntryPoint.WriteToConsoleTestLong($"GANG DELIVERY Item: {ItemToDeliver.Name} Number: {NumberOfItemsToDeliver} Lowest: {Prices.Item1}  Highest {Prices.Item2} Payment: {PaymentAmount}");
             }
-            if (MoneyToRecieve <= 0)
+            if (PaymentAmount <= 0)
             {
-                MoneyToRecieve = 500;
+                PaymentAmount = 500;
             }
-            MoneyToRecieve = MoneyToRecieve.Round(10);
+            PaymentAmount = PaymentAmount.Round(10);
         }
-        private void AddTask()
+        protected override void AddTask()
         {
-            PlayerTasks.AddTask(HiringGang.Contact, MoneyToRecieve, 500, 0, -1000, 4, "Pickup for Gang");
+            PlayerTasks.AddTask(HiringGang.Contact, PaymentAmount, RepOnCompletion, DebtOnFail, RepOnFail, DaysToComplete, DebugName);
             HiringGangDen.ExpectedItem = ItemToDeliver;
             HiringGangDen.ExpectedItemAmount = NumberOfItemsToDeliver;
 
@@ -166,14 +140,14 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             HasAddedComplications = false;
             WillAddComplications = false;// RandomItems.RandomPercent(Settings.SettingsManager.TaskSettings.RivalGangHitComplicationsPercentage);
         }
-        private void SendInitialInstructionsMessage()
+        protected override void SendInitialInstructionsMessage()
         {
             List<string> Replies = new List<string>() {
-                    $"I want you to find us {NumberOfItemsToDeliver} {ItemToDeliver.MeasurementName}(s) of {ItemToDeliver.Name}. We need it quick. Bring it to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress}. ${MoneyToRecieve}",
-                    $"Go get {NumberOfItemsToDeliver} {ItemToDeliver.MeasurementName}(s) of {ItemToDeliver.Name} from somewhere, I don't wanna know. Don't take too long. Bring it to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress}. ${MoneyToRecieve} to you when you drop it off",
-                    $"We need you to find {NumberOfItemsToDeliver} {ItemToDeliver.MeasurementName}(s) of {ItemToDeliver.Name}. We can't wait all week. Take it to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress}. You'll get ${MoneyToRecieve} when I get my item.",
+                    $"I want you to find us {NumberOfItemsToDeliver} {ItemToDeliver.MeasurementName}(s) of {ItemToDeliver.Name}. We need it quick. Bring it to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress}. ${PaymentAmount}",
+                    $"Go get {NumberOfItemsToDeliver} {ItemToDeliver.MeasurementName}(s) of {ItemToDeliver.Name} from somewhere, I don't wanna know. Don't take too long. Bring it to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress}. ${PaymentAmount} to you when you drop it off",
+                    $"We need you to find {NumberOfItemsToDeliver} {ItemToDeliver.MeasurementName}(s) of {ItemToDeliver.Name}. We can't wait all week. Take it to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress}. You'll get ${PaymentAmount} when I get my item.",
                     };
-            Player.CellPhone.AddPhoneResponse(HiringGang.Contact.Name, HiringGang.Contact.IconName, Replies.PickRandom());
+            Player.CellPhone.AddPhoneResponse(HiringContact?.Name, HiringContact?.IconName, Replies.PickRandom());
         }
     }
 }

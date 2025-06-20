@@ -368,6 +368,7 @@ namespace LosSantosRED.lsr.Helper
             //NativeFunction.Natives.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(text);
             //NativeFunction.Natives.x25fbb336df1804cb("jamyfafi"); //NativeFunction.Natives.x25fbb336df1804cb("STRING");
             AddLongString(text);
+            //EntryPoint.WriteToConsole($"{textureDictionaryName}, {textureName}, {flash}, {(int)iconID}, {title}, {subtitle}");
             NativeFunction.Natives.END_TEXT_COMMAND_THEFEED_POST_MESSAGETEXT(textureDictionaryName, textureName, flash, (int)iconID, title, subtitle);
         }
         public static void DisplayNotificationCustom(string textureDictionaryName, string textureName, string title, string subtitle, NotificationIconTypes iconID, bool flash)

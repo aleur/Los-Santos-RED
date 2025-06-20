@@ -13,62 +13,42 @@ using System.Threading.Tasks;
 
 namespace LosSantosRED.lsr.Player.ActiveTasks
 {
-    public class GangProveWorthTask : IPlayerTask
+    public class GangProveWorthTask : GangTask, IPlayerTask
     {
-        private ITaskAssignable Player;
-        private ITimeReportable Time;
-        private IGangs Gangs;
-        private PlayerTasks PlayerTasks;
-        private IPlacesOfInterest PlacesOfInterest;
         private List<DeadDrop> ActiveDrops = new List<DeadDrop>();
-        private ISettingsProvideable Settings;
-        private IEntityProvideable World;
-        private ICrimes Crimes;
-        private Gang HiringGang;
         private GangDen HiringGangDen;
         private Gang TargetGang;
         private GangDen TargetGangDen;
-        private PlayerTask CurrentTask;
         private int GameTimeToWaitBeforeComplications;
-        private int MoneyToRecieve;
         private bool HasAddedComplications;
         private bool WillAddComplications;
         private int KilledMembersAtStart;
-        private PhoneContact PhoneContact;
         private bool hasExploded = false;
-        private GangTasks GangTasks;
         public int KillRequirement { get; set; } = 1;
         private bool HasTargetGangAndHiringDen => TargetGang != null && HiringGangDen != null && TargetGangDen != null;
 
         public bool JoinGangOnComplete { get; set; } = false;
-
-        public GangProveWorthTask(ITaskAssignable player, ITimeReportable time, IGangs gangs, PlayerTasks playerTasks, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, 
-            PhoneContact phoneContact, GangTasks gangTasks)
+        public GangProveWorthTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups,
+            IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, Gang hiringGang, List<DeadDrop> activeDrops) : base(player, time, gangs, placesOfInterest, settings, world, crimes, weapons, names, pedGroups, shopMenus, modItems, playerTasks, gangTasks, hiringContact, hiringGang)
         {
-            Player = player;
-            Time = time;
-            Gangs = gangs;
-            PlayerTasks = playerTasks;
-            PlacesOfInterest = placesOfInterest;
             ActiveDrops = activeDrops;
-            Settings = settings;
-            World = world;
-            Crimes = crimes;
-            PhoneContact = phoneContact;
-            GangTasks = gangTasks;
         }
-        public void Setup()
+        public override void Setup()
         {
-            hasExploded = false;
+            hasExploded = false; 
+            RepOnCompletion = 2000;
+            DebtOnFail = 0;
+            RepOnFail = -50000;
+            DaysToComplete = 7;
+            DebugName = "Terrorize Rival Gang";
         }
-        public void Dispose()
+        public override void Dispose()
         {
 
         }
-        public void Start(Gang ActiveGang)
+        public override void Start()
         {
-            HiringGang = ActiveGang;
-            if (PlayerTasks.CanStartNewTask(ActiveGang?.ContactName))
+            if (PlayerTasks.CanStartNewTask(HiringContact?.Name))
             {
                 GetTargetGang();
                 GetHiringDen();
@@ -93,11 +73,11 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 }
                 else
                 {
-                    GangTasks.SendGenericTooSoonMessage(PhoneContact);
+                    GangTasks.SendGenericTooSoonMessage(HiringContact);
                 }
             }
         }
-        private void Loop()
+        protected override void Loop()
         {
             uint GameTimeLastCheckedStatus = 0;
             while (true)
@@ -124,7 +104,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 GameFiber.Yield();
             }
         }
-        private void FinishTask()
+        protected override void FinishTask()
         {
             if (CurrentTask != null && CurrentTask.IsActive && CurrentTask.IsReadyForPayment)
             {
@@ -152,20 +132,20 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         {
             HiringGangDen = PlacesOfInterest.GetMainDen(HiringGang.ID, World.IsMPMapLoaded, Player.CurrentLocation);
         }
-        private void GetPayment()
+        protected override void GetPayment()
         {
-            MoneyToRecieve = 0;
+            PaymentAmount = 0;
         }
-        private void AddTask()
+        protected override void AddTask()
         {
             GameTimeToWaitBeforeComplications = RandomItems.GetRandomNumberInt(3000, 10000);
             HasAddedComplications = false;
             WillAddComplications = false;
             GangReputation gr = Player.RelationshipManager.GangRelationships.GetReputation(TargetGang);
             KilledMembersAtStart = gr.MembersKilled;
-            PlayerTasks.AddTask(HiringGang.Contact, MoneyToRecieve, 2000, 0, -50000, 7, "Rival Gang Hit", JoinGangOnComplete);
+            PlayerTasks.AddTask(HiringGang.Contact, PaymentAmount, RepOnCompletion, DebtOnFail, RepOnFail, DaysToComplete, DebugName, JoinGangOnComplete);
         }
-        private void SendInitialInstructionsMessage()
+        protected override void SendInitialInstructionsMessage()
         {
             List<string> Replies = new List<string>() {
                 $"Need to send a message to {TargetGang.ColorPrefix}{TargetGang.ShortName}~s~. Get to the {TargetGang.DenName} on {TargetGangDen.FullStreetAddress} and send them an explosive surprise. Make sure its right outside the {TargetGang.DenName}. Be sure to also get rid of {KillRequirement} members for good measure.",

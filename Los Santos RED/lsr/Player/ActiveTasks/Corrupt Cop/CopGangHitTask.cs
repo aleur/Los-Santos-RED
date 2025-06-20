@@ -22,13 +22,19 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private IEntityProvideable World;
         private ICrimes Crimes;
         private PlayerTask CurrentTask;
-        private int MoneyToRecieve;
         private Gang TargetGang;
         private int KillRequirement;
         private GangReputation CurrentGangReputation;
         private int CurrentKilledMembers;
         private DeadDrop myDrop;
         private CorruptCopContact Contact;
+
+        public int PaymentAmount { get; set; }
+        public int RepOnCompletion { get; set; }
+        public int DebtOnFail { get; set; }
+        public int RepOnFail { get; set; }
+        public int DaysToComplete { get; set; }
+        public string DebugName { get; set; }
 
         public CopGangHitTask(ITaskAssignable player, ITimeReportable time, IGangs gangs, PlayerTasks playerTasks, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes,
             CorruptCopContact corruptCopContact, Gang targetGang, int killRequirement)
@@ -48,15 +54,18 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         public void Setup()
         {
-
+            RepOnCompletion = 0;
+            DebtOnFail = 2000;
+            RepOnFail = -500;
+            DaysToComplete = 7;
+            DebugName = "Gang Hit";
         }
         public void Dispose()
         {
 
         }
-        public void Start(CorruptCopContact contact)
+        public void Start()
         {
-            Contact = contact;
             if(Contact == null)
             {
                 return;
@@ -119,7 +128,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             myDrop = PlacesOfInterest.GetUsableDeadDrop(World.IsMPMapLoaded, Player.CurrentLocation);
             if (myDrop != null)
             {
-                myDrop.SetupDrop(MoneyToRecieve, false);
+                myDrop.SetupDrop(PaymentAmount, false);
                 ActiveDrops.Add(myDrop);
                 SendDeadDropStartMessage();
                 while (true)
@@ -155,15 +164,15 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             CurrentGangReputation = Player.RelationshipManager.GangRelationships.GetReputation(TargetGang);
             CurrentKilledMembers = CurrentGangReputation.MembersKilled;
             //EntryPoint.WriteToConsoleTestLong($"You are hired to kill starting kill = {CurrentKilledMembers} MembersToKill {MembersToKill}!");
-            PlayerTasks.AddTask(Contact, 0, 2000, 0, -500, 7,"Gang Hit");//money is receieved at the dead drop
+            PlayerTasks.AddTask(Contact, 0, RepOnCompletion, DebtOnFail, RepOnFail, DaysToComplete, DebugName);//money is receieved at the dead drop
             CurrentTask = PlayerTasks.GetTask(Contact.Name);
         }
         private void GetPayment()
         {
-            MoneyToRecieve = RandomItems.GetRandomNumberInt(Settings.SettingsManager.TaskSettings.OfficerFriendlyGangHitPaymentMin, Settings.SettingsManager.TaskSettings.OfficerFriendlyGangHitPaymentMax).Round(500) * KillRequirement;
-            if (MoneyToRecieve <= 0)
+            PaymentAmount = RandomItems.GetRandomNumberInt(Settings.SettingsManager.TaskSettings.OfficerFriendlyGangHitPaymentMin, Settings.SettingsManager.TaskSettings.OfficerFriendlyGangHitPaymentMax).Round(500) * KillRequirement;
+            if (PaymentAmount <= 0)
             {
-                MoneyToRecieve = 500;
+                PaymentAmount = 500;
             }
         }
         private void GetGang()
@@ -192,17 +201,17 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             if (KillRequirement == 1)
             {
                 Replies = new List<string>() {
-                    $"Some of those {TargetGang.ColorPrefix}{TargetGang.ShortName}~s~ decided to mess with our rackets. Get rid of one of them to send a message. ${MoneyToRecieve} on completion",
-                    $"The {TargetGang.ColorPrefix}{TargetGang.ShortName}~s~ thought it was a good idea to try and take out a cop. Make sure one of them ends up dead. ${MoneyToRecieve}",
-                    $"Need you to disappear a {TargetGang.ColorPrefix}{TargetGang.ShortName}~s~ member without asking a lot of questions. ${MoneyToRecieve} when you are done.",
+                    $"Some of those {TargetGang.ColorPrefix}{TargetGang.ShortName}~s~ decided to mess with our rackets. Get rid of one of them to send a message. ${PaymentAmount} on completion",
+                    $"The {TargetGang.ColorPrefix}{TargetGang.ShortName}~s~ thought it was a good idea to try and take out a cop. Make sure one of them ends up dead. ${PaymentAmount}",
+                    $"Need you to disappear a {TargetGang.ColorPrefix}{TargetGang.ShortName}~s~ member without asking a lot of questions. ${PaymentAmount} when you are done.",
                     };
             }
             else
             {
                 Replies = new List<string>() {
-                    $"Those {TargetGang.ColorPrefix}{TargetGang.ShortName}~s~ cocksuckers need to be put in their place. I want at least {KillRequirement} bodies in the street. ${MoneyToRecieve}",
-                    $"You like money and killing people right? ${MoneyToRecieve} to get rid of {KillRequirement} {TargetGang.ColorPrefix}{TargetGang.ShortName}~s~ members. A no brainer.",
-                    $"Need some spectacle in the streets to keep our budget. Need you to waste {KillRequirement} {TargetGang.ColorPrefix}{TargetGang.ShortName}~s~ members. ${MoneyToRecieve}",
+                    $"Those {TargetGang.ColorPrefix}{TargetGang.ShortName}~s~ cocksuckers need to be put in their place. I want at least {KillRequirement} bodies in the street. ${PaymentAmount}",
+                    $"You like money and killing people right? ${PaymentAmount} to get rid of {KillRequirement} {TargetGang.ColorPrefix}{TargetGang.ShortName}~s~ members. A no brainer.",
+                    $"Need some spectacle in the streets to keep our budget. Need you to waste {KillRequirement} {TargetGang.ColorPrefix}{TargetGang.ShortName}~s~ members. ${PaymentAmount}",
                      };
             }
             Player.CellPhone.AddPhoneResponse(Contact.Name,Contact.IconName, Replies.PickRandom());
@@ -210,19 +219,19 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private void SendQuickPaymentMessage()
         {
             List<string> Replies = new List<string>() {
-                            $"Seems like that thing we discussed is done? Sending you ${MoneyToRecieve}",
-                            $"Word got around that you are done with that thing for us, sending your payment of ${MoneyToRecieve}",
-                            $"Sending your payment of ${MoneyToRecieve}",
-                            $"Sending ${MoneyToRecieve}",
-                            $"Heard you were done. We owe you ${MoneyToRecieve}",
+                            $"Seems like that thing we discussed is done? Sending you ${PaymentAmount}",
+                            $"Word got around that you are done with that thing for us, sending your payment of ${PaymentAmount}",
+                            $"Sending your payment of ${PaymentAmount}",
+                            $"Sending ${PaymentAmount}",
+                            $"Heard you were done. We owe you ${PaymentAmount}",
                             };
             Player.CellPhone.AddScheduledText(Contact, Replies.PickRandom(), 0, false);
         }
         private void SendDeadDropStartMessage()
         {
             List<string> Replies = new List<string>() {
-                            $"Pickup your payment of ${MoneyToRecieve} from {myDrop.FullStreetAddress}, its {myDrop.Description}.",
-                            $"Go get your payment of ${MoneyToRecieve} from {myDrop.Description}, address is {myDrop.FullStreetAddress}.",
+                            $"Pickup your payment of ${PaymentAmount} from {myDrop.FullStreetAddress}, its {myDrop.Description}.",
+                            $"Go get your payment of ${PaymentAmount} from {myDrop.Description}, address is {myDrop.FullStreetAddress}.",
                             };
 
             Player.CellPhone.AddScheduledText(Contact, Replies.PickRandom(), 1, false);

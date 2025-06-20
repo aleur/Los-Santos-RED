@@ -14,6 +14,7 @@ namespace LosSantosRED.lsr
     {
         private IPoliceRespondable Player;
         private IPerceptable Perceptable;
+        private IContactInteractable ContactInteractable;
         private uint PoliceLastSeenVehicleHandle;
         private IEntityProvideable World;
         private ISettingsProvideable Settings;
@@ -28,12 +29,13 @@ namespace LosSantosRED.lsr
         private Vector3 prevPlacePoliceLastSeenPlayer;
         private List<Cop> CloseDriverCops = new List<Cop>();
 
-        public Police(IEntityProvideable world, IPoliceRespondable currentPlayer, IPerceptable perceptable, ISettingsProvideable settings, IItemEquipable itemEquipablePlayer, ITimeReportable time)
+        public Police(IEntityProvideable world, IPoliceRespondable currentPlayer, IPerceptable perceptable, IContactInteractable contactInteractable, ISettingsProvideable settings, IItemEquipable itemEquipablePlayer, ITimeReportable time)
         {
             World = world;
             Player = currentPlayer;
             Settings = settings;
             Perceptable = perceptable;
+            ContactInteractable = contactInteractable;
             ItemEquipablePlayer = itemEquipablePlayer;
             Time = time;
         }
@@ -78,7 +80,7 @@ namespace LosSantosRED.lsr
                 {
                     if (Cop.Pedestrian.Exists())
                     {
-                        Cop.Update(Perceptable, Player, Player.PlacePoliceLastSeenPlayer, World);
+                        Cop.Update(Perceptable, Player, ContactInteractable, Player.PlacePoliceLastSeenPlayer, World);
                         if (Settings.SettingsManager.PoliceSettings.ManageLoadout)
                         {
                             Cop.WeaponInventory.UpdateLoadout(Player, World, Time.IsNight, Settings.SettingsManager.PoliceSettings.OverrideAccuracy);

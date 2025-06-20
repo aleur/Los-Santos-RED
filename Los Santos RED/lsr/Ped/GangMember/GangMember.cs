@@ -1,8 +1,10 @@
 using ExtensionsMethods;
 using LosSantosRED.lsr.Interface;
+using LosSantosRED.lsr.Player.ActiveTasks;
 using Mod;
 using Rage;
 using Rage.Native;
+using RAGENativeUI.Elements;
 using System.Collections.Generic;
 using System.Data.SqlTypes;
 using System.Drawing;
@@ -60,9 +62,10 @@ public class GangMember : PedExt, IWeaponIssuable
     public bool IsGeneralBackup { get; internal set; }
     public override bool HasWeapon => WeaponInventory.HasPistol || WeaponInventory.HasLongGun;
 
-    public override void Update(IPerceptable perceptable, IPoliceRespondable policeRespondable, Vector3 placeLastSeen, IEntityProvideable world)
+    public override void Update(IPerceptable perceptable, IPoliceRespondable policeRespondable, IContactInteractable contactInteractable, Vector3 placeLastSeen, IEntityProvideable world)
     {
         PlayerToCheck = policeRespondable;
+        PlayerToTask = contactInteractable;
         if (!Pedestrian.Exists())
         {
             return;
@@ -92,7 +95,11 @@ public class GangMember : PedExt, IWeaponIssuable
             }
         }
         ReputationReport.Update(perceptable, world, Settings);
-        CurrentHealthState.Update(policeRespondable, world);//has a yield if they get damaged, seems ok       
+        CurrentHealthState.Update(policeRespondable, world);//has a yield if they get damaged, seems ok   
+        if (WillGiveMission && PlayerToTask != null && TaskForPlayer == null)
+        {
+            TaskForPlayer = PlayerToTask.PlayerTasks.GangTasks.RandomTask(Gang, Gang.Contact);
+        }
     }
 
     public void UpdateSpeech(IPoliceRespondable currentPlayer)
@@ -158,6 +165,7 @@ public class GangMember : PedExt, IWeaponIssuable
         WillFightPolice = RandomItems.RandomPercent(gt == null ? Gang.FightPolicePercentage : gt.FightPolicePercentage);
         WillAlwaysFightPolice = RandomItems.RandomPercent(gt == null ? Gang.AlwaysFightPolicePercentage : gt.AlwaysFightPolicePercentage);
         WillDealDrugs = RandomItems.RandomPercent(gt == null ? Gang.DrugDealerPercentage : gt.DrugDealerPercentage);
+        WillGiveMission = RandomItems.RandomPercent(Gang.WillGiveMissionPercentage);
         WillHaveLongGuns = RandomItems.RandomPercent(gt == null ? Gang.PercentageWithLongGuns : gt.PercentageWithLongGuns);
         WillHaveSidearms = RandomItems.RandomPercent(gt == null ? Gang.PercentageWithSidearms : gt.PercentageWithSidearms);
         WillHaveMelee = RandomItems.RandomPercent(gt == null ? Gang.PercentageWithMelee : gt.PercentageWithMelee);
@@ -197,7 +205,6 @@ public class GangMember : PedExt, IWeaponIssuable
         {
             NativeFunction.Natives.SET_PED_CONFIG_FLAG(Pedestrian, (int)32, true);
         }
-
     }
     public override void OnItemPurchased(ILocationInteractable player, ModItem modItem, int numberPurchased, int moneySpent)
     {

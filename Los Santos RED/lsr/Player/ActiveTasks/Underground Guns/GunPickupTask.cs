@@ -40,8 +40,13 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
 
 
 
-        private int MoneyToRecieve;
         private GunDealerContact Contact;
+        public int PaymentAmount { get; set; }
+        public int RepOnCompletion { get; set; }
+        public int DebtOnFail { get; set; }
+        public int RepOnFail { get; set; }
+        public int DaysToComplete { get; set; }
+        public string DebugName { get; set; }
 
         private bool IsSpawnedVehicleDestroyed => !SpawnedVehicle.Exists() || SpawnedVehicle.Health <= 300 || SpawnedVehicle.EngineHealth <= 300;
         private bool IsSpawnedVehicleParkedAtDestination => SpawnedVehicle.Exists() && NativeHelper.IsNearby(EntryPoint.FocusCellX, EntryPoint.FocusCellY, DropOffStore.CellX, DropOffStore.CellY, 2) && !SpawnedVehicle.HasOccupants && SpawnedVehicle.DistanceTo2D(DropOffStore.EntrancePosition) <= 50f;
@@ -63,7 +68,11 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         public void Setup()
         {
-
+            RepOnCompletion = 2000;
+            DebtOnFail = 0;
+            RepOnFail = -500;
+            DaysToComplete = 7;
+            DebugName = "Gun Transport";
         }
         public void Dispose()
         {
@@ -252,7 +261,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         private void AddTask()
         {
-            PlayerTasks.AddTask(Contact, MoneyToRecieve, 2000, 0, -500, 7,"Gun Transport");
+            PlayerTasks.AddTask(Contact, PaymentAmount, RepOnCompletion, DebtOnFail, RepOnFail, DaysToComplete, DebugName);
             CurrentTask = PlayerTasks.GetTask(Contact.Name);
             hasGottenInCar = false;
             hasSpawnedCar = false;
@@ -263,10 +272,10 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         private void GetPayment()
         {
-            MoneyToRecieve = RandomItems.GetRandomNumberInt(Settings.SettingsManager.TaskSettings.UndergroundGunsGunPickupPaymentMin, Settings.SettingsManager.TaskSettings.UndergroundGunsGunPickupPaymentMax).Round(500);
-            if (MoneyToRecieve <= 0)
+            PaymentAmount = RandomItems.GetRandomNumberInt(Settings.SettingsManager.TaskSettings.UndergroundGunsGunPickupPaymentMin, Settings.SettingsManager.TaskSettings.UndergroundGunsGunPickupPaymentMax).Round(500);
+            if (PaymentAmount <= 0)
             {
-                MoneyToRecieve = 500;
+                PaymentAmount = 500;
             }
         }
         private void GetShops()
@@ -362,20 +371,20 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private void SendInitialInstructionsMessage()
         {
             List<string> Replies = new List<string>() {
-                $"Need you to pickup some guns from our shop on {PickUpStore.FullStreetAddress} and bring them to the shop on {DropOffStore.FullStreetAddress}. They are loaded in the ~p~Burrito Van~s~ out front. ${MoneyToRecieve} when you are done",
-                $"Go get the van from {PickUpStore.FullStreetAddress} and take it to {DropOffStore.FullStreetAddress}. ${MoneyToRecieve} on completion",
-                $"There is a van in front of {PickUpStore.FullStreetAddress}, go get it and bring it to {DropOffStore.FullStreetAddress}. Some sensitive stuff in the back, don't draw attention. Payment is ${MoneyToRecieve}",
+                $"Need you to pickup some guns from our shop on {PickUpStore.FullStreetAddress} and bring them to the shop on {DropOffStore.FullStreetAddress}. They are loaded in the ~p~Burrito Van~s~ out front. ${PaymentAmount} when you are done",
+                $"Go get the van from {PickUpStore.FullStreetAddress} and take it to {DropOffStore.FullStreetAddress}. ${PaymentAmount} on completion",
+                $"There is a van in front of {PickUpStore.FullStreetAddress}, go get it and bring it to {DropOffStore.FullStreetAddress}. Some sensitive stuff in the back, don't draw attention. Payment is ${PaymentAmount}",
                     };
             Player.CellPhone.AddPhoneResponse(Contact.Name, Replies.PickRandom());
         }
         private void SendCompletedMessage()
         {
             List<string> Replies = new List<string>() {
-                        $"Seems like that thing we discussed is done? Sending you ${MoneyToRecieve}",
-                        $"Word got around that you are done with that thing for us, sending your payment of ${MoneyToRecieve}",
-                        $"Sending your payment of ${MoneyToRecieve}",
-                        $"Sending ${MoneyToRecieve}",
-                        $"Heard you were done. We owe you ${MoneyToRecieve}",
+                        $"Seems like that thing we discussed is done? Sending you ${PaymentAmount}",
+                        $"Word got around that you are done with that thing for us, sending your payment of ${PaymentAmount}",
+                        $"Sending your payment of ${PaymentAmount}",
+                        $"Sending ${PaymentAmount}",
+                        $"Heard you were done. We owe you ${PaymentAmount}",
                         };
             Player.CellPhone.AddScheduledText(Contact, Replies.PickRandom(), 1, false);
         }

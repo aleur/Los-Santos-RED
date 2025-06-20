@@ -1,6 +1,7 @@
 ﻿using ExtensionsMethods;
 using LosSantosRED.lsr.Helper;
 using LosSantosRED.lsr.Interface;
+using LosSantosRED.lsr.Player.ActiveTasks;
 using Mod;
 using Rage;
 using RAGENativeUI;
@@ -45,6 +46,7 @@ public class GangInteraction : IContactMenuInteraction
     private UIMenuItem GangJoinMenu;
     private UIMenuItem GangImpoundTheft;
     private UIMenuItem GangBodyDisposal;
+    private UIMenuItem GangRandomTask;
     private UIMenu WheelManSubMenu;
     private UIMenu CopHitSubMenu;
     private UIMenu GangHitSubMenu;
@@ -128,7 +130,7 @@ public class GangInteraction : IContactMenuInteraction
         PayoffGangFriendly = new UIMenuItem("Payoff", "Payoff the gang to get a friendly relationship") { RightLabel = "~r~" + ActiveGangReputation.CostToPayoff.ToString("C0") + "~s~" };
         PayoffGangFriendly.Activated += (sender, selectedItem) =>
         {
-            Player.PlayerTasks.GangTasks.StartPayoffGang(ActiveGang, GangContact);
+            Player.PlayerTasks.GangTasks.PayoffGang(ActiveGang, GangContact).Start();
             sender.Visible = false;
         };
         GangMenu.AddItem(PayoffGangFriendly);
@@ -153,7 +155,7 @@ public class GangInteraction : IContactMenuInteraction
                 GangJoinMenu = new UIMenuItem("Join gang", "Prove your worth and become a member of the gang");
                 GangJoinMenu.Activated += (sender, selectedItem) =>
                 {
-                    Player.PlayerTasks.GangTasks.StartGangProveWorth(ActiveGang, 2, GangContact);
+                    Player.PlayerTasks.GangTasks.GangProveWorth(ActiveGang, 2, GangContact).Start();
                     sender.Visible = false;
                 };
                 GangMenu.AddItem(GangJoinMenu);
@@ -217,6 +219,13 @@ public class GangInteraction : IContactMenuInteraction
     {
         JobsSubMenu = MenuPool.AddSubMenu(GangMenu, "Jobs");
         JobsSubMenu.RemoveBanner();
+        GangRandomTask = new UIMenuItem("Get Random Job", "Random job.") { RightLabel = $"~HUD_COLOUR_GREENDARK~???~s~" };
+        GangRandomTask.Activated += (sender, selectedItem) =>
+        {
+            Player.PlayerTasks.GangTasks.RandomTask(ActiveGang, GangContact).Start();
+            sender.Visible = false;
+        };
+        JobsSubMenu.AddItem(GangRandomTask);
         AddGangHitSubMenu();
         AddGangAmbushSubMenu();
         AddCopHitSubMenu();
@@ -224,7 +233,7 @@ public class GangInteraction : IContactMenuInteraction
         GangMoneyPickup = new UIMenuItem("Money Pickup", "Pickup some cash from a dead drop for the gang and bring it back.") { RightLabel = $"~HUD_COLOUR_GREENDARK~{ActiveGang.PickupPaymentMin:C0}-{ActiveGang.PickupPaymentMax:C0}~s~" };
         GangMoneyPickup.Activated += (sender, selectedItem) =>
         {
-            Player.PlayerTasks.GangTasks.StartGangPickup(ActiveGang, GangContact);
+            Player.PlayerTasks.GangTasks.GangPickup(ActiveGang, GangContact).Start();
             sender.Visible = false;
         };
         AddGangDeliverySubMenu();
@@ -232,37 +241,38 @@ public class GangInteraction : IContactMenuInteraction
         GangImpoundTheft = new UIMenuItem("Impound Theft", "Steal a gang car out of the impound lot. ~r~WIP~s~") { RightLabel = $"~HUD_COLOUR_GREENDARK~{ActiveGang.ImpoundTheftPaymentMin:C0}-{ActiveGang.ImpoundTheftPaymentMax:C0}~s~" };
         GangImpoundTheft.Activated += (sender, selectedItem) =>
         {
-            Player.PlayerTasks.GangTasks.StartImpoundTheft(ActiveGang, GangContact);
+            Player.PlayerTasks.GangTasks.ImpoundTheft(ActiveGang, GangContact).Start();
             sender.Visible = false;
         };
         GangBodyDisposal = new UIMenuItem("Vehicle Disposal", "Get rid of a dirty car. ~r~WIP~s~") { RightLabel = $"~HUD_COLOUR_GREENDARK~{ActiveGang.BodyDisposalPaymentMin:C0}-{ActiveGang.BodyDisposalPaymentMax:C0}~s~" };
         GangBodyDisposal.Activated += (sender, selectedItem) =>
         {
-            Player.PlayerTasks.GangTasks.StartGangBodyDisposal(ActiveGang, GangContact);
+            Player.PlayerTasks.GangTasks.GangBodyDisposal(ActiveGang, GangContact).Start();
             sender.Visible = false;
         };
+        /*
         GangPizza = new UIMenuItem("Pizza Man", "Pizza Time.") { RightLabel = $"~HUD_COLOUR_GREENDARK~{100:C0}-{250:C0}~s~" };
         GangPizza.Activated += (sender, selectedItem) =>
         {
             Player.PlayerTasks.GangTasks.StartGangPizza(ActiveGang, GangContact);
             sender.Visible = false;
-        };
+        };*/
         GangRacketeering = new UIMenuItem("Collect Protection", "Collect protection money from local shops. ~r~WIP~s~") { RightLabel = $"~HUD_COLOUR_GREENDARK~{100:C0}-{100000:C0}~s~" };
         GangRacketeering.Activated += (sender, selectedItem) =>
         {
-            Player.PlayerTasks.GangTasks.StartGangRacketeering(ActiveGang, GangContact);
+            Player.PlayerTasks.GangTasks.GangRacketeering(ActiveGang, GangContact).Start();
             sender.Visible = false;
         };
         GangBribery = new UIMenuItem("Pay Bribe", "Make a discreet payment to keep things smooth. ~r~WIP~s~") { RightLabel = $"~HUD_COLOUR_GREENDARK~{ActiveGang.BriberyPaymentMin:C0}-{ActiveGang.BriberyPaymentMax:C0}~s~" };
         GangBribery.Activated += (sender, selectedItem) =>
         {
-            Player.PlayerTasks.GangTasks.StartGangBribery(ActiveGang, GangContact);
+            Player.PlayerTasks.GangTasks.GangBribery(ActiveGang, GangContact).Start();
             sender.Visible = false;
         };
         GangArson = new UIMenuItem("Arson", "Torch a building. ~r~WIP~s~") { RightLabel = $"~HUD_COLOUR_GREENDARK~{ActiveGang.ArsonPaymentMin:C0}-{ActiveGang.ArsonPaymentMax:C0}~s~" };
         GangArson.Activated += (sender, selectedItem) =>
         {
-            Player.PlayerTasks.GangTasks.StartGangArson(ActiveGang, GangContact);
+            Player.PlayerTasks.GangTasks.GangArson(ActiveGang, GangContact).Start();
             sender.Visible = false;
         };
 
@@ -274,11 +284,12 @@ public class GangInteraction : IContactMenuInteraction
         JobsSubMenu.AddItem(GangRacketeering);
         JobsSubMenu.AddItem(GangBribery);
         JobsSubMenu.AddItem(GangArson);
-        //JobsSubMenu.AddItem(GangDelivery);  
+        //JobsSubMenu.AddItem(GangDelivery); 
+        /*
         if (ActiveGang.GangClassification == GangClassification.Mafia)// == "Gambetti" || ActiveGang.ShortName == "Pavano" || ActiveGang.ShortName == "Lupisella" || ActiveGang.ShortName == "Messina" || ActiveGang.ShortName == "Ancelotti")
         {
             JobsSubMenu.AddItem(GangPizza);
-        }
+        }*/
     }
     private void AddDrugMeetSubMenu()
     {
@@ -320,7 +331,7 @@ public class GangInteraction : IContactMenuInteraction
         UIMenuItem GangWheelmanStart = new UIMenuItem("Start", $"Start the task.") { RightLabel = $"~HUD_COLOUR_GREENDARK~{ActiveGang.WheelmanPaymentMin:C0}-{ActiveGang.WheelmanPaymentMax:C0}~s~" };
         GangWheelmanStart.Activated += (sender, selectedItem) =>
         {
-            Player.PlayerTasks.GangTasks.StartGangWheelman(ActiveGang, GangContact, WheelManAccomplices.Value, LocationType.SelectedItem, requireAllMembers.Checked);
+            Player.PlayerTasks.GangTasks.GangWheelman(ActiveGang, GangContact, WheelManAccomplices.Value, LocationType.SelectedItem, requireAllMembers.Checked).Start();
             sender.Visible = false;
         };
         //WheelManAccomplices.IndexChanged += (sender, oldIndex, newIndex) =>
@@ -344,7 +355,7 @@ public class GangInteraction : IContactMenuInteraction
         UIMenuItem StartTaskMenu = new UIMenuItem("Start", $"Start the task.") { RightLabel = $"~HUD_COLOUR_GREENDARK~{ActiveGang.CopHitPaymentMin:C0}-{ActiveGang.CopHitPaymentMax:C0}~s~" };
         StartTaskMenu.Activated += (sender, selectedItem) =>
         {
-            Player.PlayerTasks.GangTasks.StartCopHit(ActiveGang, TargetCountMenu.Value, GangContact, TargetMenu.SelectedItem);
+            Player.PlayerTasks.GangTasks.CopHit(ActiveGang, TargetCountMenu.Value, GangContact, TargetMenu.SelectedItem).Start();
             sender.Visible = false;
         };
         TargetCountMenu.IndexChanged += (sender, oldIndex, newIndex) =>
@@ -382,7 +393,7 @@ public class GangInteraction : IContactMenuInteraction
         UIMenuItem TaskStartMenu = new UIMenuItem("Start", $"Start the task.") { RightLabel = $"~HUD_COLOUR_GREENDARK~{ActiveGang.HitPaymentMin * TargetCountMenu.Value:C0}-{ActiveGang.HitPaymentMax * TargetCountMenu.Value:C0}~s~" };
         TaskStartMenu.Activated += (sender, selectedItem) =>
         {
-            Player.PlayerTasks.GangTasks.StartGangHit(ActiveGang, TargetCountMenu.Value, GangContact, TargetMenu.SelectedItem.Gang);
+            Player.PlayerTasks.GangTasks.GangHit(ActiveGang, TargetCountMenu.Value, GangContact, TargetMenu.SelectedItem.Gang).Start();
             sender.Visible = false;
         };
         TargetCountMenu.IndexChanged += (sender, oldIndex, newIndex) =>
@@ -481,7 +492,7 @@ public class GangInteraction : IContactMenuInteraction
         UIMenuItem TaskStartMenu = new UIMenuItem("Start", $"Start the task.") { RightLabel = $"~HUD_COLOUR_GREENDARK~{ActiveGang.HitPaymentMin * TargetCountMenu.Value:C0}-{ActiveGang.HitPaymentMax * TargetCountMenu.Value:C0}~s~" };
         TaskStartMenu.Activated += (sender, selectedItem) =>
         {
-            Player.PlayerTasks.GangTasks.StartGangAmbush(ActiveGang, TargetCountMenu.Value, GangContact, TargetMenu.SelectedItem.Gang);
+            Player.PlayerTasks.GangTasks.GangAmbush(ActiveGang, TargetCountMenu.Value, GangContact, TargetMenu.SelectedItem.Gang).Start();
             sender.Visible = false;
         };
         TargetCountMenu.IndexChanged += (sender, oldIndex, newIndex) =>
@@ -524,7 +535,7 @@ public class GangInteraction : IContactMenuInteraction
         UIMenuItem GangTheftStart = new UIMenuItem("Start", $"Start the task.") { RightLabel = $"~HUD_COLOUR_GREENDARK~{ActiveGang.TheftPaymentMin:C0}-{ActiveGang.TheftPaymentMax:C0}~s~" };
         GangTheftStart.Activated += (sender, selectedItem) =>
         {
-            Player.PlayerTasks.GangTasks.StartGangVehicleTheft(ActiveGang, GangContact, GangTheftTargets.SelectedItem.Gang, GangTheftVehicles.SelectedItem.ModelName, GangTheftVehicles.SelectedItem.ToString());
+            Player.PlayerTasks.GangTasks.GangVehicleTheft(ActiveGang, GangContact, GangTheftTargets.SelectedItem.Gang, GangTheftVehicles.SelectedItem.ModelName, GangTheftVehicles.SelectedItem.ToString()).Start();
             sender.Visible = false;
         };
         GangTheftSubMenu.AddItem(GangTheftTargets);
@@ -556,7 +567,7 @@ public class GangInteraction : IContactMenuInteraction
         UIMenuItem GangDeliveryStart = new UIMenuItem("Start", "Start the task.") { RightLabel = $"~HUD_COLOUR_GREENDARK~{ActiveGang.DeliveryPaymentMin:C0}-{ActiveGang.DeliveryPaymentMax:C0}~s~" };
         GangDeliveryStart.Activated += (sender, selectedItem) =>
         {
-            Player.PlayerTasks.GangTasks.StartGangDelivery(ActiveGang, GangContact, GangDeliveryItems.SelectedItem);
+            Player.PlayerTasks.GangTasks.GangDelivery(ActiveGang, GangContact, GangDeliveryItems.SelectedItem).Start();
             sender.Visible = false;
         };
         GangDeliverySubMenu.AddItem(GangDeliveryItems);
@@ -568,7 +579,7 @@ public class GangInteraction : IContactMenuInteraction
         PayoffGangNeutral = new UIMenuItem("Payoff", "Payoff the gang to return to a neutral relationship") { RightLabel = "~r~" + ActiveGangReputation.CostToPayoff.ToString("C0") + "~s~" };
         PayoffGangNeutral.Activated += (sender, selectedItem) =>
         {
-            Player.PlayerTasks.GangTasks.StartPayoffGang(ActiveGang, GangContact);
+            Player.PlayerTasks.GangTasks.PayoffGang(ActiveGang, GangContact).Start();
             sender.Visible = false;
         };
         ApoligizeToGang = new UIMenuItem("Apologize", "Apologize to the gang for your actions");
@@ -622,7 +633,7 @@ public class GangInteraction : IContactMenuInteraction
         PayoffDebt = new UIMenuItem("Payoff Debt", "Payoff your current debt to the gang") { RightLabel = "~r~" + ActiveGangReputation.PlayerDebt.ToString("C0") + "~s~" };
         PayoffDebt.Activated += (sender, selectedItem) =>
         {
-            Player.PlayerTasks.GangTasks.StartPayoffGang(ActiveGang, GangContact);
+            Player.PlayerTasks.GangTasks.PayoffGang(ActiveGang, GangContact).Start();
             sender.Visible = false;
         };
         GangMenu.AddItem(PayoffDebt);
