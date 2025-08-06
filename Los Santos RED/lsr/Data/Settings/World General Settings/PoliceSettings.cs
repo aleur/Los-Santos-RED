@@ -49,8 +49,7 @@ public class PoliceSettings : ISettingsDefaultable
     public bool DropWeaponWhenBusted { get; set; }
     [Description("Fine amount when caught at 1 star with no other serious crimes.")]
     public int GeneralFineAmount { get; set; }
-    [Description("You will only be able to bribe corrupt cops.")]
-    public bool BribeCorruptCopsOnly { get; set; }
+
     [Description("Additional fine amount when you are caught at one star and are driving without a valid license.")]
     public int DrivingWithoutLicenseFineAmount { get; set; }
     [Description("Additional fine amount added when you fail at talking your way out of a ticket.")]
@@ -188,7 +187,6 @@ public class PoliceSettings : ISettingsDefaultable
     {
         GeneralFineAmount = 250;
         TalkFailFineAmount = 250;
-        BribeCorruptCopsOnly = false;
         DrivingWithoutLicenseFineAmount = 500;
         TakeExclusiveControlOverWantedLevel = true;
         TakeExclusiveControlOverWantedLevelOneStarAndBelow = false;
@@ -203,8 +201,8 @@ public class PoliceSettings : ISettingsDefaultable
         OverrideHealth = true;
 
         WantedLevelIncreasesByKillingPolice = true;
-        KillLimit_Wanted4 = 5;// 3;// 5;
-        KillLimit_Wanted5 = 7;// 5;// 10;
+        KillLimit_Wanted4 = 6;// 5;// 3;// 5;
+        KillLimit_Wanted5 = 9;// 7;// 5;// 10;
         KillLimit_Wanted6 = 15;// 10;// 20;
         KillLimit_Wanted7 = 30;
         KillLimit_Wanted8 = 40;

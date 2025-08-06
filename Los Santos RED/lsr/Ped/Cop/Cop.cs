@@ -85,11 +85,6 @@ public class Cop : PedExt, IWeaponIssuable, IPlayerChaseable, IAIChaseable
     public override bool KnowsGangAreas => true;
     public bool IsUsingMountedWeapon { get; set; } = false;
     public PedExt CurrentTarget { get; set; }
-
-
-    public bool IsCorrupt { get; set; } = false;
-
-
     public override bool HasWeapon => WeaponInventory.HasPistol || WeaponInventory.HasLongGun;
     public override bool NeedsFullUpdate
     {
@@ -168,10 +163,10 @@ public class Cop : PedExt, IWeaponIssuable, IPlayerChaseable, IAIChaseable
                 UpdateCombatFlags();
                 if (!IsUnconscious && PlayerPerception.DistanceToTarget <= 200f)
                 {
-                    if (!PlayerPerception.RanSightThisUpdate && Settings.SettingsManager.PerformanceSettings.EnablePerformanceUpdateMode)
-                    {
-                        GameFiber.Yield();
-                    }
+                    //if (!PlayerPerception.RanSightThisUpdate && Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
+                    //{
+                    //    GameFiber.Yield();
+                    //}
                     if (Settings.SettingsManager.PoliceSettings.AllowShootingInvestigations && !IsShootingCheckerActive)//Need Frame Perfect checking on cops shooting for stealth
                     {
                         ShootingChecker();
@@ -258,13 +253,6 @@ public class Cop : PedExt, IWeaponIssuable, IPlayerChaseable, IAIChaseable
             GroupName = "Cop";
         }
         Money = RandomItems.GetRandomNumberInt(AssignedAgency.MoneyMin, AssignedAgency.MoneyMax);
-        if (RandomItems.RandomPercent(AssignedAgency.CorruptMemberPercentage) && !IsAnimal)
-        {
-            IsCorrupt = true;
-            SetupTransactionItems(shopMenus.GetWeightedRandomMenuFromGroup(AssignedAgency.CorruptMenuGroup), false);
-            Money = RandomItems.GetRandomNumberInt(AssignedAgency.CorruptMoneyMin, AssignedAgency.CorruptMoneyMax);
-            EntryPoint.WriteToConsole($"{AssignedAgency.ID}: {AssignedAgency.MemberName} IS MARKED AS CORRUPT {AssignedAgency.CorruptMenuGroup}");
-        }
         GameFiber.Yield();
         if (!Pedestrian.Exists())
         {

@@ -10,10 +10,12 @@ using System.Xml.Serialization;
 [Serializable]
 public class InteriorDoor
 {
-    private Entity doorEntity;
+    private Rage.Object doorEntity;
     private bool isLocked = true;
     private float originalHeading = 0f;
     private bool HasOriginalHeading = false;
+    private bool hasRanLockWithEntity;
+
     //private bool WasForceRotatedOpen;
 
     public InteriorDoor()
@@ -33,16 +35,34 @@ public class InteriorDoor
     public bool NeedsDefaultUnlock { get; set; } = false;
     public bool LockWhenClosed { get; set; } = false;
 
+
+    public bool CanBeForcedOpenByPlayer { get; set; } = true;
+
+
+
+    public Rage.Object DoorObject => doorEntity;
+
     [XmlIgnore]
     public bool HasBeenForceRotatedOpen { get; set; }
+
+    public bool HasRanLockWithEntity => hasRanLockWithEntity;
     public void LockDoor()
     {
+        //doorEntity = NativeFunction.Natives.GET_CLOSEST_OBJECT_OF_TYPE<Rage.Object>(Position.X, Position.Y, Position.Z, 3.0f, ModelHash, true, false, true);
         NativeFunction.Natives.x9B12F9A24FABEDB0(ModelHash, Position.X, Position.Y, Position.Z, true, 1.0f);
         if(ForceRotateOpen)
         {
             ForceRotateCloseDoor();
         }
         isLocked = true;
+
+
+        if(Game.LocalPlayer.Character.Position.DistanceTo2D(Position)<= 10f)
+        {
+            hasRanLockWithEntity = true;
+        }
+
+        EntryPoint.WriteToConsole($"LOCKED DOOR {ModelHash} {Position} hasRanLockWithEntity{hasRanLockWithEntity}");
     }
     public void UnLockDoor()
     {
@@ -52,6 +72,7 @@ public class InteriorDoor
             ForceRotateOpenDoor();
         }
         isLocked = false;
+        hasRanLockWithEntity = false;
     }
     public void Activate()
     {
@@ -59,6 +80,7 @@ public class InteriorDoor
         {
             UnLockDoor();
         }
+        
     }
     public void Deactivate()
     {
@@ -66,10 +88,19 @@ public class InteriorDoor
         {
             ForceRotateCloseDoor();
         }
+        hasRanLockWithEntity = false;
     }
     public void AddDistanceOffset(Vector3 offsetToAdd)
     {
         Position += offsetToAdd;
+    }
+    public void GetObject()
+    {
+        doorEntity = NativeFunction.Natives.GET_CLOSEST_OBJECT_OF_TYPE<Rage.Object>(Position.X, Position.Y, Position.Z, 3.0f, ModelHash, true, false, true);
+        if(doorEntity.Exists())
+        {
+            doorEntity.IsPersistent = false;
+        }
     }
     private void ForceRotateOpenDoor()
     {
@@ -118,6 +149,14 @@ public class InteriorDoor
         doorEntity.IsPersistent = false;
 
         //EntryPoint.WriteToConsole($"ForceRotateCloseDoor {originalHeading}");
+    }
+    public string ButtonPrompt()
+    {
+        if(IsLocked && CanBeForcedOpenByPlayer)
+        {
+            return "Force Door";
+        }
+        return "";
     }
 }
 

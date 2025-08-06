@@ -22,7 +22,7 @@ public class GangTerritories : IGangTerritories
         string fileName = string.IsNullOrEmpty(configName) ? "GangTerritories_*.xml" : $"GangTerritories_{configName}.xml";
 
         DirectoryInfo LSRDirectory = new DirectoryInfo("Plugins\\LosSantosRED");
-        FileInfo ConfigFile = LSRDirectory.GetFiles(fileName).OrderByDescending(x => x.Name).FirstOrDefault();
+        FileInfo ConfigFile = LSRDirectory.GetFiles(fileName).Where(x => !x.Name.Contains("+")).OrderByDescending(x => x.Name).FirstOrDefault();
         if (ConfigFile != null && !configName.Equals("Default"))
         {
             EntryPoint.WriteToConsole($"Loaded Gang Territories config  {ConfigFile.FullName}", 0);
@@ -41,7 +41,6 @@ public class GangTerritories : IGangTerritories
             DefaultConfig_LosSantos2008();
             DefaultConfig_Simple();
             DefaultConfig_LibertyCity();
-            DefaultConfig_SunshineDream();
         }
         //Load Additive
         foreach (FileInfo fileInfo in LSRDirectory.GetFiles("GangTerritories+_*.xml").OrderByDescending(x => x.Name))
@@ -354,14 +353,6 @@ public class GangTerritories : IGangTerritories
 
     }
 
-    private void DefaultConfig_SunshineDream()
-    {
-        List<GangTerritory> LibertyGangTerritoriesList = new List<GangTerritory>()
-        {
-            new GangTerritory("AMBIENT_GANG_ARMENIAN","MFLSB", 0, 100),//the triangle
-        };
-        Serialization.SerializeParams(LibertyGangTerritoriesList, "Plugins\\LosSantosRED\\AlternateConfigs\\SunshineDream\\GangTerritories_SunshineDream.xml");
-    }
     private void DefaultConfig_LosSantos2008()
     {
         List<GangTerritory> OldGangTerritoriesList = new List<GangTerritory>()

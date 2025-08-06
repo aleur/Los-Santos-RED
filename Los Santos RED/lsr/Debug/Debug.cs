@@ -530,30 +530,108 @@ public class Debug
     }
     private void DebugNumpad4()
     {
+        //NativeFunction.Natives.SET_RADIO_TO_STATION_NAME("RADIO_23_INTEGRITY");
 
-        if(!Game.LocalPlayer.Character.CurrentVehicle.Exists())
+       // NativeFunction.Natives.x477D9DB48F889591("RADIO_01_CLASS_ROCK", true);
+
+        //NativeFunction.CallByHash<bool>(0x477D9DB48F889591, "RADIO_01_CLASS_ROCK", true);
+
+        //GameFiber.Sleep(500);
+
+        /*        float LockpickAnimStopPercentage = 0.5f;
+        float LockpickAnimRestartPercentage = 0.3f;
+        float LockpickAnimIntroRate = 8.0f;
+        float LockpickAnimOutroRate = -8.0f;
+        int LockpickAnimFlags = 0;
+        float LockpickAnimAnimRate = 1.0f;
+        GameFiber.StartNew(delegate
         {
-            return;
-        }
-        Ped randomPed = new Ped("a_m_m_paparazzi_01", Game.LocalPlayer.Character.GetOffsetPositionFront(10f).Around2D(10f),0f);
-        GameFiber.Yield();
-        if (!randomPed.Exists())
-        {
-            return;
-        }
-        randomPed.RandomizeVariation();
-        if (!Game.LocalPlayer.Character.CurrentVehicle.Exists())
-        {
-            return;
-        }
-        randomPed.WarpIntoVehicle(Game.LocalPlayer.Character.CurrentVehicle, -1);
-        Vector3 PlaceToDriveTo = new Vector3(0f,0f,300f);
-        NativeFunction.Natives.TASK_HELI_MISSION(randomPed, randomPed.CurrentVehicle, 0, 0, PlaceToDriveTo.X, PlaceToDriveTo.Y, PlaceToDriveTo.Z, 4, 50f, 10f, -1f, 60, 60, -1.0f, 0);//9 = circle
-        randomPed.BlockPermanentEvents = true;
-        randomPed.IsPersistent = true;
+            
+            string animDictionary = "veh@break_in@0h@p_m_one@";
+            string animName = "std_force_entry_ds";
+            AnimationDictionary.RequestAnimationDictionay(animDictionary);
+            NativeFunction.Natives.TASK_PLAY_ANIM(Game.LocalPlayer.Character, animDictionary, animName, Settings.SettingsManager.DebugSettings.LockpickAnimIntroRate, 
+                Settings.SettingsManager.DebugSettings.LockpickAnimOutroRate, -1, Settings.SettingsManager.DebugSettings.LockpickAnimFlags, 0, false, false, false);
 
 
-        Game.LocalPlayer.Character.CurrentVehicle.Position = Game.LocalPlayer.Character.CurrentVehicle.Position + new Vector3(0f, 0f, 250f);
+            bool isLooping = false;
+
+            while (!Player.IsMoveControlPressed)
+            {
+                float pedAnimTime = NativeFunction.CallByName<float>("GET_ENTITY_ANIM_CURRENT_TIME", Game.LocalPlayer.Character, animDictionary, animName);
+                if(pedAnimTime >= Settings.SettingsManager.DebugSettings.LockpickAnimStopPercentage)
+                {
+                    isLooping = true;
+                    NativeFunction.Natives.SET_ANIM_RATE(Game.LocalPlayer.Character, -1.0f * Settings.SettingsManager.DebugSettings.LockpickAnimAnimRate, 0, false);
+                    NativeFunction.Natives.SET_ANIM_RATE(Game.LocalPlayer.Character, -1.0f * Settings.SettingsManager.DebugSettings.LockpickAnimAnimRate, 1, false);
+                    NativeFunction.Natives.SET_ANIM_RATE(Game.LocalPlayer.Character, -1.0f * Settings.SettingsManager.DebugSettings.LockpickAnimAnimRate, 2, false);
+                    //NativeFunction.Natives.SET_ENTITY_ANIM_CURRENT_TIME(Game.LocalPlayer.Character, animDictionary, animName, Settings.SettingsManager.DebugSettings.LockpickAnimRestartPercentage);
+                }
+                else if (isLooping && pedAnimTime <= Settings.SettingsManager.DebugSettings.LockpickAnimRestartPercentage)
+                {
+                    NativeFunction.Natives.SET_ANIM_RATE(Game.LocalPlayer.Character,Settings.SettingsManager.DebugSettings.LockpickAnimAnimRate, 0, false);
+                    NativeFunction.Natives.SET_ANIM_RATE(Game.LocalPlayer.Character, Settings.SettingsManager.DebugSettings.LockpickAnimAnimRate, 1, false);
+                    NativeFunction.Natives.SET_ANIM_RATE(Game.LocalPlayer.Character, Settings.SettingsManager.DebugSettings.LockpickAnimAnimRate, 2, false);
+                    //NativeFunction.Natives.SET_ENTITY_ANIM_CURRENT_TIME(Game.LocalPlayer.Character, animDictionary, animName, Settings.SettingsManager.DebugSettings.LockpickAnimRestartPercentage);
+                }
+
+                GameFiber.Yield();
+            }
+            NativeFunction.Natives.SET_ENTITY_ANIM_CURRENT_TIME(Game.LocalPlayer.Character, animDictionary, animName, Settings.SettingsManager.DebugSettings.LockpickAnimStopPercentage);
+            NativeFunction.Natives.SET_ANIM_RATE(Game.LocalPlayer.Character, 1.0f, 2, false);
+
+        }, "Run Debug Logic");
+        GameFiber.Sleep(500);
+
+        */
+
+
+
+
+        //GameFiber.StartNew(delegate
+        //{
+        //    Vector3 BasePosition = new Vector3(1171.136f, -2563.416f, 34.28861f);
+        //    float BaseHeading = 286.6383f;
+        //    Vector3 NewPosition = NativeHelper.GetOffsetPosition(BasePosition, BaseHeading, -10f);
+        //    Vector3 NewPosition1 = NativeHelper.GetOffsetPosition(BasePosition, BaseHeading-90f, 10f);
+        //    uint GameTimeStarted = Game.GameTime;
+        //    while (Game.GameTime - GameTimeStarted <= 20000)
+        //    {
+
+        //            Rage.Debug.DrawArrowDebug(BasePosition, Vector3.Zero, Rotator.Zero, 1f, Color.Red);
+        //            Rage.Debug.DrawArrowDebug(NewPosition, Vector3.Zero, Rotator.Zero, 1f, Color.White);
+        //        Rage.Debug.DrawArrowDebug(NewPosition1, Vector3.Zero, Rotator.Zero, 1f, Color.Green);
+        //        GameFiber.Yield();
+        //    }
+
+        //}, "Run Debug Logic");
+        // GameFiber.Sleep(500);
+
+
+
+        //if(!Game.LocalPlayer.Character.CurrentVehicle.Exists())
+        //{
+        //    return;
+        //}
+        //Ped randomPed = new Ped("a_m_m_paparazzi_01", Game.LocalPlayer.Character.GetOffsetPositionFront(10f).Around2D(10f),0f);
+        //GameFiber.Yield();
+        //if (!randomPed.Exists())
+        //{
+        //    return;
+        //}
+        //randomPed.RandomizeVariation();
+        //if (!Game.LocalPlayer.Character.CurrentVehicle.Exists())
+        //{
+        //    return;
+        //}
+        //randomPed.WarpIntoVehicle(Game.LocalPlayer.Character.CurrentVehicle, -1);
+        //Vector3 PlaceToDriveTo = new Vector3(0f,0f,300f);
+        //NativeFunction.Natives.TASK_HELI_MISSION(randomPed, randomPed.CurrentVehicle, 0, 0, PlaceToDriveTo.X, PlaceToDriveTo.Y, PlaceToDriveTo.Z, 4, 50f, 10f, -1f, 60, 60, -1.0f, 0);//9 = circle
+        //randomPed.BlockPermanentEvents = true;
+        //randomPed.IsPersistent = true;
+
+
+        //Game.LocalPlayer.Character.CurrentVehicle.Position = Game.LocalPlayer.Character.CurrentVehicle.Position + new Vector3(0f, 0f, 250f);
 
         //foreach(VehicleExt vehicle in World.Vehicles.NonServiceVehicles)
         //{
@@ -845,7 +923,6 @@ public class Debug
         //SpawnLocation spawnLocation = new SpawnLocation(location.EntrancePosition);
         //spawnLocation.GetClosestStreet(false);
         //spawnLocation.GetClosestSideOfRoad();
-
         //GameFiber.StartNew(delegate
         //{
         //    uint GameTimeStarted = Game.GameTime;
@@ -1206,7 +1283,7 @@ public class Debug
     }
 
 
-   
+
 
     private void DebugNumpad5()
 {
@@ -1782,9 +1859,9 @@ GameFiber.StartNew(delegate
 
 
         
-        World.Places.StaticPlaces.DebugDeactivateAllLocations();
-        Game.DisplaySubtitle("DeactivatedLocations");
-        GameFiber.Sleep(2000);
+        //World.Places.StaticPlaces.DebugDeactivateAllLocations();
+        //Game.DisplaySubtitle("DeactivatedLocations");
+        //GameFiber.Sleep(2000);
 
 
         ////X:124.8145 Y:-747.5364 Z:242.152
@@ -5340,7 +5417,7 @@ private void contacttest()
             uint currentWeapon;
             NativeFunction.Natives.GET_CURRENT_PED_WEAPON<bool>(ped.Pedestrian, out currentWeapon, true);
             uint RG = NativeFunction.Natives.GET_PED_RELATIONSHIP_GROUP_HASH<uint>(ped.Pedestrian);
-            EntryPoint.WriteToConsole($"Handle {ped.Pedestrian.Handle}-{ped.DistanceToPlayer}-Cells:{NativeHelper.MaxCellsAway(EntryPoint.FocusCellX, EntryPoint.FocusCellY, ped.CellX, ped.CellY)} {ped.Pedestrian.Model.Name} {ped.Name} ${ped.Money} CanSeePlayer{ped.CanSeePlayer} MENU? {ped.HasMenu} IsUnconscious:{ped.IsUnconscious} Alive:{ped.Pedestrian.IsAlive} Task: {ped.CurrentTask?.Name}-{ped.CurrentTask?.SubTaskName} OtherCrimes {ped.OtherCrimesWitnessed.Count()}  PlayerCrimes {ped.PlayerCrimesWitnessed.Count()} WantedLevel = {ped.WantedLevel} IsDeadlyChase = {ped.IsDeadlyChase} IsBusted {ped.IsBusted} IsArrested {ped.IsArrested} IsInVehicle {ped.IsInVehicle} ViolationWantedLevel = {ped.CurrentlyViolatingWantedLevel} Weapon {currentWeapon} Reason {ped.PedViolations.CurrentlyViolatingWantedLevelReason} Stunned {ped.Pedestrian.IsStunned} Task {ped.CurrentTask?.Name}-{ped.CurrentTask?.SubTaskName} WasEverSetPersistent:{ped.WasEverSetPersistent} Call:{ped.WillCallPolice} Fight:{ped.WillFight} WillFightPolice {ped.WillFightPolice} NewGroup:{ped.Pedestrian.RelationshipGroup.Name} NativeGroup:{RG}", 5);
+            EntryPoint.WriteToConsole($"Handle {ped.Pedestrian.Handle}-{ped.DistanceToPlayer}-Cells:{NativeHelper.MaxCellsAway(EntryPoint.FocusCellX, EntryPoint.FocusCellY, ped.CellX, ped.CellY)} {ped.Pedestrian.Model.Name} {ped.Name} ${ped.Money} CanSeePlayer{ped.CanSeePlayer} MENU? {ped.HasMenu} IsUnconscious:{ped.IsUnconscious} Alive:{ped.Pedestrian.IsAlive} Task: {ped.CurrentTask?.Name}-{ped.CurrentTask?.SubTaskName} OtherCrimes {ped.OtherCrimesWitnessed.Count()}  PlayerCrimes {ped.PlayerCrimesWitnessed.Count()} WantedLevel = {ped.WantedLevel} IsDeadlyChase = {ped.IsDeadlyChase} IsBusted {ped.IsBusted} IsArrested {ped.IsArrested} IsInVehicle {ped.IsInVehicle} ViolationWantedLevel = {ped.CurrentlyViolatingWantedLevel} Weapon {currentWeapon} Reason {ped.PedViolations.CurrentlyViolatingWantedLevelReason} Stunned {ped.Pedestrian.IsStunned} Task {ped.CurrentTask?.Name}-{ped.CurrentTask?.SubTaskName} WasEverSetPersistent:{ped.WasEverSetPersistent} Call:{ped.WillCallPolice} Fight:{ped.WillFight} WillFightPolice {ped.WillFightPolice} NewGroup:{ped.Pedestrian.RelationshipGroup.Name} NativeGroup:{RG} IsMovingAway:{ped.DistanceChecker.IsMovingAway} WasModSpawned:{ped.WasModSpawned} IsPersistent{ped.Pedestrian.IsPersistent}", 5);
         }
         EntryPoint.WriteToConsole($"============================================ CIVIES END", 5);
         EntryPoint.WriteToConsole($"============================================ SECURITY START", 5);

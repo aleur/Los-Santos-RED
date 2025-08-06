@@ -80,11 +80,11 @@ public class GangMember : PedExt, IWeaponIssuable
                 UpdateVehicleState();
                 if (!IsUnconscious && PlayerPerception.DistanceToTarget <= 200f)//was 150 only care in a bubble around the player, nothing to do with the player tho
                 {
-                    if (!PlayerPerception.RanSightThisUpdate && Settings.SettingsManager.PerformanceSettings.EnablePerformanceUpdateMode)
+                    if (!PlayerPerception.RanSightThisUpdate && Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
                     {
                         GameFiber.Yield();//TR TEST 28
                     }
-                    PedViolations.Update(policeRespondable, false);//possible yield in here!, REMOVED FOR NOW
+                    PedViolations.Update(policeRespondable);//possible yield in here!, REMOVED FOR NOW
                     PedPerception.Update();
                     if (policeRespondable.CanBustPeds)
                     {

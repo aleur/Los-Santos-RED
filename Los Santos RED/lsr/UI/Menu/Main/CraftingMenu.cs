@@ -16,20 +16,23 @@ public class CraftingMenu : ModUIMenu
     private Mod.Crafting Crafting;
     private ILocationInteractable LocationInteractablePlayer;
     private IModItems ModItems;
+    private ISettingsProvideable Settings;
 
-    public CraftingMenu(MenuPool menuPool, ICraftableItems craftableItems, Mod.Crafting crafting, ILocationInteractable locationInteractablePlayer, IModItems modItems)
+    public CraftingMenu(MenuPool menuPool, ICraftableItems craftableItems, Mod.Crafting crafting, ILocationInteractable locationInteractablePlayer, IModItems modItems, ISettingsProvideable settings)
     {
         MenuPool = menuPool;
         CraftableItems = craftableItems;
         Crafting = crafting;
         LocationInteractablePlayer = locationInteractablePlayer;
         ModItems = modItems;
+        Settings = settings;
     }
     public void Setup()
     {
         Menu = new UIMenu("Crafting", "Select crafting category");
         Crafting.CraftingMenu = this;
         Menu.SetBannerType(EntryPoint.LSRedColor);
+        Menu.Width = Settings.SettingsManager.UIGeneralSettings.CraftingMenuWidth;
         MenuPool.Add(Menu);
     }
     public override void Hide()
@@ -111,6 +114,7 @@ public class CraftingMenu : ModUIMenu
             {
                 UIMenu subMenu = menuPool.AddSubMenu(menuToUse, UNCATEGORIZED);
                 subMenu.SetBannerType(EntryPoint.LSRedColor);
+                subMenu.Width = Settings.SettingsManager.UIGeneralSettings.CraftingMenuWidth;
                 categoryMenus.Add(UNCATEGORIZED, subMenu);
                 return subMenu;
             }
@@ -123,6 +127,7 @@ public class CraftingMenu : ModUIMenu
         {
             UIMenu subMenu = menuPool.AddSubMenu(menuToUse, category);
             subMenu.SetBannerType(EntryPoint.LSRedColor);
+            subMenu.Width = Settings.SettingsManager.UIGeneralSettings.CraftingMenuWidth;
             categoryMenus.Add(category, subMenu);
             return subMenu;
         }
@@ -131,6 +136,7 @@ public class CraftingMenu : ModUIMenu
     {
         Dictionary<string, UIMenu> categoryMenus = new Dictionary<string, UIMenu>();
         menu.SetBannerType(EntryPoint.LSRedColor);
+        menu.Width = Settings.SettingsManager.UIGeneralSettings.CraftingMenuWidth;
 
         if (Crafting.UnfinishedCrafts.Count > 0)
         {
@@ -166,7 +172,6 @@ public class CraftingMenu : ModUIMenu
                 }
             }
         }
-
         foreach (CraftableItem craftableItem in CraftableItems.Items)
         {
             if (!string.IsNullOrEmpty(craftingFlag) && craftableItem.CraftingFlags != null && !craftableItem.CraftingFlags.Contains(craftingFlag))
@@ -227,6 +232,7 @@ public class CraftingMenu : ModUIMenu
                 {
                     UIMenuNumericScrollerItem<int> itemMenu = new UIMenuNumericScrollerItem<int>(craftableItem.Name, craftableItem.GetIngredientDescription(1, ModItems), 1, quantity, 1);
                     itemMenu.Value = 1;
+                    itemMenu.Formatter = craftableItem.GetResultantFormatter(ModItems);
                     itemMenu.IndexChanged += (s, oldIndex, newIndex) =>
                     {
                         itemMenu.Description = craftableItem.GetIngredientDescription(newIndex + 1, ModItems);
@@ -250,5 +256,10 @@ public class CraftingMenu : ModUIMenu
         }
         menu.Clear();
         AddToMenu(menu, craftingFlag, menuPool);
+    }
+    public bool IsAnyMenuVisible => MenuPool.IsAnyMenuOpen();
+    public void ProcessPool()
+    {
+        MenuPool.ProcessMenus();
     }
 }

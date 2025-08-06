@@ -52,9 +52,11 @@ public class PedSwap : IPedSwap
     private IInteractionable Interactionable;
     private bool HasSetOffset;
     private bool IsDisposed;
+    private ILocationInteractable LocationInteractable;
 
     public PedSwap(ITimeControllable time, IPedSwappable player, ISettingsProvideable settings, IEntityProvideable entities, IWeapons weapons, ICrimes crimes, INameProvideable names, IModItems modItems, IEntityProvideable world, 
-        IPedGroups pedGroups, IShopMenus shopMenus, IDispatchablePeople dispatchablePeople, IHeads heads, IClothesNames clothesNames, IGangs gangs, IAgencies agencies, ITattooNames tattooNames, IGameSaves gameSaves, ISavedOutfits savedOutfits, IInteractionable interactionable)
+        IPedGroups pedGroups, IShopMenus shopMenus, IDispatchablePeople dispatchablePeople, IHeads heads, IClothesNames clothesNames, IGangs gangs, IAgencies agencies, ITattooNames tattooNames, 
+        IGameSaves gameSaves, ISavedOutfits savedOutfits, IInteractionable interactionable, ILocationInteractable locationInteractable)
     {
         Time = time;
         Player = player;
@@ -76,6 +78,7 @@ public class PedSwap : IPedSwap
         GameSaves = gameSaves;
         SavedOutfits = savedOutfits;
         Interactionable = interactionable;
+        LocationInteractable = locationInteractable;
     }
     public int CurrentPedMoney { get; private set; }
     public void AddOffset()
@@ -126,7 +129,7 @@ public class PedSwap : IPedSwap
                     ResetOffsetForCurrentModel();
                     Player.IsCustomizingPed = true;
                     MenuPool menuPool = new MenuPool();
-                    PedCustomizer PedCustomizer = new PedCustomizer(menuPool, this, Names, Player, Entities, Settings, DispatchablePeople, Heads, ClothesNames, Gangs, Agencies, TattooNames, GameSaves, SavedOutfits, Interactionable);
+                    PedCustomizer PedCustomizer = new PedCustomizer(menuPool, this, Names, Player, Entities, Settings, DispatchablePeople, Heads, ClothesNames, Gangs, Agencies, TattooNames, GameSaves, SavedOutfits, Interactionable, LocationInteractable);
                     PedCustomizer.Setup();
                     PedCustomizer.Start();
                     GameFiber.Yield();
@@ -698,7 +701,7 @@ public class PedSwap : IPedSwap
             }
             if (variation != null)
             {
-                variation.ApplyToPed(Game.LocalPlayer.Character);
+                variation.ApplyToPed(Game.LocalPlayer.Character, false);
             }
             Player.SetVoice(voiceName);
             Player.DisplayPlayerNotification();
@@ -761,7 +764,7 @@ public class PedSwap : IPedSwap
 
         if (InitialPlayerVariation != null)
         {
-            InitialPlayerVariation.ApplyToPed(Game.LocalPlayer.Character);
+            InitialPlayerVariation.ApplyToPed(Game.LocalPlayer.Character, true);
         }
         //if (Settings.SettingsManager.PedSwapSettings.AliasPedAsMainCharacter && !Player.CharacterModelIsPrimaryCharacter)
         //{
@@ -1102,7 +1105,7 @@ public class PedSwap : IPedSwap
             NativeHelper.ChangeModel(ModelToChange);
             Game.LocalPlayer.Character.ResetVariation();
         }
-        variation.ApplyToPed(Game.LocalPlayer.Character);
+        variation.ApplyToPed(Game.LocalPlayer.Character, false);
 
 
         if (setRandomDemographics)
@@ -1164,7 +1167,7 @@ public class PedSwap : IPedSwap
         }
         if (!Game.LocalPlayer.Character.IsConsideredMainCharacter() && TargetPedVariation != null)
         {
-            TargetPedVariation.ApplyToPed(Game.LocalPlayer.Character);
+            TargetPedVariation.ApplyToPed(Game.LocalPlayer.Character, true);
         }
 
         VehicleExt NewVehicle = null;

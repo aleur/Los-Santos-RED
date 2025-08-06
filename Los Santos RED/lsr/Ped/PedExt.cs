@@ -134,6 +134,7 @@ public class PedExt : IComplexTaskable, ISeatAssignable
     public uint KillerHandle { get; private set; }
     public bool CanSurrender { get; set; } = false;
     public float ClosestDistanceToPlayer => PlayerPerception.ClosestDistanceToTarget;
+    public float ClosestDistanceToPlayerWithoutMask => PlayerPerception.ClosestDistanceToTargetWithoutMask;
     public List<Crime> CrimesCurrentlyViolating => PedViolations.CrimesCurrentlyViolating;
     public int CurrentlyViolatingWantedLevel => PedViolations.CurrentlyViolatingWantedLevel;
     public ComplexTask CurrentTask { get; set; }
@@ -141,6 +142,7 @@ public class PedExt : IComplexTaskable, ISeatAssignable
     public float DistanceToPlayer => PlayerPerception.DistanceToTarget;
     public float HeightToPlayer => PlayerPerception.HeightToTarget;
     public bool EverSeenPlayer => PlayerPerception.EverSeenTarget;
+    public bool EverSeenPlayerWithoutMask => PlayerPerception.EverSeenTargetWithoutMask;
     public string FormattedName => (PlayerKnownsName ? Name : GroupName);
     public bool WillGiveMission { get; set; } = false;
     public virtual int ShootRate { get; set; } = 400;
@@ -512,7 +514,7 @@ public class PedExt : IComplexTaskable, ISeatAssignable
                     }
                     if (ShouldCheckCrimes)
                     {
-                        PedViolations.Update(policeRespondable, false);//possible yield in here!, REMOVED FOR NOW
+                        PedViolations.Update(policeRespondable);//possible yield in here!, REMOVED FOR NOW
                     }
                     PedPerception.Update();
                     if (policeRespondable.CanBustPeds)
@@ -1148,7 +1150,7 @@ public class PedExt : IComplexTaskable, ISeatAssignable
     {
         foreach(WitnessedCrime witnessedCrime in PlayerCrimesWitnessed.ToList())
         {
-            Player.AddCrime(witnessedCrime.Crime, false, PositionLastSeenCrime, VehicleLastSeenPlayerIn, WeaponLastSeenPlayerWith, EverSeenPlayer && ClosestDistanceToPlayer <= 10f, true, true);
+            Player.AddCrime(witnessedCrime.Crime, false, PositionLastSeenCrime, VehicleLastSeenPlayerIn, WeaponLastSeenPlayerWith, (EverSeenPlayerWithoutMask && ClosestDistanceToPlayerWithoutMask <= 10f) || (EverSeenPlayer && ClosestDistanceToPlayer <= 3f), true, true, false);
         }
         PlayerCrimesWitnessed.Clear();
     }
@@ -1157,7 +1159,7 @@ public class PedExt : IComplexTaskable, ISeatAssignable
         WitnessedCrime toReport = OtherCrimesWitnessed.Where(x => x.Perpetrator.Pedestrian.Exists() && !x.Perpetrator.IsBusted && x.Perpetrator.Pedestrian.IsAlive).OrderByDescending(x=> x.Crime.ResultingWantedLevel).ThenBy(x => x.Crime.Priority).ThenByDescending(x => x.GameTimeLastWitnessed).FirstOrDefault();
         if (toReport != null)
         {
-            Player.AddCrime(toReport.Crime, false, toReport.Location, toReport.Vehicle, toReport.Weapon, false, true, false);
+            Player.AddCrime(toReport.Crime, false, toReport.Location, toReport.Vehicle, toReport.Weapon, false, true, false, false);
         }
         OtherCrimesWitnessed.Clear();
     }

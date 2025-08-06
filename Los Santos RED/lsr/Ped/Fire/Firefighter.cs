@@ -32,7 +32,6 @@ public class Firefighter : PedExt, IWeaponIssuable
     public bool IsRespondingToInvestigation { get; set; }
     public override bool HasWeapon => WeaponInventory.HasPistol || WeaponInventory.HasLongGun;
 
-    public bool IsCorrupt { get; private set; }
 
     public override void Update(IPerceptable perceptable, IPoliceRespondable policeRespondable, IContactInteractable contactInteractable, Vector3 placeLastSeen, IEntityProvideable world)
     {
@@ -53,13 +52,13 @@ public class Firefighter : PedExt, IWeaponIssuable
                 UpdateVehicleState();
                 if (!IsUnconscious && PlayerPerception.DistanceToTarget <= 200f)
                 {
-                    if (!PlayerPerception.RanSightThisUpdate && Settings.SettingsManager.PerformanceSettings.EnablePerformanceUpdateMode)
+                    if (!PlayerPerception.RanSightThisUpdate && Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
                     {
                         GameFiber.Yield();
                     }
                     if (ShouldCheckCrimes)
                     {
-                        PedViolations.Update(policeRespondable, true);//possible yield in here!, REMOVED FOR NOW
+                        PedViolations.Update(policeRespondable);//possible yield in here!, REMOVED FOR NOW
                     }
                     PedPerception.Update();
                     if (Settings.SettingsManager.FireSettings.AllowAlerts)
@@ -89,16 +88,6 @@ public class Firefighter : PedExt, IWeaponIssuable
             GroupName = AssignedAgency.MemberName;
         }
         Money = RandomItems.GetRandomNumberInt(AssignedAgency.MoneyMin, AssignedAgency.MoneyMax);
-        if (RandomItems.RandomPercent(AssignedAgency.CorruptMemberPercentage))
-        {
-            IsCorrupt = true;
-            SetupTransactionItems(shopMenus.GetWeightedRandomMenuFromGroup(AssignedAgency.CorruptMenuGroup), false);
-            Money = RandomItems.GetRandomNumberInt(AssignedAgency.CorruptMoneyMin, AssignedAgency.CorruptMoneyMax);
-        }
-        if (IsCorrupt)
-        {
-            WillCallPolice = false;
-        }
         if (addBlip)
         {
             AddBlip();

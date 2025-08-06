@@ -137,7 +137,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             }
             if(Player.IsWanted && !hasAddedArmedRobberyCrime)
             {
-                Player.AddCrime(Crimes.CrimeList?.FirstOrDefault(x => x.ID == "ResistingArrest"), true, Player.Character.Position, Player.CurrentVehicle, Player.WeaponEquipment.CurrentWeapon, true, true, true);
+                Player.AddCrime(Crimes.CrimeList?.FirstOrDefault(x => x.ID == "ResistingArrest"), true, Player.Character.Position, Player.CurrentVehicle, Player.WeaponEquipment.CurrentWeapon, true, true, true, false);
                 hasAddedArmedRobberyCrime = true;
             }
         }
@@ -159,7 +159,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                     PlayScene();
                     if(hasSpawnedRobbers)
                     {
-                        Player.AddCrime(Crimes.CrimeList?.FirstOrDefault(x => x.ID == "ArmedRobbery"), false, Player.Character.Position, Player.CurrentVehicle, null, true, true, true);
+                        Player.AddCrime(Crimes.CrimeList?.FirstOrDefault(x => x.ID == "ArmedRobbery"), false, Player.Character.Position, Player.CurrentVehicle, null, true, true, true, false);
                     }
                 }
                 Player.ButtonPrompts.RemovePrompts("RobberyStart");
@@ -338,11 +338,11 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 {
                     if(gm.WantedLevel > Player.WantedLevel && gm.PedViolations.WorstObservedCrime != null)
                     {
-                        Player.AddCrime(gm.PedViolations.WorstObservedCrime, true, Player.Character.Position, Player.CurrentVehicle, null, true, true, true);
+                        Player.AddCrime(gm.PedViolations.WorstObservedCrime, true, Player.Character.Position, Player.CurrentVehicle, null, true, true, true, false);
                     }
                     else if(gm.IsDeadlyChase && !Player.PoliceResponse.IsDeadlyChase && gm.PedViolations.WorstObservedCrime != null)
                     {
-                        Player.AddCrime(gm.PedViolations.WorstObservedCrime, true, Player.Character.Position, Player.CurrentVehicle, Player.WeaponEquipment.CurrentWeapon, true, true, true);
+                        Player.AddCrime(gm.PedViolations.WorstObservedCrime, true, Player.Character.Position, Player.CurrentVehicle, Player.WeaponEquipment.CurrentWeapon, true, true, true, false);
                     }
                     else if(gm.PedViolations.WorstObservedCrime == null)
                     {

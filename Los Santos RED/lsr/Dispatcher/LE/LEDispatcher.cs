@@ -280,8 +280,8 @@ public class LEDispatcher
         }
     }
     private bool HasNeedToAmbientCanineDispatch => World.Pedestrians.TotalSpawnedAmbientPoliceCanines < SpawnedK9Limit && (GameTimeLastSpawnedOrRecalledCanineUnit == 0 || Game.GameTime - GameTimeLastSpawnedOrRecalledCanineUnit >= DelayBetweenCanineSpawnAfterSpawnOrRecall);
-    public float ClosestPoliceSpawnToOtherPoliceAllowed => TotalIsWanted ? 200f : 500f;
-    public float ClosestPoliceSpawnToSuspectAllowed => TotalIsWanted ? 200f : 250f;//150f : 250f;
+    public float ClosestPoliceSpawnToOtherPoliceAllowed => 50f;// TotalIsWanted ? 200f : 500f;
+    public float ClosestPoliceSpawnToSuspectAllowed => TotalIsWanted ? 175f : 250f;//200f : 250f;//150f : 250f;
     private List<Cop> DeletableCops => World.Pedestrians.AllPoliceList.Where(x => (x.RecentlyUpdated && x.DistanceToPlayer >= MinimumDeleteDistance && x.HasBeenSpawnedFor >= MinimumExistingTime && x.Handle != Player.Handle) || x.CanRemove).ToList();//NEED TO ADD WAS MOD SPAWNED HERE, LET THE REST OF THE FUCKERS MANAGE THEIR OWN STUFF?
     private float DistanceToDelete => TotalIsWanted ? Settings.SettingsManager.PoliceSpawnSettings.DistanceToRecallInVehicle_Wanted : Settings.SettingsManager.PoliceSpawnSettings.DistanceToRecallInVehicle_NotWanted;
     private float DistanceToDeleteOnFoot => TotalIsWanted ? Settings.SettingsManager.PoliceSpawnSettings.DistanceToRecallOnFoot_Wanted : Settings.SettingsManager.PoliceSpawnSettings.DistanceToRecallOnFoot_NotWanted;
@@ -1309,8 +1309,11 @@ public class LEDispatcher
             EntryPoint.WriteToConsole("LE DISPATCHER CAN NOT GET SPAWN LOCATION");
             return;
         }
-        
-        if (!GetSpawnTypes())
+
+        bool getSpawnTypes = GetSpawnTypes();
+
+
+        if (!getSpawnTypes)
         {
             EntryPoint.WriteToConsole("LE DISPATCHER CAN NOT GET SPAWN TYPES");
             return;
@@ -1324,7 +1327,7 @@ public class LEDispatcher
         //EntryPoint.WriteToConsoleTestLong($"AMBIENT COP CALLED SPAWN TASK");
 
         bool allowAny = false;
-        if (IsTunnelSpawn)
+        if(IsTunnelSpawn)
         {
             allowAny = true;
         }
@@ -1335,7 +1338,6 @@ public class LEDispatcher
             ShouldRunAmbientDispatch = false;
             //GameTimeAttemptedDispatch = Game.GameTime;
         }
-
     }
     private void HandleRoadblockSpawns()
     {
@@ -1704,6 +1706,7 @@ public class LEDispatcher
         if (positionZone == null)
         {
             ToReturn.AddRange(Agencies.GetSpawnableAgencies(WantedLevel, ResponseType.LawEnforcement));
+            EntryPoint.WriteToConsole("GETAGENCIES POSITIONZONE IS NULL");
             return ToReturn;
         }
         Agency ZoneAgency = Jurisdictions.GetRandomAgency(positionZone.InternalGameName, WantedLevel, ResponseType.LawEnforcement);
@@ -1713,17 +1716,18 @@ public class LEDispatcher
         }
         if (!ToReturn.Any() || RandomItems.RandomPercent(LikelyHoodOfCountySpawn))
         {
+            EntryPoint.WriteToConsole($"GETAGENCIES FALLBACK TO COUNTY SPAWN HAS ANY YET:{ToReturn.Any()} CountyID:{positionZone.CountyID} {positionZone.DisplayName}");
             Agency CountyAgency = Jurisdictions.GetRandomCountyAgency(positionZone.CountyID, WantedLevel, ResponseType.LawEnforcement);
             if (CountyAgency != null)//randomly spawn the county agency
             {
                 ToReturn.Add(CountyAgency); //Zone Jurisdiciton Random
             }
-            //EntryPoint.WriteToConsole("ATTEMPING TO ADD COUNTY AGENCY!");
+            EntryPoint.WriteToConsole("GETAGENCIES ATTEMPING TO ADD COUNTY AGENCY!");
         }
         if (!ToReturn.Any() || RandomItems.RandomPercent(LikelyHoodOfAnySpawn))//fall back to anybody
         {
             ToReturn.AddRange(Agencies.GetSpawnableAgencies(WantedLevel, ResponseType.LawEnforcement));
-            //EntryPoint.WriteToConsole("ATTEMPING TO ADD ANY AGENCY!");
+            EntryPoint.WriteToConsole("GETAGENCIES FALLBACK ATTEMPING TO ADD ANY AGENCY!");
         }
         return ToReturn;
     }
@@ -1749,6 +1753,7 @@ public class LEDispatcher
                 Position = Player.Position;
             }
         }
+        EntryPoint.WriteToConsole($"LE DISTPACHER WantedLevel{Player.WantedLevel} MinDistanceToSpawn:{MinDistanceToSpawn} MaxDistanceToSpawn:{MaxDistanceToSpawn}");
         Position = Position.Around2D(MinDistanceToSpawn, MaxDistanceToSpawn);
         return Position;
     }
@@ -1757,7 +1762,7 @@ public class LEDispatcher
         Agency agency = null;
         List<Agency> PossibleAgencies = GetAgencies(spawnLocation.FinalPosition, World.TotalWantedLevel, spawnZone, spawnStreet);
 
-        //EntryPoint.WriteToConsole($"LEDIS GetRandomAgency 1 {string.Join(",",PossibleAgencies)}");
+        EntryPoint.WriteToConsole($"LEDIS GetRandomAgency 1 {string.Join(",",PossibleAgencies)}");
 
         if(PossibleAgencies == null)
         {

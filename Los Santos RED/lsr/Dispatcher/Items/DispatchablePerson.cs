@@ -346,11 +346,11 @@ public class DispatchablePerson
             }
             if (isSlow)
             {
-                variationToSet = RequiredVariation.ApplyToPedSlow(ped, setDefaultFirst);
+                variationToSet = RequiredVariation.ApplyToDispatchablePedSlow(ped, setDefaultFirst);
             }
             else
             {
-                variationToSet = RequiredVariation.ApplyToPed(ped, setDefaultFirst, false);
+                variationToSet = RequiredVariation.ApplyToPed(ped, setDefaultFirst, false, true);
             }
             if (RandomizeHead)//need to have a variation for this as its just freemode otherwise
             {

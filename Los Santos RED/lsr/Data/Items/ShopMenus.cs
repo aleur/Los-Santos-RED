@@ -5,6 +5,7 @@ using LosSantosRED.lsr.Interface;
 using NAudio.Gui;
 using Rage;
 using Rage.Native;
+using RAGENativeUI;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -31,7 +32,7 @@ public class ShopMenus : IShopMenus
         string fileName = string.IsNullOrEmpty(configName) ? "ShopMenus_*.xml" : $"ShopMenus_{configName}.xml";
 
         DirectoryInfo LSRDirectory = new DirectoryInfo("Plugins\\LosSantosRED");
-        FileInfo ConfigFile = LSRDirectory.GetFiles(fileName).OrderByDescending(x => x.Name).FirstOrDefault();
+        FileInfo ConfigFile = LSRDirectory.GetFiles(fileName).Where(x => !x.Name.Contains("+")).OrderByDescending(x => x.Name).FirstOrDefault();
         if (ConfigFile != null && !configName.Equals("Default"))
         {
             EntryPoint.WriteToConsole($"Loaded Shop Menus config  {ConfigFile.FullName}", 0);
@@ -82,6 +83,11 @@ public class ShopMenus : IShopMenus
             {
                 PossibleShopMenus.PedVariationShopMenus.RemoveAll(x => x.ID == shopMenu.ID);
                 PossibleShopMenus.PedVariationShopMenus.Add(shopMenu);
+            }
+            foreach (VehicleVariationShopMenu shopMenu in additivePossibleItems.VehicleVariationShopMenus)
+            {
+                PossibleShopMenus.VehicleVariationShopMenus.RemoveAll(x => x.ID == shopMenu.ID);
+                PossibleShopMenus.VehicleVariationShopMenus.Add(shopMenu);
             }
 
             foreach (TreatmentOptions shopMenu in additivePossibleItems.TreatmentOptionsList)
@@ -269,7 +275,6 @@ public class ShopMenus : IShopMenus
         final.ShopMenuList.AddRange(oldPossibleShopMenus.ShopMenuList);
         Serialization.SerializeParam(final, "Plugins\\LosSantosRED\\AlternateConfigs\\LosSantos2008\\ShopMenus+_LosSantos2008.xml");
     }
-
     private void DefaultConfig_FullExpandedWeapons()
     {
         ShopMenuTypes fejPossibleShopMenus = PossibleShopMenus.Copy();
@@ -286,6 +291,7 @@ public class ShopMenus : IShopMenus
             "Vom Feuer DP1 Carbine",
             "Vom Feuer SCRAMP",
             "Vom Feuer VF76",
+            "Vom Feuer A5-1R",
         };
 
 
@@ -317,6 +323,11 @@ public class ShopMenus : IShopMenus
                     menuItem.ModItemName = "Vom Feuer VF86";
                 }
 
+                if(menuItem.ModItemName == "Vom Feuer A5-1R")
+                {
+                    menuItem.ModItemName = "Duke A5-1R";
+                }
+
                 if (menuItem.ModItemName == "Hawk & Little 1919A1")
                 {
                     menuItem.Extras.Add(new MenuItemExtra("Suppressor", 600));
@@ -342,28 +353,34 @@ public class ShopMenus : IShopMenus
 
         Serialization.SerializeParam(final, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.FEWConfigFolder}\\ShopMenus+_{StaticStrings.FEWConfigSuffix}.xml");
     }
-
-
     private void DefaultConfig_FullModernTraffic()
     {
         ShopMenuTypes fejPossibleShopMenus = PossibleShopMenus.Copy();
-        fejPossibleShopMenus.ShopMenuList.RemoveAll(x => x.ID != "VapidMenu" && x.ID != "KarinMenu" && x.ID != "AlbanyMenu" && x.ID != "PremiumDeluxeMenu" && x.ID != "ElitasMenu" && x.ID != "SunshineMenu" && x.ID != "JDM-X");
+        fejPossibleShopMenus.ShopMenuList.RemoveAll(x => x.ID != "SandersMenu" &&  x.ID != "VapidMenu" && x.ID != "KarinMenu" && x.ID != "AlbanyMenu" && x.ID != "PremiumDeluxeMenu" && x.ID != "ElitasMenu" && x.ID != "SunshineMenu" && x.ID != "JDM-X");
         ShopMenu vapidMenu = fejPossibleShopMenus.ShopMenuList.Where(x => x.ID == "VapidMenu").FirstOrDefault();
         if(vapidMenu != null)
         {
             vapidMenu.Items.Add(new MenuItem("Vapid Scout", 55000, 25000));
             vapidMenu.Items.Add(new MenuItem("Vapid Gemini", 35000, 15000));
+            vapidMenu.Items.Add(new MenuItem("Vapid Sadler 4WD", 25000, 12000));
             vapidMenu.Items.Add(new MenuItem("Vapid Stanier 2nd Gen", 25000, 12000));
-            vapidMenu.Items.Add(new MenuItem("Vapid Caracara Service", 32000, 15000));
-            vapidMenu.Items.Add(new MenuItem("Vapid Caracara 4x2", 30000, 14000));
+            vapidMenu.Items.Add(new MenuItem("Vapid Caracara Utility", 32000, 15000));
+            vapidMenu.Items.Add(new MenuItem("Vapid Caracara 2WD", 30000, 14000));
+            vapidMenu.Items.Add(new MenuItem("Vapid Caracara SX3 4WD", 45000, 14000));
             vapidMenu.Items.Add(new MenuItem("Vapid Bobcat 4x4", 22000, 5000));
             vapidMenu.Items.Add(new MenuItem("Vapid Bobcat Regular Bed", 12000, 4000));
+
+
+
+            vapidMenu.Items.Add(new MenuItem("Vapid Dominator 4th Gen", 25000, 5600));
+            vapidMenu.Items.Add(new MenuItem("Vapid Firebolt Stock", 18000, 5000));
         }
         //KarinMenu
         ShopMenu karinMenu = fejPossibleShopMenus.ShopMenuList.Where(x => x.ID == "KarinMenu").FirstOrDefault();
         if (karinMenu != null)
         {
             karinMenu.Items.Add(new MenuItem("Karin Everon V8", 58000, 25500));
+            karinMenu.Items.Add(new MenuItem("Karin Everon 2nd Gen", 48000, 25500));
         }
         ShopMenu albanyMenu = fejPossibleShopMenus.ShopMenuList.Where(x => x.ID == "AlbanyMenu").FirstOrDefault();
         if (albanyMenu != null)
@@ -375,11 +392,19 @@ public class ShopMenus : IShopMenus
         {
             premiumDeluxMenu.Items.Add(new MenuItem("Declasse Merit", 23000, 7800));
             premiumDeluxMenu.Items.Add(new MenuItem("Karin Everon V8", 58000, 25500));
-
+            premiumDeluxMenu.Items.Add(new MenuItem("Karin Everon 2nd Gen", 48000, 25500));
             premiumDeluxMenu.Items.Add(new MenuItem("Albany Presidente", 26000, 12000));
             premiumDeluxMenu.Items.Add(new MenuItem("Schyster PMP 600", 36000, 17000));
             premiumDeluxMenu.Items.Add(new MenuItem("Canis Bodhi Mod", 28000, 14500));
-
+            premiumDeluxMenu.Items.Add(new MenuItem("Bravado Gauntlet R/T", 76000, 24500));
+            premiumDeluxMenu.Items.Add(new MenuItem("Bravado Bison XL", 31000, 14000));
+        }
+        ShopMenu sandersMenu = fejPossibleShopMenus.ShopMenuList.Where(x => x.ID == "SandersMenu").FirstOrDefault();
+        if (sandersMenu != null)
+        {
+            sandersMenu.Items.Add(new MenuItem("Western Gargoyle Cruiser", 23000, 5800));
+            sandersMenu.Items.Add(new MenuItem("Western Sovereign Cruiser", 27000, 11000));
+            
         }
         ShopMenu elitasMenu = fejPossibleShopMenus.ShopMenuList.Where(x => x.ID == "ElitasMenu").FirstOrDefault();
         if (elitasMenu != null)
@@ -514,8 +539,62 @@ public class ShopMenus : IShopMenus
         return PossibleShopMenus.PedVariationShopMenus.FirstOrDefault(x => x.ID == pedVariationShopMenuID);
         //public PedVariationShopMenu PedVariationShopMenu
     }
+    public VehicleVariationShopMenu GetVehicleVariationMenu(string vehicleVariationShopMenuID)
+    {
+        return PossibleShopMenus.VehicleVariationShopMenus.FirstOrDefault(x => x.ID == vehicleVariationShopMenuID);
+        //public PedVariationShopMenu PedVariationShopMenu
+    }
 
-
+    public int GetAverageStreetSalesPrice(ModItem modItem)
+    {
+        if(modItem == null)
+        {
+            EntryPoint.WriteToConsole($"GetAverageStreetSalesPrice NO MOD ITEM");
+            return 0;
+        }
+        List<MenuItem> MatchingMenuItems = new List<MenuItem>();
+        List<ShopMenuGroup> drugCustomerMenus = PossibleShopMenus.ShopMenuGroupList.Where(x => x.CategoryID == StaticStrings.DrugCustomerMenuID).ToList();
+        foreach(ShopMenuGroup group in drugCustomerMenus)
+        {
+            foreach(PercentageSelectShopMenu pssm in group.PossibleShopMenus)
+            {
+                MatchingMenuItems.AddRange(pssm.ShopMenu.Items.Where(x => x.ModItemName == modItem.Name));
+            }
+        }
+        if(!MatchingMenuItems.Any())
+        {
+            EntryPoint.WriteToConsole($"GetAverageStreetSalesPrice {modItem.Name} NO MATCHING MENUS");
+            return 0;
+        }
+        double averagePrice = MatchingMenuItems.Average(x => x.SalesPrice);
+        EntryPoint.WriteToConsole($"GetAverageStreetSalesPrice {modItem.Name} averagePrice:{averagePrice}");
+        return (int)Math.Round(averagePrice);
+    }
+    public int GetAverageStreetPurchasePrice(ModItem modItem)
+    {
+        if (modItem == null)
+        {
+            EntryPoint.WriteToConsole($"GetAverageStreetPurchasePrice NO MOD ITEM");
+            return 0;
+        }
+        List<MenuItem> MatchingMenuItems = new List<MenuItem>();
+        List<ShopMenuGroup> drugDealersMenu = PossibleShopMenus.ShopMenuGroupList.Where(x => x.CategoryID == StaticStrings.DrugDealerMenuID).ToList();
+        foreach (ShopMenuGroup group in drugDealersMenu)
+        {
+            foreach (PercentageSelectShopMenu pssm in group.PossibleShopMenus)
+            {
+                MatchingMenuItems.AddRange(pssm.ShopMenu.Items.Where(x => x.ModItemName == modItem.Name));
+            }
+        }
+        if (!MatchingMenuItems.Any())
+        {
+            EntryPoint.WriteToConsole($"GetAverageStreetPurchasePrice {modItem.Name} NO MATCHING MENUS");
+            return 0;
+        }
+        double averagePrice = MatchingMenuItems.Average(x => x.PurchasePrice);
+        EntryPoint.WriteToConsole($"GetAverageStreetPurchasePrice {modItem.Name} averagePrice:{averagePrice}");
+        return (int)Math.Round(averagePrice);
+    }
     private void DefaultConfig()
     {
         SetupPropMenus();
@@ -536,6 +615,7 @@ public class ShopMenus : IShopMenus
         DealerHangouts();
         SetupTreatments();
         SetupPedVariationMenus();
+        SetupVehicleVariationMenus();
         Serialization.SerializeParam(PossibleShopMenus, ConfigFileName);
     }
     private void SetupPedVariationMenus()
@@ -566,6 +646,252 @@ public class ShopMenus : IShopMenus
             new PedComponentShopMenu("player_one","Shape Up",2,4,0,20),
         };
         PossibleShopMenus.PedVariationShopMenus.Add(pedVariationShopMenu);
+    }
+    private void SetupVehicleVariationMenus()
+    {
+        VehicleVariationShopMenu vehicleVariationShopMenu = new VehicleVariationShopMenu();
+        vehicleVariationShopMenu.ID = "GenericModShop";
+        vehicleVariationShopMenu.VehicleModKitShopMenuItems = new List<VehicleModKitShopMenuItem>()
+        {
+            new VehicleModKitShopMenuItem(11, 5000,1500),//"Engine",
+            new VehicleModKitShopMenuItem(12, 3500,750),//"Brakes",
+            new VehicleModKitShopMenuItem(13, 2000,500),//"Transmission",
+            new VehicleModKitShopMenuItem(15, 2500,750),//"Suspension",
+
+            new VehicleModKitShopMenuItem(14, 500,0),//"Horns",
+            new VehicleModKitShopMenuItem(16, 10000,4000),//"Armor",
+            new VehicleModKitShopMenuItem(17, 1000,450),//"Nitrous",
+            new VehicleModKitShopMenuItem(18, 3000,300),//"Turbo",
+
+            new VehicleModKitShopMenuItem(0,500,100),//"Spoilers",
+            new VehicleModKitShopMenuItem(1, 1000,100),//"Front Bumper",
+            new VehicleModKitShopMenuItem(2, 1000,200),//"Rear Bumper",
+            new VehicleModKitShopMenuItem(3, 1000,100),//"Side Skirt",
+            new VehicleModKitShopMenuItem(4, 450,100),//"Exhaust",
+            new VehicleModKitShopMenuItem(5, 250,100),//"Frame",
+            new VehicleModKitShopMenuItem(6, 300,100),//"Grille",
+            new VehicleModKitShopMenuItem(7, 500,500),//"Hood",
+            new VehicleModKitShopMenuItem(8, 400,300),//"Fender",
+            new VehicleModKitShopMenuItem(9, 400,200),//"Right Fender",
+            new VehicleModKitShopMenuItem(10, 2000,750),//"Roof",
+
+            new VehicleModKitShopMenuItem(19, 500,100),//"Subwoofer",
+            new VehicleModKitShopMenuItem(20, 500,100),//"Tire Smoke",
+            new VehicleModKitShopMenuItem(21, 500,100),//"Hydraulics",
+            new VehicleModKitShopMenuItem(22, 500,100),//"Xenon",
+            new VehicleModKitShopMenuItem(23, 2000,50),//"Front Wheels",
+            new VehicleModKitShopMenuItem(24, 2000,50),//"Back Wheels",
+            new VehicleModKitShopMenuItem(25, 500,100),//"Plate holders",
+            new VehicleModKitShopMenuItem(26, 500,100),//"Vanity Plate",
+            new VehicleModKitShopMenuItem(27, 600,100),//"Trim Design",
+            new VehicleModKitShopMenuItem(28, 500,100),//"Ornaments",
+            new VehicleModKitShopMenuItem(29, 700,100),//"Interior (3)", 
+            new VehicleModKitShopMenuItem(30, 500,100),//"Dial Design",
+            new VehicleModKitShopMenuItem(31, 500,100),//"Interior5",
+            new VehicleModKitShopMenuItem(32, 500,100),//"Seats",
+            new VehicleModKitShopMenuItem(33, 500,100),//"Steering Wheel"
+            new VehicleModKitShopMenuItem(34, 500,100),//"Shift Lever", 
+            new VehicleModKitShopMenuItem(35, 500,100),//"Plaques", 
+            new VehicleModKitShopMenuItem(36, 300,100),//"Ice", 
+            new VehicleModKitShopMenuItem(37, 500,100),//"Trunk", 
+            new VehicleModKitShopMenuItem(38, 500,100),//"Hydro", 
+            new VehicleModKitShopMenuItem(39, 500,100),//"Engine (1)", 
+            new VehicleModKitShopMenuItem(40, 800,100),//"Boost", 
+            new VehicleModKitShopMenuItem(41, 800,100),//"Engine (3)",
+            new VehicleModKitShopMenuItem(42, 400,100),//"Pushbar", 
+            new VehicleModKitShopMenuItem(43, 500,100),//"Aerials", 
+            new VehicleModKitShopMenuItem(44, 500,100),//"Chassis (4)", 
+            new VehicleModKitShopMenuItem(45, 500,100),//"Chassis (5)", 
+            new VehicleModKitShopMenuItem(46, 500,100),//"Door-L", 
+            new VehicleModKitShopMenuItem(47, 500,100),//"Door-R", 
+            new VehicleModKitShopMenuItem(48, 250,0),//"Livery", 
+            new VehicleModKitShopMenuItem(49, 500,100),//"Lightbar", 
+        };
+        vehicleVariationShopMenu.VehicleModKitWheelTypeShopMenuItems = new List<VehicleModKitWheelTypeShopMenuItem>()
+        {
+            new VehicleModKitWheelTypeShopMenuItem(0,0),//sport
+            new VehicleModKitWheelTypeShopMenuItem(1,0),//muslce
+            new VehicleModKitWheelTypeShopMenuItem(2,0),//loweirder
+            new VehicleModKitWheelTypeShopMenuItem(3,0),//suv
+            new VehicleModKitWheelTypeShopMenuItem(4,250),//off road
+            new VehicleModKitWheelTypeShopMenuItem(5,350),//tuner
+            new VehicleModKitWheelTypeShopMenuItem(6,0),//bike
+            new VehicleModKitWheelTypeShopMenuItem(7,450),//high end
+            new VehicleModKitWheelTypeShopMenuItem(8,500),//sm 1
+            new VehicleModKitWheelTypeShopMenuItem(9,1000),//sm 2
+            new VehicleModKitWheelTypeShopMenuItem(10,1500),//sm3
+            new VehicleModKitWheelTypeShopMenuItem(11,2000),//sm4
+            new VehicleModKitWheelTypeShopMenuItem(12,2500),//sm5
+        };
+        vehicleVariationShopMenu.VehicleColorShopMenuItems = new List<VehicleColorShopMenuItem>()
+        {
+            new VehicleColorShopMenuItem(0,1500)//"Metallic Black","Metallic","Black",1) { RGBColor = System.Drawing.Color.FromArgb(13, 17, 22) }
+            ,new VehicleColorShopMenuItem(1,1500)//"Metallic Graphite Black","Metallic","Graphite Black",2) { RGBColor = System.Drawing.Color.FromArgb(28, 29, 33) }
+            ,new VehicleColorShopMenuItem(2,1500)//"Metallic Black Steal","Metallic","Black Steal",3) { RGBColor = System.Drawing.Color.FromArgb(50, 56, 61) }
+            ,new VehicleColorShopMenuItem(3,1500)//"Metallic Dark Silver","Metallic","Dark Silver",4) { RGBColor = System.Drawing.Color.FromArgb(69, 75, 79) }
+            ,new VehicleColorShopMenuItem(4,1500)//"Metallic Silver","Metallic","Silver",5) { RGBColor = System.Drawing.Color.FromArgb(153, 157, 160) }
+            ,new VehicleColorShopMenuItem(5,1500)//"Metallic Blue Silver","Metallic","Blue Silver",6) { RGBColor = System.Drawing.Color.FromArgb(194, 196, 198) }
+            ,new VehicleColorShopMenuItem(6,1500)//"Metallic Steel Gray","Metallic","Steel Gray",7) { RGBColor = System.Drawing.Color.FromArgb(151, 154, 151) }
+            ,new VehicleColorShopMenuItem(7,1500)//"Metallic Shadow Silver","Metallic","Shadow Silver",8) { RGBColor = System.Drawing.Color.FromArgb(99, 115, 128) }
+            ,new VehicleColorShopMenuItem(8,1500)//"Metallic Stone Silver","Metallic","Stone Silver",9) { RGBColor = System.Drawing.Color.FromArgb(99, 98, 92) }
+            ,new VehicleColorShopMenuItem(9,1500)//"Metallic Midnight Silver","Metallic","Midnight Silver",10) { RGBColor = System.Drawing.Color.FromArgb(60, 63, 71) }
+            ,new VehicleColorShopMenuItem(10,1500)//"Metallic Gun Metal","Metallic","Gun Metal",11) { RGBColor = System.Drawing.Color.FromArgb(68, 78, 84) }
+            ,new VehicleColorShopMenuItem(11,1500)//"Metallic Anthracite Grey","Metallic","Anthracite Grey",12) { RGBColor = System.Drawing.Color.FromArgb(29, 33, 41) }
+            ,new VehicleColorShopMenuItem(27,1500)//"Metallic Red","Metallic","Red",13) { RGBColor = System.Drawing.Color.FromArgb(192, 14, 26) }
+            ,new VehicleColorShopMenuItem(28,1500)//"Metallic Torino Red","Metallic","Torino Red",14) { RGBColor = System.Drawing.Color.FromArgb(218, 25, 24) }
+            ,new VehicleColorShopMenuItem(29,1500)//"Metallic Formula Red","Metallic","Formula Red",15) { RGBColor = System.Drawing.Color.FromArgb(182, 17, 27) }
+            ,new VehicleColorShopMenuItem(30,1500)//"Metallic Blaze Red","Metallic","Blaze Red",16) { RGBColor = System.Drawing.Color.FromArgb(165, 30, 35) }
+            ,new VehicleColorShopMenuItem(31,1500)//"Metallic Graceful Red","Metallic","Graceful Red",17) { RGBColor = System.Drawing.Color.FromArgb(123, 26, 34) }
+            ,new VehicleColorShopMenuItem(32,1500)//"Metallic Garnet Red","Metallic","Garnet Red",18) { RGBColor = System.Drawing.Color.FromArgb(142, 27, 31) }
+            ,new VehicleColorShopMenuItem(33,1500)//"Metallic Desert Red","Metallic","Desert Red",19) { RGBColor = System.Drawing.Color.FromArgb(111, 24, 24) }
+            ,new VehicleColorShopMenuItem(34,1500)//"Metallic Cabernet Red","Metallic","Cabernet Red",20) { RGBColor = System.Drawing.Color.FromArgb(73, 17, 29) }
+            ,new VehicleColorShopMenuItem(35,1500)//"Metallic Candy Red","Metallic","Candy Red",21) { RGBColor = System.Drawing.Color.FromArgb(182, 15, 37) }
+            ,new VehicleColorShopMenuItem(36,1500)//"Metallic Sunrise Orange","Metallic","Sunrise Orange",22) { RGBColor = System.Drawing.Color.FromArgb(212, 74, 23) }
+            ,new VehicleColorShopMenuItem(37,1500)//"Metallic Classic Gold","Metallic","Classic Gold",23) { RGBColor = System.Drawing.Color.FromArgb(194, 148, 79) }
+            ,new VehicleColorShopMenuItem(38,1500)//"Metallic Orange","Metallic","Orange",24) { RGBColor = System.Drawing.Color.FromArgb(247, 134, 22) }
+            ,new VehicleColorShopMenuItem(49,1500)//"Metallic Dark Green","Metallic","Dark Green",25) { RGBColor = System.Drawing.Color.FromArgb(19, 36, 40) }
+            ,new VehicleColorShopMenuItem(50,1500)//"Metallic Racing Green","Metallic","Racing Green",26) { RGBColor = System.Drawing.Color.FromArgb(18, 46, 43) }
+            ,new VehicleColorShopMenuItem(51,1500)//"Metallic Sea Green","Metallic","Sea Green",27) { RGBColor = System.Drawing.Color.FromArgb(18, 56, 60) }
+            ,new VehicleColorShopMenuItem(52,1500)//"Metallic Olive Green","Metallic","Olive Green",28) { RGBColor = System.Drawing.Color.FromArgb(49, 66, 63) }
+            ,new VehicleColorShopMenuItem(53,1500)//"Metallic Green","Metallic","Green",29) { RGBColor = System.Drawing.Color.FromArgb(21, 92, 45) }
+            ,new VehicleColorShopMenuItem(54,1500)//"Metallic Gasoline Blue Green","Metallic","Gasoline Blue Green",30) { RGBColor = System.Drawing.Color.FromArgb(27, 103, 112) }
+            ,new VehicleColorShopMenuItem(61,1500)//"Metallic Midnight Blue","Metallic","Midnight Blue",31) { RGBColor = System.Drawing.Color.FromArgb(34, 46, 70) }
+            ,new VehicleColorShopMenuItem(62,1500)//"Metallic Dark Blue","Metallic","Dark Blue",32) { RGBColor = System.Drawing.Color.FromArgb(35, 49, 85) }
+            ,new VehicleColorShopMenuItem(63,1500)//"Metallic Saxony Blue","Metallic","Saxony Blue",33) { RGBColor = System.Drawing.Color.FromArgb(48, 76, 126) }
+            ,new VehicleColorShopMenuItem(64,1500)//"Metallic Blue","Metallic","Blue",34) { RGBColor = System.Drawing.Color.FromArgb(71, 87, 143) }
+            ,new VehicleColorShopMenuItem(65,1500)//"Metallic Mariner Blue","Metallic","Mariner Blue",35) { RGBColor = System.Drawing.Color.FromArgb(99, 123, 167) }
+            ,new VehicleColorShopMenuItem(66,1500)//"Metallic Harbor Blue","Metallic","Harbor Blue",36) { RGBColor = System.Drawing.Color.FromArgb(57, 71, 98) }
+            ,new VehicleColorShopMenuItem(67,1500)//"Metallic Diamond Blue","Metallic","Diamond Blue",37) { RGBColor = System.Drawing.Color.FromArgb(214, 231, 241) }
+            ,new VehicleColorShopMenuItem(68,1500)//"Metallic Surf Blue","Metallic","Surf Blue",38) { RGBColor = System.Drawing.Color.FromArgb(118, 175, 190) }
+            ,new VehicleColorShopMenuItem(69,1500)//"Metallic Nautical Blue","Metallic","Nautical Blue",39) { RGBColor = System.Drawing.Color.FromArgb(52, 94, 114) }
+            ,new VehicleColorShopMenuItem(70,1500)//"Metallic Bright Blue","Metallic","Bright Blue",40) { RGBColor = System.Drawing.Color.FromArgb(11, 156, 241) }
+            ,new VehicleColorShopMenuItem(71,1500)//"Metallic Purple Blue","Metallic","Purple Blue",41) { RGBColor = System.Drawing.Color.FromArgb(47, 45, 82) }
+            ,new VehicleColorShopMenuItem(72,1500)//"Metallic Spinnaker Blue","Metallic","Spinnaker Blue",42) { RGBColor = System.Drawing.Color.FromArgb(40, 44, 77) }
+            ,new VehicleColorShopMenuItem(73,1500)//"Metallic Ultra Blue","Metallic","Ultra Blue",43) { RGBColor = System.Drawing.Color.FromArgb(35, 84, 161) }
+            ,new VehicleColorShopMenuItem(74,1500)//"Metallic Bright Blue","Metallic","Bright Blue",44) { RGBColor = System.Drawing.Color.FromArgb(110, 163, 198) }
+            ,new VehicleColorShopMenuItem(88,1500)//"Metallic Taxi Yellow","Metallic","Taxi Yellow",45) { RGBColor = System.Drawing.Color.FromArgb(255, 207, 32) }
+            ,new VehicleColorShopMenuItem(89,1500)//"Metallic Race Yellow","Metallic","Race Yellow",46) { RGBColor = System.Drawing.Color.FromArgb(251, 226, 18) }
+            ,new VehicleColorShopMenuItem(90,1500)//"Metallic Bronze","Metallic","Bronze",47) { RGBColor = System.Drawing.Color.FromArgb(145, 101, 50) }
+            ,new VehicleColorShopMenuItem(91,1500)//"Metallic Yellow Bird","Metallic","Yellow Bird",48) { RGBColor = System.Drawing.Color.FromArgb(224, 225, 61) }
+            ,new VehicleColorShopMenuItem(92,1500)//"Metallic Lime","Metallic","Lime",49) { RGBColor = System.Drawing.Color.FromArgb(152, 210, 35) }
+            ,new VehicleColorShopMenuItem(93,1500)//"Metallic Champagne","Metallic","Champagne",50) { RGBColor = System.Drawing.Color.FromArgb(155, 140, 120) }
+            ,new VehicleColorShopMenuItem(94,1500)//"Metallic Pueblo Beige","Metallic","Pueblo Beige",51) { RGBColor = System.Drawing.Color.FromArgb(80, 50, 24) }
+            ,new VehicleColorShopMenuItem(95,1500)//"Metallic Dark Ivory","Metallic","Dark Ivory",52) { RGBColor = System.Drawing.Color.FromArgb(71, 63, 43) }
+            ,new VehicleColorShopMenuItem(96,1500)//"Metallic Choco Brown","Metallic","Choco Brown",53) { RGBColor = System.Drawing.Color.FromArgb(34, 27, 25) }
+            ,new VehicleColorShopMenuItem(97,1500)//"Metallic Golden Brown","Metallic","Golden Brown",54) { RGBColor = System.Drawing.Color.FromArgb(101, 63, 35) }
+            ,new VehicleColorShopMenuItem(98,1500)//"Metallic Light Brown","Metallic","Light Brown",55) { RGBColor = System.Drawing.Color.FromArgb(119, 92, 62) }
+            ,new VehicleColorShopMenuItem(99,1500)//"Metallic Straw Beige","Metallic","Straw Beige",56) { RGBColor = System.Drawing.Color.FromArgb(172, 153, 117) }
+            ,new VehicleColorShopMenuItem(100,1500)//"Metallic Moss Brown","Metallic","Moss Brown",57) { RGBColor = System.Drawing.Color.FromArgb(108, 107, 75) }
+            ,new VehicleColorShopMenuItem(101,1500)//"Metallic Biston Brown","Metallic","Biston Brown",58) { RGBColor = System.Drawing.Color.FromArgb(64, 46, 43) }
+            ,new VehicleColorShopMenuItem(102,1500)//"Metallic Beechwood","Metallic","Beechwood",59) { RGBColor = System.Drawing.Color.FromArgb(164, 150, 95) }
+            ,new VehicleColorShopMenuItem(103,1500)//"Metallic Dark Beechwood","Metallic","Dark Beechwood",60) { RGBColor = System.Drawing.Color.FromArgb(70, 35, 26) }
+            ,new VehicleColorShopMenuItem(104,1500)//"Metallic Choco Orange","Metallic","Choco Orange",61) { RGBColor = System.Drawing.Color.FromArgb(117, 43, 25) }
+            ,new VehicleColorShopMenuItem(105,1500)//"Metallic Beach Sand","Metallic","Beach Sand",62) { RGBColor = System.Drawing.Color.FromArgb(191, 174, 123) }
+            ,new VehicleColorShopMenuItem(106,1500)//"Metallic Sun Bleeched Sand","Metallic","Sun Bleeched Sand",63) { RGBColor = System.Drawing.Color.FromArgb(223, 213, 178) }
+            ,new VehicleColorShopMenuItem(107,1500)//"Metallic Cream","Metallic","Cream",64) { RGBColor = System.Drawing.Color.FromArgb(247, 237, 213) }
+            ,new VehicleColorShopMenuItem(111,1500)//"Metallic White","Metallic","White",65) { RGBColor = System.Drawing.Color.FromArgb(255, 255, 246) }
+            ,new VehicleColorShopMenuItem(112,1500)//"Metallic Frost White","Metallic","Frost White",66) { RGBColor = System.Drawing.Color.FromArgb(234, 234, 234) }
+            ,new VehicleColorShopMenuItem(125,1500)//"Metallic Securicor Green","Metallic","Securicor Green",67) { RGBColor = System.Drawing.Color.FromArgb(131, 197, 102) }
+            ,new VehicleColorShopMenuItem(137,1500)//"Metallic Vermillion Pink","Metallic","Vermillion Pink",68) { RGBColor = System.Drawing.Color.FromArgb(223, 88, 145) }
+            ,new VehicleColorShopMenuItem(141,1500)//"Metallic Black Blue","Metallic","Black Blue",69) { RGBColor = System.Drawing.Color.FromArgb(10, 12, 23) }
+            ,new VehicleColorShopMenuItem(142,1500)//"Metallic Black Purple","Metallic","Black Purple",70) { RGBColor = System.Drawing.Color.FromArgb(12, 13, 24) }
+            ,new VehicleColorShopMenuItem(143,1500)//"Metallic Black Red","Metallic","Black Red",71) { RGBColor = System.Drawing.Color.FromArgb(14, 13, 20) }
+            ,new VehicleColorShopMenuItem(145,1500)//"Metallic Purple","Metallic","Purple",72) { RGBColor = System.Drawing.Color.FromArgb(98, 18, 118) }
+            ,new VehicleColorShopMenuItem(146,1500)//"Metallic V Dark Blue","Metallic","V Dark Blue",73) { RGBColor = System.Drawing.Color.FromArgb(11, 20, 33) }
+            ,new VehicleColorShopMenuItem(150,1500)//"Metallic Lava Red","Metallic","Lava Red",74) { RGBColor = System.Drawing.Color.FromArgb(188, 25, 23) }
+
+            ,new VehicleColorShopMenuItem(12,550)//"Matte Black","Matte","Black",75) { RGBColor = System.Drawing.Color.FromArgb(19, 24, 31) }
+            ,new VehicleColorShopMenuItem(13,550)//"Matte Gray","Matte","Gray",76) { RGBColor = System.Drawing.Color.FromArgb(38, 40, 42) }
+            ,new VehicleColorShopMenuItem(14,550)//"Matte Light Grey","Matte","Light Grey",77) { RGBColor = System.Drawing.Color.FromArgb(81, 85, 84) }
+            ,new VehicleColorShopMenuItem(39,550)//"Matte Red","Matte","Red",78) { RGBColor = System.Drawing.Color.FromArgb(207, 31, 33) }
+            ,new VehicleColorShopMenuItem(40,550)//"Matte Dark Red","Matte","Dark Red",79) { RGBColor = System.Drawing.Color.FromArgb(115, 32, 33) }
+            ,new VehicleColorShopMenuItem(41,550)//"Matte Orange","Matte","Orange",80) { RGBColor = System.Drawing.Color.FromArgb(242, 125, 32) }
+            ,new VehicleColorShopMenuItem(42,550)//"Matte Yellow","Matte","Yellow",81) { RGBColor = System.Drawing.Color.FromArgb(255, 201, 31) }
+            ,new VehicleColorShopMenuItem(55,550)//"Matte Lime Green","Matte","Lime Green",82) { RGBColor = System.Drawing.Color.FromArgb(102, 184, 31) }
+            ,new VehicleColorShopMenuItem(82,550)//"Matte Dark Blue","Matte","Dark Blue",83) { RGBColor = System.Drawing.Color.FromArgb(31, 40, 82) }
+            ,new VehicleColorShopMenuItem(83,550)//"Matte Blue","Matte","Blue",84) { RGBColor = System.Drawing.Color.FromArgb(37, 58, 167) }
+            ,new VehicleColorShopMenuItem(84,550)//"Matte Midnight Blue","Matte","Midnight Blue",85) { RGBColor = System.Drawing.Color.FromArgb(28, 53, 81) }
+            ,new VehicleColorShopMenuItem(128,550)//"Matte Green","Matte","Green",86) { RGBColor = System.Drawing.Color.FromArgb(78, 100, 67) }
+            ,new VehicleColorShopMenuItem(129,550)//"Matte Brown","Matte","Brown",87) { RGBColor = System.Drawing.Color.FromArgb(188, 172, 143) }
+            ,new VehicleColorShopMenuItem(148,550)//"Matte Purple","Matte","Purple",88) { RGBColor = System.Drawing.Color.FromArgb(107, 31, 123) }
+            ,new VehicleColorShopMenuItem(149,550)//"Matte Dark Purple","Matte","Dark Purple",89) { RGBColor = System.Drawing.Color.FromArgb(30, 29, 34) }
+            ,new VehicleColorShopMenuItem(151,550)//"Matte Forest Green","Matte","Forest Green",90) { RGBColor = System.Drawing.Color.FromArgb(45, 54, 42) }
+            ,new VehicleColorShopMenuItem(152,550)//"Matte Olive Drab","Matte","Olive Drab",91) { RGBColor = System.Drawing.Color.FromArgb(105, 103, 72) }
+            ,new VehicleColorShopMenuItem(153,550)//"Matte Desert Brown","Matte","Desert Brown",92) { RGBColor = System.Drawing.Color.FromArgb(122, 108, 85) }
+            ,new VehicleColorShopMenuItem(154,550)//"Matte Desert Tan","Matte","Desert Tan",93) { RGBColor = System.Drawing.Color.FromArgb(195, 180, 146) }
+            ,new VehicleColorShopMenuItem(155,550)//"Matte Foilage Green","Matte","Foilage Green",94) { RGBColor = System.Drawing.Color.FromArgb(90, 99, 82) }
+            ,new VehicleColorShopMenuItem(131,550)//"Matte White","Matte","White",95) { RGBColor = System.Drawing.Color.FromArgb(252, 249, 241) }
+
+            ,new VehicleColorShopMenuItem(15,450)//"Util Black","Util","Black",96) { RGBColor = System.Drawing.Color.FromArgb(21, 25, 33) }
+            ,new VehicleColorShopMenuItem(16,450)//"Util Black Poly","Util","Black Poly",97) { RGBColor = System.Drawing.Color.FromArgb(30, 36, 41) }
+            ,new VehicleColorShopMenuItem(17,450)//"Util Dark silver","Util","Dark silver",98) { RGBColor = System.Drawing.Color.FromArgb(51, 58, 60) }
+            ,new VehicleColorShopMenuItem(18,450)//"Util Silver","Util","Silver",99) { RGBColor = System.Drawing.Color.FromArgb(140, 144, 149) }
+            ,new VehicleColorShopMenuItem(19,450)//"Util Gun Metal","Util","Gun Metal",100) { RGBColor = System.Drawing.Color.FromArgb(57, 67, 77) }
+            ,new VehicleColorShopMenuItem(20,450)//"Util Shadow Silver","Util","Shadow Silver",101) { RGBColor = System.Drawing.Color.FromArgb(80, 98, 114) }
+            ,new VehicleColorShopMenuItem(43,450)//"Util Red","Util","Red",102) { RGBColor = System.Drawing.Color.FromArgb(156, 16, 22) }
+            ,new VehicleColorShopMenuItem(44,450)//"Util Bright Red","Util","Bright Red",103) { RGBColor = System.Drawing.Color.FromArgb(222, 15, 24) }
+            ,new VehicleColorShopMenuItem(45,450)//"Util Garnet Red","Util","Garnet Red",104) { RGBColor = System.Drawing.Color.FromArgb(143, 30, 23) }
+            ,new VehicleColorShopMenuItem(56,450)//"Util Dark Green","Util","Dark Green",105) { RGBColor = System.Drawing.Color.FromArgb(34, 56, 62) }
+            ,new VehicleColorShopMenuItem(57,450)//"Util Green","Util","Green",106) { RGBColor = System.Drawing.Color.FromArgb(29, 90, 63) }
+            ,new VehicleColorShopMenuItem(75,450)//"Util Dark Blue","Util","Dark Blue",107) { RGBColor = System.Drawing.Color.FromArgb(17, 37, 82) }
+            ,new VehicleColorShopMenuItem(76,450)//"Util Midnight Blue","Util","Midnight Blue",108) { RGBColor = System.Drawing.Color.FromArgb(27, 32, 62) }
+            ,new VehicleColorShopMenuItem(77,450)//"Util Blue","Util","Blue",109) { RGBColor = System.Drawing.Color.FromArgb(39, 81, 144) }
+            ,new VehicleColorShopMenuItem(78,450)//"Util Sea Foam Blue","Util","Sea Foam Blue",110) { RGBColor = System.Drawing.Color.FromArgb(96, 133, 146) }
+            ,new VehicleColorShopMenuItem(79,450)//"Util Lightning blue","Util","Lightning blue",111) { RGBColor = System.Drawing.Color.FromArgb(36, 70, 168) }
+            ,new VehicleColorShopMenuItem(80,450)//"Util Maui Blue Poly","Util","Maui Blue Poly",112) { RGBColor = System.Drawing.Color.FromArgb(66, 113, 225) }
+            ,new VehicleColorShopMenuItem(81,450)//"Util Bright Blue","Util","Bright Blue",113) { RGBColor = System.Drawing.Color.FromArgb(59, 57, 224) }
+            ,new VehicleColorShopMenuItem(108,450)//"Util Brown","Util","Brown",114) { RGBColor = System.Drawing.Color.FromArgb(58, 42, 27) }
+            ,new VehicleColorShopMenuItem(109,450)//"Util Medium Brown","Util","Medium Brown",115) { RGBColor = System.Drawing.Color.FromArgb(120, 95, 51) }
+            ,new VehicleColorShopMenuItem(110,450)//"Util Light Brown","Util","Light Brown",116) { RGBColor = System.Drawing.Color.FromArgb(181, 160, 121) }
+            ,new VehicleColorShopMenuItem(122,450)//"Util Off White","Util","Off White",117) { RGBColor = System.Drawing.Color.FromArgb(223, 221, 208) }
+
+            ,new VehicleColorShopMenuItem(21,400)//"Worn Black","Worn","Black",118) { RGBColor = System.Drawing.Color.FromArgb(30, 35, 47) }
+            ,new VehicleColorShopMenuItem(22,400)//"Worn Graphite","Worn","Graphite",119) { RGBColor = System.Drawing.Color.FromArgb(54, 58, 63) }
+            ,new VehicleColorShopMenuItem(23,400)//"Worn Silver Grey","Worn","Silver Grey",120) { RGBColor = System.Drawing.Color.FromArgb(160, 161, 153) }
+            ,new VehicleColorShopMenuItem(24,400)//"Worn Silver","Worn","Silver",121) { RGBColor = System.Drawing.Color.FromArgb(211, 211, 211) }
+            ,new VehicleColorShopMenuItem(25,400)//"Worn Blue Silver","Worn","Blue Silver",122) { RGBColor = System.Drawing.Color.FromArgb(183, 191, 202) }
+            ,new VehicleColorShopMenuItem(26,400)//"Worn Shadow Silver","Worn","Shadow Silver",123) { RGBColor = System.Drawing.Color.FromArgb(119, 135, 148) }
+            ,new VehicleColorShopMenuItem(46,400)//"Worn Red","Worn","Red",124) { RGBColor = System.Drawing.Color.FromArgb(169, 71, 68) }
+            ,new VehicleColorShopMenuItem(47,400)//"Worn Golden Red","Worn","Golden Red",125) { RGBColor = System.Drawing.Color.FromArgb(177, 108, 81) }
+            ,new VehicleColorShopMenuItem(48,400)//"Worn Dark Red","Worn","Dark Red",126) { RGBColor = System.Drawing.Color.FromArgb(55, 28, 37) }
+            ,new VehicleColorShopMenuItem(58,400)//"Worn Dark Green","Worn","Dark Green",127) { RGBColor = System.Drawing.Color.FromArgb(45, 66, 63) }
+            ,new VehicleColorShopMenuItem(59,400)//"Worn Green","Worn","Green",128) { RGBColor = System.Drawing.Color.FromArgb(69, 89, 75) }
+            ,new VehicleColorShopMenuItem(60,400)//"Worn Sea Wash","Worn","Sea Wash",129) { RGBColor = System.Drawing.Color.FromArgb(101, 134, 127) }
+            ,new VehicleColorShopMenuItem(85,400)//"Worn Dark blue","Worn","Dark blue",130) { RGBColor = System.Drawing.Color.FromArgb(76, 95, 129) }
+            ,new VehicleColorShopMenuItem(86,400)//"Worn Blue","Worn","Blue",131) { RGBColor = System.Drawing.Color.FromArgb(88, 104, 142) }
+            ,new VehicleColorShopMenuItem(87,400)//"Worn Light blue","Worn","Light blue",132) { RGBColor = System.Drawing.Color.FromArgb(116, 181, 216) }
+            ,new VehicleColorShopMenuItem(113,400)//"Worn Honey Beige","Worn","Honey Beige",133) { RGBColor = System.Drawing.Color.FromArgb(176, 171, 148) }
+            ,new VehicleColorShopMenuItem(114,400)//"Worn Brown","Worn","Brown",134) { RGBColor = System.Drawing.Color.FromArgb(69, 56, 49) }
+            ,new VehicleColorShopMenuItem(115,400)//"Worn Dark Brown","Worn","Dark Brown",135) { RGBColor = System.Drawing.Color.FromArgb(42, 40, 43) }
+            ,new VehicleColorShopMenuItem(116,400)//"Worn straw beige","Worn","straw beige",136) { RGBColor = System.Drawing.Color.FromArgb(114, 108, 87) }
+            ,new VehicleColorShopMenuItem(121,400)//"Worn Off White","Worn","Off White",137) { RGBColor = System.Drawing.Color.FromArgb(234, 230, 222) }
+            ,new VehicleColorShopMenuItem(123,400)//"Worn Orange","Worn","Orange",138) { RGBColor = System.Drawing.Color.FromArgb(242, 173, 46) }
+            ,new VehicleColorShopMenuItem(124,400)//"Worn Light Orange","Worn","Light Orange",139) { RGBColor = System.Drawing.Color.FromArgb(249, 164, 88) }
+            ,new VehicleColorShopMenuItem(126,400)//"Worn Taxi Yellow","Worn","Taxi Yellow",140) { RGBColor = System.Drawing.Color.FromArgb(241, 204, 64) }
+            ,new VehicleColorShopMenuItem(130,400)//"Worn Orange","Worn","Orange",141) { RGBColor = System.Drawing.Color.FromArgb(248, 182, 88) }
+            ,new VehicleColorShopMenuItem(132,400)//"Worn White","Worn","White",142) { RGBColor = System.Drawing.Color.FromArgb(255, 255, 251) }
+            ,new VehicleColorShopMenuItem(133,400)//"Worn Olive Army Green","Worn","Olive Army Green",143) { RGBColor = System.Drawing.Color.FromArgb(129, 132, 76) }
+
+            ,new VehicleColorShopMenuItem(134,700)//"Pure White","Standard","Pure White",150) { RGBColor = System.Drawing.Color.FromArgb(255, 255, 255) }
+            ,new VehicleColorShopMenuItem(135,700)//"Hot Pink","Standard","Hot Pink",150) { RGBColor = System.Drawing.Color.FromArgb(242, 31, 153) }
+            ,new VehicleColorShopMenuItem(136,700)//"Salmon pink","Standard","Salmon Pink",150) { RGBColor = System.Drawing.Color.FromArgb(253, 214, 205) }
+            ,new VehicleColorShopMenuItem(138,700)//"Orange","Standard","Orange",150) { RGBColor = System.Drawing.Color.FromArgb(246, 174, 32) }
+            ,new VehicleColorShopMenuItem(139,700)//"Green","Standard","Green",150) { RGBColor = System.Drawing.Color.FromArgb(176, 238, 110) }
+            ,new VehicleColorShopMenuItem(140,700)//"Blue","Standard","Blue",150) { RGBColor = System.Drawing.Color.FromArgb(8, 233, 250) }
+            ,new VehicleColorShopMenuItem(156,50)//"DEFAULT ALLOY COLOR","Standard","DEFAULT ALLOY COLOR",206)
+
+            ,new VehicleColorShopMenuItem(120,20000)//"Chrome","Chrome","Chrome",199) { RGBColor = System.Drawing.Color.FromArgb(88, 112, 161) }
+
+            ,new VehicleColorShopMenuItem(117,5000)//"Brushed Steel","Metals","Brushed Steel",200) { RGBColor = System.Drawing.Color.FromArgb(106, 116, 124) }
+            ,new VehicleColorShopMenuItem(118,6000)//"Brushed Black Steel","Metals","Brushed Black Steel",201) { RGBColor = System.Drawing.Color.FromArgb(53, 65, 88) }
+            ,new VehicleColorShopMenuItem(119,6500)//"Brushed Aluminium","Metals","Brushed Aluminium",202) { RGBColor = System.Drawing.Color.FromArgb(155, 160, 168) }
+            ,new VehicleColorShopMenuItem(158,10000)//"Pure Gold","Metals","Pure Gold",203) { RGBColor = System.Drawing.Color.FromArgb(122, 100, 64) }
+            ,new VehicleColorShopMenuItem(159,15000)//"Brushed Gold","Metals","Brushed Gold",204) { RGBColor = System.Drawing.Color.FromArgb(127, 106, 72) }
+            
+   
+
+        };
+        PossibleShopMenus.VehicleVariationShopMenus.Add(vehicleVariationShopMenu);
     }
     private void SetupTreatments()
     {
@@ -1634,6 +1960,31 @@ public class ShopMenus : IShopMenus
     }
     private void SpecificDealerships()
     {
+
+
+
+        /*            new VehicleItem("Karin Everon RS", true, ItemType.Vehicles) { ModelName = "everon3" },
+            new VehicleItem("Annis Hardy", true, ItemType.Vehicles) { ModelName = "hardy" },
+            new VehicleItem("Buckingham Higgins Helitours Maverick", true, ItemType.Vehicles) { ModelName = "maverick2" },
+            new VehicleItem("Western Police Bike Redux", true, ItemType.Vehicles) { ModelName = "policeb2" },
+            new VehicleItem("Dewbauchee Rapid GT X", true, ItemType.Vehicles) { ModelName = "rapidgt4" },
+            new VehicleItem("Ubermacht Sentinel GTS", true, ItemType.Vehicles) { ModelName = "sentinel5" },
+            new VehicleItem("Karin Woodlander", true, ItemType.Vehicles) { ModelName = "woodlander" },
+            new VehicleItem("Overflod Suzume", true, ItemType.Vehicles) { ModelName = "suzume" },
+            new VehicleItem("Declasse Walton L35 2", true, ItemType.Vehicles) { ModelName = "l352" },
+            new VehicleItem("Annis Minimus", true, ItemType.Vehicles) { ModelName = "minimus" },
+            new VehicleItem("Declasse Tampa GT", true, ItemType.Vehicles) { ModelName = "tampa4" },
+            new VehicleItem("Grotti LSCM Cheetah Classic", true, ItemType.Vehicles) { ModelName = "cheetah3" },
+            new VehicleItem("Brute Bobcat Security Stockade", true, ItemType.Vehicles) { ModelName = "stockade4" },
+            new VehicleItem("MTL Flatbed Custom 2", true, ItemType.Vehicles) { ModelName = "flatbed2" },
+
+            //Drift
+            new VehicleItem("Dinka Drift Chavos V6", ItemType.Vehicles) { ModelName = "driftchanvosv6", RequiresDLC = true, },
+            new VehicleItem("Vapid Drift Dominator 10", ItemType.Vehicles) { ModelName = "drfitdominator10", RequiresDLC = true, },
+            new VehicleItem("Bravado Drift Gauntlet Hellfire", ItemType.Vehicles) { ModelName = "driftgauntlet4", RequiresDLC = true, },
+            new VehicleItem("Annis Drift Hardy", ItemType.Vehicles) { ModelName = "drifthardy", RequiresDLC = true, },
+            new VehicleItem("Declasse Dift Walton L35 2", ItemType.Vehicles) { ModelName = "driftl352", RequiresDLC = true, },*/
+
         PossibleShopMenus.ShopMenuList.AddRange(new List<ShopMenu>{
             new ShopMenu("BenefactorGallavanterMenu","Benefactor/Gallavanter",new List<MenuItem>() {
                 new MenuItem("Gallivanter Baller",67000,45000),
@@ -1724,6 +2075,7 @@ public class ShopMenus : IShopMenus
 
                 new MenuItem("Nagasaki Carbon RS",40000,22500),
                 new MenuItem("Nagasaki BF400",12000,6200),
+                new MenuItem("Nagasaki Shinobi", 34000,12000),
 
                 //NEW
                 new MenuItem("LCC Hexer",37000,23000),
@@ -1735,8 +2087,15 @@ public class ShopMenus : IShopMenus
                 new MenuItem("Western Daemon LOST",29000,20000),
                 new MenuItem("Western Bagger",19000,9500),
 
+                new MenuItem("Pegassi FCR 1000",24000,12000),
+                
+
             }),
             new ShopMenu("LuxuryAutosMenu","Luxury Autos",new List<MenuItem>() {//pegassi/grotti/enus/buckingham/pfiuster
+                
+                
+                new MenuItem("Dewbauchee Rapid GT X",159000,75000),
+
                 new MenuItem("Enus Huntley S",119000,65000),
                 new MenuItem("Enus Cognoscenti Cabrio",185000,120000),
                 new MenuItem("Enus Super Diamond",235000,189000),
@@ -1819,7 +2178,7 @@ public class ShopMenus : IShopMenus
 
                 //Overflod
                 new MenuItem("Overflod Pipistrello",1500000,324000),
-
+                new MenuItem("Overflod Suzume",1600000,334000),
                 //Coil
                 new MenuItem("Coil Voltic",90000,45000),
                 new MenuItem("Coil Cyclone",120000,56000),
@@ -1839,6 +2198,7 @@ public class ShopMenus : IShopMenus
                 new MenuItem("Ubermacht Revolter",150000,67000),
                 new MenuItem("Ubermacht SC1",178000,100000),
                 new MenuItem("Ubermacht Sentinel XS",37000,21000),
+                new MenuItem("Ubermacht Sentinel GTS",77000,41000),
                 new MenuItem("Ubermacht Sentinel 2",35000,19000),//regular
                 new MenuItem("Ubermacht Sentinel 3",25000,12000),//classic
                 new MenuItem("Ubermacht Zion",35000,17000),
@@ -1859,7 +2219,8 @@ public class ShopMenus : IShopMenus
                 new MenuItem("Bravado Bison 3",31000),
                 new MenuItem("Bravado Gauntlet",32000),
                 new MenuItem("Bravado Buffalo",35000),
-                new MenuItem("Bravado Buffalo S",65000),
+                new MenuItem("Bravado Buffalo S",45000),
+                new MenuItem("Bravado Buffalo STX",55000),
                 new MenuItem("Bravado Banshee",105000),
                 new MenuItem("Bravado Banshee 900R",150000),
                 new MenuItem("Bravado Gauntlet Hellfire",120000,56000),
@@ -1892,7 +2253,8 @@ public class ShopMenus : IShopMenus
                 new MenuItem("Bravado Bison 3",31000, 25000),
                 new MenuItem("Bravado Gauntlet",32000,28000),
                 new MenuItem("Bravado Buffalo",35000,27000),
-                new MenuItem("Bravado Buffalo S",65000,55000),
+                new MenuItem("Bravado Buffalo S",45000,25000),
+                new MenuItem("Bravado Buffalo STX",55000,35000),
                 new MenuItem("Bravado Banshee",105000,78000),
                 new MenuItem("Bravado Banshee 900R",150000,89000),
                 new MenuItem("Bravado Gauntlet Hellfire",120000,56000),
@@ -1913,10 +2275,11 @@ public class ShopMenus : IShopMenus
                 new MenuItem("Karin Intruder",38000,32000),
                 new MenuItem("Karin Previon",39000,34500),
                 new MenuItem("Karin Everon",44000,35000),
+                new MenuItem("Karin Everon RS",64000,45000),
                 new MenuItem("Karin Kuruma",45000,36000),
                 new MenuItem("Karin Vivanite",37000,12000),
                 new MenuItem("Karin Asterope GZ",38000,23500),
-
+                new MenuItem("Karin Woodlander",22000,8900),
                 //Annis
                 new MenuItem("Annis Euros X32",25000,14000),
                 new MenuItem("Annis 300R",36000,16000),
@@ -1924,6 +2287,8 @@ public class ShopMenus : IShopMenus
                 new MenuItem("Annis Euros",38000,19000),
                 new MenuItem("Annis Hellion",23000,8000),
                 new MenuItem("Annis ZR350",29000,9500),
+                new MenuItem("Annis Minimus",35000,13500),
+                new MenuItem("Annis Hardy",12000,5000),
 
                 //Bollokan
                 new MenuItem("Bollokan Prairie",15000,6000),
@@ -1969,10 +2334,12 @@ public class ShopMenus : IShopMenus
                 new MenuItem("Declasse Moonbeam",19000,3000),
                 new MenuItem("Declasse Vigero ZX",96000,56000),
                 new MenuItem("Declasse Walton L35",24000,12000),
+                new MenuItem("Declasse Walton L35 2",24000,12000),
                 new MenuItem("Declasse Vigero ZX Convertible",75000,35000),
                 new MenuItem("Declasse Impaler SZ",34000,15000),
                 new MenuItem("Declasse Impaler LX",35000,16000),
                 new MenuItem("Declasse Yosemite 1500",17000,8000),
+                new MenuItem("Declasse Tampa GT",42000,21000),
 
                 //Fathom
                 new MenuItem("Fathom FR36",45000,23000),
@@ -5828,6 +6195,7 @@ public class ShopMenus : IShopMenus
                     }),
         });
     }
+   
     private void DealerHangouts()
     {
         PossibleShopMenus.ShopMenuList.AddRange(new List<ShopMenu> {
@@ -5874,7 +6242,139 @@ public class ShopMenus : IShopMenus
                 //OTHER
                 new MenuItem("Improvised Incendiary",30) { NumberOfItemsToSellToPlayer = 5, IsIllicilt = true, SubAmount = 1,SubPrice = 30 },
                 new MenuItem("BZ Gas Grenade",100) { NumberOfItemsToSellToPlayer = 5,IsIllicilt = true, SubAmount = 1,SubPrice = 100 },
-                    }),
+               }),
+               new ShopMenu("DealerHangoutMenu2","DealerHangoutMenu2",new List<MenuItem>() {
+                    new VariablePriceMenuItem("Cocaine", 150, 180, 110, 140) { NumberOfItemsToSellToPlayer = 15, NumberOfItemsToPurchaseFromPlayer = 10,IsIllicilt = true },
+                    new VariablePriceMenuItem("SPANK",45, 55, 20, 30) { NumberOfItemsToSellToPlayer = 15, NumberOfItemsToPurchaseFromPlayer = 10,IsIllicilt = true },
+                    new MenuItem("Brass Knuckles",150) { IsIllicilt = true },
+                    new MenuItem("Combat Knife",120) { IsIllicilt = true },
+                    new MenuItem("Switchblade",55) { IsIllicilt = true },
+                //Pistola
+                new MenuItem("Hawk & Little PTF092F",445) { IsIllicilt = true, Extras = new List<MenuItemExtra>() {
+                    new MenuItemExtra("Default Clip",0),
+                    new MenuItemExtra("Extended Clip", 75),
+                    new MenuItemExtra("Suppressor", 343) },  },
+                new MenuItem("Hawk & Little 1919 Tactical",1134) { IsIllicilt = true, Extras = new List<MenuItemExtra>() {
+                    new MenuItemExtra("Default Clip", 0),
+                    new MenuItemExtra("Extended Clip", 50),
+                    new MenuItemExtra("Suppressor", 125), } },
+                new MenuItem("Vom Feuer P69",790) {IsIllicilt = true,  Extras = new List<MenuItemExtra>() {
+                    new MenuItemExtra("Default Clip", 0),
+                    new MenuItemExtra("Extended Clip", 85),
+                    new MenuItemExtra("Suppressor", 125), } },
+                //Shotgun
+                new MenuItem("Shrewsbury 420 Sawed-Off",200) { IsIllicilt = true },
+                new MenuItem("Toto 12 Guage Sawed-Off",250) { IsIllicilt = true },
+                //SMG
+                new MenuItem("Shrewsbury Luzi",455) { IsIllicilt = true, Extras = new List<MenuItemExtra>() {
+                    new MenuItemExtra("Default Clip", 0),
+                    new MenuItemExtra("Extended Clip", 120),
+                    new MenuItemExtra("Suppressor", 145), } },
+                new MenuItem("Vom Feuer KEK-9",250) {IsIllicilt = true,  Extras = new List<MenuItemExtra>() {
+                    new MenuItemExtra("Default Clip", 0),
+                    new MenuItemExtra("Extended Clip", 120),
+                    new MenuItemExtra("Drum Magazine", 123),
+                    new MenuItemExtra("Suppressor", 356) } },
+                new MenuItem("Hawk & Little Millipede",450) { IsIllicilt = true, Extras = new List<MenuItemExtra>() {
+                    new MenuItemExtra("Default Clip", 0),
+                    new MenuItemExtra("Extended Clip", 120), } },
+                //AR
+                new MenuItem("Shrewsbury Stinkov",450) { IsIllicilt = true, Extras = new List<MenuItemExtra>() {
+                    new MenuItemExtra("Default Clip", 0),
+                    new MenuItemExtra("Extended Clip", 125),
+                    new MenuItemExtra("Drum Magazine", 200),} },
+                //OTHER
+                new MenuItem("Improvised Incendiary",30) { NumberOfItemsToSellToPlayer = 5, IsIllicilt = true, SubAmount = 1,SubPrice = 30 },
+                new MenuItem("BZ Gas Grenade",100) { NumberOfItemsToSellToPlayer = 5,IsIllicilt = true, SubAmount = 1,SubPrice = 100 },
+               }),
+               new ShopMenu("DealerHangoutMenu3","DealerHangoutMenu3",new List<MenuItem>() {
+                    new VariablePriceMenuItem("Methamphetamine", 55, 65, 35, 45) { NumberOfItemsToSellToPlayer = 15, NumberOfItemsToPurchaseFromPlayer = 10,IsIllicilt = true },
+                    new VariablePriceMenuItem("Heroin",150, 160, 100, 110) { NumberOfItemsToSellToPlayer = 15, NumberOfItemsToPurchaseFromPlayer = 10,IsIllicilt = true },
+                    new MenuItem("Brass Knuckles",150) { IsIllicilt = true },
+                    new MenuItem("Combat Knife",120) { IsIllicilt = true },
+                    new MenuItem("Switchblade",55) { IsIllicilt = true },
+                //Pistola
+                new MenuItem("Hawk & Little PTF092F",445) { IsIllicilt = true, Extras = new List<MenuItemExtra>() {
+                    new MenuItemExtra("Default Clip",0),
+                    new MenuItemExtra("Extended Clip", 75),
+                    new MenuItemExtra("Suppressor", 343) },  },
+                new MenuItem("Hawk & Little 1919 Tactical",1134) { IsIllicilt = true, Extras = new List<MenuItemExtra>() {
+                    new MenuItemExtra("Default Clip", 0),
+                    new MenuItemExtra("Extended Clip", 50),
+                    new MenuItemExtra("Suppressor", 125), } },
+                new MenuItem("Vom Feuer P69",790) {IsIllicilt = true,  Extras = new List<MenuItemExtra>() {
+                    new MenuItemExtra("Default Clip", 0),
+                    new MenuItemExtra("Extended Clip", 85),
+                    new MenuItemExtra("Suppressor", 125), } },
+                //Shotgun
+                new MenuItem("Shrewsbury 420 Sawed-Off",200) { IsIllicilt = true },
+                new MenuItem("Toto 12 Guage Sawed-Off",250) { IsIllicilt = true },
+                //SMG
+                new MenuItem("Shrewsbury Luzi",455) { IsIllicilt = true, Extras = new List<MenuItemExtra>() {
+                    new MenuItemExtra("Default Clip", 0),
+                    new MenuItemExtra("Extended Clip", 120),
+                    new MenuItemExtra("Suppressor", 145), } },
+                new MenuItem("Vom Feuer KEK-9",250) {IsIllicilt = true,  Extras = new List<MenuItemExtra>() {
+                    new MenuItemExtra("Default Clip", 0),
+                    new MenuItemExtra("Extended Clip", 120),
+                    new MenuItemExtra("Drum Magazine", 123),
+                    new MenuItemExtra("Suppressor", 356) } },
+                new MenuItem("Hawk & Little Millipede",450) { IsIllicilt = true, Extras = new List<MenuItemExtra>() {
+                    new MenuItemExtra("Default Clip", 0),
+                    new MenuItemExtra("Extended Clip", 120), } },
+                //AR
+                new MenuItem("Shrewsbury Stinkov",450) { IsIllicilt = true, Extras = new List<MenuItemExtra>() {
+                    new MenuItemExtra("Default Clip", 0),
+                    new MenuItemExtra("Extended Clip", 125),
+                    new MenuItemExtra("Drum Magazine", 200),} },
+                //OTHER
+                new MenuItem("Improvised Incendiary",30) { NumberOfItemsToSellToPlayer = 5, IsIllicilt = true, SubAmount = 1,SubPrice = 30 },
+                new MenuItem("BZ Gas Grenade",100) { NumberOfItemsToSellToPlayer = 5,IsIllicilt = true, SubAmount = 1,SubPrice = 100 },
+               }),
+               new ShopMenu("DealerHangoutMenu4","DealerHangoutMenu4",new List<MenuItem>() {
+                    new VariablePriceMenuItem("Crack", 48, 58, 30, 40) { NumberOfItemsToSellToPlayer = 15, NumberOfItemsToPurchaseFromPlayer = 10,IsIllicilt = true },
+                    new VariablePriceMenuItem("Marijuana", 13, 15, 11, 12) { NumberOfItemsToSellToPlayer = 15, NumberOfItemsToPurchaseFromPlayer = 10,IsIllicilt = true },
+                    new MenuItem("Brass Knuckles",150) { IsIllicilt = true },
+                    new MenuItem("Combat Knife",120) { IsIllicilt = true },
+                    new MenuItem("Switchblade",55) { IsIllicilt = true },
+                //Pistola
+                new MenuItem("Hawk & Little PTF092F",445) { IsIllicilt = true, Extras = new List<MenuItemExtra>() {
+                    new MenuItemExtra("Default Clip",0),
+                    new MenuItemExtra("Extended Clip", 75),
+                    new MenuItemExtra("Suppressor", 343) },  },
+                new MenuItem("Hawk & Little 1919 Tactical",1134) { IsIllicilt = true, Extras = new List<MenuItemExtra>() {
+                    new MenuItemExtra("Default Clip", 0),
+                    new MenuItemExtra("Extended Clip", 50),
+                    new MenuItemExtra("Suppressor", 125), } },
+                new MenuItem("Vom Feuer P69",790) {IsIllicilt = true,  Extras = new List<MenuItemExtra>() {
+                    new MenuItemExtra("Default Clip", 0),
+                    new MenuItemExtra("Extended Clip", 85),
+                    new MenuItemExtra("Suppressor", 125), } },
+                //Shotgun
+                new MenuItem("Shrewsbury 420 Sawed-Off",200) { IsIllicilt = true },
+                new MenuItem("Toto 12 Guage Sawed-Off",250) { IsIllicilt = true },
+                //SMG
+                new MenuItem("Shrewsbury Luzi",455) { IsIllicilt = true, Extras = new List<MenuItemExtra>() {
+                    new MenuItemExtra("Default Clip", 0),
+                    new MenuItemExtra("Extended Clip", 120),
+                    new MenuItemExtra("Suppressor", 145), } },
+                new MenuItem("Vom Feuer KEK-9",250) {IsIllicilt = true,  Extras = new List<MenuItemExtra>() {
+                    new MenuItemExtra("Default Clip", 0),
+                    new MenuItemExtra("Extended Clip", 120),
+                    new MenuItemExtra("Drum Magazine", 123),
+                    new MenuItemExtra("Suppressor", 356) } },
+                new MenuItem("Hawk & Little Millipede",450) { IsIllicilt = true, Extras = new List<MenuItemExtra>() {
+                    new MenuItemExtra("Default Clip", 0),
+                    new MenuItemExtra("Extended Clip", 120), } },
+                //AR
+                new MenuItem("Shrewsbury Stinkov",450) { IsIllicilt = true, Extras = new List<MenuItemExtra>() {
+                    new MenuItemExtra("Default Clip", 0),
+                    new MenuItemExtra("Extended Clip", 125),
+                    new MenuItemExtra("Drum Magazine", 200),} },
+                //OTHER
+                new MenuItem("Improvised Incendiary",30) { NumberOfItemsToSellToPlayer = 5, IsIllicilt = true, SubAmount = 1,SubPrice = 30 },
+                new MenuItem("BZ Gas Grenade",100) { NumberOfItemsToSellToPlayer = 5,IsIllicilt = true, SubAmount = 1,SubPrice = 100 },
+               }),
         });
     }
     private void MenuGroupList()

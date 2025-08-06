@@ -26,7 +26,7 @@ public class CraftableItems : ICraftableItems
         string fileName = string.IsNullOrEmpty(configName) ? "CraftableItems_*.xml" : $"CraftableItems_{configName}.xml";
 
         DirectoryInfo LSRDirectory = new DirectoryInfo("Plugins\\LosSantosRED");
-        FileInfo ConfigFile = LSRDirectory.GetFiles(fileName).OrderByDescending(x => x.Name).FirstOrDefault();
+        FileInfo ConfigFile = LSRDirectory.GetFiles(fileName).Where(x => !x.Name.Contains("+")).OrderByDescending(x => x.Name).FirstOrDefault();
         if (ConfigFile != null && !configName.Equals("Default"))
         {
             EntryPoint.WriteToConsole($"Loaded Craftable Items config: {ConfigFile.FullName}", 0);
@@ -50,16 +50,7 @@ public class CraftableItems : ICraftableItems
             CraftableList.RemoveAll(x => additivePossibleItems.Any(y => y.Name.ToLower() == x.Name.ToLower()));
             CraftableList.AddRange(additivePossibleItems);
         }
-
-
-
         CraftableList.RemoveAll(x => ModItems.Get(x.Resultant) == null || (x.SingleUnit == false && x.ResultantAmount < 1) || x.Ingredients.Any(y => y.Quantity < 1));
-
-
-
-
-
-
     }
 
     private void DefaultConfig()
@@ -96,7 +87,7 @@ public class CraftableItems : ICraftableItems
                 CraftingFlags = new HashSet<string>{ "DrugLab", "Stove" },
                 Category = "Narcotics",
                 AnimationDictionary = "anim@amb@business@meth@meth_smash_weight_check@",
-                AnimationName = "break_weight_char02"
+                AnimationName = "break_weigh_char02"
             },
 
             new CraftableItem("Molotov Cocktail", "Improvised Incendiary", new List<Ingredient>()

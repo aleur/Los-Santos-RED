@@ -7,7 +7,8 @@ using System.Collections.Generic;
 using Rage.Native;
 using LosSantosRED.lsr.Helper;
 using RAGENativeUI;
-using System.ComponentModel;
+using System.Drawing;
+using RAGENativeUI.Elements;
 
 namespace Mod
 {
@@ -17,11 +18,15 @@ namespace Mod
         private IModItems ModItems;
         private ISettingsProvideable Settings;
         private IWeapons Weapons;
-        private bool IsCrafting = false;
+
+        private TimerBarPool TimerBarPool;
+
+
+        public bool IsCrafting { get; private set; } = false;
         public CraftingMenu CraftingMenu { get; set; }
         public ICraftableItems CraftableItems;
+        private BarTimerBar ProgressBar;
         public List<(int, CraftableItem)> UnfinishedCrafts { get; set; } = new List<(int, CraftableItem)> ();
-
 
         public Crafting(Player player, ICraftableItems craftableItems, IModItems modItems, ISettingsProvideable settings, IWeapons weapons)
         {
@@ -35,6 +40,12 @@ namespace Mod
         {
             SetupCraftableLookup();
             Player.Crafting = this;
+
+            TimerBarPool= new TimerBarPool();
+            ProgressBar = new BarTimerBar("Progress");
+            ProgressBar.BackgroundColor = Color.FromArgb(100, 142, 50, 50);
+            ProgressBar.ForegroundColor = Color.FromArgb(255, 181, 48, 48);//Red
+
         }
         public void Reset()
         {
@@ -45,7 +56,7 @@ namespace Mod
             CraftableItems.CraftablesLookup = new System.Collections.Generic.Dictionary<string, CraftableItemLookupModel>();
 
             //Just holding reference to the craftable item in case any of the other details are required anywhere else.
-            foreach (var craftableItem in CraftableItems.Items)
+            foreach (CraftableItem craftableItem in CraftableItems.Items)
             {
                 CraftableItems.CraftablesLookup.Add(
                     craftableItem.Name,
@@ -78,12 +89,15 @@ namespace Mod
         }
         private void PerformAnimation(CraftableItem craftItem)
         {
+            if(Player.ActivityManager.IsInteractingWithLocation && !Player.InteriorManager.IsInsideTeleportInterior)
+            {
+                return;
+            }
             string dictionary = "missmechanic";
             string animation = "work2_base";
 
             //anim@scripted@ulp_missions@paperwork@male@
             //action
-
             if (craftItem != null && craftItem.HasCustomAnimations)
             {
                 dictionary = craftItem.AnimationDictionary;
@@ -93,7 +107,6 @@ namespace Mod
             {
                 return;
             }
-
 
             NativeFunction.CallByName<uint>("TASK_PLAY_ANIM", Player.Character, dictionary, animation, 4.0f, -4.0f, -1, 1, 0, false, false, false);
         }
@@ -129,15 +142,14 @@ namespace Mod
             Player.IsSetDisabledControlsWithCamera = true;
             IsCrafting = true;
 
-            //if ((!string.IsNullOrEmpty(craftableItem.AnimationDictionary)) && (!string.IsNullOrEmpty(craftableItem.AnimationName)))
-            //{
             PerformAnimation(craftableItem);
-            //}
 
             if (!string.IsNullOrEmpty(craftableItem.CrimeId))
             {
                 Player.Violations.SetContinuouslyViolating(craftableItem.CrimeId);
             }
+
+            TimerBarPool.Add(ProgressBar);
 
             uint GameTimeStartedCrafting = Game.GameTime;
 
@@ -184,6 +196,8 @@ namespace Mod
 
                     return;
                 }
+                float currentPercentage = (float)(Game.GameTime - GameTimeStartedCrafting) / (float)craftableItem.Cooldown;
+                ProgressBar.Percentage = currentPercentage;
                 if (Game.GameTime - GameTimeStartedCrafting >= craftableItem.Cooldown)
                 {
                     GameTimeStartedCrafting = Game.GameTime;
@@ -196,8 +210,13 @@ namespace Mod
                     }
                     EntryPoint.WriteToConsole($"CRAFTED ONE craftedQuantity{craftedQuantity} quantity{quantity}");
                 }
+
+                TimerBarPool.Draw();
+
                 GameFiber.Yield();
             }
+            TimerBarPool.Remove(ProgressBar);
+
             Player.ButtonPrompts.RemovePrompts("craftingPause");
             Player.ButtonPrompts.RemovePrompts("craftingStop");   
             NativeFunction.Natives.CLEAR_PED_TASKS(Player.Character);
@@ -206,7 +225,6 @@ namespace Mod
             if (!string.IsNullOrEmpty(craftableItem.CrimeId)) Player.Violations.StopContinuouslyViolating(craftableItem.CrimeId);
             Player.IsSetDisabledControlsWithCamera = false;
             Game.DisplaySubtitle($"Crafted {productName} - {quantity} {itemToGive.MeasurementName}(s)");
-            //CraftingMenu.RedrawCraftingMenu(craftingFlag);
         }
     }
 }

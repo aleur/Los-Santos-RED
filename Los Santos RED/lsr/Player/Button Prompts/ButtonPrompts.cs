@@ -90,6 +90,7 @@ public class ButtonPrompts
             RemovePrompts("VehicleInteract");
             return;
         }
+       // EntryPoint.WriteToConsole($"BP ADDDING VEHICLE MAYBE Player.ActivityManager.IsInteractingWithLocation {Player.ActivityManager.IsInteractingWithLocation}");
         toConsider.UpdateInteractPrompts(Player);
     }
     public void Dispose()
@@ -468,6 +469,7 @@ public class ButtonPrompts
 
         //do more like this?
         Player.ActivityManager.CheckHidingButtonPrompts(this, Player.CurrentLookedAtObject);
+        Player.ActivityManager.CheckDoorButtonPrompts(this, Player.CurrentLookedAtObject);
     }
     private void SittingPrompts()
     {

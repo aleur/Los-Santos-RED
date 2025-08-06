@@ -53,9 +53,9 @@ public class PedVariation
 
     public List<AppliedOverlay> AppliedOverlays { get; set; } = new List<AppliedOverlay>();
 
-    public PedVariation ApplyToPed(Ped ped)
+    public PedVariation ApplyToPed(Ped ped, bool SetDefaultApplied)
     {
-        return ApplyToPed(ped, false, false);
+        return ApplyToPed(ped, false, false, SetDefaultApplied);
     }
     //public PedVariation ApplyToPed(Ped ped, bool setDefaultFirst)
     //{
@@ -65,7 +65,7 @@ public class PedVariation
     //    }
     //    return ApplyToPed(ped);
     //}
-    public PedVariation ApplyToPed(Ped ped, bool setDefaultFirst, bool checkComponentValid)
+    public PedVariation ApplyToPed(Ped ped, bool setDefaultFirst, bool checkComponentValid, bool SetDefaultApplied)
     {
         try
         {
@@ -80,15 +80,23 @@ public class PedVariation
             {
                 if (!checkComponentValid || NativeFunction.Natives.IS_PED_COMPONENT_VARIATION_VALID<bool>(ped, Component.ComponentID, Component.DrawableID, Component.TextureID))
                 {
+                    setVariation.Components.Add(new PedComponent(Component.ComponentID, Component.DrawableID, Component.TextureID, Component.PaletteID) { IsDefaultNotApplied = Component.IsDefaultNotApplied });
+                    if (Component.IsDefaultNotApplied && !SetDefaultApplied)
+                    {
+                        continue;
+                    }
                     NativeFunction.Natives.SET_PED_COMPONENT_VARIATION(ped, Component.ComponentID, Component.DrawableID, Component.TextureID, Component.PaletteID);
-                    setVariation.Components.Add(new PedComponent(Component.ComponentID, Component.DrawableID, Component.TextureID, Component.PaletteID));
                 }
             }
             NativeFunction.Natives.CLEAR_ALL_PED_PROPS(ped);
             foreach (PedPropComponent Prop in Props)
             {
+                setVariation.Props.Add(new PedPropComponent(Prop.PropID, Prop.DrawableID, Prop.TextureID) { IsDefaultNotApplied = Prop.IsDefaultNotApplied });
+                if (Prop.IsDefaultNotApplied && !SetDefaultApplied)
+                {
+                    continue;
+                }
                 NativeFunction.Natives.SET_PED_PROP_INDEX(ped, Prop.PropID, Prop.DrawableID, Prop.TextureID, false);
-                setVariation.Props.Add(new PedPropComponent(Prop.PropID, Prop.DrawableID, Prop.TextureID));
             }
             NativeFunction.Natives.CLEAR_PED_DECORATIONS(ped);
             if (AppliedOverlays != null && AppliedOverlays.Any())
@@ -141,7 +149,7 @@ public class PedVariation
         }
         return null;
     }
-    public PedVariation ApplyToPedSlow(Ped ped, bool setDefaultFirst)
+    public PedVariation ApplyToDispatchablePedSlow(Ped ped, bool setDefaultFirst)
     {
         try
         {

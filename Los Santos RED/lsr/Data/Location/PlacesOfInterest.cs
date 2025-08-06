@@ -72,7 +72,6 @@ public class PlacesOfInterest : IPlacesOfInterest
     private List<TattooShop> TattooShopPlaces;
     private List<PlasticSurgeryClinic> PlasticSurgeryClinics;
     private List<BarberShop> BarberShopPlaces;
-    private List<ExteriorCraftingLocation> ExteriorCraftingLocations;
     private List<Business> Businesses;
     private PedCustomizerLocation DefaultPedCustomizerLocation;
 
@@ -88,7 +87,7 @@ public class PlacesOfInterest : IPlacesOfInterest
         string fileName = string.IsNullOrEmpty(configName) ? "Locations_*.xml" : $"Locations_{configName}.xml";
 
         DirectoryInfo LSRDirectory = new DirectoryInfo("Plugins\\LosSantosRED");
-        FileInfo ConfigFile = LSRDirectory.GetFiles(fileName).OrderByDescending(x => x.Name).FirstOrDefault();
+        FileInfo ConfigFile = LSRDirectory.GetFiles(fileName).Where(x => !x.Name.Contains("+")).OrderByDescending(x => x.Name).FirstOrDefault();
         if (ConfigFile != null && !configName.Equals("Default"))
         {
             EntryPoint.WriteToConsole($"Loaded Locations config: {ConfigFile.FullName}", 0);
@@ -102,7 +101,6 @@ public class PlacesOfInterest : IPlacesOfInterest
         else
         {
             EntryPoint.WriteToConsole($"No Locations config found, creating default", 0);
-            DefaultConfig_SunshineDream();
             DefaultConfig();
             DefaultConfig_LibertyCity();
             DefaultConfig_2008();
@@ -237,7 +235,6 @@ public class PlacesOfInterest : IPlacesOfInterest
         DefaultConfig_BarberShops();
         DefaultConfig_PlasticSurgeryClinics();
         DefaultConfig_TattooShops();
-        DefaultConfig_ExteriorCraftingLocations();
         DefaultConfig_Businesses();
 
         PossibleLocations.DeadDrops.AddRange(DeadDrops);
@@ -289,7 +286,6 @@ public class PlacesOfInterest : IPlacesOfInterest
         PossibleLocations.BarberShops.AddRange(BarberShopPlaces);
         PossibleLocations.PlasticSurgeryClinics.AddRange(PlasticSurgeryClinics);
         PossibleLocations.TattooShops.AddRange(TattooShopPlaces);
-        PossibleLocations.ExteriorCraftingLocations.AddRange(ExteriorCraftingLocations);
         PossibleLocations.Businesses.AddRange(Businesses);
         PossibleLocations.PedCustomizerLocation = DefaultPedCustomizerLocation;
 
@@ -301,7 +297,7 @@ public class PlacesOfInterest : IPlacesOfInterest
         DefaultPedCustomizerLocation = new PedCustomizerLocation();
         DefaultPedCustomizerLocation.DefaultModelPedPosition = new Vector3(402.8473f, -996.7224f, -99.00025f);
         DefaultPedCustomizerLocation.DefaultModelPedHeading = 182.7549f;
-        DefaultPedCustomizerLocation.DefaultPlayerHoldingPosition = new Vector3(402.5164f, -1002.847f, -99.2587f);
+        DefaultPedCustomizerLocation.DefaultPlayerHoldingPosition = new Vector3(398.0133f, -1004.411f, -99.00411f); //new Vector3(402.5164f, -1002.847f, -99.2587f);
         List<CameraCyclerPosition> CameraCyclerPositions = new List<CameraCyclerPosition>();
         CameraCyclerPositions.Add(new CameraCyclerPosition("Default", new Vector3(402.9301f, -998.267f, -98.51537f), new Vector3(0.004358141f, 0.9860916f, -0.1661458f), new Rotator(-9.5638f, -4.058472E-08f, -0.2532234f), 0));//new Vector3(402.8145f, -998.5043f, -98.29621f), new Vector3(-0.02121102f, 0.9286007f, -0.3704739f), new Rotator(-21.74485f, -5.170386E-07f, 1.308518f), 0));
         CameraCyclerPositions.Add(new CameraCyclerPosition("Face", new Vector3(402.8708f, -997.5441f, -98.30454f), new Vector3(-0.005195593f, 0.9991391f, -0.04116036f), new Rotator(-2.358982f, 2.136245E-06f, 0.2979394f), 1));
@@ -416,19 +412,10 @@ public class PlacesOfInterest : IPlacesOfInterest
 
         };
     }
-    private void DefaultConfig_ExteriorCraftingLocations()
-    {
-        ExteriorCraftingLocations = new List<ExteriorCraftingLocation>()
-        {
-            //why does this exist? just a random free meth lab i guess.
-           //new ExteriorCraftingLocation(new Vector3(1389.315f, 3604.739f,38.94193f),302.1837f,"Craft Meth","")
-           //{
-           //   CraftingFlag = "DrugLab" ,
-           //},
-        };
-    }
     private void DefaultConfig_Businesses()
     {
+        Businesses = new List<Business>();
+
         Businesses = new List<Business>()
         {
             new Business(new Vector3(1437.496f,-1491.862f,63.62201f),163.8885f,"Trap House", "Selling misery since the 80's")
@@ -438,11 +425,12 @@ public class PlacesOfInterest : IPlacesOfInterest
                 PurchasePrice = 135000,
                 SalesPrice = 25000,
                 FullName = "El Burro Heights, Trap House",
-                PossibleModItemPayouts = new List<string>() { "Marijana", "Cocaine", "Crack", "Methamphetamine", "Heroin", "SPANK" },
+                PossibleModItemPayouts = new List<string>() { "Marijuana", "Cocaine", "Crack", "Methamphetamine", "Heroin", "SPANK" },
                 ModItemPayoutAmount = 100,
                 CameraPosition = new Vector3(0f, 0f, 0f),
                 CameraDirection = new Vector3(0f, 0f, 0f),
-                CameraRotation = new Rotator(0f, 0f, 0f)
+                CameraRotation = new Rotator(0f, 0f, 0f),
+                CraftingFlag = "DrugLab"
             },
             new Business(new Vector3(2221.945f,5614.832f,54.90165f),108.9486f,"Weed Farm", "")
             {
@@ -803,11 +791,11 @@ public class PlacesOfInterest : IPlacesOfInterest
                     new AirportFlight("LDR",StaticStrings.AirHerlerCarrierID,"Relax on one of our state of the art jets and arrive in luxury. ~n~~n~Taxi service to downtown Ludendorff included.", 1500, 5),
                     new AirportFlight("LDR",StaticStrings.CaipiraAirwaysCarrierID,"Only three connections and 12 hours for a 5 hour flight! What else could you ask for? ~n~~n~Taxi service to downtown Ludendorff included.", 550, 12),
 
-                    new AirportFlight("SFX",StaticStrings.SanFierroAirCarrierID,"When driving just isn't an option and your company is paying.", 350, 1),
-                    new AirportFlight("SFX",StaticStrings.LosSantosAirCarrierID,"Experience the luxury of a small regional carriers lowest end fare.", 325, 2),
+                    //new AirportFlight("SFX",StaticStrings.SanFierroAirCarrierID,"When driving just isn't an option and your company is paying.", 350, 1),
+                    //new AirportFlight("SFX",StaticStrings.LosSantosAirCarrierID,"Experience the luxury of a small regional carriers lowest end fare.", 325, 2),
 
-                    new AirportFlight("FIA",StaticStrings.FlyUSCarrierID,"Need to get FAR away? FlyUS and see the difference deregulation made!", 450, 6),
-                    new AirportFlight("VCIA",StaticStrings.FlyUSCarrierID,"Nonstop service to the sunniest state in the nation!", 425, 7),
+                    //new AirportFlight("FIA",StaticStrings.FlyUSCarrierID,"Need to get FAR away? FlyUS and see the difference deregulation made!", 450, 6),
+                    //new AirportFlight("VCIA",StaticStrings.FlyUSCarrierID,"Nonstop service to the sunniest state in the nation!", 425, 7),
                     new AirportFlight("CPA",StaticStrings.AdiosAirlinesCarrierID,"We won't be the only ones saying 'Adios' to you!", 500, 10),
 
                     new AirportFlight("SSA",StaticStrings.LosSantosAirCarrierID,"Just a hop skip and a jump away, LSIX is proud to provide service to our rural neighbors to the north.", 200, 1),
@@ -985,7 +973,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 ,CommercialFlights = new List<AirportFlight>()
                 {
                     new AirportFlight("LSIX",StaticStrings.CaipiraAirwaysCarrierID,"You'll get there when you get there", 650, 14),
-                    new AirportFlight("SFX",StaticStrings.SanFierroAirCarrierID,"Its the San Fierro Treat!", 680, 15),
+                    //new AirportFlight("SFX",StaticStrings.SanFierroAirCarrierID,"Its the San Fierro Treat!", 680, 15),
                 }
                 ,RoadToggels = new HashSet<RoadToggler>()
                 {
@@ -1717,20 +1705,45 @@ public class PlacesOfInterest : IPlacesOfInterest
                 CloseTime = 24,
                 CanInteractWhenWanted = true,
                 BannerImagePath = "stores\\paynspray.png",
+                PossibleVehicleSpawns = new List<ConditionalLocation> () { new CivilianConditionalLocation(new Vector3(151.3446f, -1081.765f, 28.77507f), 181.199f, 5f) {  OverrideDispatchableVehicleGroupID = "HighEndVehicles" }, } ,
             },
 
         };
 
         VehicleModShops = new List<VehicleModShop>()
         {
-            new VehicleModShop(new Vector3(872.4106f, -1662.971f, 30.41852f), 86.49644f,"Test Shop1","Test Shop 1 Desc") { 
+            //new VehicleModShop(new Vector3(135.8826f, -1049.596f, 29.15182f), 338.5946f,"RED Customs","Serving Pillbox Hill")
+            //{
+            //    OpenTime = 0,
+            //    CloseTime = 24,
+            //    GarageDoors = new List<InteriorDoor>() {
+            //        new InteriorDoor(3312435724,new Vector3(134.1454f,-1054.235f,31.3015f)),
+            //    },
+            //   CanInteractWhenWanted = true,
+            //},
+
+
+
+
+            //new VehicleModShop(new Vector3(865.2888f, -1715.959f, 29.20321f), 196.2501f,"RED Customs","Pimp The Auto")
+            //{
+            //    OpenTime = 0,
+            //    CloseTime = 24,
+            //    HasNoGarageDoors = true,
+            //    VehiclePreviewLocation = new SpawnPlace(new Vector3(228.374f, -992.5745f, -98.99996f), 178.1117f),
+            //    CameraPosition = new Vector3(867.4737f, -1659.601f, 31.49755f),
+            //    CameraDirection = new Vector3(0.8348238f, -0.5354371f, -0.1279697f),
+            //    CameraRotation = new Rotator(-7.352283f, 1.50649E-06f, -122.6752f)
+            //},
+
+            new VehicleModShop(new Vector3(854.3461f, -2094.082f, 29.83458f), 173.3708f,"Olson's Autos","Serving Imperial Blvd.")
+            {
                 OpenTime = 0,
                 CloseTime = 24,
                 HasNoGarageDoors = true,
-                CameraPosition = new Vector3(867.4737f, -1659.601f, 31.49755f), 
-                CameraDirection = new Vector3(0.8348238f, -0.5354371f, -0.1279697f), 
-                CameraRotation = new Rotator(-7.352283f, 1.50649E-06f, -122.6752f)},
-            
+                VehiclePreviewLocation = new SpawnPlace(new Vector3(228.374f, -992.5745f, -98.99996f), 178.1117f),
+            },
+
         };
 
     }
@@ -4641,7 +4654,7 @@ public class PlacesOfInterest : IPlacesOfInterest
             new Hotel(new Vector3(307.3867f, -727.7486f, 29.31678f), 254.8814f, "Alesandro", "","CheapHotelMenu"){OpenTime = 0, CloseTime = 24, FullName = "The Alesandro Hotel" },
             new Hotel(new Vector3(-702.4747f, -2274.476f, 13.45538f), 225.7683f, "Opium Nights", "Don't your head","ExpensiveHotelMenu") {OpenTime = 0, CloseTime = 24 },
             new Hotel(new Vector3(379.4438f, -1781.435f, 29.46008f), 47.01642f, "Motel & Beauty", "","CheapHotelMenu"){OpenTime = 0, CloseTime = 24 },
-            new Hotel(new Vector3(570.0554f, -1745.989f, 29.22319f), 260.0757f, "Billings Gate Motel", "","CheapHotelMenu"){OpenTime = 0, CloseTime = 24 },
+            new Hotel(new Vector3(570.0554f, -1745.989f, 29.22319f), 260.0757f, "Billings Gate Motel", "","CheapHotelMenu"){OpenTime = 0, CloseTime = 24, PossibleVehicleSpawns = new List<ConditionalLocation> () { new CivilianConditionalLocation(new Vector3(549.778f, -1796.519f, 28.77426f), 167.0992f, 5f) {  OverrideDispatchableVehicleGroupID = "HighEndVehicles" }, } },
             new Hotel(new Vector3(-104.5376f, 6315.921f, 31.57622f), 141.414f, "Dream View Motel", "Mostly Bug Free!","CheapHotelMenu"){OpenTime = 0, CloseTime = 24 },
             new Hotel(new Vector3(317.7083f, 2623.256f, 44.46722f), 306.9629f, "Eastern Motel", "","CheapHotelMenu"){OpenTime = 0, CloseTime = 24, ScannerFilePath = "01_specific_location\\0x0B4EB13E.mp3" },
             new Hotel(new Vector3(1142.035f, 2664.177f, 38.16088f), 86.68575f, "The Motor Motel", "Motor on in","CheapHotelMenu"){OpenTime = 0, CloseTime = 24 },
@@ -6217,11 +6230,7 @@ public class PlacesOfInterest : IPlacesOfInterest
         PlacesOfInterest_Liberty placesOfInterest_Liberty = new PlacesOfInterest_Liberty(this);
         placesOfInterest_Liberty.DefaultConfig();
     }
-    private void DefaultConfig_SunshineDream()
-    {
-        PlacesOfInterest_SunshineDream placesOfInterest_SunshineDream = new PlacesOfInterest_SunshineDream();
-        placesOfInterest_SunshineDream.DefaultConfig();
-    }
+
     public void Setup()
     {
         foreach (GameLocation bl in AllLocations())

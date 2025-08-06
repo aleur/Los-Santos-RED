@@ -84,6 +84,9 @@ public class Interior
     public bool IsWeaponRestricted { get; set; } = false;
     public bool IsTunnel { get; set; } = false;
     public float MaxUpdateDistance { get; set; } = 50f;
+
+
+    public bool IsTrespassingWhenClosed { get; set; } = false;
     public List<InteriorInteract> InteractPoints { get; set; } = new List<InteriorInteract>();
     public List<Vector3> ClearPositions { get; set; } = new List<Vector3>();
     public string ForceAutoInteractName { get; set; }
@@ -93,6 +96,9 @@ public class Interior
     [XmlIgnore]
     public virtual List<InteriorInteract> AllInteractPoints => InteractPoints;
     public InteriorInteract ClosestInteract => AllInteractPoints.Where(x => x.CanAddPrompt).OrderBy(x => x.DistanceTo).FirstOrDefault();
+
+    public GameLocation GameLocation { get; set; }
+
     public virtual void Setup(IInteractionable player, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, ILocationInteractable locationInteractable, IModItems modItems, IClothesNames clothesNames)
     {
         Settings = settings;
@@ -105,6 +111,14 @@ public class Interior
         foreach (InteriorInteract interiorInteract in AllInteractPoints)//InteractPoints)
         {
             interiorInteract.Setup(modItems, clothesNames);
+        }
+    }
+    public void DebugLockDoors()
+    {
+        foreach (InteriorDoor door in Doors)
+        {
+            door.LockDoor();
+            EntryPoint.WriteToConsole($"INTERIOR: {Name} {door.ModelHash} {door.Position} LOCKED");
         }
     }
     public void DebugOpenDoors()
@@ -200,9 +214,18 @@ public class Interior
                         ii.OnInteriorLoaded();
                     }
                 }
+
+                
+
                 IsActive = true;
                 GameFiber.Yield();
+
                 EntryPoint.WriteToConsole($"Load Interior {Name} isOpen{isOpen}");
+
+
+                //GameFiber.Sleep(250);
+               // LoadDoors(isOpen);
+
             }
             catch (Exception ex)
             {
@@ -212,6 +235,7 @@ public class Interior
     }
     protected virtual void LoadDoors(bool isOpen)
     {
+        EntryPoint.WriteToConsole($"LOAD DOORS RAN {isOpen}");
         if (isOpen)
         {
             foreach (InteriorDoor door in Doors)
@@ -221,6 +245,7 @@ public class Interior
         }
         else
         {
+            EntryPoint.WriteToConsole($"LOAD DOORS RAN LOCKING STUFF {isOpen}");
             foreach (InteriorDoor door in Doors.Where(x => x.LockWhenClosed))
             {
                 door.LockDoor();
@@ -302,11 +327,19 @@ public class Interior
     }
     public void Update()
     {
-        foreach (InteriorDoor door in Doors.Where(x=>x.ForceRotateOpen && !x.HasBeenForceRotatedOpen))
+        foreach (InteriorDoor door in Doors.Where(x=> !x.IsLocked && x.ForceRotateOpen && !x.HasBeenForceRotatedOpen))
         {
             EntryPoint.WriteToConsole("ATTEMPTING TO FORCE ROTATE OPEN DOOR THAT WASNT THERE");
             door.UnLockDoor();
         }
+
+
+        foreach (InteriorDoor door in Doors.Where(x => x.IsLocked && x.LockWhenClosed && !x.HasRanLockWithEntity))
+        {
+            EntryPoint.WriteToConsole("ATTEMPTING TO LOCK A DOOR WHERE THE ENTITY DOESNT EXISTS");
+            door.LockDoor();
+        }
+
         //if(IsTeleportEntry)
         //{
         //    return;

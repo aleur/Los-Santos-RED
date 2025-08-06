@@ -28,6 +28,8 @@ namespace LosSantosRED.lsr
         private Vector3 prevPlacePoliceShouldSearchForPlayer;
         private Vector3 prevPlacePoliceLastSeenPlayer;
         private List<Cop> CloseDriverCops = new List<Cop>();
+        private uint GameTimeLastTimePoliceSeenPlayer;
+        private bool SeenPoliceWithinTime => GameTimeLastTimePoliceSeenPlayer > 0 && Game.GameTime - GameTimeLastTimePoliceSeenPlayer <= Settings.SettingsManager.PoliceSettings.RecentlySeenTime;
 
         public Police(IEntityProvideable world, IPoliceRespondable currentPlayer, IPerceptable perceptable, IContactInteractable contactInteractable, ISettingsProvideable settings, IItemEquipable itemEquipablePlayer, ITimeReportable time)
         {
@@ -218,6 +220,7 @@ namespace LosSantosRED.lsr
             bool anyPoliceRecentlySeenPlayer = false;
             bool anyPoliceSawPlayerViolating = false;
             bool anyPoliceInHeliCanSeePlayer = false;
+            
             int tested = 0;
             foreach (Cop cop in World.Pedestrians.AllPoliceList.OrderBy(x=>x.DistanceToPlayer))
             {
@@ -264,13 +267,23 @@ namespace LosSantosRED.lsr
                 }
                 //GameFiber.Yield();
             }
+
+
+            if(anyPoliceCanSeePlayer)
+            {
+                GameTimeLastTimePoliceSeenPlayer = Game.GameTime;
+            }
+
+
             Player.AnyPoliceCanSeePlayer = anyPoliceCanSeePlayer;
             Player.AnyPoliceCanHearPlayer = anyPoliceCanHearPlayer;
             Player.AnyPoliceCanRecognizePlayer = anyPoliceCanRecognizePlayer;
 
 
 
-            Player.AnyPoliceRecentlySeenPlayer = anyPoliceRecentlySeenPlayer;
+
+
+            Player.AnyPoliceRecentlySeenPlayer = anyPoliceRecentlySeenPlayer || SeenPoliceWithinTime;
 
 
 

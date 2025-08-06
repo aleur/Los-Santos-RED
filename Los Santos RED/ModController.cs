@@ -46,7 +46,7 @@ namespace LosSantosRED.lsr
         public bool RunVanilla { get; set; } = true;
         public bool RunMenuOnly { get; set; } = true;
         public bool IsDisplayingAlertScreen { get; set; } = false;
-        public void Setup(GameConfig Config)
+        public void Setup()
         {
             IsRunning = true;
             EntryPoint.IsLoadingAltConfig = false;
@@ -58,7 +58,7 @@ namespace LosSantosRED.lsr
 
 
             ModDataFileManager = new ModDataFileManager();
-            ModDataFileManager.Setup(Config);
+            ModDataFileManager.Setup();
             GameFiber.Yield();
 
             NAudioPlayer = new NAudioPlayer(ModDataFileManager.Settings);
@@ -88,7 +88,7 @@ namespace LosSantosRED.lsr
             Civilians = new Civilians(World, Player, Player, Player, ModDataFileManager.Settings, ModDataFileManager.Gangs);
             GameFiber.Yield();
             PedSwap = new PedSwap(Time, Player, ModDataFileManager.Settings, World, ModDataFileManager.Weapons, ModDataFileManager.Crimes, ModDataFileManager.Names, ModDataFileManager.ModItems, World, ModDataFileManager.RelationshipGroups,
-                ModDataFileManager.ShopMenus, ModDataFileManager.DispatchablePeople, ModDataFileManager.Heads, ModDataFileManager.ClothesNames, ModDataFileManager.Gangs, ModDataFileManager.Agencies, ModDataFileManager.TattooNames, ModDataFileManager.GameSaves, ModDataFileManager.SavedOutfits, Player);
+                ModDataFileManager.ShopMenus, ModDataFileManager.DispatchablePeople, ModDataFileManager.Heads, ModDataFileManager.ClothesNames, ModDataFileManager.Gangs, ModDataFileManager.Agencies, ModDataFileManager.TattooNames, ModDataFileManager.GameSaves, ModDataFileManager.SavedOutfits, Player, Player);
             GameFiber.Yield();
             Player.PedSwap = PedSwap;
             Tasker = new Mod.Tasker(World, Player, ModDataFileManager.Weapons, ModDataFileManager.Settings, ModDataFileManager.PlacesOfInterest);
@@ -98,7 +98,8 @@ namespace LosSantosRED.lsr
             Weather.Setup();
             GameFiber.Yield();
             Dispatcher = new Dispatcher(World, Player, ModDataFileManager.Agencies, ModDataFileManager.Settings, ModDataFileManager.Streets, ModDataFileManager.Zones, ModDataFileManager.Jurisdictions, ModDataFileManager.Weapons, ModDataFileManager.Names, ModDataFileManager.Crimes,
-                ModDataFileManager.RelationshipGroups, ModDataFileManager.Gangs, ModDataFileManager.GangTerritories, ModDataFileManager.ShopMenus, ModDataFileManager.PlacesOfInterest, Weather, Time, ModDataFileManager.ModItems, ModDataFileManager.Organizations, ModDataFileManager.Interiors);
+                ModDataFileManager.RelationshipGroups, ModDataFileManager.Gangs, ModDataFileManager.GangTerritories, ModDataFileManager.ShopMenus, ModDataFileManager.PlacesOfInterest, Weather, 
+                Time, ModDataFileManager.ModItems, ModDataFileManager.Organizations, ModDataFileManager.Interiors, ModDataFileManager.DispatchablePeople, ModDataFileManager.DispatchableVehicles);
             Dispatcher.Setup();
             Player.Dispatcher = Dispatcher;
             Player.Weather = Weather;
@@ -143,14 +144,14 @@ namespace LosSantosRED.lsr
             Game.FadeScreenIn(500, true);
             DisplayLoadSuccessfulMessage();
 
-            string ConfigName = string.IsNullOrEmpty(Config.ConfigName) ? "No Config" : Config.ConfigName + " Config";
+            //string ConfigName = string.IsNullOrEmpty(Config.ConfigName) ? "No Config" : Config.ConfigName + " Config";
             
 
-            if (!string.IsNullOrEmpty(Config.ConfigName))
-            {
-                Game.DisplayNotification($"~s~Los Santos ~r~RED~s~ {ConfigName} Loaded");
-                EntryPoint.WriteToConsole($"Loaded {ConfigName}", 0); 
-            }
+            //if (!string.IsNullOrEmpty(Config.ConfigName))
+            //{
+            //    Game.DisplayNotification($"~s~Los Santos ~r~RED~s~ {ConfigName} Loaded");
+            //    EntryPoint.WriteToConsole($"Loaded {ConfigName}", 0); 
+            //}
         }
         public void SetupFileOnly()
         {
@@ -159,7 +160,7 @@ namespace LosSantosRED.lsr
                 GameFiber.Yield();
             }
             ModDataFileManager = new ModDataFileManager();
-            ModDataFileManager.Setup(new GameConfig("Default"));
+            ModDataFileManager.Setup();
         }
         public void Dispose()
         {
@@ -174,6 +175,8 @@ namespace LosSantosRED.lsr
             Weather.Dispose();
             Debug.Dispose();
             WeatherManager.Dispose();
+
+
 
             Game.DisplayNotification("~s~Los Santos ~r~RED ~s~Deactivated");
             EntryPoint.WriteToConsole($"Has Been Deactivated", 0);

@@ -18,6 +18,9 @@ public class VehicleModShop : GameLocation
 {
     private UIMenu RepairGarageSubMenu;
     private int FinalRepairCost;
+    private OrbitCamera OrbitCamera;
+    private bool hasteleported;
+
     public VehicleModShop() : base()
     {
 
@@ -35,6 +38,14 @@ public class VehicleModShop : GameLocation
     public int WashCost { get; set; } = 10;
 
     public bool HasNoGarageDoors { get; set; } = false;
+
+
+    public int DefaultPrice { get; set; } = 500;
+    public int DefaultPriceScalar { get; set; } = 100;
+
+    public string VehicleVariationShopMenuID { get; set; } = "GenericModShop";
+    [XmlIgnore]
+    public VehicleVariationShopMenu VehicleVariationShopMenu { get; set; }
 
     public VehicleModShop(Vector3 _EntrancePosition, float _EntranceHeading, string _Name, string _Description) : base(_EntrancePosition, _EntranceHeading, _Name, _Description)
     {
@@ -63,24 +74,59 @@ public class VehicleModShop : GameLocation
         Player.ActivityManager.IsInteractingWithLocation = true;
         CanInteract = false;
         Player.IsTransacting = true;
+        Player.IsSetDisabledControls = true;
         GameFiber.StartNew(delegate
         {
             try
             {
-                CreateInteractionMenu();
+                if(VehiclePreviewLocation != null)
+                {
+                    Game.FadeScreenOut(500, true);
+                    Player.GPSManager.TeleportToCoords(VehiclePreviewLocation.Position, VehiclePreviewLocation.Heading, false,true,0);
+                    hasteleported = true;
+                    GameFiber.Sleep(500);
+                    
+                }
+                Player.CurrentVehicle?.Radio.SetOff();
 
-                StoreCamera = new LocationCamera(this, Player, Settings, NoEntryCam);
-                StoreCamera.StaysInVehicle = true;
-                StoreCamera.Setup();
+                CreateInteractionMenu();
+                SetupOrbitCamera();
+
+                if(hasteleported)
+                {
+                    Game.FadeScreenIn(500, true);
+                }
+
                 HandleDoor();
                 GenerateModMenu();
-                ProcessInteractionMenu();
+                ProcessMenu();
                 DisposeInteractionMenu();
                 DisposeDoor();
-                StoreCamera.Dispose();
+
+
+                if (VehiclePreviewLocation != null && hasteleported)
+                {
+                    Game.FadeScreenOut(500, true);
+                    Player.GPSManager.TeleportToCoords(EntrancePosition, EntranceHeading, false, true, 0);
+                    OrbitCamera.Dispose();
+                    GameFiber.Sleep(500);         
+                    Game.FadeScreenIn(500, true);
+                }
+                else
+                {
+                    OrbitCamera.Dispose();
+                }
+
+                
+
+
+
+
+
                 Player.ActivityManager.IsInteractingWithLocation = false;
                 CanInteract = true;
                 Player.IsTransacting = false;
+                Player.IsSetDisabledControls = false;
             }
             catch (Exception ex)
             {
@@ -89,6 +135,37 @@ public class VehicleModShop : GameLocation
             }
         }, "ModShopInteract");
 
+    }
+
+    private void SetupOrbitCamera()
+    {
+        OrbitCamera = new OrbitCamera(Player,Player.CurrentVehicle.Vehicle, null, Settings, MenuPool);
+        OrbitCamera.HandleUpdates = true;
+        OrbitCamera.Setup();
+    }
+
+    private void ProcessMenu()
+    {
+        while (IsAnyMenuVisible)
+        {
+
+            if (Game.IsKeyDownRightNow(System.Windows.Forms.Keys.LShiftKey) && Game.IsKeyDownRightNow(System.Windows.Forms.Keys.Z))
+            {
+
+                EntryPoint.WriteToConsole("Z KEY HIT EXITING DEBUG");
+                break;
+            }
+
+            //if (Game.IsKeyDownRightNow(System.Windows.Forms.Keys.T))
+            //{
+
+            //    EntryPoint.WriteToConsole($"{InteractionMenu.Visible}");
+            //    InteractionMenu.Visible = true;
+            //}
+
+            GameFiber.Yield();
+        }
+        EntryPoint.WriteToConsole("BREAK HAPPENED");
     }
     private void HandleDoor()
     {
@@ -120,13 +197,21 @@ public class VehicleModShop : GameLocation
         }
         GameFiber.Sleep(1000);
     }
+
+    public override void StoreData(IShopMenus shopMenus, IAgencies agencies, IGangs gangs, IZones zones, IJurisdictions jurisdictions, IGangTerritories gangTerritories, INameProvideable names, ICrimes crimes, IPedGroups PedGroups, IEntityProvideable world, IStreets streets, ILocationTypes locationTypes, ISettingsProvideable settings, IPlateTypes plateTypes, IOrganizations associations, IContacts contacts, IInteriors interiors, ILocationInteractable player, IModItems modItems, IWeapons weapons, ITimeControllable time, IPlacesOfInterest placesOfInterest, IIssuableWeapons issuableWeapons, IHeads heads, IDispatchablePeople dispatchablePeople, ModDataFileManager modDataFileManager)
+    {
+        VehicleVariationShopMenu = shopMenus.GetVehicleVariationMenu(VehicleVariationShopMenuID);
+        base.StoreData(shopMenus, agencies, gangs, zones, jurisdictions, gangTerritories, names, crimes, PedGroups, world, streets, locationTypes, settings, plateTypes, associations, contacts, interiors, player, modItems, weapons, time, placesOfInterest, issuableWeapons, heads, dispatchablePeople, modDataFileManager);
+    }
     private void GenerateModMenu()
     {
         if (!Player.IsInVehicle || Player.CurrentVehicle == null || !Player.CurrentVehicle.Vehicle.Exists())
         {
             return;
         }
-        ModShopMenu modShopMenu = new ModShopMenu(Player, MenuPool, InteractionMenu, this, MaxRepairCost, RepairHours, WashCost, WashHours);
+        EntryPoint.WriteToConsole("ORBIT CAMERA START");
+        
+        ModShopMenu modShopMenu = new ModShopMenu(Player, MenuPool, InteractionMenu, this, VehicleVariationShopMenu, MaxRepairCost, RepairHours, WashCost, WashHours, null, DefaultPrice, DefaultPriceScalar, PlateTypes);
         modShopMenu.CreateMenu();
     }
     public override void Activate(IInteriors interiors, ISettingsProvideable settings, ICrimes crimes, IWeapons weapons, ITimeReportable time, IEntityProvideable world)
@@ -137,11 +222,14 @@ public class VehicleModShop : GameLocation
         }
         if (IsOpen(time.CurrentHour))
         {
-            foreach (InteriorDoor id in GarageDoors)
+            if (GarageDoors != null)
             {
-                if (id.Position != Vector3.Zero)
+                foreach (InteriorDoor id in GarageDoors)
                 {
-                    id.Activate();
+                    if (id.Position != Vector3.Zero)
+                    {
+                        id.Activate();
+                    }
                 }
             }
         }

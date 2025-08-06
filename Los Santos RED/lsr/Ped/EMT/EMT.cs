@@ -26,7 +26,7 @@ public class EMT : PedExt
     public override Color BlipColor => AssignedAgency != null ? AssignedAgency.Color : base.BlipColor;
     public override bool GenerateUnconsciousAlerts { get; set; } = false;
     public bool IsRespondingToInvestigation { get; set; }
-    public bool IsCorrupt { get; set; } = false;
+    
     public override void Update(IPerceptable perceptable, IPoliceRespondable policeRespondable, IContactInteractable contactInteractable, Vector3 placeLastSeen, IEntityProvideable world)
     {
         PlayerToCheck = policeRespondable;
@@ -45,13 +45,13 @@ public class EMT : PedExt
                 UpdateVehicleState();
                 if (!IsUnconscious && PlayerPerception.DistanceToTarget <= 200f)
                 {
-                    if (!PlayerPerception.RanSightThisUpdate && Settings.SettingsManager.PerformanceSettings.EnablePerformanceUpdateMode)
+                    if (!PlayerPerception.RanSightThisUpdate && Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
                     {
                         GameFiber.Yield();
                     }
                     if (ShouldCheckCrimes)
                     {
-                        PedViolations.Update(policeRespondable, true);//possible yield in here!, REMOVED FOR NOW
+                        PedViolations.Update(policeRespondable);//possible yield in here!, REMOVED FOR NOW
                     }
                     PedPerception.Update();
                     if (Settings.SettingsManager.EMSSettings.AllowAlerts)
@@ -71,16 +71,6 @@ public class EMT : PedExt
             return;
         }
         Money = RandomItems.GetRandomNumberInt(AssignedAgency.MoneyMin, AssignedAgency.MoneyMax);
-        if (RandomItems.RandomPercent(AssignedAgency.CorruptMemberPercentage))
-        {
-            IsCorrupt = true;
-            SetupTransactionItems(shopMenus.GetWeightedRandomMenuFromGroup(AssignedAgency.CorruptMenuGroup), false);
-            Money = RandomItems.GetRandomNumberInt(AssignedAgency.CorruptMoneyMin, AssignedAgency.CorruptMoneyMax);
-        }
-        if(IsCorrupt)
-        {
-            WillCallPolice = false;
-        }
         if (addBlip)
         {
             AddBlip();

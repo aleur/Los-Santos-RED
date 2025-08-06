@@ -119,18 +119,18 @@ public class DispatchableVehicles_FEJ_Modern
             //Common Marked
             DispatchableVehicles_FEJ.Create_PoliceInterceptor(50,50,1,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"","", -1,40),
             DispatchableVehicles_FEJ.Create_PoliceScout(50,50,1,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
-            DispatchableVehicles_FEJ.Create_PoliceGresley(50,50,1,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
-            DispatchableVehicles_FEJ.Create_PoliceRadius(20,20,1,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"","", -1,40),
-            DispatchableVehicles_FEJ.Create_PoliceAleutian(20,20,1,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
+            DispatchableVehicles_FEJ.Create_PoliceGresley(30,30,1,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
+            DispatchableVehicles_FEJ.Create_PoliceRadius(10,10,1,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"","", -1,40),
+            DispatchableVehicles_FEJ.Create_PoliceAleutian(10,10,1,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_PoliceBuffaloSTX(15,15,1,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_PoliceGranger3600(10,10,1,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,31,-1,-1,"",""),
-            DispatchableVehicles_FEJ.Create_PoliceStanier(10,10,1,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"","", -1,100),
-            DispatchableVehicles_FEJ.Create_PoliceFugitive(8,8,1,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
+            DispatchableVehicles_FEJ.Create_PoliceStanier(8,8,1,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"","", -1,100),
+            DispatchableVehicles_FEJ.Create_PoliceFugitive(5,5,1,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
 
             //UnCommonMarked
-            DispatchableVehicles_FEJ.Create_PoliceVSTR(8,8,0,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
-            DispatchableVehicles_FEJ.Create_PoliceRaiden(5,5,0,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
-            DispatchableVehicles_FEJ.Create_PolicePurge(5,5,0,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
+            DispatchableVehicles_FEJ.Create_PoliceVSTR(5,5,0,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
+            DispatchableVehicles_FEJ.Create_PoliceRaiden(3,3,0,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
+            DispatchableVehicles_FEJ.Create_PolicePurge(3,3,0,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_PoliceGauntlet(5,5,0,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_PoliceLandstalkerXL(3,3,1,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_PoliceCaracara(3,3,1,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
@@ -159,7 +159,7 @@ public class DispatchableVehicles_FEJ_Modern
             DispatchableVehicles_FEJ.Create_PoliceAleutian(0,50,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,6,"SWAT",""),
             DispatchableVehicles_FEJ.Create_PoliceLandstalkerXL(0,10,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,4,"SWAT",""),
             DispatchableVehicles_FEJ.Create_PoliceScout(0,50,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,4,"SWAT",""),
-            DispatchableVehicles_FEJ.Create_PoliceBeaverRam(0,50,-1,false,PoliceVehicleType.Marked,-1,4,-1,6,8,"SWAT",""),
+            DispatchableVehicles_FEJ.Create_PoliceBeaverRam(0,50,0,false,PoliceVehicleType.Marked,22,4,-1,6,8,"SWAT",""),//13 is ok
 
             DispatchableVehicles_FEJ.Create_PoliceVindicator(20,10,3,false,PoliceVehicleType.Marked,-1,-1,2,1,1,"MotorcycleCop","Motorcycle",40),
             DispatchableVehicles_FEJ.Create_PoliceSanchez(1,0,0,false,PoliceVehicleType.Marked,0,-1,2,1,1,"DirtBike","DirtBike",20),
@@ -171,9 +171,9 @@ public class DispatchableVehicles_FEJ_Modern
         EastLSPDVehicles_FEJ_Modern = new List<DispatchableVehicle>()
         {
             //Common Marked
-            DispatchableVehicles_FEJ.Create_PoliceGresley(40,40,3,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
+            DispatchableVehicles_FEJ.Create_PoliceGresley(20,20,3,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_PoliceScout(50,50,3,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
-            DispatchableVehicles_FEJ.Create_PoliceInterceptor(30,30,3,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"","", -1,30),
+            DispatchableVehicles_FEJ.Create_PoliceInterceptor(40,40,3,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"","", -1,30),
             DispatchableVehicles_FEJ.Create_PoliceFugitive(15,15,3,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_PoliceStanier(15,15,3,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"","", -1,100),
             DispatchableVehicles_FEJ.Create_PoliceAleutian(15,15,2,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
@@ -206,7 +206,7 @@ public class DispatchableVehicles_FEJ_Modern
             DispatchableVehicles_FEJ.Create_PoliceAleutian(0,50,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,6,"SWAT",""),
             DispatchableVehicles_FEJ.Create_PoliceLandstalkerXL(0,10,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,4,"SWAT",""),
             DispatchableVehicles_FEJ.Create_PoliceScout(0,50,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,4,"SWAT",""),
-            DispatchableVehicles_FEJ.Create_PoliceBeaverRam(0,50,-1,false,PoliceVehicleType.Marked,-1,4,-1,6,8,"SWAT",""),
+            DispatchableVehicles_FEJ.Create_PoliceBeaverRam(0,50,0,false,PoliceVehicleType.Marked,22,4,-1,6,8,"SWAT",""),
 
             DispatchableVehicles_FEJ.Create_PoliceVindicator(20,10,3,false,PoliceVehicleType.Marked,-1,-1,2,1,1,"MotorcycleCop","Motorcycle",40),
             DispatchableVehicles_FEJ.Create_PoliceThrust(20,10,2,false,PoliceVehicleType.Marked,-1,-1,2,1,1,"MotorcycleCop","Motorcycle",40,134,134,0),
@@ -217,9 +217,9 @@ public class DispatchableVehicles_FEJ_Modern
         {
             DispatchableVehicles_FEJ.Create_PoliceAleutian(35,35,3,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_PoliceScout(50,50,2,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
-            DispatchableVehicles_FEJ.Create_PoliceGresley(25,25,2,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
+            DispatchableVehicles_FEJ.Create_PoliceGresley(20,20,2,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_PoliceGranger3600(20,20,2,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
-            DispatchableVehicles_FEJ.Create_PoliceInterceptor(15,15,2,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"","", -1,0),
+            DispatchableVehicles_FEJ.Create_PoliceInterceptor(25,25,2,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"","", -1,0),
             DispatchableVehicles_FEJ.Create_PoliceRadius(15,15,2,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"","", -1,0),
             DispatchableVehicles_FEJ.Create_PoliceBuffaloSTX(10,10,2,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
 
@@ -249,7 +249,7 @@ public class DispatchableVehicles_FEJ_Modern
             DispatchableVehicles_FEJ.Create_PoliceAleutian(0,50,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,6,"SWAT",""),
             DispatchableVehicles_FEJ.Create_PoliceLandstalkerXL(0,10,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,4,"SWAT",""),
             DispatchableVehicles_FEJ.Create_PoliceScout(0,50,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,4,"SWAT",""),
-            DispatchableVehicles_FEJ.Create_PoliceBeaverRam(0,50,-1,false,PoliceVehicleType.Marked,-1,4,-1,6,8,"SWAT",""),
+            DispatchableVehicles_FEJ.Create_PoliceBeaverRam(0,50,0,false,PoliceVehicleType.Marked,22,4,-1,6,8,"SWAT",""),
 
             DispatchableVehicles_FEJ.Create_PoliceVindicator(20,10,3,false,PoliceVehicleType.Marked,-1,-1,2,1,1,"MotorcycleCop","Motorcycle",40),
             DispatchableVehicles_FEJ.Create_PoliceThrust(20,10,2,false,PoliceVehicleType.Marked,-1,-1,2,1,1,"MotorcycleCop","Motorcycle",40,134,134,0),
@@ -262,8 +262,8 @@ public class DispatchableVehicles_FEJ_Modern
             DispatchableVehicles_FEJ.Create_PoliceBuffaloSTX(55,60,5,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_PoliceScout(25,25,5,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_PoliceGranger3600(50,50,5,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
-            DispatchableVehicles_FEJ.Create_PoliceRaiden(20,20,5,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
-            DispatchableVehicles_FEJ.Create_PoliceGresley(25,25,5,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
+            DispatchableVehicles_FEJ.Create_PoliceRaiden(10,10,5,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
+            DispatchableVehicles_FEJ.Create_PoliceGresley(15,15,5,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_PoliceInterceptor(25,25,5,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"","", -1,0),
             DispatchableVehicles_FEJ.Create_PoliceAleutian(15,15,5,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_PoliceLandstalkerXL(15,15,5,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,3,-1,-1,"",""),
@@ -291,7 +291,7 @@ public class DispatchableVehicles_FEJ_Modern
             DispatchableVehicles_FEJ.Create_PoliceAleutian(0,50,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,6,"SWAT",""),
             DispatchableVehicles_FEJ.Create_PoliceLandstalkerXL(0,10,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,4,"SWAT",""),
             DispatchableVehicles_FEJ.Create_PoliceScout(0,50,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,4,"SWAT",""),
-            DispatchableVehicles_FEJ.Create_PoliceBeaverRam(0,50,-1,false,PoliceVehicleType.Marked,-1,4,-1,6,8,"SWAT",""),
+            DispatchableVehicles_FEJ.Create_PoliceBeaverRam(0,50,-1,false,PoliceVehicleType.Marked,154,4,-1,6,8,"SWAT",""),
 
             DispatchableVehicles_FEJ.Create_PoliceBicycle(0,0,-1,false,PoliceVehicleType.Unmarked,0,-1,2,1,1,"Bicycle","Bicycle",50),
         };
@@ -330,6 +330,7 @@ public class DispatchableVehicles_FEJ_Modern
             DispatchableVehicles_FEJ.Create_PoliceAleutian(0,50,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,6,"SWAT",""),
             DispatchableVehicles_FEJ.Create_PoliceLandstalkerXL(0,10,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,4,"SWAT",""),
             DispatchableVehicles_FEJ.Create_PoliceScout(0,50,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,4,"SWAT",""),
+            DispatchableVehicles_FEJ.Create_PoliceBeaverRam(0,50,-1,false,PoliceVehicleType.Marked,153,4,-1,6,8,"SWAT",""),
 
             DispatchableVehicles_FEJ.Create_PoliceBicycle(0,0,-1,false,PoliceVehicleType.Unmarked,0,-1,2,1,1,"Bicycle","Bicycle",50),
         };
@@ -359,8 +360,8 @@ public class DispatchableVehicles_FEJ_Modern
 
         LSIAPDVehicles_FEJ_Modern = new List<DispatchableVehicle>()
         {
-            DispatchableVehicles_FEJ.Create_PoliceInterceptor(40,40,12,false,PoliceVehicleType.MarkedFlatLightbar,-1,-1,-1,-1,-1,"","", -1,0),
-            DispatchableVehicles_FEJ.Create_PoliceGresley(25,25,12,false,PoliceVehicleType.MarkedFlatLightbar,-1,-1,-1,-1,-1,"",""),
+            DispatchableVehicles_FEJ.Create_PoliceInterceptor(45,45,12,false,PoliceVehicleType.MarkedFlatLightbar,-1,-1,-1,-1,-1,"","", -1,0),
+            DispatchableVehicles_FEJ.Create_PoliceGresley(15,15,12,false,PoliceVehicleType.MarkedFlatLightbar,-1,-1,-1,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_PoliceScout(25,25,11,false,PoliceVehicleType.MarkedFlatLightbar,-1,-1,-1,-1,-1,"",""),
 
             DispatchableVehicles_FEJ.Create_PoliceRadius(25,25,12,false,PoliceVehicleType.MarkedFlatLightbar,-1,-1,-1,-1,-1,"","", -1,0),
@@ -371,14 +372,14 @@ public class DispatchableVehicles_FEJ_Modern
             DispatchableVehicles_FEJ.Create_PoliceFugitive(10,10,12,false,PoliceVehicleType.MarkedFlatLightbar,-1,-1,-1,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_PoliceLandstalkerXL(3,3,12,false,PoliceVehicleType.MarkedFlatLightbar,-1,-1,-1,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_PoliceGauntlet(2,2,6,false,PoliceVehicleType.MarkedFlatLightbar,-1,-1,-1,-1,-1,"",""),
-            DispatchableVehicles_FEJ.Create_PoliceStanier(12,12,12,false,PoliceVehicleType.MarkedFlatLightbar,-1,-1,-1,-1,-1,"","",-1,0),
+            DispatchableVehicles_FEJ.Create_PoliceStanier(15,15,12,false,PoliceVehicleType.MarkedFlatLightbar,-1,-1,-1,-1,-1,"","",-1,0),
         };
         LSPPVehicles_FEJ_Modern = new List<DispatchableVehicle>()
         {
             DispatchableVehicles_FEJ.Create_PoliceInterceptor(25,25,13,false,PoliceVehicleType.MarkedFlatLightbar,-1,-1,-1,-1,-1,"","", -1,0),
             DispatchableVehicles_FEJ.Create_PoliceRadius(20,20,13,false,PoliceVehicleType.MarkedFlatLightbar,-1,-1,-1,-1,-1,"","", -1,0),
             DispatchableVehicles_FEJ.Create_PoliceScout(20,20,12,false,PoliceVehicleType.MarkedFlatLightbar,-1,-1,-1,-1,-1,"",""),
-            DispatchableVehicles_FEJ.Create_PoliceGresley(20,20,13,false,PoliceVehicleType.MarkedFlatLightbar,-1,-1,-1,-1,-1,"",""),
+            DispatchableVehicles_FEJ.Create_PoliceGresley(10,10,13,false,PoliceVehicleType.MarkedFlatLightbar,-1,-1,-1,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_PoliceBison(15,15,13,false,PoliceVehicleType.MarkedFlatLightbar,-1,-1,-1,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_PoliceGranger3600(15,15,13,false,PoliceVehicleType.MarkedValorLightbar,-1,-1,-1,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_PoliceAleutian(15,15,13,false,PoliceVehicleType.MarkedFlatLightbar,-1,-1,-1,-1,-1,"",""),
@@ -458,7 +459,7 @@ public class DispatchableVehicles_FEJ_Modern
             DispatchableVehicles_FEJ.Create_PoliceAleutian(0,50,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,6,"SWAT",""),
             DispatchableVehicles_FEJ.Create_PoliceLandstalkerXL(0,10,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,4,"SWAT",""),
             DispatchableVehicles_FEJ.Create_PoliceScout(0,50,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,4,"SWAT",""),
-
+            DispatchableVehicles_FEJ.Create_PoliceBeaverRam(0,50,3,false,PoliceVehicleType.Marked,152,4,-1,6,8,"SWAT",""),
 
 
             DispatchableVehicles_FEJ.Create_PoliceFrogger(1,1,3,false,-1,-1,0,2,2,3,"Pilot","Helicopter",true),
@@ -517,6 +518,7 @@ public class DispatchableVehicles_FEJ_Modern
             DispatchableVehicles_FEJ.Create_PoliceAleutian(0,50,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,6,"SWAT",""),
             DispatchableVehicles_FEJ.Create_PoliceLandstalkerXL(0,10,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,4,"SWAT",""),
             DispatchableVehicles_FEJ.Create_PoliceScout(0,35,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,4,"SWAT",""),
+            DispatchableVehicles_FEJ.Create_PoliceBeaverRam(0,50,2,false,PoliceVehicleType.Marked,152,4,-1,6,8,"SWAT",""),
 
             DispatchableVehicles_FEJ.Create_PoliceSanchez(1,0,3,false,PoliceVehicleType.Marked,0,-1,2,1,1,"DirtBike","DirtBike",10),
             DispatchableVehicles_FEJ.Create_PoliceVindicator(15,10,1,false,PoliceVehicleType.Marked,-1,-1,2,1,1,"MotorcycleCop","Motorcycle",40),
@@ -595,6 +597,7 @@ public class DispatchableVehicles_FEJ_Modern
             DispatchableVehicles_FEJ.Create_PoliceAleutian(0,50,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,6,"SWAT",""),
             DispatchableVehicles_FEJ.Create_PoliceLandstalkerXL(0,10,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,4,"SWAT",""),
             DispatchableVehicles_FEJ.Create_PoliceScout(0,35,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,4,"SWAT",""),
+            DispatchableVehicles_FEJ.Create_PoliceBeaverRam(0,50,1,false,PoliceVehicleType.Marked,153,4,-1,6,8,"SWAT",""),
 
             DispatchableVehicles_FEJ.Create_PoliceVindicator(20,10,5,false,PoliceVehicleType.Marked,-1,-1,2,1,1,"MotorcycleCop","Motorcycle",40),
             DispatchableVehicles_FEJ.Create_PoliceThrust(20,10,4,false,PoliceVehicleType.Marked,-1,-1,2,1,1,"MotorcycleCop","Motorcycle",40,134,134,0),
@@ -647,6 +650,7 @@ public class DispatchableVehicles_FEJ_Modern
             DispatchableVehicles_FEJ.Create_PoliceAleutian(0,50,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,6,"SWAT",""),
             DispatchableVehicles_FEJ.Create_PoliceLandstalkerXL(0,10,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,4,"SWAT",""),
             DispatchableVehicles_FEJ.Create_PoliceScout(0,35,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,4,"SWAT",""),
+            DispatchableVehicles_FEJ.Create_PoliceBeaverRam(0,50,1,false,PoliceVehicleType.Marked,153,4,-1,6,8,"SWAT",""),
 
             DispatchableVehicles_FEJ.Create_PoliceVindicator(20,10,5,false,PoliceVehicleType.Marked,-1,-1,2,1,1,"MotorcycleCop","Motorcycle",40),
             DispatchableVehicles_FEJ.Create_PoliceThrust(20,10,4,false,PoliceVehicleType.Marked,-1,-1,2,1,1,"MotorcycleCop","Motorcycle",40,134,134,0),
@@ -694,6 +698,7 @@ public class DispatchableVehicles_FEJ_Modern
             DispatchableVehicles_FEJ.Create_PoliceAleutian(0,50,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,6,"SWAT",""),
             DispatchableVehicles_FEJ.Create_PoliceLandstalkerXL(0,10,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,4,"SWAT",""),
             DispatchableVehicles_FEJ.Create_PoliceScout(0,35,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,4,"SWAT",""),
+            DispatchableVehicles_FEJ.Create_PoliceBeaverRam(0,50,1,false,PoliceVehicleType.Marked,153,4,-1,6,8,"SWAT",""),
 
             DispatchableVehicles_FEJ.Create_PoliceVindicator(20,10,5,false,PoliceVehicleType.Marked,-1,-1,2,1,1,"MotorcycleCop","Motorcycle",40),
             DispatchableVehicles_FEJ.Create_PoliceThrust(20,10,4,false,PoliceVehicleType.Marked,-1,-1,2,1,1,"MotorcycleCop","Motorcycle",40,134,134,0),
@@ -751,6 +756,7 @@ public class DispatchableVehicles_FEJ_Modern
             DispatchableVehicles_FEJ.Create_PoliceAleutian(0,50,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,6,"SWAT",""),
             DispatchableVehicles_FEJ.Create_PoliceLandstalkerXL(0,10,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,4,"SWAT",""),
             DispatchableVehicles_FEJ.Create_PoliceScout(0,35,-1,true,PoliceVehicleType.Detective,-1,4,-1,3,4,"SWAT",""),
+            DispatchableVehicles_FEJ.Create_PoliceBeaverRam(0,50,1,false,PoliceVehicleType.Marked,153,4,-1,6,8,"SWAT",""),
 
             DispatchableVehicles_FEJ.Create_PoliceVindicator(15,10,5,false,PoliceVehicleType.Marked,-1,-1,2,1,1,"MotorcycleCop","Motorcycle",25),
             DispatchableVehicles_FEJ.Create_PoliceThrust(15,10,4,false,PoliceVehicleType.Marked,-1,-1,2,1,1,"MotorcycleCop","Motorcycle",40,134,134,0),
@@ -898,6 +904,7 @@ public class DispatchableVehicles_FEJ_Modern
             DispatchableVehicles_FEJ.Create_PoliceFrogger(0,30,0,false,1,1,5,5,3,4,"FIBHET","",false),
             DispatchableVehicles_FEJ.Create_PoliceMaverick(0,30,3,false,1,1,5,5,3,4,"FIBHET","",false),
 
+            DispatchableVehicles_FEJ.Create_PoliceBeaverRam(0,50,-1,false,PoliceVehicleType.Marked,12,5,5,6,8,"FIBHET",""),
 
 
             DispatchableVehicles_FEJ.Create_PoliceLandstalkerXL(0,15,-1,false,PoliceVehicleType.Detective,1,5,5,3,4,"FIBHET",""),
@@ -928,7 +935,7 @@ public class DispatchableVehicles_FEJ_Modern
             DispatchableVehicles_FEJ.Create_PoliceGresley(25,25,19,false,PoliceVehicleType.MarkedFlatLightbar,134,-1,-1,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_PoliceTerminus(5,5,9,false,PoliceVehicleType.MarkedFlatLightbar,134,-1,-1,-1,-1,"","",15),
             DispatchableVehicles_FEJ.Create_PoliceTerminus(5,5,9,false,PoliceVehicleType.SlicktopMarked,134,-1,-1,-1,-1,"","",15),
-            DispatchableVehicles_FEJ.Create_PoliceBison(10,10,11,false,PoliceVehicleType.MarkedFlatLightbar,-1,-1,-1,-1,-1,"",""),
+            DispatchableVehicles_FEJ.Create_PoliceBison(10,10,11,false,PoliceVehicleType.MarkedFlatLightbar,134,-1,-1,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_PoliceLandstalkerXL(5,5,16,false,PoliceVehicleType.MarkedFlatLightbar,134,-1,-1,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_PoliceCaracara(15,15,16,false,PoliceVehicleType.MarkedFlatLightbar,134,-1,-1,-1,-1,"",""),
 
@@ -1054,36 +1061,232 @@ public class DispatchableVehicles_FEJ_Modern
     }
     private void Security()
     {
+        DispatchableVehicle AleutianSecurityBobCat = new DispatchableVehicle("aleutian", 5, 0) //Undercover Gauntlet
+        {
+            DebugName = "AleutianSecurity_BC_DLC",
+            RequiresDLC = true,
+            RequiredPrimaryColorID = 111,
+            RequiredSecondaryColorID = 111,
+            RequiredVariation = new VehicleVariation()
+            {
+                PrimaryColor = 111,
+                SecondaryColor = 111,
+                Mod1PaintType = 7,
+                Mod2PaintType = 7,
+                WheelColor = 156,
+                WheelType = 4,
+                WindowTint = 0,
+                PearlescentColor = 73,
+                VehicleMods = new List<VehicleMod>()
+                    {
+                        new VehicleMod(1,5),
+                        new VehicleMod(2,1),
+                        new VehicleMod(3,1),
+                        new VehicleMod(15,3),
+                        new VehicleMod(23,9),
+                        new VehicleMod(48,4),//5,6,9 BC, G6, MW, SECURO
+                    },
+            }
+        };
+        DispatchableVehicle AleutianSecurityG6 = new DispatchableVehicle("aleutian", 20, 20)
+        {
+            DebugName = "AleutianSecurity_G6_DLC",
+            RequiresDLC = true,
+            RequiredPrimaryColorID = 111,
+            RequiredSecondaryColorID = 111,
+            RequiredVariation = new VehicleVariation()
+            {
+                PrimaryColor = 111,
+                SecondaryColor = 111,
+                Mod1PaintType = 7,
+                Mod2PaintType = 7,
+                WheelColor = 156,
+                WheelType = 4,
+                WindowTint = 0,
+                PearlescentColor = 73,
+                VehicleMods = new List<VehicleMod>()
+                    {
+                        new VehicleMod(1,5),
+                        new VehicleMod(2,1),
+                        new VehicleMod(3,1),
+                        new VehicleMod(15,3),
+                        new VehicleMod(23,9),
+                        new VehicleMod(48,5),//5,6,9 BC, G6, MW, SECURO
+                    },
+            }
+        };
+        DispatchableVehicle AleutianSecurityMW = new DispatchableVehicle("aleutian", 20, 20)
+        {
+            DebugName = "AleutianSecurity_MW_DLC",
+            RequiresDLC = true,
+            RequiredPrimaryColorID = 111,
+            RequiredSecondaryColorID = 111,
+            RequiredVariation = new VehicleVariation()
+            {
+                PrimaryColor = 111,
+                SecondaryColor = 111,
+                Mod1PaintType = 7,
+                Mod2PaintType = 7,
+                WheelColor = 156,
+                WheelType = 4,
+                WindowTint = 0,
+                PearlescentColor = 73,
+                VehicleMods = new List<VehicleMod>()
+                    {
+                        new VehicleMod(1,5),
+                        new VehicleMod(2,1),
+                        new VehicleMod(3,1),
+                        new VehicleMod(15,3),
+                        new VehicleMod(23,9),
+                        new VehicleMod(48,6),//5,6,9 BC, G6, MW, SECURO
+                    },
+            }
+        };
+        DispatchableVehicle AleutianSecuritySECURO = new DispatchableVehicle("aleutian", 20, 20)
+        {
+            DebugName = "AleutianSecurity_SECURO_DLC",
+            RequiresDLC = true,
+            RequiredPrimaryColorID = 111,
+            RequiredSecondaryColorID = 111,
+            RequiredVariation = new VehicleVariation()
+            {
+                PrimaryColor = 111,
+                SecondaryColor = 111,
+                Mod1PaintType = 7,
+                Mod2PaintType = 7,
+                WheelColor = 156,
+                WheelType = 4,
+                WindowTint = 0,
+                PearlescentColor = 73,
+                VehicleMods = new List<VehicleMod>()
+                    {
+                        new VehicleMod(1,5),
+                        new VehicleMod(2,1),
+                        new VehicleMod(3,1),
+                        new VehicleMod(15,3),
+                        new VehicleMod(23,9),
+                        new VehicleMod(48,9),//5,6,9 BC, G6, MW, SECURO
+                    },
+            }
+        };
+        DispatchableVehicle AsteropeSecuritySECURO = new DispatchableVehicle("asterope2", 20, 20)
+        {
+            DebugName = "AsteropeSecurity_SECURO_DLC",
+            RequiresDLC = true,
+            RequiredPrimaryColorID = 111,
+            RequiredSecondaryColorID = 111,
+            RequiredVariation = new VehicleVariation()
+            {
+                PrimaryColor = 111,
+                SecondaryColor = 111,
+                WheelColor = 156,
+                WheelType = 1,
+                WindowTint = 0,
+                PearlescentColor = 0,
+                VehicleMods = new List<VehicleMod>()
+                    {
+                        new VehicleMod(23,10),
+                        new VehicleMod(48,6),
+                    },
+            }
+        };
+        DispatchableVehicle AsteropeSecurityMW = new DispatchableVehicle("asterope2", 20, 20)
+        {
+            DebugName = "AsteropeSecurity_MW_DLC",
+            RequiresDLC = true,
+            RequiredPrimaryColorID = 111,
+            RequiredSecondaryColorID = 111,
+            RequiredVariation = new VehicleVariation()
+            {
+                PrimaryColor = 111,
+                SecondaryColor = 111,
+                WheelColor = 156,
+                WheelType = 1,
+                WindowTint = 0,
+                PearlescentColor = 0,
+                VehicleMods = new List<VehicleMod>()
+                    {
+                        new VehicleMod(23,10),
+                        new VehicleMod(48,7),
+                    },
+            }
+        };
+        DispatchableVehicle AsteropeSecurityBobCat = new DispatchableVehicle("asterope2", 20, 20)
+        {
+            DebugName = "AsteropeSecurity_BobCat_DLC",
+            RequiresDLC = true,
+            RequiredPrimaryColorID = 111,
+            RequiredSecondaryColorID = 111,
+            RequiredVariation = new VehicleVariation()
+            {
+                PrimaryColor = 111,
+                SecondaryColor = 111,
+                WheelColor = 156,
+                WheelType = 1,
+                WindowTint = 0,
+                PearlescentColor = 0,
+                VehicleMods = new List<VehicleMod>()
+                    {
+                        new VehicleMod(23,10),
+                        new VehicleMod(48,8),
+                    },
+            }
+        };
+        DispatchableVehicle AsteropeSecurityG6 = new DispatchableVehicle("asterope2", 20, 20)
+        {
+            DebugName = "AsteropeSecurity_G6_DLC",
+            RequiresDLC = true,
+            RequiredPrimaryColorID = 111,
+            RequiredSecondaryColorID = 111,
+            RequiredVariation = new VehicleVariation()
+            {
+                PrimaryColor = 111,
+                SecondaryColor = 111,
+                WheelColor = 156,
+                WheelType = 1,
+                WindowTint = 0,
+                PearlescentColor = 0,
+                VehicleMods = new List<VehicleMod>()
+                    {
+                        new VehicleMod(23,10),
+                        new VehicleMod(48,9),
+                    },
+            }
+        };
+
+
+
+
         MerryweatherPatrolVehicles_FEJ_Modern = new List<DispatchableVehicle>()
         {
             DispatchableVehicles_FEJ.Create_ServiceDilettante(35,35,5,false,ServiceVehicleType.Security,-1,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_ServiceInterceptor(35,35,6,false,ServiceVehicleType.Security,-1,-1,-1),
-            DispatchableVehicles_FEJ.DispatchableVehicles.AleutianSecurityMW,
-            DispatchableVehicles_FEJ.DispatchableVehicles.AsteropeSecurityMW,
+            AleutianSecurityMW,
+            AsteropeSecurityMW,
             DispatchableVehicles_FEJ.Create_SecurityStanier(20,20,0,false,ServiceVehicleType.Security,-1,-1,-1),
         };
         BobcatSecurityVehicles_FEJ_Modern = new List<DispatchableVehicle>()
         {
             DispatchableVehicles_FEJ.Create_ServiceDilettante(20,20,8,false,ServiceVehicleType.Security,-1,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_ServiceInterceptor(20,20,9,false,ServiceVehicleType.Security,-1,-1,-1),
-            DispatchableVehicles_FEJ.DispatchableVehicles.AleutianSecurityBobCat,
-            DispatchableVehicles_FEJ.DispatchableVehicles.AsteropeSecurityBobCat,
+            AleutianSecurityBobCat,
+            AsteropeSecurityBobCat,
             DispatchableVehicles_FEJ.Create_SecurityStanier(20,20,3,false,ServiceVehicleType.Security,-1,-1,-1),
         };
         GroupSechsVehicles_FEJ_Modern = new List<DispatchableVehicle>()
         {
             DispatchableVehicles_FEJ.Create_ServiceDilettante(20,20,7,false,ServiceVehicleType.Security,-1,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_ServiceInterceptor(20,20,8,false,ServiceVehicleType.Security,-1,-1,-1),
-            DispatchableVehicles_FEJ.DispatchableVehicles.AleutianSecurityG6,
-            DispatchableVehicles_FEJ.DispatchableVehicles.AsteropeSecurityG6,
+            AleutianSecurityG6,
+            AsteropeSecurityG6,
             DispatchableVehicles_FEJ.Create_SecurityStanier(20,20,2,false,ServiceVehicleType.Security,-1,-1,-1),
         };
         SecuroservVehicles_FEJ_Modern = new List<DispatchableVehicle>()
         {
             DispatchableVehicles_FEJ.Create_ServiceDilettante(20,20,6,false,ServiceVehicleType.Security,-1,-1,-1,"",""),
             DispatchableVehicles_FEJ.Create_ServiceInterceptor(20,20,7,false,ServiceVehicleType.Security,-1,-1,-1),
-            DispatchableVehicles_FEJ.DispatchableVehicles.AleutianSecuritySECURO,
-            DispatchableVehicles_FEJ.DispatchableVehicles.AsteropeSecuritySECURO,
+            AleutianSecuritySECURO,
+            AsteropeSecuritySECURO,
             DispatchableVehicles_FEJ.Create_SecurityStanier(20,20,1,false,ServiceVehicleType.Security,-1,-1,-1),
         };
 

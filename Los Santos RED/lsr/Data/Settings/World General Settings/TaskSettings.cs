@@ -72,6 +72,17 @@ public class TaskSettings : ISettingsDefaultable
     [Description("Percent of torching stores in Enemy Territory")]
     public float GangArsonEnemyTurfPercentage { get; set; }
 
+
+
+    public float DrugMeetAmbushPercentageNeutral { get; set; }
+    public float DrugMeetAmbushPercentageFriendly { get; set; }
+    public float DrugMeetPriceScalarMin { get; set; }
+    public float DrugMeetPriceScalarMax { get; set; }
+
+
+    public int DrugMeetMin { get; set; }
+    public int DrugMeetMax { get; set; }
+
     public TaskSettings()
     {
         SetDefault();
@@ -106,6 +117,17 @@ public class TaskSettings : ISettingsDefaultable
         GangRacketeeringExtortionComplicationsPercentage = 10f;
         GangRacketeeringComplicationsPercentage = 5f;
         GangArsonEnemyTurfPercentage = 5f;
+
+
+        DrugMeetAmbushPercentageNeutral = 15f;
+        DrugMeetAmbushPercentageFriendly = 1f;
+
+
+        DrugMeetPriceScalarMin = 0.8f;
+        DrugMeetPriceScalarMax = 1.2f;
+
+        DrugMeetMin = 200;
+        DrugMeetMax = 2000;
     }
     [OnDeserialized()]
     private void SetValuesOnDeserialized(StreamingContext context)

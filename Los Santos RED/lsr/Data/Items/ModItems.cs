@@ -76,7 +76,7 @@ public class ModItems : IModItems
         string fileName = string.IsNullOrEmpty(configName) ? "ModItems_*.xml" : $"ModItems_{configName}.xml";
 
         DirectoryInfo LSRDirectory = new DirectoryInfo("Plugins\\LosSantosRED");
-        FileInfo ConfigFile = LSRDirectory.GetFiles(fileName).OrderByDescending(x => x.Name).FirstOrDefault();
+        FileInfo ConfigFile = LSRDirectory.GetFiles(fileName).Where(x => !x.Name.Contains("+")).OrderByDescending(x => x.Name).FirstOrDefault();
         if (ConfigFile != null && !configName.Equals("Default"))
         {
             EntryPoint.WriteToConsole($"Loaded Mod Items config: {ConfigFile.FullName}", 0);
@@ -119,6 +119,14 @@ public class ModItems : IModItems
             false, ItemType.Weapons)
         { VanillaName = "Combat Pistol", ModelName = "weapon_combatpistol", PoliceFindDuringPlayerSearchPercentage = 35, FindPercentage = 10 });
 
+
+
+        newPossibleItems.WeaponItems.Add(new WeaponItem("WIN 95",
+    "Too big for a pistol, too small for a sub gun. Make up for it by pissing bullets in their direction.",
+    false, ItemType.Weapons)
+        { VanillaName = "Macro Pistol", ModelName = "weapon_nanopistol", PoliceFindDuringPlayerSearchPercentage = 35, FindPercentage = 10 });
+
+
         newPossibleItems.WeaponItems.Add(new WeaponItem("Vom Feuer VF86",
             "When you need to dump an entire magazine at someone, but can't be bothered to carry something heavier than a few pounds.",
             false, ItemType.Weapons)
@@ -130,13 +138,19 @@ public class ModItems : IModItems
             );
 
         newPossibleItems.WeaponItems.Add(new WeaponItem("Vom Feuer 609",
-            "The LSPD standard issue. Extended capacity in a small package. Good for dumping round after round into the criminals general direction. Who cares if a Post-Op delivery man eats a few?",
+            "The LSPD standard issue pistol. Extended capacity in a small package. Good for dumping round after round into the criminals general direction. Who cares if a Post-Op delivery man eats a few?",
             false, ItemType.Weapons)
         { VanillaName = "Pistol Mk2", ModelName = "weapon_pistol_mk2", PoliceFindDuringPlayerSearchPercentage = 35, FindPercentage = 10 });
 
         newPossibleItems.WeaponItems.Add(new WeaponItem("Hawk & Little 1919A1", 
-            "Killing people before there was talking in movies. Accept no substitutes.", true, ItemType.Weapons) 
+            "Killing people before there was talking in movies. Accept no substitutes. Goes great with a pocket watch and bowler hat.", true, ItemType.Weapons) 
         { VanillaName = "Vintage Pistol", ModelName = "weapon_vintagepistol", PoliceFindDuringPlayerSearchPercentage = 35, FindPercentage = 5 });
+
+
+        newPossibleItems.WeaponItems.Add(new WeaponItem("Duke A5-1R",
+            "How do you make the ultimate assault rifle better? Chop the barrel and bolt shit onto it apparently. Did somebody say polymer?", false, ItemType.Weapons)
+        { VanillaName = "Carbine Rifle", ModelName = "weapon_carbinerifle", PoliceFindDuringPlayerSearchPercentage = 100, FindPercentage = 5 });
+            
 
 
         Serialization.SerializeParam(newPossibleItems, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.FEWConfigFolder}\\ModItems+_{StaticStrings.FEWConfigSuffix}.xml");
@@ -201,8 +215,15 @@ public class ModItems : IModItems
     {
         PossibleItems newPossibleItems = new PossibleItems();//PossibleItems.Copy();
 
+        //
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Brute Headmaster", ItemType.Vehicles) { ModelName = "civsbus" });
 
-        
+        //Motorcycles
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Western Sovereign Cruiser", ItemType.Vehicles) { ModelName = "civsovereign2" });
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Western Gargoyle Cruiser", ItemType.Vehicles) { ModelName = "civgargoylestock" });
+        //Muscle
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Bravado Gauntlet R/T", ItemType.Vehicles) { ModelName = "civgauntletstock" });
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Vapid Dominator 4th Gen", ItemType.Vehicles) { ModelName = "civdominator7" });
         //Sedans
         newPossibleItems.VehicleItems.Add(new VehicleItem("Vapid Gemini", ItemType.Vehicles) { OverrideMakeName = "Vapid", OverrideClassName = "Sedan", ModelName = "civinterceptor", Description = "The civilian version of the police classic. So what if they couldn't sell it to law enforcement? It still can get you to Burger Shot without breaking down. Often.", });
         newPossibleItems.VehicleItems.Add(new VehicleItem("Vapid Stanier 2nd Gen", ItemType.Vehicles) { OverrideMakeName = "Vapid",OverrideClassName = "Sedan", ModelName = "civstanier2", Description = "The remix of a classic. As heavy and slow as before, now with worse quality control. We'll make up for it in fleet sales.", });
@@ -217,13 +238,24 @@ public class ModItems : IModItems
         newPossibleItems.VehicleItems.Add(new VehicleItem("Albany Presidente", ItemType.Vehicles) { OverrideMakeName = "Albany", OverrideClassName = "Sedan", ModelName = "civpresidente" });
 
         //Trucks
-        newPossibleItems.VehicleItems.RemoveAll(x => x.ModelName == "caracara");
-        newPossibleItems.VehicleItems.Add(new VehicleItem("Vapid Caracara Service", ItemType.Vehicles) { ModelName = "caracara" });
-        newPossibleItems.VehicleItems.Add(new VehicleItem("Vapid Caracara 4x2", ItemType.Vehicles) { ModelName = "civcaracarawork" });
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Vapid Firebolt Stock", ItemType.Vehicles) { ModelName = "civfireboltstock" });
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Vapid Sadler 4WD", ItemType.Vehicles) { ModelName = "civsadleroffroad" });
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Vapid Caracara Utility", ItemType.Vehicles) { ModelName = "civcaracarautil" });
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Vapid Caracara 2WD", ItemType.Vehicles) { ModelName = "civcaracarawork" });
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Vapid Caracara SX3 4WD", ItemType.Vehicles) { ModelName = "civcaracarastock" });
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Bravado Bison XL", ItemType.Vehicles) { ModelName = "civbisonxl", OverrideLoadBodiesInBed = true, BedLoadOffsetOverride = new Vector3(0f, -1.5f, 1.25f) });
+            
+
         newPossibleItems.VehicleItems.Add(new VehicleItem("Vapid Bobcat 4x4", ItemType.Vehicles) { OverrideMakeName = "Vapid", OverrideClassName = "Pickup", ModelName = "civbobcatoffroad" });
         newPossibleItems.VehicleItems.Add(new VehicleItem("Vapid Bobcat Regular Bed", ItemType.Vehicles) { OverrideMakeName = "Vapid", OverrideClassName = "Pickup", ModelName = "civbobcatwork" });
         newPossibleItems.VehicleItems.RemoveAll(x => x.ModelName == "contender");
         newPossibleItems.VehicleItems.Add(new VehicleItem("Karin Everon V8", true, ItemType.Vehicles) { OverrideMakeName = "Karin", ModelName = "contender" });//swapped from vaid to KARIN and renamed
+
+
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Karin Everon 2nd Gen", true, ItemType.Vehicles) { OverrideMakeName = "Karin", ModelName = "civeveron3" });
+        
+
+
 
         newPossibleItems.VehicleItems.Add(new VehicleItem("Canis Bodhi Mod", ItemType.Vehicles) { OverrideMakeName = "Canis", ModelName = "bodhi", Description = "The Canis Bodhi has traveled the well-trodden path from military to redneck to hipster." });
 
@@ -2403,30 +2435,30 @@ public class ModItems : IModItems
         {
             //Generic Tools
             new ScrewdriverItem("Flint Phillips Screwdriver","Might get you into some locked things. No relation.") {
-                ModelItemID = "prop_tool_screwdvr01", FindPercentage = 10,ItemSubType = ItemSubType.Tool },
+                ModelItemID = "prop_tool_screwdvr01", FindPercentage = 10,ItemSubType = ItemSubType.Tool, MinDoorPickTime = 9000, MaxDoorPickTime = 20000 },
             new ScrewdriverItem("Flint Flathead Screwdriver","Might get you into some locked things. With a nice flat head.") {
-                ModelItemID = "gr_prop_gr_sdriver_01", FindPercentage = 10,ItemSubType = ItemSubType.Tool },
+                ModelItemID = "gr_prop_gr_sdriver_01", FindPercentage = 10,ItemSubType = ItemSubType.Tool, MinDoorPickTime = 9000, MaxDoorPickTime = 20000 },
             new ScrewdriverItem("Flint Multi-Bit Screwdriver","Might get you into some locked things. Now multi-bit!") {
-                ModelItemID = "gr_prop_gr_sdriver_02", FindPercentage = 10,ItemSubType = ItemSubType.Tool },
+                ModelItemID = "gr_prop_gr_sdriver_02", FindPercentage = 10,ItemSubType = ItemSubType.Tool, MinDoorPickTime = 9000, MaxDoorPickTime = 20000 },
         });
         PossibleItems.DrillItems.AddRange(new List<DrillItem>
         {
             new DrillItem("Power Metal Cordless Drill","Not recommended for dentistry.") {
-                ModelItemID = "gr_prop_gr_drill_01a",ItemSubType = ItemSubType.Tool,MinSafeDrillTime = 10000,MaxSafeDrillTime = 19000  },
+                ModelItemID = "gr_prop_gr_drill_01a",ItemSubType = ItemSubType.Tool,MinSafeDrillTime = 10000,MaxSafeDrillTime = 19000,  MinDoorDrillTime = 8000, MaxDoorDrillTime = 16000  },
             new DrillItem("Power Metal Cordless Impact Driver","DRIVE it right in!") {
-                ModelItemID = "gr_prop_gr_driver_01a",ItemSubType = ItemSubType.Tool,MinSafeDrillTime = 15000,MaxSafeDrillTime = 20000  },
+                ModelItemID = "gr_prop_gr_driver_01a",ItemSubType = ItemSubType.Tool,MinSafeDrillTime = 15000,MaxSafeDrillTime = 20000, MinDoorDrillTime = 8000, MaxDoorDrillTime = 15000  },
             new DrillItem("Flint Cordless Drill","2-Speed Battery Drill. Impact-resistant casing. Light, compact and easy to use.") {
-                ModelItemID = "prop_tool_drill" ,ItemSubType = ItemSubType.Tool,MinSafeDrillTime = 8000,MaxSafeDrillTime = 17000 },
+                ModelItemID = "prop_tool_drill" ,ItemSubType = ItemSubType.Tool,MinSafeDrillTime = 8000,MaxSafeDrillTime = 17000, MinDoorDrillTime = 6000, MaxDoorDrillTime = 13000 },
 
 
             new DrillItem("Power Metal Side Drill","Make quick work of a safe deposit box!"){ 
-                ModelItemID = "hei_prop_heist_drill",ItemSubType = ItemSubType.Tool,MinSafeDrillTime = 6000,MaxSafeDrillTime = 9000 },
+                ModelItemID = "hei_prop_heist_drill",ItemSubType = ItemSubType.Tool,MinSafeDrillTime = 6000,MaxSafeDrillTime = 9000, MinDoorDrillTime = 4500, MaxDoorDrillTime = 7000 },
 
             new DrillItem("Power Metal Custom Side Drill","Make quick work of a safe deposit box! Now with more bells and whistles!"){
-                ModelItemID = "ch_prop_ch_heist_drill",ItemSubType = ItemSubType.Tool,MinSafeDrillTime = 6000,MaxSafeDrillTime = 9000 },
+                ModelItemID = "ch_prop_ch_heist_drill",ItemSubType = ItemSubType.Tool,MinSafeDrillTime = 6000,MaxSafeDrillTime = 9000, MinDoorDrillTime = 4000, MaxDoorDrillTime = 7000 },
 
             new DrillItem("Power Metal Laser Side Drill","Use space age tech to drill holes in things!"){
-                ModelItemID = "ch_prop_laserdrill_01a",ItemSubType = ItemSubType.Tool,MinSafeDrillTime = 4000,MaxSafeDrillTime = 6000 },
+                ModelItemID = "ch_prop_laserdrill_01a",ItemSubType = ItemSubType.Tool,MinSafeDrillTime = 4000,MaxSafeDrillTime = 6000, MinDoorDrillTime = 3000, MaxDoorDrillTime = 4000 },
 
         });
         PossibleItems.PliersItems.AddRange(new List<PliersItem>
@@ -3280,6 +3312,22 @@ public class ModItems : IModItems
             //new VehicleItem("Western Company Duster 300-H", ItemType.Vehicles) { ModelName = "driftcypher", RequiresDLC = true, },       
             //new VehicleItem("Eberhard Titan 250 D", ItemType.Vehicles) { ModelName = "driftcypher", RequiresDLC = true, },
 
+            //Money Fronts
+            new VehicleItem("Karin Everon RS", true, ItemType.Vehicles) { ModelName = "everon3" },
+            new VehicleItem("Annis Hardy", true, ItemType.Vehicles) { ModelName = "hardy" },
+            new VehicleItem("Buckingham Higgins Helitours Maverick", true, ItemType.Vehicles) { ModelName = "maverick2" },
+            new VehicleItem("Western Police Bike Redux", true, ItemType.Vehicles) { ModelName = "policeb2" },
+            new VehicleItem("Dewbauchee Rapid GT X", true, ItemType.Vehicles) { ModelName = "rapidgt4" },
+            new VehicleItem("Ubermacht Sentinel GTS", true, ItemType.Vehicles) { ModelName = "sentinel5" },
+            new VehicleItem("Karin Woodlander", true, ItemType.Vehicles) { ModelName = "woodlander" },
+            new VehicleItem("Overflod Suzume", true, ItemType.Vehicles) { ModelName = "suzume" },
+            new VehicleItem("Declasse Walton L35 2", true, ItemType.Vehicles) { ModelName = "l352" },
+            new VehicleItem("Annis Minimus", true, ItemType.Vehicles) { ModelName = "minimus" },
+            new VehicleItem("Declasse Tampa GT", true, ItemType.Vehicles) { ModelName = "tampa4" },
+            new VehicleItem("Grotti LSCM Cheetah Classic", true, ItemType.Vehicles) { ModelName = "cheetah3" },
+            new VehicleItem("Brute Bobcat Security Stockade", true, ItemType.Vehicles) { ModelName = "stockade4" },
+            new VehicleItem("MTL Flatbed Custom 2", true, ItemType.Vehicles) { ModelName = "flatbed2" },
+
             //Drift
             new VehicleItem("Declasse Drift Tampa", ItemType.Vehicles) { ModelName = "drifttampa", RequiresDLC = true, },
             new VehicleItem("Declasse Drift Yosemite", ItemType.Vehicles) { ModelName = "driftyosemite", RequiresDLC = true, },       
@@ -3289,6 +3337,13 @@ public class ModItems : IModItems
             new VehicleItem("Dinka Drift Jester", ItemType.Vehicles) { ModelName = "driftjester", RequiresDLC = true, },
             new VehicleItem("Annis Drift Remus", ItemType.Vehicles) { ModelName = "driftremus", RequiresDLC = true, },
             new VehicleItem("Annis Drift ZR350", ItemType.Vehicles) { ModelName = "driftzr350", RequiresDLC = true, },
+
+            new VehicleItem("Dinka Drift Chavos V6", ItemType.Vehicles) { ModelName = "driftchanvosv6", RequiresDLC = true, },
+            new VehicleItem("Vapid Drift Dominator 10", ItemType.Vehicles) { ModelName = "drfitdominator10", RequiresDLC = true, },
+            new VehicleItem("Bravado Drift Gauntlet Hellfire", ItemType.Vehicles) { ModelName = "driftgauntlet4", RequiresDLC = true, },
+            new VehicleItem("Annis Drift Hardy", ItemType.Vehicles) { ModelName = "drifthardy", RequiresDLC = true, },
+            new VehicleItem("Declasse Dift Walton L35 2", ItemType.Vehicles) { ModelName = "driftl352", RequiresDLC = true, },
+
 
             //Bikes
             new VehicleItem("BMX", ItemType.Vehicles) { Description = "The classic bike for tooling the neighborhood or doing a double peg grind. Reinforced steel, super comfortable seat that wont cut off the circulation to your scrotum too bad. (i.e. for wimps!) A great deal for the cash-strapped.", ModelName = "bmx" },
