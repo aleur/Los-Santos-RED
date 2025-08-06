@@ -19,12 +19,11 @@ public class PoliceSpawnSettings : ISettingsDefaultable
     public int LocationSpawnedPedLimit { get; set; }
     [Description("Vehicle limit on how many location police can spawn.")]
     public int LocationSpawnedVehicleLimit { get; set; }
-
     [Description("Maximum distance (in meters) that police can spawn when you are wanted and seen by police.")]
     public float MaxDistanceToSpawn_WantedSeen { get; set; }
     [Description("Maximum distance (in meters) that police can spawn when you are wanted and not seen by police.")]
     public float MaxDistanceToSpawn_WantedUnseen { get; set; }
-    [Description("Maximum distance (in meters) that police can spawn when you not wanted.")]
+    [Description("Maximum distance (in meters) that police can spawn when you are not wanted.")]
     public float MaxDistanceToSpawn_NotWanted { get; set; }
     [Description("Minimum distance (in meters) that police can spawn when you are wanted and not seen by police.")]
     public float MinDistanceToSpawn_WantedUnseen { get; set; }

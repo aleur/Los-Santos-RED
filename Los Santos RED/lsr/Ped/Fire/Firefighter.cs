@@ -32,9 +32,11 @@ public class Firefighter : PedExt, IWeaponIssuable
     public bool IsRespondingToInvestigation { get; set; }
     public override bool HasWeapon => WeaponInventory.HasPistol || WeaponInventory.HasLongGun;
 
-    public override void Update(IPerceptable perceptable, IPoliceRespondable policeRespondable, Vector3 placeLastSeen, IEntityProvideable world)
+
+    public override void Update(IPerceptable perceptable, IPoliceRespondable policeRespondable, IContactInteractable contactInteractable, Vector3 placeLastSeen, IEntityProvideable world)
     {
         PlayerToCheck = policeRespondable;
+        PlayerToTask = contactInteractable;
         if (!Pedestrian.Exists())
         {
             return;

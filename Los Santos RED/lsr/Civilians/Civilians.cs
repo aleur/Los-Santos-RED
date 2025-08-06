@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 public class Civilians
 {
     private IEntityProvideable World;
+    private IContactInteractable ContactInteractable;
     private IPoliceRespondable PoliceRespondable;
     private IPerceptable Perceptable;
     private ISettingsProvideable Settings;
@@ -37,10 +38,11 @@ public class Civilians
     private int TotalSecurityGuardsChecked;
     private int TotalSecurityGuardsRan;
 
-    public Civilians(IEntityProvideable world, IPoliceRespondable policeRespondable, IPerceptable perceptable, ISettingsProvideable settings, IGangs gangs)
+    public Civilians(IEntityProvideable world, IPoliceRespondable policeRespondable, IContactInteractable contactInteractable, IPerceptable perceptable, ISettingsProvideable settings, IGangs gangs)
     {
         World = world;
         PoliceRespondable = policeRespondable;
+        ContactInteractable = contactInteractable;
         Perceptable = perceptable;
         Settings = settings;
         Gangs = gangs;
@@ -72,7 +74,7 @@ public class Civilians
                     TotalRan++;
                     localRan++;
                 }
-                ped.Update(Perceptable, PoliceRespondable, Vector3.Zero, World);
+                ped.Update(Perceptable, PoliceRespondable, ContactInteractable, Vector3.Zero, World);
                 if (!ped.WasEverSetPersistent && ped.Pedestrian.Exists() && ped.Pedestrian.IsPersistent)
                 {
                     ped.CanBeAmbientTasked = false;
@@ -126,7 +128,7 @@ public class Civilians
                     TotalEMTsRan++;
                     localRan++;
                 }
-                ped.Update(Perceptable, PoliceRespondable, Vector3.Zero, World);
+                ped.Update(Perceptable, PoliceRespondable, ContactInteractable, Vector3.Zero, World);
                 if (!ped.WasModSpawned && !ped.WasEverSetPersistent && ped.Pedestrian.Exists() && ped.Pedestrian.IsPersistent)
                 {
                     ped.CanBeAmbientTasked = false;
@@ -171,7 +173,7 @@ public class Civilians
                     TotalEMTsRan++;
                     localRan++;
                 }
-                ped.Update(Perceptable, PoliceRespondable, Vector3.Zero, World);
+                ped.Update(Perceptable, PoliceRespondable, ContactInteractable, Vector3.Zero, World);
                 if (!ped.WasModSpawned && !ped.WasEverSetPersistent && ped.Pedestrian.Exists() && ped.Pedestrian.IsPersistent)
                 {
                     ped.CanBeAmbientTasked = false;
@@ -216,7 +218,7 @@ public class Civilians
                     TotalMerchantsRan++;
                     localRan++;
                 }
-                ped.Update(Perceptable, PoliceRespondable, Vector3.Zero, World);
+                ped.Update(Perceptable, PoliceRespondable, ContactInteractable, Vector3.Zero, World);
                 if (yield && localRan == Settings.SettingsManager.PerformanceSettings.MerchantsUpdateBatch)
                 {
                     GameFiber.Yield();
@@ -256,7 +258,7 @@ public class Civilians
                     TotalGangMembersRan++;
                     localRan++;
                 }
-                ped.Update(Perceptable, PoliceRespondable, Vector3.Zero, World);
+                ped.Update(Perceptable, PoliceRespondable, ContactInteractable, Vector3.Zero, World);
                 if (Settings.SettingsManager.GangSettings.AllowAmbientSpeech)
                 {
                     ped.UpdateSpeech(PoliceRespondable);
@@ -367,7 +369,7 @@ public class Civilians
                     TotalSecurityGuardsRan++;
                     localRan++;
                 }
-                ped.Update(Perceptable, PoliceRespondable, Vector3.Zero, World);
+                ped.Update(Perceptable, PoliceRespondable, ContactInteractable, Vector3.Zero, World);
                 if (Settings.SettingsManager.PoliceSpeechSettings.AllowAmbientSpeech)
                 {
                     ped.UpdateSpeech(PoliceRespondable);
@@ -609,7 +611,7 @@ public class Civilians
 //                TotalRan++;
 //                localRan++;
 //            }
-//            ped.Update(Perceptable, PoliceRespondable, Vector3.Zero, World);
+//            ped.Update(Perceptable, PoliceRespondable, ContactInteractable, Vector3.Zero, World);
 //            if (yield && localRan == 5)
 //            {
 //                GameFiber.Yield();

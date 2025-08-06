@@ -10,62 +10,39 @@ using System.Threading.Tasks;
 
 namespace LosSantosRED.lsr.Player.ActiveTasks
 {
-    public class RivalGangVehicleTheftTask : IPlayerTask
+    public class RivalGangVehicleTheftTask : GangTask, IPlayerTask
     {
-
-        private ITaskAssignable Player;
-        private ITimeReportable Time;
-        private IGangs Gangs;
-        private PlayerTasks PlayerTasks;
-        private IPlacesOfInterest PlacesOfInterest;
-        private List<DeadDrop> ActiveDrops = new List<DeadDrop>();
-        private ISettingsProvideable Settings;
-        private IEntityProvideable World;
-        private ICrimes Crimes;
-        private Gang HiringGang;
         private GangDen HiringGangDen;
         private Gang TargetGang;
-        private PlayerTask CurrentTask;
-        private int MoneyToRecieve;
-        private PhoneContact PhoneContact;
-        private GangTasks GangTasks;
         private uint VehicleToStealHash;
         private string VehicleModelName;
         private string VehicleDisplayName;
         private bool HasTargetGangVehicleAndHiringDen => TargetGang != null && HiringGangDen != null && VehicleToStealHash != 0;
         private bool IsInStolenGangCar => Player.CurrentVehicle != null && Player.CurrentVehicle.Vehicle.Exists() && Player.CurrentVehicle.Vehicle.Model.Hash == VehicleToStealHash && Player.CurrentVehicle.WasModSpawned && Player.CurrentVehicle.AssociatedGang != null && Player.CurrentVehicle.AssociatedGang.ID == TargetGang.ID;
-        public RivalGangVehicleTheftTask(ITaskAssignable player, ITimeReportable time, IGangs gangs, PlayerTasks playerTasks, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes,
-            PhoneContact phoneContact, GangTasks gangTasks, Gang targetGang, string vehicleModelName, string vehicleDisplayName)
+        public RivalGangVehicleTheftTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups,
+            IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, Gang hiringGang, Gang targetGang, string vehicleModelName, string vehicleDisplayName) : base(player, time, gangs, placesOfInterest, activeDrops, settings, world, crimes, weapons, names, pedGroups, shopMenus, modItems, playerTasks, gangTasks, hiringContact, hiringGang)
         {
-            Player = player;
-            Time = time;
-            Gangs = gangs;
-            PlayerTasks = playerTasks;
-            PlacesOfInterest = placesOfInterest;
-            ActiveDrops = activeDrops;
-            Settings = settings;
-            World = world;
-            Crimes = crimes;
-            PhoneContact = phoneContact;
-            GangTasks = gangTasks;
             TargetGang = targetGang;
             VehicleModelName = vehicleModelName;
             VehicleDisplayName = vehicleDisplayName;
         }
-        public void Setup()
+        public override void Setup()
         {
-            
+            RepOnCompletion = 1000;
+            DebtOnFail = 0;
+            RepOnFail = -500;
+            DaysToComplete = 5;
+            DebugName = "Auto Theft for Gang";
         }
-        public void Dispose()
+        public override void Dispose()
         {
 
         }
-        public void Start(Gang ActiveGang)
+        public override void Start()
         {
-            HiringGang = ActiveGang;
-            if (PlayerTasks.CanStartNewTask(ActiveGang?.ContactName))
+            if (PlayerTasks.CanStartNewTask(HiringContact?.Name))
             {
-                GetTargetGang();
+                GetStolenCarHash();
                 GetHiringDen();
                 if (HasTargetGangVehicleAndHiringDen)
                 {
@@ -88,15 +65,15 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 }
                 else
                 {
-                    GangTasks.SendGenericTooSoonMessage(PhoneContact);
+                    GangTasks.SendGenericTooSoonMessage(HiringContact);
                 }
             }
         }
-        private void Loop()
+        protected override void Loop()
         {
             while (true)
             {
-                CurrentTask = PlayerTasks.GetTask(HiringGang.ContactName);
+                CurrentTask = PlayerTasks.GetTask(HiringContact?.Name);
                 if (CurrentTask == null || !CurrentTask.IsActive)
                 {
                     break;
@@ -109,15 +86,15 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 GameFiber.Sleep(1000);
             }
         }
-        private void FinishTask()
+        protected override void FinishTask()
         {
             if (CurrentTask != null && CurrentTask.IsActive && CurrentTask.IsReadyForPayment)
             {
-                //GameFiber.Sleep(RandomItems.GetRandomNumberInt(5000, 15000));
-                GangTasks.SendGenericPickupMoneyMessage(PhoneContact, HiringGang.DenName, HiringGangDen, MoneyToRecieve);
+                if (HiringGangDen.IsAvailableForPlayer) SendMoneyPickupMessage(HiringGang.DenName, HiringGangDen);
+                else SetReadyToPickupDeadDrop();
             }
         }
-        private void GetTargetGang()
+        private void GetStolenCarHash()
         {
             VehicleToStealHash = 0;
             VehicleToStealHash = Game.GetHashKey(VehicleModelName);
@@ -127,25 +104,25 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         {
             HiringGangDen = PlacesOfInterest.GetMainDen(HiringGang.ID, World.IsMPMapLoaded, Player.CurrentLocation);
         }
-        private void GetPayment()
+        protected override void GetPayment()
         {
-            MoneyToRecieve = RandomItems.GetRandomNumberInt(HiringGang.TheftPaymentMin, HiringGang.TheftPaymentMax).Round(500);
-            if (MoneyToRecieve <= 0)
+            PaymentAmount = RandomItems.GetRandomNumberInt(HiringGang.TheftPaymentMin, HiringGang.TheftPaymentMax).Round(500);
+            if (PaymentAmount <= 0)
             {
-                MoneyToRecieve = 500;
+                PaymentAmount = 500;
             }
         }
-        private void AddTask()
+        protected override void AddTask()
         {
-            PlayerTasks.AddTask(HiringGang.Contact, MoneyToRecieve, 1000, 0, -500, 5, "Auto Theft for Gang");
+            PlayerTasks.AddTask(HiringContact, PaymentAmount, RepOnCompletion, DebtOnFail, RepOnFail, DaysToComplete, DebugName);
         }
-        private void SendInitialInstructionsMessage()
+        protected override void SendInitialInstructionsMessage()
         {
             List<string> Replies = new List<string>() {
-                    $"Go steal a ~p~{VehicleDisplayName}~s~ from those {TargetGang.ColorPrefix}{TargetGang.ShortName}~s~ assholes. Once you are done come back to {HiringGang.DenName} on {HiringGangDen.FullStreetAddress}. ${MoneyToRecieve} on completion",
-                    $"Go get me a ~p~{VehicleDisplayName}~s~ with {TargetGang.ColorPrefix}{TargetGang.ShortName}~s~ gang colors. Bring it back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress}. Payment ${MoneyToRecieve}",
+                    $"Go steal a ~p~{VehicleDisplayName}~s~ from those {TargetGang.ColorPrefix}{TargetGang.ShortName}~s~ assholes. Once you are done come back to {HiringGang.DenName} on {HiringGangDen.FullStreetAddress}. ${PaymentAmount} on completion",
+                    $"Go get me a ~p~{VehicleDisplayName}~s~ with {TargetGang.ColorPrefix}{TargetGang.ShortName}~s~ gang colors. Bring it back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress}. Payment ${PaymentAmount}",
                     };
-            Player.CellPhone.AddPhoneResponse(HiringGang.Contact.Name, HiringGang.Contact.IconName, Replies.PickRandom());
+            Player.CellPhone.AddPhoneResponse(HiringContact.Name, HiringContact.IconName, Replies.PickRandom());
         }
     }
 }

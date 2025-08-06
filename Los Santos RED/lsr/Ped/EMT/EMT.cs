@@ -26,9 +26,11 @@ public class EMT : PedExt
     public override Color BlipColor => AssignedAgency != null ? AssignedAgency.Color : base.BlipColor;
     public override bool GenerateUnconsciousAlerts { get; set; } = false;
     public bool IsRespondingToInvestigation { get; set; }
-    public override void Update(IPerceptable perceptable, IPoliceRespondable policeRespondable, Vector3 placeLastSeen, IEntityProvideable world)
+    
+    public override void Update(IPerceptable perceptable, IPoliceRespondable policeRespondable, IContactInteractable contactInteractable, Vector3 placeLastSeen, IEntityProvideable world)
     {
         PlayerToCheck = policeRespondable;
+        PlayerToTask = contactInteractable;
         if(!Pedestrian.Exists())
         {
             return;

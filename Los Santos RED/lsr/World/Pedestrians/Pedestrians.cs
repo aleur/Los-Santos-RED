@@ -145,6 +145,15 @@ public class Pedestrians : ITaskerReportable
             return myList;
         }
     }
+    public List<GangMember> AllGangMembersList
+    {
+        get
+        {
+            List<GangMember> myList = new List<GangMember>();
+            myList.AddRange(GangMemberList);
+            return myList;
+        }
+    }
     public List<PedExt> PedExts
     {
         get

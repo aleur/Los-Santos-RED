@@ -13,67 +13,48 @@ using System.Threading.Tasks;
 
 namespace LosSantosRED.lsr.Player.ActiveTasks
 {
-    public class GangArsonTask : IPlayerTask
+    public class GangArsonTask : GangTask, IPlayerTask
     {
-        private ITaskAssignable Player;
-        private ITimeReportable Time;
-        private IGangs Gangs;
         private IGangTerritories GangTerritories;
         private IZones Zones;
-        private PlayerTasks PlayerTasks;
-        private IPlacesOfInterest PlacesOfInterest;
-        private List<DeadDrop> ActiveDrops = new List<DeadDrop>();
-        private ISettingsProvideable Settings;
-        private IEntityProvideable World;
-        private ICrimes Crimes;
-        private Gang HiringGang;
         private GangDen HiringGangDen;
         private GameLocation TorchLocation;
         private Gang EnemyGang;
         private Zone SelectedZone;
-        private PlayerTask CurrentTask;
         private int GameTimeToWaitBeforeComplications;
-        private int MoneyToReceive;
         private bool HasAddedComplications;
         private bool WillAddComplications;
         private PhoneContact PhoneContact;
         private bool hasExploded = false;
-        private GangTasks GangTasks;
         private bool WillTorchEnemyTurf;
         private bool HasConditions => TorchLocation != null && HiringGangDen != null;
 
 
-        public GangArsonTask(ITaskAssignable player, ITimeReportable time, IGangs gangs, PlayerTasks playerTasks, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, 
-            PhoneContact phoneContact, GangTasks gangTasks, IGangTerritories gangTerritories, IZones zones)
+        public GangArsonTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups,
+            IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, Gang hiringGang, IGangTerritories gangTerritories, IZones zones) : base(player, time, gangs, placesOfInterest, activeDrops, settings, world, crimes, weapons, names, pedGroups, shopMenus, modItems, playerTasks, gangTasks, hiringContact, hiringGang)
         {
-            Player = player;
-            Time = time;
-            Gangs = gangs;
-            PlayerTasks = playerTasks;
-            PlacesOfInterest = placesOfInterest;
-            ActiveDrops = activeDrops;
-            Settings = settings;
-            World = world;
-            Crimes = crimes;
-            PhoneContact = phoneContact;
-            GangTasks = gangTasks;
             GangTerritories = gangTerritories;
             Zones = zones;
         }
-        public void Setup()
+        public override void Setup()
         {
             hasExploded = false;
+
+            RepOnCompletion = 500;
+            DebtOnFail = 0;
+            RepOnFail = -2000;
+            DaysToComplete = 7;
+            DebugName = "Arson";
         }
-        public void Dispose()
+        public override void Dispose()
         {
             if (TorchLocation != null) { TorchLocation.IsPlayerInterestedInLocation = false; }
         }
-        public void Start(Gang ActiveGang)
+        public override void Start()
         {
-            HiringGang = ActiveGang;
             WillTorchEnemyTurf = RandomItems.RandomPercent(Settings.SettingsManager.TaskSettings.GangArsonEnemyTurfPercentage);
 
-            if (PlayerTasks.CanStartNewTask(ActiveGang?.ContactName))
+            if (PlayerTasks.CanStartNewTask(HiringContact?.Name))
             {
                 GetTorchLocation();
                 GetHiringDen();
@@ -102,7 +83,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 }
             }
         }
-        private void Loop()
+        protected override void Loop()
         {
             while (true)
             {
@@ -125,12 +106,14 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 GameFiber.Sleep(250);
             }
         }
-        private void FinishTask()
+        protected override void FinishTask()
         {
             if (CurrentTask != null && CurrentTask.IsActive && CurrentTask.IsReadyForPayment)
             {
                 TorchLocation.IsPlayerInterestedInLocation = false;
-                SendMoneyPickupMessage();
+
+                if (HiringGangDen.IsAvailableForPlayer) SendMoneyPickupMessage(HiringGang.DenName, HiringGangDen);
+                else SetReadyToPickupDeadDrop();
             }
             else if (CurrentTask != null && !CurrentTask.IsActive)
             {
@@ -210,64 +193,53 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         {
             HiringGangDen = PlacesOfInterest.GetMainDen(HiringGang.ID, World.IsMPMapLoaded, Player.CurrentLocation);
         }
-        private void GetPayment()
+        protected override void GetPayment()
         {
-            MoneyToReceive = RandomItems.GetRandomNumberInt(HiringGang.ArsonPaymentMin, HiringGang.ArsonPaymentMax).Round(500);
-            if (MoneyToReceive <= 0)
+            PaymentAmount = RandomItems.GetRandomNumberInt(HiringGang.ArsonPaymentMin, HiringGang.ArsonPaymentMax).Round(500);
+            if (PaymentAmount <= 0)
             {
-                MoneyToReceive = 100;
+                PaymentAmount = 100;
             }
             if (WillTorchEnemyTurf)
             {
-                MoneyToReceive *= 5;
+                PaymentAmount *= 5;
             }
         }
-        private void AddTask()
+        protected override void AddTask()
         {
-            PlayerTasks.AddTask(HiringGang.Contact, MoneyToReceive, 500, 0, -2000, 7, "Arson");
+            PlayerTasks.AddTask(HiringContact, PaymentAmount, RepOnCompletion, DebtOnFail, RepOnFail, DaysToComplete, DebugName);
             TorchLocation.IsPlayerInterestedInLocation = true;
             CurrentTask = PlayerTasks.GetTask(HiringGang.ContactName);
             CurrentTask.FailOnStandardRespawn = true;
         }
-        private void SendInitialInstructionsMessage()
+        protected override void SendInitialInstructionsMessage()
         {
             List<string> Replies;
             if (WillTorchEnemyTurf)
             {
                 Replies = new List<string>() {
-                $"Set fire to {TorchLocation.Name}. Make them feel the heat of our dominance. ~g~${MoneyToReceive}~s~ for your trouble.",
-                $"Burn down {TorchLocation.Name} and show {EnemyGang.ColorPrefix}{EnemyGang.ShortName}~s~ they’re out of their league. Bigger payout this time: ~g~${MoneyToReceive}~s~.",
-                $"Torch {TorchLocation.Name} and let them know we run this city. Take ~g~${MoneyToReceive}~s~ for your efforts.",
-                $"Light up {TorchLocation.Name} and remind them that this is our territory. You’ll earn ~g~${MoneyToReceive}~s~ for the job.",
-                $"Turn {TorchLocation.Name} into ashes and show {EnemyGang.ColorPrefix}{EnemyGang.ShortName}~s~ who really calls the shots. Your reward: ~g~${MoneyToReceive}~s~.",
-                $"Set {TorchLocation.Name} ablaze and send a message that we’re in charge. Your cut: ~g~${MoneyToReceive}~s~."
+                $"Set fire to {TorchLocation.Name}. Make them feel the heat of our dominance. ~g~${PaymentAmount}~s~ for your trouble.",
+                $"Burn down {TorchLocation.Name} and show {EnemyGang.ColorPrefix}{EnemyGang.ShortName}~s~ they’re out of their league. Bigger payout this time: ~g~${PaymentAmount}~s~.",
+                $"Torch {TorchLocation.Name} and let them know we run this city. Take ~g~${PaymentAmount}~s~ for your efforts.",
+                $"Light up {TorchLocation.Name} and remind them that this is our territory. You’ll earn ~g~${PaymentAmount}~s~ for the job.",
+                $"Turn {TorchLocation.Name} into ashes and show {EnemyGang.ColorPrefix}{EnemyGang.ShortName}~s~ who really calls the shots. Your reward: ~g~${PaymentAmount}~s~.",
+                $"Set {TorchLocation.Name} ablaze and send a message that we’re in charge. Your cut: ~g~${PaymentAmount}~s~."
                 };
             }
             else
             {
                 Replies = new List<string>() {
-                $"Burn down {TorchLocation.Name} and remind them they can’t ignore us. You’ll get ~g~${MoneyToReceive}~s~ for your work, 10% cut like usual.",
-                $"Set fire to {TorchLocation.Name} to show them we’re not messing around. Your reward: ~g~${MoneyToReceive}~s~.",
-                $"Torch {TorchLocation.Name} and let them feel the consequences of defying us. ~g~${MoneyToReceive}~s~ for you.",
-                $"Light {TorchLocation.Name} on fire and make them regret their unpaid debts. You’ll get ~g~${MoneyToReceive}~s~ for your trouble.",
-                $"Burn {TorchLocation.Name} to the ground and send a message that we’re not here to negotiate. Your cut: ~g~${MoneyToReceive}~s~.",
-                $"Set {TorchLocation.Name} on fire to remind them they can’t skip out on us. You’ll pocket ~g~${MoneyToReceive}~s~ for the job."
+                $"Burn down {TorchLocation.Name} and remind them they can’t ignore us. You’ll get ~g~${PaymentAmount}~s~ for your work, 10% cut like usual.",
+                $"Set fire to {TorchLocation.Name} to show them we’re not messing around. Your reward: ~g~${PaymentAmount}~s~.",
+                $"Torch {TorchLocation.Name} and let them feel the consequences of defying us. ~g~${PaymentAmount}~s~ for you.",
+                $"Light {TorchLocation.Name} on fire and make them regret their unpaid debts. You’ll get ~g~${PaymentAmount}~s~ for your trouble.",
+                $"Burn {TorchLocation.Name} to the ground and send a message that we’re not here to negotiate. Your cut: ~g~${PaymentAmount}~s~.",
+                $"Set {TorchLocation.Name} on fire to remind them they can’t skip out on us. You’ll pocket ~g~${PaymentAmount}~s~ for the job."
                 };
             }
 
 
-            Player.CellPhone.AddPhoneResponse(HiringGang.Contact.Name, HiringGang.Contact.IconName, Replies.PickRandom());
-        }
-        private void SendMoneyPickupMessage()
-        {
-            List<string> Replies = new List<string>() {
-                                $"Seems like that thing we discussed is done? Come by the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} to collect the ~g~${MoneyToReceive}~s~",
-                                $"Word got around that you are done with that thing for us, Come back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} for your payment of ~g~${MoneyToReceive}~s~",
-                                $"Get back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} for your payment of ~g~${MoneyToReceive}~s~",
-                                $"{HiringGangDen.FullStreetAddress} for ~g~${MoneyToReceive}~s~",
-                                $"Heard you were done, see you at the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress}. We owe you ~g~${MoneyToReceive}~s~",
-                                };
-            Player.CellPhone.AddScheduledText(PhoneContact, Replies.PickRandom(), 1, false);
+            Player.CellPhone.AddPhoneResponse(HiringContact.Name, HiringContact.IconName, Replies.PickRandom());
         }
     }
 }

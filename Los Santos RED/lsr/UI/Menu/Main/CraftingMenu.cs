@@ -137,6 +137,41 @@ public class CraftingMenu : ModUIMenu
         Dictionary<string, UIMenu> categoryMenus = new Dictionary<string, UIMenu>();
         menu.SetBannerType(EntryPoint.LSRedColor);
         menu.Width = Settings.SettingsManager.UIGeneralSettings.CraftingMenuWidth;
+
+        if (Crafting.UnfinishedCrafts.Count > 0)
+        {
+            UIMenu PendingCraftsMenu = MenuPool.AddSubMenu(Menu, "Unfinished Crafts");
+            Menu.MenuItems[Menu.MenuItems.Count() - 1].Description = "Finish crafts that were paused";
+            Menu.MenuItems[Menu.MenuItems.Count() - 1].RightBadge = UIMenuItem.BadgeStyle.Ammo;
+            PendingCraftsMenu.SetBannerType(EntryPoint.LSRedColor);
+
+            foreach ((int, CraftableItem) uc in Crafting.UnfinishedCrafts)
+            {
+                int quantity = uc.Item1;
+                CraftableItem craftableItem = uc.Item2;
+
+                if (!string.IsNullOrEmpty(craftingFlag) && craftableItem.CraftingFlags != null && !craftableItem.CraftingFlags.Contains(craftingFlag))
+                {
+                    continue;
+                }
+                if (craftableItem.CraftingFlags != null && craftableItem.CraftingFlags.Count > 0 && !craftableItem.CraftingFlags.Contains(craftingFlag))
+                {
+                    continue;
+                }
+
+                if (quantity > 0)
+                {
+                    UIMenuItem itemMenu = new UIMenuItem(craftableItem.Name, $"{quantity} {ModItems.Get(craftableItem.Resultant).MeasurementName}(s) left to craft");
+                    itemMenu.Activated += (s, e) =>
+                    {
+                        Crafting.CraftItem(craftableItem, quantity, 0, craftingFlag: craftingFlag);
+                        Crafting.UnfinishedCrafts.Remove(uc);
+                        RedrawCraftingMenu(craftingFlag, menuPool, menu);
+                    };
+                    PendingCraftsMenu.AddItem(itemMenu);
+                }
+            }
+        }
         foreach (CraftableItem craftableItem in CraftableItems.Items)
         {
             if (!string.IsNullOrEmpty(craftingFlag) && craftableItem.CraftingFlags != null && !craftableItem.CraftingFlags.Contains(craftingFlag))
@@ -188,7 +223,7 @@ public class CraftingMenu : ModUIMenu
                     UIMenuItem itemMenu = new UIMenuItem(craftableItem.Name, craftableItem.GetIngredientDescription(1, ModItems));
                     itemMenu.Activated += (s, e) =>
                     {
-                        Crafting.CraftItem(itemMenu.Text, craftingFlag: craftingFlag);
+                        Crafting.CraftItem(craftableItem, craftableItem.ResultantAmount, craftingFlag: craftingFlag);
                         RedrawCraftingMenu(craftingFlag, menuPool, menu);
                     };
                     uIMenu.AddItem(itemMenu);
@@ -204,7 +239,7 @@ public class CraftingMenu : ModUIMenu
                     };
                     itemMenu.Activated += (s, e) =>
                     {
-                        Crafting.CraftItem(itemMenu.Text, itemMenu.Value, craftingFlag: craftingFlag);
+                        Crafting.CraftItem(craftableItem, craftableItem.ResultantAmount * itemMenu.Value, itemMenu.Value, craftingFlag: craftingFlag);
                         RedrawCraftingMenu(craftingFlag, menuPool, menu);
                     };
                     uIMenu.AddItem(itemMenu);

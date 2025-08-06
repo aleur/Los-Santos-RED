@@ -351,6 +351,7 @@ public class GameLocation : ILocationDispatchable
     public virtual int SalesPrice { get; set; }
     public virtual int MaxSalesPrice { get; set; }
     public int GrowthPercentage { get; set; } = 20;
+    public bool CashPurchaseOnly { get; set; }
     [XmlIgnore]
     public int CurrentSalesPrice { get; set; }
     [XmlIgnore]
@@ -602,20 +603,21 @@ public class GameLocation : ILocationDispatchable
     }
     protected virtual bool Purchase()
     {
-        if (Player.BankAccounts.GetMoney(true) >= PurchasePrice)
+        bool hasEnoughMoney = CashPurchaseOnly ? Player.BankAccounts.GetMoney(false) >= PurchasePrice : Player.BankAccounts.GetMoney(true) >= PurchasePrice;
+        if (hasEnoughMoney)
         {
             OnPurchased();
             DisplayMessage("~g~Purchased", $"Thank you for purchasing {Name}");
             return true;
         }
-        DisplayMessage("~r~Purchased Failed", "We are sorry, we are unable to complete this purchase. Please make sure you have the funds.");
+        DisplayMessage("~r~Purchase Failed", "We are sorry, we are unable to complete this purchase. Please make sure you have the funds.");
         return false;
     }
     protected virtual void OnPurchased()
     {
         //Player.Properties.AddPayoutProperty(this);
         AddOwnership();
-        Player.BankAccounts.GiveMoney(-1 * PurchasePrice, true);
+        Player.BankAccounts.GiveMoney(-1 * PurchasePrice, !CashPurchaseOnly);
         IsOwned = true;
         DatePayoutPaid = Time.CurrentDateTime;
         DatePayoutDue = DatePayoutPaid.AddDays(PayoutFrequency);

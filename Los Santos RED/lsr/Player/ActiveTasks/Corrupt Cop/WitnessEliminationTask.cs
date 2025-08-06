@@ -24,7 +24,6 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private ICrimes Crimes;
         private IShopMenus ShopMenus;
         private PlayerTask CurrentTask;
-        private int MoneyToRecieve;
         private DeadDrop myDrop;
         private IWeapons Weapons;
         private INameProvideable Names;
@@ -58,7 +57,12 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private ShopMenu WitnessShopMenu;
         private WeaponInformation WitnessWeapon;
         private CorruptCopContact Contact;
-
+        public int PaymentAmount { get; set; }
+        public int RepOnCompletion { get; set; }
+        public int DebtOnFail { get; set; }
+        public int RepOnFail { get; set; }
+        public int DaysToComplete { get; set; }
+        public string DebugName { get; set; }
         private bool IsPlayerFarFromWitness => Witness != null && Witness.Pedestrian.Exists() && Witness.Pedestrian.DistanceTo2D(Player.Character) >= 850f;
         private bool IsPlayerNearWitnessSpawn => SpawnPositionCellX != -1 && SpawnPositionCellY != -1 && NativeHelper.IsNearby(EntryPoint.FocusCellX, EntryPoint.FocusCellY, SpawnPositionCellX, SpawnPositionCellY, 6);
         public WitnessEliminationTask(ITaskAssignable player, ITimeReportable time, IGangs gangs, PlayerTasks playerTasks, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, 
@@ -80,7 +84,11 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         public void Setup()
         {
-            
+            RepOnCompletion = 2000;
+            DebtOnFail = 0;
+            RepOnFail = -500;
+            DaysToComplete = 7;
+            DebugName = "Witness Elimination";
         }
         public void Dispose()
         {
@@ -95,9 +103,8 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 WitnessLocation.IsPlayerInterestedInLocation = false;
             }
         }
-        public void Start(CorruptCopContact contact)
+        public void Start()
         {
-            Contact = contact;
             if (Contact == null)
             {
                 return;
@@ -246,7 +253,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             myDrop = PlacesOfInterest.GetUsableDeadDrop(World.IsMPMapLoaded, Player.CurrentLocation);
             if (myDrop != null)
             {
-                myDrop.SetupDrop(MoneyToRecieve, false);
+                myDrop.SetupDrop(PaymentAmount, false);
                 ActiveDrops.Add(myDrop);
                 SendDeadDropStartMessage();
                 while (true)
@@ -281,7 +288,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private void AddTask()
         {
             //EntryPoint.WriteToConsoleTestLong($"You are hired to kill a witness!");
-            PlayerTasks.AddTask(Contact, 0, 2000, 0, -500, 7,"Witness Elimination");
+            PlayerTasks.AddTask(Contact, 0, RepOnCompletion, DebtOnFail, RepOnFail, DaysToComplete, DebugName);
             CurrentTask = PlayerTasks.GetTask(Contact.Name);
             IsWitnessSpawned = false;
             GameTimeToWaitBeforeComplications = RandomItems.GetRandomNumberInt(3000, 10000);
@@ -498,10 +505,10 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         private void GetPayment()
         {
-            MoneyToRecieve = RandomItems.GetRandomNumberInt(Settings.SettingsManager.TaskSettings.OfficerFriendlyWitnessEliminationPaymentMin, Settings.SettingsManager.TaskSettings.OfficerFriendlyWitnessEliminationPaymentMax).Round(500);
-            if (MoneyToRecieve <= 0)
+            PaymentAmount = RandomItems.GetRandomNumberInt(Settings.SettingsManager.TaskSettings.OfficerFriendlyWitnessEliminationPaymentMin, Settings.SettingsManager.TaskSettings.OfficerFriendlyWitnessEliminationPaymentMax).Round(500);
+            if (PaymentAmount <= 0)
             {
-                MoneyToRecieve = 500;
+                PaymentAmount = 500;
             }
         }
         private void SendTaskAbortMessage()
@@ -522,21 +529,21 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             if (WitnessIsAtHome)
             {
                 Replies = new List<string>() {
-                    $"Got a witness that needs to disappear. Home address is ~p~{WitnessLocation.FullStreetAddress}~s~. Name ~y~{WitnessName}~s~. ${MoneyToRecieve}",
-                    $"Get to the house at ~p~{WitnessLocation.FullStreetAddress}~s~ and get rid of ~y~{WitnessName}~s~. ${MoneyToRecieve} on complation",
-                    $"We need to you shut this guy up before he squeals. He lives at ~p~{WitnessLocation.FullStreetAddress}~s~. The name is ~y~{WitnessName}~s~. Payment of ${MoneyToRecieve}",
-                    $"~y~{WitnessName}~s~ is living at ~p~{WitnessLocation.FullStreetAddress}~s~. They should be home. You know what to do. ${MoneyToRecieve}",
-                    $"Need you to make sure ~y~{WitnessName}~s~ doesn't make it to the deposition, they live at ~p~{WitnessLocation.FullStreetAddress}~s~. ${MoneyToRecieve}",
+                    $"Got a witness that needs to disappear. Home address is ~p~{WitnessLocation.FullStreetAddress}~s~. Name ~y~{WitnessName}~s~. ${PaymentAmount}",
+                    $"Get to the house at ~p~{WitnessLocation.FullStreetAddress}~s~ and get rid of ~y~{WitnessName}~s~. ${PaymentAmount} on complation",
+                    $"We need to you shut this guy up before he squeals. He lives at ~p~{WitnessLocation.FullStreetAddress}~s~. The name is ~y~{WitnessName}~s~. Payment of ${PaymentAmount}",
+                    $"~y~{WitnessName}~s~ is living at ~p~{WitnessLocation.FullStreetAddress}~s~. They should be home. You know what to do. ${PaymentAmount}",
+                    $"Need you to make sure ~y~{WitnessName}~s~ doesn't make it to the deposition, they live at ~p~{WitnessLocation.FullStreetAddress}~s~. ${PaymentAmount}",
                      };
             }
             else
             {
                 Replies = new List<string>() {
-                    $"Got a witness that needs to disappear. They hang around ~p~{WitnessLocation.Name}~s~. Address is ~p~{WitnessLocation.FullStreetAddress}~s~. Name ~y~{WitnessName}~s~. ${MoneyToRecieve}",
-                    $"Get to ~p~{WitnessLocation.Name}~s~ on ~p~{WitnessLocation.FullStreetAddress}~s~ and get rid of ~y~{WitnessName}~s~. ${MoneyToRecieve} on complation",
-                    $"We need to you shut this guy up before he squeals. He's at ~p~{WitnessLocation.Name}~s~ ~p~{WitnessLocation.FullStreetAddress}~s~. The name is ~y~{WitnessName}~s~. Payment of ${MoneyToRecieve}",
-                    $"~y~{WitnessName}~s~ is at ~p~{WitnessLocation.Name}~s~, address is ~p~{WitnessLocation.FullStreetAddress}~s~. You know what to do. ${MoneyToRecieve}",
-                    $"Need you to make sure ~y~{WitnessName}~s~ doesn't make it to the deposition, they are currently at ~p~{WitnessLocation.Name}~s~ on ~p~{WitnessLocation.FullStreetAddress}~s~. ${MoneyToRecieve}",
+                    $"Got a witness that needs to disappear. They hang around ~p~{WitnessLocation.Name}~s~. Address is ~p~{WitnessLocation.FullStreetAddress}~s~. Name ~y~{WitnessName}~s~. ${PaymentAmount}",
+                    $"Get to ~p~{WitnessLocation.Name}~s~ on ~p~{WitnessLocation.FullStreetAddress}~s~ and get rid of ~y~{WitnessName}~s~. ${PaymentAmount} on complation",
+                    $"We need to you shut this guy up before he squeals. He's at ~p~{WitnessLocation.Name}~s~ ~p~{WitnessLocation.FullStreetAddress}~s~. The name is ~y~{WitnessName}~s~. Payment of ${PaymentAmount}",
+                    $"~y~{WitnessName}~s~ is at ~p~{WitnessLocation.Name}~s~, address is ~p~{WitnessLocation.FullStreetAddress}~s~. You know what to do. ${PaymentAmount}",
+                    $"Need you to make sure ~y~{WitnessName}~s~ doesn't make it to the deposition, they are currently at ~p~{WitnessLocation.Name}~s~ on ~p~{WitnessLocation.FullStreetAddress}~s~. ${PaymentAmount}",
                      };
             }
             
@@ -545,19 +552,19 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private void SendQuickPaymentMessage()
         {
             List<string> Replies = new List<string>() {
-                            $"Seems like that thing we discussed is done? Sending you ${MoneyToRecieve}",
-                            $"Word got around that you are done with that thing for us, sending your payment of ${MoneyToRecieve}",
-                            $"Sending your payment of ${MoneyToRecieve}",
-                            $"Sending ${MoneyToRecieve}",
-                            $"Heard you were done. We owe you ${MoneyToRecieve}",
+                            $"Seems like that thing we discussed is done? Sending you ${PaymentAmount}",
+                            $"Word got around that you are done with that thing for us, sending your payment of ${PaymentAmount}",
+                            $"Sending your payment of ${PaymentAmount}",
+                            $"Sending ${PaymentAmount}",
+                            $"Heard you were done. We owe you ${PaymentAmount}",
                             };
             Player.CellPhone.AddScheduledText(Contact, Replies.PickRandom(), 1, false);
         }
         private void SendDeadDropStartMessage()
         {
             List<string> Replies = new List<string>() {
-                            $"Pickup your payment of ${MoneyToRecieve} from {myDrop.FullStreetAddress}, its {myDrop.Description}.",
-                            $"Go get your payment of ${MoneyToRecieve} from {myDrop.Description}, address is {myDrop.FullStreetAddress}.",
+                            $"Pickup your payment of ${PaymentAmount} from {myDrop.FullStreetAddress}, its {myDrop.Description}.",
+                            $"Go get your payment of ${PaymentAmount} from {myDrop.Description}, address is {myDrop.FullStreetAddress}.",
                             };
 
             Player.CellPhone.AddScheduledText(Contact, Replies.PickRandom(), 1, false);
@@ -565,11 +572,11 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private void SendCompletedMessage()
         {
             List<string> Replies = new List<string>() {
-                        $"Seems like that thing we discussed is done? Sending you ${MoneyToRecieve}",
-                        $"Word got around that you are done with that thing for us, sending your payment of ${MoneyToRecieve}",
-                        $"Sending your payment of ${MoneyToRecieve}",
-                        $"Sending ${MoneyToRecieve}",
-                        $"Heard you were done. We owe you ${MoneyToRecieve}",
+                        $"Seems like that thing we discussed is done? Sending you ${PaymentAmount}",
+                        $"Word got around that you are done with that thing for us, sending your payment of ${PaymentAmount}",
+                        $"Sending your payment of ${PaymentAmount}",
+                        $"Sending ${PaymentAmount}",
+                        $"Heard you were done. We owe you ${PaymentAmount}",
                         };
             Player.CellPhone.AddScheduledText(Contact, Replies.PickRandom(), 1, false);
         }

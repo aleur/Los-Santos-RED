@@ -27,9 +27,9 @@ public class CanineUnit : Cop
     {
 
     }
-    public override void Update(IPerceptable perceptable, IPoliceRespondable policeRespondable, Vector3 placeLastSeen, IEntityProvideable world)
+    public override void Update(IPerceptable perceptable, IPoliceRespondable policeRespondable, IContactInteractable contactInteractable, Vector3 placeLastSeen, IEntityProvideable world)
     {
-        base.Update(perceptable, policeRespondable, placeLastSeen, world);
+        base.Update(perceptable, policeRespondable, contactInteractable, placeLastSeen, world);
 
         if(!Pedestrian.Exists() || !Pedestrian.IsAlive)
         {

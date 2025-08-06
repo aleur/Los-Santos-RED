@@ -1304,7 +1304,7 @@ public class LEDispatcher
         GameFiber.Yield();
 
 
-        if(!getspawnLocation)
+        if (!getspawnLocation)
         {
             EntryPoint.WriteToConsole("LE DISPATCHER CAN NOT GET SPAWN LOCATION");
             return;
@@ -1338,7 +1338,6 @@ public class LEDispatcher
             ShouldRunAmbientDispatch = false;
             //GameTimeAttemptedDispatch = Game.GameTime;
         }
-        
     }
     private void HandleRoadblockSpawns()
     {
@@ -1735,13 +1734,13 @@ public class LEDispatcher
     private Vector3 GetSpawnPosition()
     {
         Vector3 Position;
-        if(World.TotalWantedLevel > 0 && (World.TotalWantedLevel > Player.WantedLevel || Player.IsNotWanted))//someone else is the priority
+        if (World.TotalWantedLevel > 0 && (World.TotalWantedLevel > Player.WantedLevel || Player.IsNotWanted))//someone else is the priority
         {
             Position = World.PoliceBackupPoint;
         }
         else//player is priority
         {
-            if(Player.IsWanted && Player.IsInVehicle && Player.IsMoving)//if you are wanted and in a car, put it out front to better get it
+            if (Player.IsWanted && Player.IsInVehicle && Player.IsMoving)//if you are wanted and in a car, put it out front to better get it
             {
                 Position = Player.Character.GetOffsetPositionFront(250f);// 200f);// 250f);//350f
             }

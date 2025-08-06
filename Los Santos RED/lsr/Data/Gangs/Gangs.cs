@@ -136,6 +136,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMin = 400,
             DealerMemberMoneyMax = 1500,
             EnemyGangs = new List<string>() { "AMBIENT_GANG_MADRAZO", "AMBIENT_GANG_GAMBETTI" },
+            DeliveryItems = new List<string>() { "Methamphetamine" },
             DealerMenuGroup = "MethamphetamineDealerMenu",
 
             PickupPaymentMin = 200,
@@ -173,6 +174,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMin = 400,
             DealerMemberMoneyMax = 1000,
             EnemyGangs = new List<string>() { "AMBIENT_GANG_SALVA" },
+            DeliveryItems = new List<string>() { "Marijuana" },
             DealerMenuGroup = "MarijuanaDealerMenu",
 
             PickupPaymentMin = 200,
@@ -209,6 +211,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMax = 1100,
             HeadDataGroupID = "VarriosHeads",
             EnemyGangs = new List<string>() { "AMBIENT_GANG_WEICHENG" },
+            DeliveryItems = new List<string>() { "Crack" },
             DealerMenuGroup = "CrackDealerMenu",
 
             PickupPaymentMin = 200,
@@ -244,6 +247,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMin = 250,
             DealerMemberMoneyMax = 850,
             EnemyGangs = new List<string>() { "AMBIENT_GANG_MADRAZO" },
+            DeliveryItems = new List<string>() { "Marijuana" },
             DealerMenuGroup = "MarijuanaDealerMenu",
 
             PickupPaymentMin = 200,
@@ -279,6 +283,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMin = 350,
             DealerMemberMoneyMax = 1100,
             EnemyGangs = new List<string>() { "AMBIENT_GANG_BALLAS" },
+            DeliveryItems = new List<string>() { "Marijuana" },
             DealerMenuGroup = "MarijuanaDealerMenu",
 
             PickupPaymentMin = 200,
@@ -314,6 +319,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMin = 325,
             DealerMemberMoneyMax = 1200,
             EnemyGangs = new List<string>() { "AMBIENT_GANG_FAMILY" },
+            DeliveryItems = new List<string>() { "Crack" },
             DealerMenuGroup = "CrackDealerMenu",
 
             PickupPaymentMin = 200,
@@ -349,6 +355,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMin = 800,
             DealerMemberMoneyMax = 1900,
             EnemyGangs = new List<string>() { "AMBIENT_GANG_SALVA" },
+            DeliveryItems = new List<string>() { "Heroin" },
             DealerMenuGroup = "HeroinDealerMenu",
 
             PickupPaymentMin = 200,
@@ -384,6 +391,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMin = 200,
             DealerMemberMoneyMax = 500,
             EnemyGangs = new List<string>() { "AMBIENT_GANG_WEICHENG" },
+            DeliveryItems = new List<string>() { "Toilet Cleaner" },
             DealerMenuGroup = "ToiletCleanerDealerMenu",
 
             PickupPaymentMin = 200,
@@ -420,6 +428,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMin = 700,
             DealerMemberMoneyMax = 1700,
             EnemyGangs = new List<string>() { "AMBIENT_GANG_WEICHENG" },
+            DeliveryItems = new List<string>() { "Heroin" },
             DealerMenuGroup = "HeroinDealerMenu",
 
             PickupPaymentMin = 200,
@@ -457,6 +466,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMin = 650,
             DealerMemberMoneyMax = 2000,
             EnemyGangs = new List<string>() { "AMBIENT_GANG_LOST" },
+            DeliveryItems = new List<string>() { "Cocaine" },
             DealerMenuGroup = "CokeDealerMenu",
             HeadDataGroupID = "MafiaHeads",
 
@@ -493,6 +503,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMin = 650,
             DealerMemberMoneyMax = 2000,
             EnemyGangs = new List<string>() { "AMBIENT_GANG_ARMENIAN" },
+            DeliveryItems = new List<string>() { "Cocaine" },
             DealerMenuGroup = "CokeDealerMenu",
             HeadDataGroupID = "MafiaHeads",
 
@@ -529,6 +540,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMin = 650,
             DealerMemberMoneyMax = 2000,
             EnemyGangs = new List<string>() { "AMBIENT_GANG_KKANGPAE" },
+            DeliveryItems = new List<string>() { "Cocaine" },
             DealerMenuGroup = "CokeDealerMenu",
             HeadDataGroupID = "MafiaHeads",
 
@@ -565,6 +577,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMin = 650,
             DealerMemberMoneyMax = 2000,
             EnemyGangs = new List<string>() { "AMBIENT_GANG_WEICHENG", "AMBIENT_GANG_SALVA" },
+            DeliveryItems = new List<string>() { "Cocaine" },
             DealerMenuGroup = "CokeDealerMenu",
             HeadDataGroupID = "MafiaHeads",
 
@@ -601,6 +614,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMin = 650,
             DealerMemberMoneyMax = 2000,
             EnemyGangs = new List<string>() { "AMBIENT_GANG_LOST" },
+            DeliveryItems = new List<string>() { "Cocaine" },
             DealerMenuGroup = "CokeDealerMenu",
             HeadDataGroupID = "MafiaHeads",
 
@@ -637,6 +651,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMin = 450,
             DealerMemberMoneyMax = 1700,
             EnemyGangs = new List<string>() { "AMBIENT_GANG_MARABUNTE" },
+            DeliveryItems = new List<string>() { "Methamphetamine" },
             DealerMenuGroup = "MethamphetamineDealerMenu",
 
             PickupPaymentMin = 200,
@@ -673,6 +688,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMin = 475,
             DealerMemberMoneyMax = 1500,
             EnemyGangs = new List<string>() { "AMBIENT_GANG_GAMBETTI" },
+            DeliveryItems = new List<string>() { "Heroin" },
             DealerMenuGroup = "HeroinDealerMenu",
 
             PickupPaymentMin = 200,
@@ -709,6 +725,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMin = 250,
             DealerMemberMoneyMax = 900,
             EnemyGangs = new List<string>() { "AMBIENT_GANG_KKANGPAE", "AMBIENT_GANG_DIABLOS" },
+            DeliveryItems = new List<string>() { "Marijuana" },
             DealerMenuGroup = "MarijuanaDealerMenu",
 
             NeutralRepLevel = 0,
@@ -735,6 +752,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMin = 300,
             DealerMemberMoneyMax = 650,
             EnemyGangs = new List<string>() { "AMBIENT_GANG_YARDIES" },
+            DeliveryItems = new List<string>() { "SPANK" },
             DealerMenuGroup = "SPANKDealerMenu",
             NeutralRepLevel = 0,
             FriendlyRepLevel = 1500,
@@ -765,6 +783,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMin = 400,
             DealerMemberMoneyMax = 1500,
             EnemyGangs = new List<string>() { "AMBIENT_GANG_LOST", "AMBIENT_GANG_YARDIES" },
+            DeliveryItems = new List<string>() { "Methamphetamine" },
             DealerMenuGroup = "MethamphetamineDealerMenu",
 
             PickupPaymentMin = 200,
@@ -868,6 +887,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMax = 1100,
             HeadDataGroupID = "VarriosHeads",
             EnemyGangs = new List<string>() { "AMBIENT_GANG_WEICHENG" },
+            DeliveryItems = new List<string>() { "Crack" },
             DealerMenuGroup = "CrackDealerMenu",
            
             PickupPaymentMin = 200,
@@ -908,6 +928,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMin = 700,
             DealerMemberMoneyMax = 1700,
             EnemyGangs = new List<string>() { "AMBIENT_GANG_GAMBETTI", "AMBIENT_GANG_PETROVIC" },
+            DeliveryItems = new List<string>() { "Heroin" },
             DealerMenuGroup = "HeroinDealerMenu",
 
             PickupPaymentMin = 200,
@@ -948,6 +969,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMin = 350,
             DealerMemberMoneyMax = 1100,
             EnemyGangs = new List<string>() { "AMBIENT_GANG_ARMENIAN" },
+            DeliveryItems = new List<string>() { "Crack" },
             DealerMenuGroup = "CrackDealerMenu",
 
             PickupPaymentMin = 200,
@@ -989,6 +1011,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMax = 1500,
             
             EnemyGangs = new List<string>() { "AMBIENT_GANG_WEICHENG", "AMBIENT_GANG_PAVANO", "AMBIENT_GANG_ANGELS", "AMBIENT_GANG_KOREAN" },
+            DeliveryItems = new List<string>() { "Cocaine" },
             DealerMenuGroup = "CokeDealerMenu",
 
             PickupPaymentMin = 200,
@@ -1032,6 +1055,7 @@ public class Gangs : IGangs
             HeadDataGroupID = "UptownRidersHeads",
             
             EnemyGangs = new List<string>() { "AMBIENT_GANG_ANGELS" },
+            DeliveryItems = new List<string>() { "Methamphetamine" },
             DealerMenuGroup = "MethamphetamineDealerMenu",
 
             PickupPaymentMin = 200,

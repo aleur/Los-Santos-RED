@@ -358,7 +358,27 @@ public class DebugHelperSubMenu : DebugSubMenu
                 audioName = scriptName;
             }
         };
+
         HelperMenuItem.AddItem(playAudioName);
+
+        UIMenuItem setTimecycleModifier = new UIMenuItem("Set Timecycle Modifier", "");
+        setTimecycleModifier.Activated += (menu, item) =>
+        {
+            string timecycleName = NativeHelper.GetKeyboardInput("");
+            if (!string.IsNullOrEmpty(timecycleName))
+            {
+                setTimecycleModifier.RightLabel = timecycleName;
+                NativeFunction.CallByName<int>("SET_TIMECYCLE_MODIFIER", timecycleName);
+            }
+        };
+        HelperMenuItem.AddItem(setTimecycleModifier);
+
+        UIMenuItem clearTimecycle = new UIMenuItem("Clear Timecycle", "");
+        clearTimecycle.Activated += (menu, item) =>
+        {
+            NativeFunction.CallByName<int>("CLEAR_TIMECYCLE_MODIFIER");
+        };
+        HelperMenuItem.AddItem(clearTimecycle);
 
         UIMenuItem playAudioRef = new UIMenuItem("Set Audio Ref", "");
         playAudioRef.Activated += (menu, item) =>

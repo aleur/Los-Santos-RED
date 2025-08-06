@@ -13,6 +13,8 @@ using System.Windows.Forms;
 
 public class PedExt : IComplexTaskable, ISeatAssignable
 {
+    public IPlayerTask TaskForPlayer;
+    public IContactInteractable PlayerToTask;
     public IPoliceRespondable PlayerToCheck;
     protected ISettingsProvideable Settings;
     protected uint GameTimeSpawned;
@@ -142,6 +144,7 @@ public class PedExt : IComplexTaskable, ISeatAssignable
     public bool EverSeenPlayer => PlayerPerception.EverSeenTarget;
     public bool EverSeenPlayerWithoutMask => PlayerPerception.EverSeenTargetWithoutMask;
     public string FormattedName => (PlayerKnownsName ? Name : GroupName);
+    public bool WillGiveMission { get; set; } = false;
     public virtual int ShootRate { get; set; } = 400;
     public virtual int Accuracy { get; set; } = 5;
     public virtual int CombatAbility { get; set; } = 0;
@@ -487,9 +490,10 @@ public class PedExt : IComplexTaskable, ISeatAssignable
     public int CopsKilled { get; private set; }
     public int CiviliansKilled { get; private set; }
 
-    public virtual void Update(IPerceptable perceptable, IPoliceRespondable policeRespondable, Vector3 placeLastSeen, IEntityProvideable world)
+    public virtual void Update(IPerceptable perceptable, IPoliceRespondable policeRespondable, IContactInteractable taskAssignable, Vector3 placeLastSeen, IEntityProvideable world)
     {
         PlayerToCheck = policeRespondable;
+        PlayerToTask = taskAssignable;
         if (!Pedestrian.Exists())
         {
             return;
