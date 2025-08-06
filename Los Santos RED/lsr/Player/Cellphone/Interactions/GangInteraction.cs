@@ -241,7 +241,7 @@ public class GangInteraction : IContactMenuInteraction
         GangImpoundTheft = new UIMenuItem("Impound Theft", "Steal a gang car out of the impound lot. ~r~WIP~s~") { RightLabel = $"~HUD_COLOUR_GREENDARK~{ActiveGang.ImpoundTheftPaymentMin:C0}-{ActiveGang.ImpoundTheftPaymentMax:C0}~s~" };
         GangImpoundTheft.Activated += (sender, selectedItem) =>
         {
-            Player.PlayerTasks.GangTasks.ImpoundTheft(ActiveGang, GangContact).Start();
+            Player.PlayerTasks.GangTasks.GangImpoundTheft(ActiveGang, GangContact).Start();
             sender.Visible = false;
         };
         GangBodyDisposal = new UIMenuItem("Vehicle Disposal", "Get rid of a dirty car. ~r~WIP~s~") { RightLabel = $"~HUD_COLOUR_GREENDARK~{ActiveGang.BodyDisposalPaymentMin:C0}-{ActiveGang.BodyDisposalPaymentMax:C0}~s~" };
@@ -355,7 +355,7 @@ public class GangInteraction : IContactMenuInteraction
         UIMenuItem StartTaskMenu = new UIMenuItem("Start", $"Start the task.") { RightLabel = $"~HUD_COLOUR_GREENDARK~{ActiveGang.CopHitPaymentMin:C0}-{ActiveGang.CopHitPaymentMax:C0}~s~" };
         StartTaskMenu.Activated += (sender, selectedItem) =>
         {
-            Player.PlayerTasks.GangTasks.CopHit(ActiveGang, TargetCountMenu.Value, GangContact, TargetMenu.SelectedItem).Start();
+            Player.PlayerTasks.GangTasks.GangCopHit(ActiveGang, TargetCountMenu.Value, GangContact, TargetMenu.SelectedItem).Start();
             sender.Visible = false;
         };
         TargetCountMenu.IndexChanged += (sender, oldIndex, newIndex) =>

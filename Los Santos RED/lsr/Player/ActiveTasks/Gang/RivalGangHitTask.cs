@@ -23,8 +23,8 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
 
         public bool JoinGangOnComplete { get; set; } = false;
 
-        public RivalGangHitTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups,
-            IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, Gang hiringGang, Gang targetGang, int killRequirement) : base(player, time, gangs, placesOfInterest, settings, world, crimes, weapons, names, pedGroups, shopMenus, modItems, playerTasks, gangTasks, hiringContact, hiringGang)
+        public RivalGangHitTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups,
+            IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, Gang hiringGang, Gang targetGang, int killRequirement) : base(player, time, gangs, placesOfInterest, activeDrops, settings, world, crimes, weapons, names, pedGroups, shopMenus, modItems, playerTasks, gangTasks, hiringContact, hiringGang)
         {
             TargetGang = targetGang;
             KillRequirement = killRequirement;
@@ -93,8 +93,8 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         {
             if (CurrentTask != null && CurrentTask.IsActive && CurrentTask.IsReadyForPayment)
             {
-                //GameFiber.Sleep(RandomItems.GetRandomNumberInt(5000, 15000));
-                SendMoneyPickupMessage();
+                if (HiringGangDen.IsAvailableForPlayer) SendMoneyPickupMessage(HiringGang.DenName, HiringGangDen);
+                else SetReadyToPickupDeadDrop();
             }
         }
         private void GetTargetGang()
@@ -133,23 +133,17 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         protected override void SendInitialInstructionsMessage()
         {
-            List<string> Replies = new List<string>() {
+            List<string> Replies = HiringGangDen.IsAvailableForPlayer ? new List<string>() {
                 $"Those {TargetGang.ColorPrefix}{TargetGang.ShortName}~s~ think they can fuck with me? Go give {KillRequirement} of those pricks a dirt nap. Once you are done come back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress}. ${PaymentAmount} to you",
                 $"{TargetGang.ColorPrefix}{TargetGang.ShortName}~s~ decided to make some moves against us. Let them know we don't approve by sending {KillRequirement} of those assholes to the other side. When you are finished, get back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress}. I'll have ${PaymentAmount} waiting for you.",
                 $"Go find {KillRequirement} of those {TargetGang.ColorPrefix}{TargetGang.ShortName}~s~ pricks. Make sure they won't ever talk to anyone again. Come back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} for your payment of ${PaymentAmount}",
-                    };
+                } :
+                new List<string>() {
+                $"Those {TargetGang.ColorPrefix}{TargetGang.ShortName}~s~ think they can fuck with me? Go give {KillRequirement} of those pricks a dirt nap. ${PaymentAmount}",
+                $"{TargetGang.ColorPrefix}{TargetGang.ShortName}~s~ decided to make some moves against us. Let them know we don't approve by sending {KillRequirement} of those assholes to the other side. I'll have ${PaymentAmount} waiting for you.",
+                $"Go find {KillRequirement} of those {TargetGang.ColorPrefix}{TargetGang.ShortName}~s~ pricks. Make sure they won't ever talk to anyone again. Easy ${PaymentAmount} for your pockets.",
+                };
             Player.CellPhone.AddPhoneResponse(HiringGang.Contact.Name, HiringGang.Contact.IconName, Replies.PickRandom());
-        }
-        private void SendMoneyPickupMessage()
-        {
-            List<string> Replies = new List<string>() {
-                                $"Seems like that thing we discussed is done? Come by the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} to collect the ${PaymentAmount}",
-                                $"Word got around that you are done with that thing for us, Come back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} for your payment of ${PaymentAmount}",
-                                $"Get back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} for your payment of ${PaymentAmount}",
-                                $"{HiringGangDen.FullStreetAddress} for ${PaymentAmount}",
-                                $"Heard you were done, see you at the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress}. We owe you ${PaymentAmount}",
-                                };
-            Player.CellPhone.AddScheduledText(HiringContact, Replies.PickRandom(), 1, false);
         }
     }
 }

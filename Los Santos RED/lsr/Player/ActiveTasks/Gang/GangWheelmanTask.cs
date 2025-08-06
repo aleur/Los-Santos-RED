@@ -45,8 +45,8 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private bool RequireAllMembersToFinish;
         private string ButtonPromptIdentifier => "RobberyStart" + RobberyLocation?.Name + HiringGang?.ID;
         private bool HasLocations => RobberyLocation != null && HiringGangDen != null;
-        public GangWheelmanTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups,
-            IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, Gang hiringGang, int robbersToSpawn, string locationType, bool requireAllMembersToFinish) : base(player, time, gangs, placesOfInterest, settings, world, crimes, weapons, names, pedGroups, shopMenus, modItems, playerTasks, gangTasks, hiringContact, hiringGang)
+        public GangWheelmanTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups,
+            IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, Gang hiringGang, int robbersToSpawn, string locationType, bool requireAllMembersToFinish) : base(player, time, gangs, placesOfInterest, activeDrops, settings, world, crimes, weapons, names, pedGroups, shopMenus, modItems, playerTasks, gangTasks, hiringContact, hiringGang)
         {
             RobbersToSpawn = robbersToSpawn;
             ForcedLocationType = locationType;
@@ -258,7 +258,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 CurrentTask.OnReadyForPayment(true);
                 if (!hasSentCompleteMessage)
                 {
-                    SendMoneyPickupMessage();
+                    SendMoneyPickupMessage(HiringGang.DenName, HiringGangDen);
                     hasSentCompleteMessage = true;
                 }
             }
@@ -589,17 +589,6 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
 
             };
             Player.CellPhone.AddPhoneResponse(HiringGang.Contact.Name, HiringGang.Contact.IconName, Replies.PickRandom());
-        }
-        private void SendMoneyPickupMessage()
-        {
-            List<string> Replies = new List<string>() {
-                                $"Seems like that thing we discussed is done? Come by the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} to collect the ${PaymentAmount}",
-                                $"Word got around that you are done with that thing for us, Come back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} for your payment of ${PaymentAmount}",
-                                $"Get back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} for your payment of ${PaymentAmount}",
-                                $"{HiringGangDen.FullStreetAddress} for ${PaymentAmount}",
-                                $"Heard you were done, see you at the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress}. We owe you ${PaymentAmount}",
-                                };
-            Player.CellPhone.AddScheduledText(HiringContact, Replies.PickRandom(), 1, false);
         }
     }
 }

@@ -18,7 +18,6 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
     {
         private GangDen HiringGangDen;
         private int GameTimeToWaitBeforeComplications;
-        private int MoneyToRecieve;
         private int HushMoney;
         private bool HasAddedComplications;
         private bool WillAddComplications;
@@ -33,15 +32,18 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
 
         public PlayerTask PlayerTask => CurrentTask;
 
-        public GangBriberyTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups,
-            IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, Gang hiringGang, IGangTerritories gangTerritories, IZones zones) : base(player, time, gangs, placesOfInterest, settings, world, crimes, weapons, names, pedGroups, shopMenus, modItems, playerTasks, gangTasks, hiringContact, hiringGang)
+        public GangBriberyTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups,
+            IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, Gang hiringGang, IGangTerritories gangTerritories, IZones zones) : base(player, time, gangs, placesOfInterest, activeDrops, settings, world, crimes, weapons, names, pedGroups, shopMenus, modItems, playerTasks, gangTasks, hiringContact, hiringGang)
         {
             GangTerritories = gangTerritories;
             Zones = zones;
         }
         public override void Setup()
         {
-
+            RepOnCompletion = 2000;
+            RepOnFail = -2500;
+            DaysToComplete = 7;
+            DebugName = "Gang Bribery";
         }
         public override void Dispose()
         {
@@ -117,7 +119,9 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             if (CurrentTask != null && CurrentTask.IsActive && CurrentTask.IsReadyForPayment)
             {
                 if (DepositLocation != null) { DepositLocation.IsPlayerInterestedInLocation = false; }
-                SendMoneyPickupMessage();
+
+                if (HiringGangDen.IsAvailableForPlayer) SendMoneyPickupMessage(HiringGang.DenName, HiringGangDen);
+                else SetReadyToPickupDeadDrop();
             }
             else if (CurrentTask != null && !CurrentTask.IsActive)
             {
@@ -160,17 +164,18 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         protected override void GetPayment()
         {
-            MoneyToRecieve = RandomItems.GetRandomNumberInt(HiringGang.BriberyPaymentMin, HiringGang.BriberyPaymentMax).Round(500);
-            if (MoneyToRecieve <= 0)
+            PaymentAmount = RandomItems.GetRandomNumberInt(HiringGang.BriberyPaymentMin, HiringGang.BriberyPaymentMax).Round(500);
+            if (PaymentAmount <= 0)
             {
-                MoneyToRecieve = 1000;
+                PaymentAmount = 1000;
             }
-            HushMoney = MoneyToRecieve * 5;
+            HushMoney = PaymentAmount * 5;
             HiringGangDen.PickupMoney = HushMoney;
+            DebtOnFail = HushMoney * -5;
         }
         protected override void AddTask()
         {
-            PlayerTasks.AddTask(HiringContact, MoneyToRecieve, 2000, HiringGangDen.PickupMoney * -5, -2500, 7, "Gang Bribery");
+            PlayerTasks.AddTask(HiringContact, PaymentAmount, RepOnCompletion, DebtOnFail, RepOnFail, DaysToComplete, DebugName);
             CurrentTask = PlayerTasks.GetTask(HiringContact?.Name);
             CurrentTask.FailOnStandardRespawn = true;
         }
@@ -204,17 +209,6 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             $"The chief in {SelectedZone.DisplayName} is causing trouble. A quick stop at {DepositLocation.Name} with ~g~{HushMoney:C0}~s~ will smooth things over.",
             };
             Player.CellPhone.AddPhoneResponse(HiringContact.Name, HiringContact.IconName, Replies.PickRandom());
-        }
-        private void SendMoneyPickupMessage()
-        {
-            List<string> Replies = new List<string>() {
-                                $"Seems like that thing we discussed is done? Come by the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} to collect the ${MoneyToRecieve}",
-                                $"Word got around that you are done with that thing for us, Come back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} for your payment of ${MoneyToRecieve}",
-                                $"Get back to the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress} for your payment of ${MoneyToRecieve}",
-                                $"{HiringGangDen.FullStreetAddress} for ${MoneyToRecieve}",
-                                $"Heard you were done, see you at the {HiringGang.DenName} on {HiringGangDen.FullStreetAddress}. We owe you ${MoneyToRecieve}",
-                                };
-            Player.CellPhone.AddScheduledText(HiringContact, Replies.PickRandom(), 1, false);
         }
         public void OnInteractionMenuCreated(GameLocation gameLocation, MenuPool menuPool, UIMenu interactionMenu)
         {

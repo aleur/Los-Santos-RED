@@ -98,7 +98,7 @@ public class GangMember : PedExt, IWeaponIssuable
         CurrentHealthState.Update(policeRespondable, world);//has a yield if they get damaged, seems ok   
         if (WillGiveMission && PlayerToTask != null && TaskForPlayer == null)
         {
-            TaskForPlayer = PlayerToTask.PlayerTasks.GangTasks.RandomTask(Gang, Gang.Contact);
+            TaskForPlayer = PlayerToTask.PlayerTasks.GangTasks.RandomSimpleTask(Gang, Gang.Contact);
         }
     }
 

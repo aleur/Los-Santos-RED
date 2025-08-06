@@ -120,101 +120,112 @@ public class GangTasks : IPlayerTaskGroup
             () => GangBribery(gang, gangContact),
             () => GangRacketeering(gang, gangContact),
             () => GangPickup(gang, gangContact),
-            () => ImpoundTheft(gang, gangContact),
+            () => GangImpoundTheft(gang, gangContact),
+        };
+        int rng = new Random().Next(options.Count);
+        return options[rng]();
+    }
+    public GangTask RandomSimpleTask(Gang gang, GangContact gangContact)
+    {
+        int RandomKillRequirement = new Random().Next(1, 5);
+        List<Func<GangTask>> options = new List<Func<GangTask>>{
+            () => GangHit(gang, RandomKillRequirement, gangContact, Gangs.GetGang(gang.EnemyGangs.PickRandom())),
+            () => GangAmbush(gang, RandomKillRequirement, gangContact, Gangs.GetGang(gang.EnemyGangs.PickRandom())),
+            () => GangArson(gang, gangContact),
         };
         int rng = new Random().Next(options.Count);
         return options[rng]();
     }
     public GangTask GangProveWorth(Gang gang, int killRequirement, GangContact gangContact)
     {
-        GangProveWorthTask newTask = new GangProveWorthTask(Player, Time, Gangs, PlacesOfInterest, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang, ActiveDrops);
+        GangProveWorthTask newTask = new GangProveWorthTask(Player, Time, Gangs, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang);
         newTask.KillRequirement = killRequirement;
         newTask.JoinGangOnComplete = true;
         GangProveWorthTasks.Add(newTask);
         newTask.Setup();
         return newTask;
     }
-    public GangTask CopHit(Gang gang, int killRequirement, GangContact gangContact, Agency targetAgency)
+    public GangTask GangCopHit(Gang gang, int killRequirement, GangContact gangContact, Agency targetAgency)
     {
-        GangCopHitTask newTask = new GangCopHitTask(Player, Time, Gangs, PlacesOfInterest, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang, targetAgency, Agencies, killRequirement);
+        GangCopHitTask newTask = new GangCopHitTask(Player, Time, Gangs, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang, targetAgency, Agencies, killRequirement);
         AllGenericGangTasks.Add(newTask);
         newTask.Setup();
         return newTask;
     }
     public GangTask GangHit(Gang gang, int killRequirement, GangContact gangContact, Gang targetGang)
     {
-        RivalGangHitTask newTask = new RivalGangHitTask(Player, Time, Gangs, PlacesOfInterest, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang, targetGang, killRequirement);
+        RivalGangHitTask newTask = new RivalGangHitTask(Player, Time, Gangs, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang, targetGang, killRequirement);
         AllGenericGangTasks.Add(newTask);
         newTask.Setup();
         return newTask;
     }
     public GangTask GangAmbush(Gang gang, int killRequirement, GangContact gangContact, Gang targetGang)
     {
-        RivalGangAmbushTask newTask = new RivalGangAmbushTask(Player, Time, Gangs, PlacesOfInterest, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang, targetGang, killRequirement, GangTerritories, Zones);
+        RivalGangAmbushTask newTask = new RivalGangAmbushTask(Player, Time, Gangs, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang, targetGang, killRequirement, GangTerritories, Zones);
         RivalGangAmbush.Add(newTask);
         newTask.Setup();
         return newTask;
     }
     public GangTask PayoffGang(Gang gang, GangContact gangContact)
     {
-        PayoffGangTask newTask = new PayoffGangTask(Player, Time, Gangs, PlacesOfInterest, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang, ActiveDrops);
+        PayoffGangTask newTask = new PayoffGangTask(Player, Time, Gangs, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang);
         PayoffGangTasks.Add(newTask);
         newTask.Setup();
         return newTask;
     }
     public GangTask GangVehicleTheft(Gang gang, GangContact gangContact, Gang targetGang, string vehicleModelName, string vehicleDisplayName)
     {
-        RivalGangVehicleTheftTask newTask = new RivalGangVehicleTheftTask(Player, Time, Gangs, PlacesOfInterest, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang, targetGang, vehicleModelName, vehicleDisplayName);
+        RivalGangVehicleTheftTask newTask = new RivalGangVehicleTheftTask(Player, Time, Gangs, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang, targetGang, vehicleModelName, vehicleDisplayName);
         RivalGangTheftTasks.Add(newTask);
         newTask.Setup();
         return newTask;
     }
     public GangTask GangBribery(Gang gang, GangContact gangContact)
     {
-        GangBriberyTask newTask = new GangBriberyTask(Player, Time, Gangs, PlacesOfInterest, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang, GangTerritories, Zones);
+        GangBriberyTask newTask = new GangBriberyTask(Player, Time, Gangs, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang, GangTerritories, Zones);
         GangBriberyTasks.Add(newTask);
         newTask.Setup();
         return newTask;
     }
     public GangTask GangArson(Gang gang, GangContact gangContact)
     {
-        GangArsonTask newTask = new GangArsonTask(Player, Time, Gangs, PlacesOfInterest, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang, GangTerritories, Zones);
+        GangArsonTask newTask = new GangArsonTask(Player, Time, Gangs, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang, GangTerritories, Zones);
         GangArsonTasks.Add(newTask);
         newTask.Setup();
         return newTask;
     }
     public GangTask GangRacketeering(Gang gang, GangContact gangContact)
     {
-        GangRacketeeringTask newTask = new GangRacketeeringTask(Player, Time, Gangs, PlacesOfInterest, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang, GangTerritories, Zones);
+        GangRacketeeringTask newTask = new GangRacketeeringTask(Player, Time, Gangs, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang, GangTerritories, Zones);
         GangRacketeeringTasks.Add(newTask);
         newTask.Setup();
         return newTask;
     }
     public GangTask GangPickup(Gang gang, GangContact gangContact)
     {
-        GangPickupTask newTask = new GangPickupTask(Player, Time, Gangs, PlacesOfInterest, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang, ActiveDrops);
+        GangPickupTask newTask = new GangPickupTask(Player, Time, Gangs, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang);
         GangPickupTasks.Add(newTask);
         newTask.Setup();
         return newTask;
     }
     public GangTask GangDelivery(Gang gang, GangContact gangContact, string modItemName)
     {
-        GangDeliveryTask newTask = new GangDeliveryTask(Player, Time, Gangs, PlacesOfInterest, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang, modItemName);
+        GangDeliveryTask newTask = new GangDeliveryTask(Player, Time, Gangs, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang, modItemName);
         GangDeliveryTasks.Add(newTask);
         newTask.Setup();
         return newTask;
     }
     public GangTask GangWheelman(Gang gang, GangContact gangContact, int robbersToSpawn, string locationType, bool requireAllMembersToFinish)
     {
-        GangWheelmanTask newTask = new GangWheelmanTask(Player, Time, Gangs, PlacesOfInterest, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang, robbersToSpawn, locationType, requireAllMembersToFinish);
+        GangWheelmanTask newTask = new GangWheelmanTask(Player, Time, Gangs, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang, robbersToSpawn, locationType, requireAllMembersToFinish);
         GangWheelmanTasks.Add(newTask);
         newTask.Setup();
         return newTask;
     }
 
-    public GangTask ImpoundTheft(Gang gang, GangContact gangContact)
+    public GangTask GangImpoundTheft(Gang gang, GangContact gangContact)
     {
-        GangGetCarOutOfImpoundTask newTask = new GangGetCarOutOfImpoundTask(Player, Time, Gangs, PlacesOfInterest, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang);
+        GangGetCarOutOfImpoundTask newTask = new GangGetCarOutOfImpoundTask(Player, Time, Gangs, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang);
         GangGetCarOutOfImpoundTasks.Add(newTask);
         newTask.Setup();
         return newTask;
@@ -222,7 +233,7 @@ public class GangTasks : IPlayerTaskGroup
 
     public GangTask GangBodyDisposal(Gang gang, GangContact gangContact)
     {
-        GangBodyDisposalTask newTask = new GangBodyDisposalTask(Player, Time, Gangs, PlacesOfInterest, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems,PlayerTasks,this, gangContact, gang);
+        GangBodyDisposalTask newTask = new GangBodyDisposalTask(Player, Time, Gangs, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems,PlayerTasks,this, gangContact, gang);
         AllGenericGangTasks.Add(newTask);
         newTask.Setup();
         return newTask;
@@ -237,7 +248,7 @@ public class GangTasks : IPlayerTaskGroup
 
     public void StartDrugMeetTask(Gang gang, GangContact gangContact, ModItem modItem,int quantity, Gang meetingGang)
     {
-        GangDrugMeetTask dugMeetTask = new GangDrugMeetTask(Player, Time, Gangs, PlacesOfInterest, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, 
+        GangDrugMeetTask dugMeetTask = new GangDrugMeetTask(Player, Time, Gangs, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, 
             gangContact, gang, modItem, quantity, meetingGang);
         AllGenericGangTasks.Add(dugMeetTask);
         dugMeetTask.Setup();
@@ -246,7 +257,7 @@ public class GangTasks : IPlayerTaskGroup
 
 
 
-    public string GetGeneircTaskAbortMessage()
+    public string GetGenericTaskAbortMessage()
     {
         List<string> Replies = new List<string>() {
                     "Nothing yet, I'll let you know",
@@ -272,7 +283,7 @@ public class GangTasks : IPlayerTaskGroup
     }
     public void SendGenericTooSoonMessage(PhoneContact contact)
     {
-        Player.CellPhone.AddPhoneResponse(contact.Name, GetGeneircTaskAbortMessage());
+        Player.CellPhone.AddPhoneResponse(contact.Name, GetGenericTaskAbortMessage());
     }
 
     public void SendGenericFailMessage(PhoneContact contact)
@@ -280,17 +291,6 @@ public class GangTasks : IPlayerTaskGroup
         Player.CellPhone.AddScheduledText(contact, GetGenericFailMessage(), 1, false);
     }
 
-    public void SendGenericPickupMoneyMessage(PhoneContact contact,string placetypeName, GameLocation gameLocation, int MoneyToRecieve)
-    {
-        List<string> Replies = new List<string>() {
-                                $"Seems like that thing we discussed is done? Come by the {placetypeName} on {gameLocation.FullStreetAddress} to collect the ${MoneyToRecieve}",
-                                $"Word got around that you are done with that thing for us, Come back to the {placetypeName} on {gameLocation.FullStreetAddress} for your payment of ${MoneyToRecieve}",
-                                $"Get back to the {placetypeName} on {gameLocation.FullStreetAddress} for your payment of ${MoneyToRecieve}",
-                                $"{gameLocation.FullStreetAddress} for ${MoneyToRecieve}",
-                                $"Heard you were done, see you at the {placetypeName} on {gameLocation.FullStreetAddress}. We owe you ${MoneyToRecieve}",
-                                };
-        Player.CellPhone.AddScheduledText(contact, Replies.PickRandom(), 1, false);
-    }
 
     public void SendHitSquadMessage(PhoneContact contact)
     {

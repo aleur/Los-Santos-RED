@@ -34,8 +34,8 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         public bool IsInterestingInLocations { get; private set; } = false;
         public PlayerTask PlayerTask => CurrentTask;
 
-        public GangRacketeeringTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups,
-            IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, Gang hiringGang, IGangTerritories gangTerritories, IZones zones) : base(player, time, gangs, placesOfInterest, settings, world, crimes, weapons, names, pedGroups, shopMenus, modItems, playerTasks, gangTasks, hiringContact, hiringGang)
+        public GangRacketeeringTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups,
+            IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, Gang hiringGang, IGangTerritories gangTerritories, IZones zones) : base(player, time, gangs, placesOfInterest, activeDrops, settings, world, crimes, weapons, names, pedGroups, shopMenus, modItems, playerTasks, gangTasks, hiringContact, hiringGang)
         {
             GangTerritories = gangTerritories;
             Zones = zones;
@@ -273,48 +273,48 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             float PercentCut = 0;
             foreach (GameLocation location in RacketeeringLocations)
             {
-                int PaymentAmount = 0;
-                PaymentAmount = location.GetRacketeeringPaymentAmount();
+                int LocationPayment = 0;
+                LocationPayment = location.GetRacketeeringPaymentAmount();
 
-                if (PaymentAmount > 1000)
+                if (LocationPayment > 1000)
                 {
-                    PaymentAmount = PaymentAmount.Round(100);
+                    LocationPayment = LocationPayment.Round(100);
                 }
                 else
                 {
-                    PaymentAmount = PaymentAmount.Round(50);
+                    LocationPayment = LocationPayment.Round(50);
                 }
 
 
 
                 //if (location.GetType().ToString().Equals("Bank"))
                 //{
-                //    PaymentAmount = RandomItems.GetRandomNumberInt(10000, 20000).Round(100);
+                //    LocationPayment = RandomItems.GetRandomNumberInt(10000, 20000).Round(100);
                 //}
                 //else if (location.GetType().ToString().Equals("Dealership"))
                 //{
-                //    PaymentAmount = RandomItems.GetRandomNumberInt(5000, 10000).Round(100);
+                //    LocationPayment = RandomItems.GetRandomNumberInt(5000, 10000).Round(100);
                 //}
                 //else if (location.GetType().ToString().Equals("Hotel"))
                 //{
-                //    PaymentAmount = RandomItems.GetRandomNumberInt(2000, 5000).Round(100);
+                //    LocationPayment = RandomItems.GetRandomNumberInt(2000, 5000).Round(100);
                 //}
                 //else 
                 //{ 
-                //    PaymentAmount = RandomItems.GetRandomNumberInt(500, 1000).Round(50);
+                //    LocationPayment = RandomItems.GetRandomNumberInt(500, 1000).Round(50);
                 //}
 
                 if (Zones.GetZone(location.EntrancePosition).Economy == eLocationEconomy.Rich)// .ToString().Equals("Rich")) 
-                { 
-                    PaymentAmount *= 5; 
+                {
+                    LocationPayment *= 5; 
                 }
                 else if (Zones.GetZone(location.EntrancePosition).Economy == eLocationEconomy.Middle)//  .ToString().Equals("Middle")) 
-                { 
-                    PaymentAmount *= 2; 
+                {
+                    LocationPayment *= 2; 
                 }
 
-                MoneyToPickup += PaymentAmount;
-                location.ProtectionMoneyDue = PaymentAmount;
+                MoneyToPickup += LocationPayment;
+                location.ProtectionMoneyDue = LocationPayment;
             }
             if (WillExtortEnemyTurf)
             {

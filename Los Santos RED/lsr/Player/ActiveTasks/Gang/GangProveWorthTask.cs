@@ -15,7 +15,6 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
 {
     public class GangProveWorthTask : GangTask, IPlayerTask
     {
-        private List<DeadDrop> ActiveDrops = new List<DeadDrop>();
         private GangDen HiringGangDen;
         private Gang TargetGang;
         private GangDen TargetGangDen;
@@ -28,10 +27,10 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private bool HasTargetGangAndHiringDen => TargetGang != null && HiringGangDen != null && TargetGangDen != null;
 
         public bool JoinGangOnComplete { get; set; } = false;
-        public GangProveWorthTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups,
-            IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, Gang hiringGang, List<DeadDrop> activeDrops) : base(player, time, gangs, placesOfInterest, settings, world, crimes, weapons, names, pedGroups, shopMenus, modItems, playerTasks, gangTasks, hiringContact, hiringGang)
+        public GangProveWorthTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups,
+            IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, Gang hiringGang) : base(player, time, gangs, placesOfInterest, activeDrops, settings, world, crimes, weapons, names, pedGroups, shopMenus, modItems, playerTasks, gangTasks, hiringContact, hiringGang)
         {
-            ActiveDrops = activeDrops;
+
         }
         public override void Setup()
         {

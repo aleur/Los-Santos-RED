@@ -12,7 +12,6 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
 {
     public class PayoffGangTask : GangTask, IPlayerTask
     {
-        private List<DeadDrop> ActiveDrops = new List<DeadDrop>();
         private DeadDrop DeadDrop;
         private int GameTimeToWaitBeforeComplications;
         private GangReputation HiringGangReputation;
@@ -22,19 +21,18 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
 
         private bool HasDeadDrop => DeadDrop != null;
 
-        public PayoffGangTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups,
-            IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, Gang hiringGang, List<DeadDrop> activeDrops) : base(player, time, gangs, placesOfInterest, settings, world, crimes, weapons, names, pedGroups, shopMenus, modItems, playerTasks, gangTasks, hiringContact, hiringGang)
+        public PayoffGangTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups,
+            IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, Gang hiringGang) : base(player, time, gangs, placesOfInterest, activeDrops, settings, world, crimes, weapons, names, pedGroups, shopMenus, modItems, playerTasks, gangTasks, hiringContact, hiringGang)
         {
-            ActiveDrops = activeDrops;
+
         }
         public override void Setup()
         {
             PaymentAmount = 0;
-            RepOnCompletion = 2000;
             DebtOnFail = 0;
             RepOnFail = -500;
-            DaysToComplete = 7;
-            DebugName = "Gun Transport";
+            DaysToComplete = 2;
+            DebugName = "Dead Drop";
         }
         public override void Dispose()
         {
@@ -142,7 +140,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         protected override void AddTask()
         {
-            PlayerTasks.AddTask(HiringContact, PaymentAmount, RepOnCompletion, 0, -200, 2, "Dead Drop");
+            PlayerTasks.AddTask(HiringContact, PaymentAmount, RepOnCompletion, DebtOnFail, RepOnFail, DaysToComplete, DebugName);
             DeadDrop.SetupDrop(CostToPayoff, true);
             ActiveDrops.Add(DeadDrop);
             GameTimeToWaitBeforeComplications = RandomItems.GetRandomNumberInt(3000, 10000);

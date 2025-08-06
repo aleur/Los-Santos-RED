@@ -1,4 +1,5 @@
-﻿using LosSantosRED.lsr.Interface;
+﻿using ExtensionsMethods;
+using LosSantosRED.lsr.Interface;
 using Rage;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,8 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
     public class GangTask : IPlayerTask
     {
         protected ITaskAssignable Player;
-
+        protected List<DeadDrop> ActiveDrops = new List<DeadDrop>();
+        protected DeadDrop DeadDropPayment;
         protected ITimeControllable Time;
         protected IGangs Gangs;
         protected IPlacesOfInterest PlacesOfInterest;
@@ -38,7 +40,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         public int DaysToComplete { get; set; }
         public string DebugName { get; set; }
 
-        public GangTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, IEntityProvideable world,ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups, 
+        public GangTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world,ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups, 
             IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, Gang hiringGang)
         {
             Player = player;
@@ -46,6 +48,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             Time = time;
             Gangs = gangs;  
             PlacesOfInterest = placesOfInterest;
+            ActiveDrops = activeDrops;
             Settings = settings;
             World = world;
             Crimes = crimes;
@@ -125,7 +128,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         protected virtual void AddTask()
         {
-            PlayerTasks.AddTask(HiringGang.Contact, PaymentAmount, RepOnCompletion, DebtOnFail, RepOnFail, DaysToComplete, DebugName, false);
+            PlayerTasks.AddTask(HiringContact, PaymentAmount, RepOnCompletion, DebtOnFail, RepOnFail, DaysToComplete, DebugName, false);
         }
         protected virtual void Loop()
         {
@@ -151,15 +154,80 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         {
             OnTaskCompletedOrFailed();
         }
+        protected virtual void SetReadyToPickupDeadDrop()
+        {
+            DeadDropPayment = PlacesOfInterest.GetUsableDeadDrop(World.IsMPMapLoaded, Player.CurrentLocation);
+            if (DeadDropPayment != null)
+            {
+                DeadDropPayment.SetupDrop(PaymentAmount, false);
+                ActiveDrops.Add(DeadDropPayment);
+                SendDeadDropStartMessage();
+                while (true)
+                {
+                    if (CurrentTask == null || !CurrentTask.IsActive)
+                    {
+                        break;
+                    }
+                    if (DeadDropPayment.InteractionComplete)
+                    {
+                        Game.DisplayHelp($"{HiringContact.Name} Money Picked Up");
+                        break;
+                    }
+                    GameFiber.Sleep(1000);
+                }
+                if (CurrentTask != null && CurrentTask.IsActive && CurrentTask.IsReadyForPayment)
+                {
+                    PlayerTasks.CompleteTask(HiringContact, true);
+                }
+                DeadDropPayment?.Reset();
+                DeadDropPayment?.Deactivate(true);
+            }
+            else
+            {
+                PlayerTasks.CompleteTask(HiringContact, true);
+                SendQuickPaymentMessage();
+            }
+        }
         protected virtual void SetFailed()
         {
             OnTaskCompletedOrFailed();
             GangTasks.SendGenericFailMessage(HiringContact);
-            PlayerTasks.FailTask(HiringGang.Contact);
+            PlayerTasks.FailTask(HiringContact);
         }
         protected virtual void OnTaskCompletedOrFailed()
         {
 
+        }
+        protected virtual void SendMoneyPickupMessage(string placetypeName, GameLocation gameLocation)
+        {
+            List<string> Replies = new List<string>() {
+                                $"Seems like that thing we discussed is done? Come by the {placetypeName} on {gameLocation.FullStreetAddress} to collect the ${PaymentAmount}",
+                                $"Word got around that you are done with that thing for us, Come back to the {placetypeName} on {gameLocation.FullStreetAddress} for your payment of ${PaymentAmount}",
+                                $"Get back to the {placetypeName} on {gameLocation.FullStreetAddress} for your payment of ${PaymentAmount}",
+                                $"{gameLocation.FullStreetAddress} for ${PaymentAmount}",
+                                $"Heard you were done, see you at the {placetypeName} on {gameLocation.FullStreetAddress}. We owe you ${PaymentAmount}",
+                                };
+            Player.CellPhone.AddScheduledText(HiringContact, Replies.PickRandom(), 1, false);
+        }
+        private void SendQuickPaymentMessage()
+        {
+            List<string> Replies = new List<string>() {
+                            $"Seems like that thing we discussed is done? Sending you ${PaymentAmount}",
+                            $"Word got around that you are done with that thing for us, sending your payment of ${PaymentAmount}",
+                            $"Sending your payment of ${PaymentAmount}",
+                            $"Sending ${PaymentAmount}",
+                            $"Heard you were done. We owe you ${PaymentAmount}",
+                            };
+            Player.CellPhone.AddScheduledText(HiringContact, Replies.PickRandom(), 1, false);
+        }
+        private void SendDeadDropStartMessage()
+        {
+            List<string> Replies = new List<string>() {
+                            $"Pickup your payment of ${PaymentAmount} from {DeadDropPayment.FullStreetAddress}, its {DeadDropPayment.Description}.",
+                            $"Go get your payment of ${PaymentAmount} from {DeadDropPayment.Description}, address is {DeadDropPayment.FullStreetAddress}.",
+                            };
+
+            Player.CellPhone.AddScheduledText(HiringContact, Replies.PickRandom(), 1, false);
         }
     }
 }
