@@ -534,7 +534,7 @@ public class PedCustomizer
     {
         if (WorkingVariation!= null) 
         {
-            Serialization.SerializeParam(WorkingVariation, $"Plugins\\LosSantosRED\\SavedVariation{WorkingModelName}{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xml");
+            Serialization.SerializeParam(WorkingVariation, $"Plugins\\LosSantosRED\\SavedVariations\\SavedVariation{WorkingModelName}{DateTime.Now.ToString("yyyyMMddHHmmssfff")}.xml");
         }
     }
     private void DisplayName()

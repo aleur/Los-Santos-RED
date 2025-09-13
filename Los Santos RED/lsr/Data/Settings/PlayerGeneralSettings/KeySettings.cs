@@ -46,6 +46,8 @@ public class KeySettings : ISettingsDefaultable
     public Keys AltActionPopUpDisplayKey { get; set; }
     public Keys AltActionPopUpDisplayKeyModifier { get; set; }
 
+    public Keys CraftingMenuKey { get; set; }
+    public Keys CraftingMenuKeyModifier { get; set; }
 
     public Keys VehicleInteract { get; set; }
     public Keys VehicleInteractModifier { get; set; }
@@ -135,6 +137,9 @@ public class KeySettings : ISettingsDefaultable
 
         AltActionPopUpDisplayKey = Keys.N;//N
         AltActionPopUpDisplayKeyModifier = Keys.LMenu;//left alt 
+
+        CraftingMenuKey = Keys.B;//N
+        CraftingMenuKeyModifier = Keys.LMenu;//left alt 
 
         ControllerAction = 236;//189 - frontend left//234 - ScriptPadLeft//217;// 236 - back;
         ControllerActionModifier = -1;//227 - scriptRB//206 - frontenRB

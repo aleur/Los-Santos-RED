@@ -232,7 +232,7 @@ public class CraftingMenu : ModUIMenu
                 {
                     UIMenuNumericScrollerItem<int> itemMenu = new UIMenuNumericScrollerItem<int>(craftableItem.Name, craftableItem.GetIngredientDescription(1, ModItems), 1, quantity, 1);
                     itemMenu.Value = 1;
-                    itemMenu.Formatter = craftableItem.GetResultantFormatter(ModItems);
+                    //itemMenu.Formatter = craftableItem.GetResultantFormatter(ModItems);
                     itemMenu.IndexChanged += (s, oldIndex, newIndex) =>
                     {
                         itemMenu.Description = craftableItem.GetIngredientDescription(newIndex + 1, ModItems);

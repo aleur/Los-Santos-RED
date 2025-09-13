@@ -23,7 +23,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private int KilledMembersAtStart;
         private int ExternalZoneKills = 0;
         private int InternalZoneKills = 0;
-        public int KillRequirement { get; set; } = 1;
+        private int KillRequirement { get; set; } = 1;
         private bool HasConditions => HiringGangDen != null && TargetZone != null;
 
         public bool JoinGangOnComplete { get; set; } = false;
@@ -110,7 +110,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             if (CurrentTask != null && CurrentTask.IsActive && CurrentTask.IsReadyForPayment)
             {
                 if (HiringGangDen.IsAvailableForPlayer) SendMoneyPickupMessage(HiringGang.DenName, HiringGangDen);
-                else { SetReadyToPickupDeadDrop(); }
+                else SetReadyToPickupDeadDrop(); 
             }
         }
         private void GetTargetZone()

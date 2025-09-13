@@ -248,11 +248,12 @@ public class GangTasks : IPlayerTaskGroup
 
     public void StartDrugMeetTask(Gang gang, GangContact gangContact, ModItem modItem,int quantity, Gang meetingGang, bool IsPlayerSellingDrugs, GameLocation dealingLocation)
     {
-        GangDrugMeetTask dugMeetTask = new GangDrugMeetTask(Player, Time, Gangs, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, 
-            gangContact, gang, modItem, quantity, meetingGang);
-        AllGenericGangTasks.Add(dugMeetTask);
-        dugMeetTask.Setup();
-        dugMeetTask.Start();
+        GangDrugMeetTask drugMeetTask = new GangDrugMeetTask(Player, Time, Gangs, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, 
+            gangContact, gang, modItem, quantity, meetingGang, dealingLocation);
+        drugMeetTask.IsPlayerSellingDrugs = IsPlayerSellingDrugs;
+        AllGenericGangTasks.Add(drugMeetTask);
+        drugMeetTask.Setup();
+        drugMeetTask.Start();
     }
 
 

@@ -37,6 +37,7 @@ namespace LosSantosRED.lsr
         private uint GameTimeLastPressedSimplePhone;
         private uint GameTimeLastPressedSurrender;
         private uint GameTimeLastPressedGesture;
+        private uint GameTimeLastPressedCraftingMenu;
         private int TicksPressedVehicleEnter;
         private int TicksNotPressedVehicleEnter;
         private bool heldVehicleEnter;
@@ -61,6 +62,7 @@ namespace LosSantosRED.lsr
         private bool IsPressingCrouchToggle => IsKeyDownSafe(Settings.SettingsManager.KeySettings.CrouchKey, false) && IsKeyDownSafe(Settings.SettingsManager.KeySettings.CrouchKeyModifier, true);
         private bool IsPressingSimpleCellphone => IsKeyDownSafe(Settings.SettingsManager.KeySettings.SimplePhoneKey,false) && IsKeyDownSafe(Settings.SettingsManager.KeySettings.SimplePhoneKeyModifer, true);
 
+        private bool IsPressingCraftingMenu => IsKeyDownSafe(Settings.SettingsManager.KeySettings.CraftingMenuKey, false) && IsKeyDownSafe(Settings.SettingsManager.KeySettings.CraftingMenuKeyModifier, true);
 
         private bool IsPressingYell => IsKeyDownSafe(Settings.SettingsManager.KeySettings.YellKey, false) && IsKeyDownSafe(Settings.SettingsManager.KeySettings.YellKeyModifier, true);
 
@@ -80,6 +82,7 @@ namespace LosSantosRED.lsr
         private bool RecentlyPressedSimplePhone => Game.GameTime - GameTimeLastPressedSimplePhone <= 500;
         private bool RecentlyPressedYell => Game.GameTime - GameTimeLastPressedYell <= 500;
         private bool RecentlyPressedGroupModeToggle => Game.GameTime - GameTimeLastPressedGroupModeToggle <= 750;
+        private bool RecentlyPressedCraftingMenu => Game.GameTime - GameTimeLastPressedCraftingMenu <= 500;
         public Input(IInputable player, ISettingsProvideable settings, IMenuProvideable menuProvider, IPedSwap pedswap)
         {
             Player = player;
@@ -386,6 +389,11 @@ namespace LosSantosRED.lsr
                 else if (IsPressingDebugMenuKey)
                 {
                     MenuProvider.ToggleDebugMenu();
+                }
+                else if (!RecentlyPressedCraftingMenu && IsPressingCraftingMenu)
+                {
+                    MenuProvider.ToggleCraftingMenu();
+                    GameTimeLastPressedCraftingMenu = Game.GameTime;
                 }
             }
             if(!MenuProvider.IsPressingActionWheelButton && !CanToggleAltMenu)

@@ -1,6 +1,7 @@
 ﻿using ExtensionsMethods;
 using LosSantosRED.lsr.Helper;
 using LosSantosRED.lsr.Interface;
+using Mod;
 using Rage;
 using Rage.Native;
 using System;
@@ -36,6 +37,10 @@ public class DeadDrop : GameLocation
     public bool IsDropOff { get; set; } = true;
     [XmlIgnore]
     public int MoneyAmount { get; set; } = 500;
+    [XmlIgnore]
+    public WeaponInformation WeaponInformation { get; set; }
+    public ModItem ModItem { get; set; }
+    public float ItemAmount { get; set; } = 1.0f;
     public bool CanUse => !IsEnabled;
 
     public DeadDrop(Vector3 _EntrancePosition, float _EntranceHeading, string _Name, string _Description) : base(_EntrancePosition, _EntranceHeading, _Name, _Description)
@@ -52,11 +57,33 @@ public class DeadDrop : GameLocation
                 { 
                     if (IsDropOff)
                     {
-                        DoDropOff(Player);
+                        if (WeaponInformation != null)
+                        {
+                            WeaponDropOff(Player);
+                        }
+                        else if (ModItem != null) 
+                        { 
+                            ItemDropOff(Player); 
+                        }
+                        else
+                        {
+                            CashDropOff(Player);
+                        }
                     }
                     else
                     {
-                        DoPickup(Player);
+                        if (WeaponInformation != null)
+                        {
+                            WeaponPickup(Player);
+                        }
+                        else if (ModItem != null) 
+                        { 
+                            ItemPickup(Player); 
+                        }
+                        else
+                        {
+                            CashPickup(Player);
+                        }
                     }
                 }
                 catch (Exception ex)
@@ -69,7 +96,7 @@ public class DeadDrop : GameLocation
         }
         //base.OnInteract(player);
     }
-    private void DoDropOff(ILocationInteractable Player)
+    private void CashDropOff(ILocationInteractable Player)
     {
         if (Player.BankAccounts.GetMoney(false) >= Math.Abs(MoneyAmount))
         {
@@ -93,10 +120,10 @@ public class DeadDrop : GameLocation
         }
         else
         {
-            Game.DisplayHelp("You do not have enought cash to make the drop!");
+            Game.DisplayHelp("You do not have enough cash to make the drop!");
         }
     }
-    private void DoPickup(ILocationInteractable Player)
+    private void CashPickup(ILocationInteractable Player)
     {
         CanInteract = false;
         Player.ActivityManager.IsInteractingWithLocation = true;
@@ -110,6 +137,94 @@ public class DeadDrop : GameLocation
         Player.BankAccounts.GiveMoney(MoneyAmount, false);
         IsEnabled = false;
         MoneyAmount = 0;
+        InteractionComplete = true;
+        ButtonPromptText = "";
+        Deactivate(true);
+        Player.ActivityManager.IsInteractingWithLocation = false;
+    }
+    private void ItemDropOff(ILocationInteractable Player)
+    {
+        if (Player.Inventory.Get(ModItem)?.Amount >= ItemAmount) // could be gross logicPlayer.WeaponEquipment.StoredWeapons.Where(x=> x.WeaponHash == WeaponInformation.Hash).Any() 
+        {
+            Player.ActivityManager.IsInteractingWithLocation = true;
+            CanInteract = false;
+            if (!MoveToDrop(Player) || !PlayMoneyAnimation(Player))
+            {
+                Player.ActivityManager.IsInteractingWithLocation = false;
+                CanInteract = true;
+                return;
+            }
+            Game.DisplayHelp("You have dropped off the item, leave the area");
+            Player.Inventory.Remove(ModItem, (int)ItemAmount);
+            CanInteract = false;
+            IsEnabled = false;
+            InteractionComplete = true;
+            Deactivate(true);
+            ButtonPromptText = "";
+            Player.ActivityManager.IsInteractingWithLocation = false;
+        }
+        else
+        {
+            Game.DisplayHelp("You do not have the items required to make the drop!");
+        }
+    }
+    private void ItemPickup(ILocationInteractable Player)
+    {
+        CanInteract = false;
+        Player.ActivityManager.IsInteractingWithLocation = true;
+        if (!MoveToDrop(Player) || !PlayMoneyAnimation(Player))
+        {
+            Player.ActivityManager.IsInteractingWithLocation = false;
+            CanInteract = true;
+            return;
+        }
+        Game.DisplayHelp("You have picked up the item, don't hang around");
+        Player.Inventory.Add(ModItem, ItemAmount);
+        IsEnabled = false;
+        InteractionComplete = true;
+        ButtonPromptText = "";
+        Deactivate(true);
+        Player.ActivityManager.IsInteractingWithLocation = false;
+    }
+    private void WeaponDropOff(ILocationInteractable Player)
+    {
+        if (NativeFunction.Natives.HAS_PED_GOT_WEAPON<bool>(Player.Character, WeaponInformation.Hash, false)) // could be gross logicPlayer.WeaponEquipment.StoredWeapons.Where(x=> x.WeaponHash == WeaponInformation.Hash).Any() 
+        {
+            Player.ActivityManager.IsInteractingWithLocation = true;
+            CanInteract = false;
+            if (!MoveToDrop(Player) || !PlayMoneyAnimation(Player))
+            {
+                Player.ActivityManager.IsInteractingWithLocation = false;
+                CanInteract = true;
+                return;
+            }
+            Game.DisplayHelp("You have dropped off the item, leave the area");
+            NativeFunction.Natives.REMOVE_WEAPON_FROM_PED(Player.Character, WeaponInformation.Hash);
+            CanInteract = false;
+            IsEnabled = false;
+            InteractionComplete = true;
+            Deactivate(true);
+            ButtonPromptText = "";
+            Player.ActivityManager.IsInteractingWithLocation = false;
+        }
+        else
+        {
+            Game.DisplayHelp("You do not have the items required to make the drop!");
+        }
+    }
+    private void WeaponPickup(ILocationInteractable Player)
+    {
+        CanInteract = false;
+        Player.ActivityManager.IsInteractingWithLocation = true;
+        if (!MoveToDrop(Player) || !PlayMoneyAnimation(Player))
+        {
+            Player.ActivityManager.IsInteractingWithLocation = false;
+            CanInteract = true;
+            return;
+        }
+        Game.DisplayHelp("You have picked up the item, don't hang around");
+        NativeFunction.Natives.GIVE_WEAPON_TO_PED(Player.Character, WeaponInformation.Hash, WeaponInformation.AmmoAmount, false, false);
+        IsEnabled = false;
         InteractionComplete = true;
         ButtonPromptText = "";
         Deactivate(true);
@@ -229,6 +344,22 @@ public class DeadDrop : GameLocation
             ButtonPromptText = $"Pickup ${Math.Abs(MoneyAmount)}";
         }
     }
+    public void SetupDrop(ModItem modItem, bool isDropOff)
+    {
+        IsEnabled = true;
+        IsDropOff = isDropOff;
+        ModItem = modItem;
+        InteractionComplete = false;
+        CanInteract = true;
+        if (IsDropOff)
+        {
+            ButtonPromptText = $"Drop off {modItem.DisplayName}";
+        }
+        else
+        {
+            ButtonPromptText = $"Pickup {modItem.DisplayName}";
+        }
+    }
     public override void Reset()
     {
         InteractionComplete = false;
@@ -236,6 +367,8 @@ public class DeadDrop : GameLocation
         IsDropOff = false;
         CanInteract = true;
         MoneyAmount = 0;
+        ModItem = null;
+        ItemAmount = 1;
     }
     public override string ToString()
     {

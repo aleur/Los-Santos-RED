@@ -22,6 +22,8 @@ public class GunDealerInteraction : IContactMenuInteraction
     private UIMenu LocationsSubMenu;
     private UIMenu JobsSubMenu;
 
+    private UIMenu DropoffSubMenu;
+
     public GunDealerInteraction(IContactInteractable player, IGangs gangs, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, GunDealerContact contact)
     {
         Player = player;
@@ -148,13 +150,41 @@ public class GunDealerInteraction : IContactMenuInteraction
             JobsSubMenu.AddItem(TaskCancel);
             return;
         }
-        UIMenuItem GunPickup = new UIMenuItem("Gun Pickup", "Pickup some guns and bring them to a shop.") { RightLabel = $"~HUD_COLOUR_GREENDARK~{Settings.SettingsManager.TaskSettings.UndergroundGunsGunPickupPaymentMin:C0}-{Settings.SettingsManager.TaskSettings.UndergroundGunsGunPickupPaymentMax:C0}~s~" };
-        GunPickup.Activated += (sender, selectedItem) =>
+        UIMenuItem GunTransport = new UIMenuItem("Gun Transport", "Pickup some guns and bring them to a shop.") { RightLabel = $"~HUD_COLOUR_GREENDARK~{Settings.SettingsManager.TaskSettings.UndergroundGunsGunTransportPaymentMin:C0}-{Settings.SettingsManager.TaskSettings.UndergroundGunsGunTransportPaymentMax:C0}~s~" };
+        GunTransport.Activated += (sender, selectedItem) =>
         {
-            Player.PlayerTasks.UndergroundGunsTasks.StartGunPickup(AnsweredContact);
+            Player.PlayerTasks.UndergroundGunsTasks.StartGunTransport(AnsweredContact);
             sender.Visible = false;
         };
-        JobsSubMenu.AddItem(GunPickup);
+
+        AddDropoffSubMenu();
+        JobsSubMenu.AddItem(GunTransport);
+    }
+    private void AddDropoffSubMenu()
+    {
+        DropoffSubMenu = MenuPool.AddSubMenu(JobsSubMenu, "Dropoff");
+        JobsSubMenu.MenuItems[JobsSubMenu.MenuItems.Count() - 1].Description = $"Pickup some guns and drop them off.";
+        JobsSubMenu.MenuItems[JobsSubMenu.MenuItems.Count() - 1].RightLabel = $"~HUD_COLOUR_GREENDARK~{Settings.SettingsManager.TaskSettings.UndergroundGunsGunDropoffPaymentMin:C0}-{Settings.SettingsManager.TaskSettings.UndergroundGunsGunDropoffPaymentMax:C0}~s~";
+        DropoffSubMenu.RemoveBanner();
+        List<string> locationTypes = PlacesOfInterest.PossibleLocations.RobberyTaskLocations().Select(x => x.TypeName).Distinct().ToList();
+        locationTypes.Add("Random");
+        // UIMenuListScrollerItem<string> LocationType = new UIMenuListScrollerItem<string>("Weapon Type", "Set the weapon type", ??); could add weapon types in the future
+        UIMenuNumericScrollerItem<int> NumDropoffsMenu = new UIMenuNumericScrollerItem<int>("Weapons", $"Select the number of weapons to drop off", 1, 10, 1) { Value = 1 };
+
+
+        UIMenuItem StartTaskMenu = new UIMenuItem("Start", "Start the task.") { RightLabel = $"~HUD_COLOUR_GREENDARK~{Settings.SettingsManager.TaskSettings.UndergroundGunsGunDropoffPaymentMin:C0}-{Settings.SettingsManager.TaskSettings.UndergroundGunsGunDropoffPaymentMax:C0}~s~" };
+        StartTaskMenu.Activated += (sender, selectedItem) =>
+        {
+            Player.PlayerTasks.UndergroundGunsTasks.StartGunDropoff(AnsweredContact, NumDropoffsMenu.Value);
+            sender.Visible = false;
+        };
+        NumDropoffsMenu.IndexChanged += (sender, oldIndex, newIndex) =>
+        {
+            StartTaskMenu.RightLabel = $"~HUD_COLOUR_GREENDARK~{Settings.SettingsManager.TaskSettings.UndergroundGunsGunDropoffPaymentMin * NumDropoffsMenu.Value:C0}-{Settings.SettingsManager.TaskSettings.UndergroundGunsGunDropoffPaymentMax * NumDropoffsMenu.Value:C0}~s~";
+        };
+
+        DropoffSubMenu.AddItem(NumDropoffsMenu);
+        DropoffSubMenu.AddItem(StartTaskMenu);
     }
     private void RequestLocations(GunStore gunStore)
     {

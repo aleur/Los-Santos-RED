@@ -23,10 +23,12 @@ public class UndergroundGunsTasks : IPlayerTaskGroup
     private ISettingsProvideable Settings;
     private IEntityProvideable World;
     private ICrimes Crimes;
+    private IModItems ModItems;
+    private IWeapons Weapons;
 
     private List<IPlayerTask> AllTasks = new List<IPlayerTask>();
 
-    public UndergroundGunsTasks(ITaskAssignable player, ITimeReportable time, IGangs gangs, PlayerTasks playerTasks, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes)
+    public UndergroundGunsTasks(ITaskAssignable player, ITimeReportable time, IGangs gangs, PlayerTasks playerTasks, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, IModItems modItems, IWeapons weapons)
     {
         Player = player;
         Time = time;
@@ -37,6 +39,8 @@ public class UndergroundGunsTasks : IPlayerTaskGroup
         Settings = settings;
         World = world;
         Crimes = crimes;
+        ModItems = modItems;
+        Weapons = weapons;
     }
     public void Setup()
     {
@@ -47,12 +51,20 @@ public class UndergroundGunsTasks : IPlayerTaskGroup
         AllTasks.ForEach(x => x.Dispose());
         AllTasks.Clear();
     }
-   public void StartGunPickup(GunDealerContact contact)
+    public void StartGunTransport(GunDealerContact contact)
     {
-        GunPickupTask gunPickupTask = new GunPickupTask(Player, Time, Gangs, PlayerTasks, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, contact);
-        AllTasks.Add(gunPickupTask);
-        gunPickupTask.Setup();
-        gunPickupTask.Start();
+        GunTransportTask gunTransportTask = new GunTransportTask(Player, Time, Gangs, PlayerTasks, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, contact);
+        AllTasks.Add(gunTransportTask);
+        gunTransportTask.Setup();
+        gunTransportTask.Start();
+    }
+
+    public void StartGunDropoff(GunDealerContact contact, int numDropoffs)
+    {
+        GunDropoffTask gunDropoffTask = new GunDropoffTask(Player, Time, Gangs, PlayerTasks, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, ModItems, Weapons, contact, numDropoffs);
+        AllTasks.Add(gunDropoffTask);
+        gunDropoffTask.Setup();
+        gunDropoffTask.Start();
     }
 
     public void OnInteractionMenuCreated(GameLocation gameLocation, MenuPool menuPool, UIMenu interactionMenu)

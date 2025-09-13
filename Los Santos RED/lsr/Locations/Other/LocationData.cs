@@ -190,7 +190,7 @@ namespace LosSantosRED.lsr.Locations
                 }
 
                 
-                if (PreviousZone == null || CurrentZone.InternalGameName != PreviousZone.InternalGameName)
+                if (PreviousZone == null || CurrentZone == null || CurrentZone.InternalGameName != PreviousZone.InternalGameName)
                 {
                     GameTimeEnteredZone = Game.GameTime;
                     if(PreviousZone != null && CurrentZone != null && PreviousZone.StateID != CurrentZone.StateID)

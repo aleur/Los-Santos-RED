@@ -92,6 +92,10 @@ public class SimpleInventory
             }
         }
     }
+    public void AddItem(ModItem toAdd, int amount)
+    {
+        Add(toAdd, amount * toAdd.AmountPerPackage);
+    }
     public void CreateInteractionMenu(IInteractionable player, MenuPool menuPool, UIMenu menuToAdd, bool withAnimations, List<ItemType> AllowedItemTypes, List<ItemType> DisallowedItemTypes, bool removeBanner, string overrideTitle, string overrideDescription)
     {
         string title = "Stored Inventory";

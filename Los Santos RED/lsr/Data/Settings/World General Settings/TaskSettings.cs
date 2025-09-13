@@ -48,13 +48,19 @@ public class TaskSettings : ISettingsDefaultable
 
 
 
+    [Description("Minimum payment amount for the Gun Dropoff task from Underground Guns")]
+    public int UndergroundGunsGunDropoffPaymentMin { get; set; }
+    [Description("Maximum payment amount for the Gun Dropoff task from Underground Guns")]
+    public int UndergroundGunsGunDropoffPaymentMax { get; set; }
+    [Description("Complications Percent for the Gun Dropoff task from Underground Guns")]
+    public float UndergroundGunsGunDropoffComplicationsPercentage { get; set; }
 
-    [Description("Minimum payment amount for the Gun Pickup task from Underground Guns")]
-    public int UndergroundGunsGunPickupPaymentMin { get; set; }
-    [Description("Maximum payment amount for the Gun Pickup task from Underground Guns")]
-    public int UndergroundGunsGunPickupPaymentMax { get; set; }
-    [Description("Complications Percent for the Gun Pickup task from Underground Guns")]
-    public float UndergroundGunsGunPickupComplicationsPercentage { get; set; }
+    [Description("Minimum payment amount for the Gun Transport task from Underground Guns")]
+    public int UndergroundGunsGunTransportPaymentMin { get; set; }
+    [Description("Maximum payment amount for the Gun Transport task from Underground Guns")]
+    public int UndergroundGunsGunTransportPaymentMax { get; set; }
+    [Description("Complications Percent for the Gun Transport task from Underground Guns")]
+    public float UndergroundGunsGunTransportComplicationsPercentage { get; set; }
 
     [Description("Show blips on entities that are related to the task.")]
     public bool ShowEntityBlips { get; set; }
@@ -103,9 +109,13 @@ public class TaskSettings : ISettingsDefaultable
         OfficerFriendlyCopHitComplicationsPercentage = 25f;
 
 
-        UndergroundGunsGunPickupPaymentMin = 2000;// 5000;
-        UndergroundGunsGunPickupPaymentMax = 4000;// 10000;
-        UndergroundGunsGunPickupComplicationsPercentage = 15f;
+
+        UndergroundGunsGunTransportPaymentMin = 2000;// 5000;
+        UndergroundGunsGunTransportPaymentMax = 4000;// 10000;
+        UndergroundGunsGunTransportComplicationsPercentage = 15f;
+        UndergroundGunsGunDropoffPaymentMin = 2000;// 5000;
+        UndergroundGunsGunDropoffPaymentMax = 4000;// 10000;
+        UndergroundGunsGunDropoffComplicationsPercentage = 15f;
 
         ShowEntityBlips = true;
         DisplayHelpPrompts = true;

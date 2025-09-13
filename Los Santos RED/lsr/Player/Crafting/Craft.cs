@@ -81,7 +81,7 @@ namespace Mod
         {
             foreach (Ingredient ingredient in craftItem.CraftableItem.Ingredients)
             {
-                if (ingredient.IsConsumed)
+                if (ingredient.IsConsumed && ingredient.Quantity * quantity > 0)
                 {
                     Player.Inventory.Remove(Player.Inventory.ItemsList.Find(x=>x.ModItem.Name == ingredient.IngredientName).ModItem, ingredient.Quantity * quantity);
                 }
@@ -169,6 +169,7 @@ namespace Mod
                     string Message;
                     if (Player.ButtonPrompts.IsPressed("stopcraftingprompt1"))
                     {
+                        TimerBarPool.Remove(ProgressBar);
                         Message = "Crafting cancelled.";
                         // Give back ingredients if none crafted
                         if (craftedQuantity == 0)
@@ -178,12 +179,14 @@ namespace Mod
                     }
                     else if (Player.ButtonPrompts.IsPressed("putawayprompt1"))
                     {
+                        TimerBarPool.Remove(ProgressBar);
                         Message = "Crafting paused: item put away.";
                         UnfinishedCrafts.Add((quantity-craftedQuantity, craftableItem));
                         Game.DisplaySubtitle($"Crafted {productName} - {craftedQuantity} {itemToGive.MeasurementName}(s)");
                     }
                     else
                     {
+                        TimerBarPool.Remove(ProgressBar);
                         Message = "Crafting failed.";
                     }
                     Game.DisplayHelp(Message);

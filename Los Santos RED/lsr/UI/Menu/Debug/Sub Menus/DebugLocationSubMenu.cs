@@ -549,21 +549,21 @@ public class DebugLocationSubMenu : DebugSubMenu
     {
         StringBuilder sb = new StringBuilder();
         sb.Append(TextToLog + System.Environment.NewLine);
-        File.AppendAllText("Plugins\\LosSantosRED\\" + "CameraPositions.txt", sb.ToString());
+        File.AppendAllText("Plugins\\LosSantosRED\\Debug\\" + "CameraPositions.txt", sb.ToString());
         sb.Clear();
     }
     private void WriteToLogLocations(String TextToLog)
     {
         StringBuilder sb = new StringBuilder();
         sb.Append(TextToLog + System.Environment.NewLine);
-        File.AppendAllText("Plugins\\LosSantosRED\\" + "StoredLocations.txt", sb.ToString());
+        File.AppendAllText("Plugins\\LosSantosRED\\Debug\\" + "StoredLocations.txt", sb.ToString());
         sb.Clear();
     }
     private void WriteToLogInteriors(String TextToLog)
     {
         StringBuilder sb = new StringBuilder();
         sb.Append(TextToLog + System.Environment.NewLine);
-        File.AppendAllText("Plugins\\LosSantosRED\\" + "StoredInteriors.txt", sb.ToString());
+        File.AppendAllText("Plugins\\LosSantosRED\\Debug\\" + "StoredInteriors.txt", sb.ToString());
         sb.Clear();
     }
 

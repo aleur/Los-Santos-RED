@@ -241,6 +241,7 @@
     <Compile Include="lsr\Player\ActiveTasks\Gang\GangBriberyTask.cs" />
     <Compile Include="lsr\Player\ActiveTasks\Gang\Generic\DrugMeetTask.cs" />
     <Compile Include="lsr\Player\ActiveTasks\Generic Contact\PayoffContactTask.cs" />
+    <Compile Include="lsr\Player\ActiveTasks\Underground Guns\GunDropoffTask.cs" />
     <Compile Include="lsr\Player\Activity\ForceDoorActivity.cs" />
     <Compile Include="lsr\Player\Activity\HideableObject.cs" />
     <Compile Include="lsr\Player\Activity\HidingActivity.cs" />
@@ -910,7 +911,7 @@
     <Compile Include="lsr\Player\ActiveTasks\Gang\PayoffGangTask.cs" />
     <Compile Include="lsr\Player\ActiveTasks\Gang\RivalGangHitTask.cs" />
     <Compile Include="lsr\Player\ActiveTasks\Gang\RivalGangVehicleTheftTask.cs" />
-    <Compile Include="lsr\Player\ActiveTasks\Underground Guns\GunPickupTask.cs" />
+    <Compile Include="lsr\Player\ActiveTasks\Underground Guns\GunTransportTask.cs" />
     <Compile Include="lsr\Player\ActiveTasks\Underground Guns\UndergroundGunsTasks.cs" />
     <Compile Include="lsr\Player\ActiveTasks\Corrupt Cop\WitnessEliminationTask.cs" />
     <Compile Include="lsr\Player\Activity\ActivityManager.cs" />

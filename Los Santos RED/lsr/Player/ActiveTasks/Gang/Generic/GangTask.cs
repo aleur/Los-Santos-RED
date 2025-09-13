@@ -154,12 +154,13 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         {
             OnTaskCompletedOrFailed();
         }
-        protected virtual void SetReadyToPickupDeadDrop()
+        protected void SetReadyToPickupDeadDrop()
         {
             DeadDropPayment = PlacesOfInterest.GetUsableDeadDrop(World.IsMPMapLoaded, Player.CurrentLocation);
             if (DeadDropPayment != null)
             {
-                DeadDropPayment.SetupDrop(PaymentAmount, false);
+                EntryPoint.WriteToConsole($"Setup DeadDrop with ${PaymentAmount}");
+                DeadDropPayment.SetupDrop(0, false); // Set to zero because PlayerTask pays out automatically
                 ActiveDrops.Add(DeadDropPayment);
                 SendDeadDropStartMessage();
                 while (true)
