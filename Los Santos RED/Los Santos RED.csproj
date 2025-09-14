@@ -731,6 +731,7 @@
     <Compile Include="lsr\UI\Menu\Customize Ped\Other\VoicePreview.cs" />
     <Compile Include="lsr\UI\Menu\Customize Ped\PedFashionAlias.cs" />
     <Compile Include="lsr\UI\Menu\Debug\Sub Menus\DebugAnimationSubMenu.cs" />
+    <Compile Include="lsr\UI\Menu\Debug\Sub Menus\DebugConfigSubMenu.cs" />
     <Compile Include="lsr\UI\Menu\Debug\Sub Menus\DebugCrimeSubMenu.cs" />
     <Compile Include="lsr\UI\Menu\Debug\Sub Menus\DebugDispatcherSubMenu.cs" />
     <Compile Include="lsr\UI\Menu\Debug\Sub Menus\DebugGangSubMenu.cs" />

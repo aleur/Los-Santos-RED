@@ -69,11 +69,11 @@ public static class EntryPoint
         {
             if (ModController == null || !ModController.IsRunning)
             {
-                if ((Game.IsKeyDown(Keys.F10) && Game.IsShiftKeyDownRightNow))
+                if ((Game.IsKeyDown(Keys.F10) && Game.IsShiftKeyDownRightNow) || IsLoadingAltConfig)
                 {
                     RemoveNotification();
                     ModController = new ModController();
-                    ModController.Setup();
+                    ModController.Setup(LoadedConfig);
                 }
             }
 

@@ -49,7 +49,7 @@ public class DebugMenu : ModUIMenu
 
     public DebugMenu(MenuPool menuPool, IActionable player, IWeapons weapons, RadioStations radioStations, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, ITimeControllable time, 
         IEntityProvideable world, ITaskerable tasker, Dispatcher dispatcher, IAgencies agencies, IGangs gangs, IModItems modItems, ICrimes crimes, IPlateTypes plateTypes, INameProvideable names, ModDataFileManager modDataFileManager, 
-        IPoliceRespondable policeRespondable, IInteractionable interactionable)
+        IPoliceRespondable policeRespondable, IInteractionable interactionable, UI ui)
     {
         Gangs = gangs;
         Dispatcher = dispatcher;
@@ -102,6 +102,7 @@ public class DebugMenu : ModUIMenu
 #endif
 
         DebugSubMenus.Add(new DebugVehicleRaceSubMenu(Debug, MenuPool, Player, modDataFileManager.VehicleRaces, world, ModDataFileManager, interactionable));
+        DebugSubMenus.Add(new DebugConfigSubMenu(Debug, MenuPool, Player, ui, modDataFileManager.GameConfigs));
     }
     public override void Hide()
     {
