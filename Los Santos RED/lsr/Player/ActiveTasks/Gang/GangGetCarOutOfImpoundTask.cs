@@ -31,7 +31,8 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         public override void Setup()
         {
-
+            base.Setup();
+            DebugName = "Lockup Theft";
         }
         public override void Dispose()
         {
@@ -195,7 +196,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             {
                 ImpoundLocation.IsPlayerInterestedInLocation = true;
             }
-            PlayerTasks.AddTask(HiringContact, PaymentAmount, 2000, 0, -500, 3, "Lockup Theft", false);
+            PlayerTasks.AddTask(HiringGang.Contact, PaymentAmount, RepOnCompletion, DebtOnFail, RepOnFail, DaysToComplete, DebugName);
         }
         protected override void SendInitialInstructionsMessage()
         {

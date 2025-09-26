@@ -8,33 +8,19 @@ using System.Threading.Tasks;
 
 public class TaskSettings : ISettingsDefaultable
 {
-
-
-
-
-
-
-
+    // Officer Friendly
     [Description("Minimum payment amount for the Gang Hit task from Officer Friendly")]
     public int OfficerFriendlyGangHitPaymentMin { get; set; }
     [Description("Maximum payment amount for the Gang Hit task from Officer Friendly")]
     public int OfficerFriendlyGangHitPaymentMax { get; set; }
     [Description("Complications Percent for the Gang Hit task from Officer Friendly")]
     public float OfficerFriendlyGangHitComplicationsPercentage { get; set; }
-
-
-
-
-
     [Description("Minimum payment amount for the Cop Hit task from Officer Friendly")]
     public int OfficerFriendlyCopHitPaymentMin { get; set; }
     [Description("Maximum payment amount for the Cop Hit task from Officer Friendly")]
     public int OfficerFriendlyCopHitPaymentMax { get; set; }
     [Description("Complications Percent for the Cop Hit task from Officer Friendly")]
     public float OfficerFriendlyCopHitComplicationsPercentage { get; set; }
-
-
-
     [Description("Minimum payment amount for the Witness Elimination task from Officer Friendly")]
     public int OfficerFriendlyWitnessEliminationPaymentMin { get; set; }
     [Description("Maximum payment amount for the Witness Elimination task from Officer Friendly")]
@@ -43,11 +29,7 @@ public class TaskSettings : ISettingsDefaultable
     public float OfficerFriendlyWitnessEliminationComplicationsPercentage { get; set; }
 
 
-
-
-
-
-
+    // Underground Guns
     [Description("Minimum payment amount for the Gun Dropoff task from Underground Guns")]
     public int UndergroundGunsGunDropoffPaymentMin { get; set; }
     [Description("Maximum payment amount for the Gun Dropoff task from Underground Guns")]
@@ -62,13 +44,30 @@ public class TaskSettings : ISettingsDefaultable
     [Description("Complications Percent for the Gun Transport task from Underground Guns")]
     public float UndergroundGunsGunTransportComplicationsPercentage { get; set; }
 
+    // QoL
     [Description("Show blips on entities that are related to the task.")]
     public bool ShowEntityBlips { get; set; }
     [Description("Show help text pop ups on task status changes.")]
     public bool DisplayHelpPrompts { get; set; }
+
+    // Vehicle Exporter
     public int VehicleExporterTransferPaymentMin { get; set; }
     public int VehicleExporterTransferPaymentMax { get; set; }
     public float VehicleExporterTransferComplicationsPercentage { get; set; }
+
+    // Gangs
+    [Description("Days to complete gang task")]
+    public int GangDaysToCompleteTask { get; set; }
+    [Description("Reputation lost upon failing gang task")]
+    public int GangRepOnFailingTask { get; set; }
+    [Description("Reputation gained upon completion of gang task")]
+    public int GangRepOnCompletingTask { get; set; }
+    [Description("Days to complete URGENT gang task")]
+    public int GangDaysToCompleteUrgentTask { get; set; }
+    [Description("Reputation lost upon failing URGENT gang task")]
+    public int GangRepOnFailingUrgentTask { get; set; }
+    [Description("Reputation gained upon completion of URGENT gang task")]
+    public int GangRepOnCompletingUrgentTask { get; set; }
     [Description("Percent that you will extort stores in Enemy Territory")]
     public float GangRacketeeringExtortionPercentage { get; set; }
     [Description("Complications Percent of stores calling for enemy backup during extortion.")]
@@ -77,15 +76,12 @@ public class TaskSettings : ISettingsDefaultable
     public float GangRacketeeringComplicationsPercentage { get; set; }
     [Description("Percent of torching stores in Enemy Territory")]
     public float GangArsonEnemyTurfPercentage { get; set; }
-
-
-
+    [Description("Multiplies reputation gained by the number of enemies killed during lethal tasks")] // ass explanation but ok
+    public bool GangMultiplyRepByKillCount { get; set; }
     public float DrugMeetAmbushPercentageNeutral { get; set; }
     public float DrugMeetAmbushPercentageFriendly { get; set; }
     public float DrugMeetPriceScalarMin { get; set; }
     public float DrugMeetPriceScalarMax { get; set; }
-
-
     public int DrugMeetMin { get; set; }
     public int DrugMeetMax { get; set; }
 
@@ -122,7 +118,14 @@ public class TaskSettings : ISettingsDefaultable
 
         VehicleExporterTransferPaymentMin = 1500;// 2000;
         VehicleExporterTransferPaymentMax = 2500;// 5000;
-        VehicleExporterTransferComplicationsPercentage = 25f;
+        VehicleExporterTransferComplicationsPercentage = 25f; 
+        GangDaysToCompleteTask = 7;
+        GangRepOnFailingTask = -1000;
+        GangRepOnCompletingTask = 500;
+        GangDaysToCompleteUrgentTask = 2;
+        GangRepOnFailingUrgentTask = -2000;
+        GangRepOnCompletingUrgentTask = 1000;
+        GangMultiplyRepByKillCount = true;
         GangRacketeeringExtortionPercentage = 25f;
         GangRacketeeringExtortionComplicationsPercentage = 10f;
         GangRacketeeringComplicationsPercentage = 5f;

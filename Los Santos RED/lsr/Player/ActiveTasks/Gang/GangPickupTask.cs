@@ -28,9 +28,11 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         public override void Setup()
         {
+            base.Setup();
+            /*
             RepOnCompletion = 500;
             RepOnFail = -1000;
-            DaysToComplete = 2;
+            DaysToComplete = 2;*/
             DebugName = "Pickup for Gang";
         }
         public override void Dispose()

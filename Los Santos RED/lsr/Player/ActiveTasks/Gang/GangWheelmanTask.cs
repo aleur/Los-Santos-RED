@@ -54,10 +54,12 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         public override void Setup()
         { 
+            base.Setup();
+            /*
             RepOnCompletion = 2000;
             DebtOnFail = 0;
             RepOnFail = -500;
-            DaysToComplete = 7;
+            DaysToComplete = 7;*/
             DebugName = "Gang Wheelman";
         }
         public override void Dispose()

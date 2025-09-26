@@ -28,10 +28,11 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         public override void Setup()
         {
+            base.Setup();/*
             RepOnCompletion = 1000;
             DebtOnFail = 0;
             RepOnFail = -500;
-            DaysToComplete = 5;
+            DaysToComplete = 5;*/
             DebugName = "Auto Theft for Gang";
         }
         public override void Dispose()

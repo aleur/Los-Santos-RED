@@ -30,10 +30,12 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         public override void Setup()
         {
+            base.Setup();
+            /*
             RepOnCompletion = 500;
             DebtOnFail = 0;
             RepOnFail = -1000;
-            DaysToComplete = 4;
+            DaysToComplete = 4;*/
             DebugName = "Delivery for Gang";
         }
         public override void Dispose()

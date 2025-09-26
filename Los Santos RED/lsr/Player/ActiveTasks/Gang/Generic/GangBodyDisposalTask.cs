@@ -27,11 +27,13 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         public override void Setup()
         {
-            DebugName = "Body Disposal";
+            base.Setup();/*
             RepOnCompletion = 2000;
             DebtOnFail = 0;
             RepOnFail = -500;
-            DaysToComplete = 2;
+            DaysToComplete = 2;*/
+
+            DebugName = "Body Disposal";
         }
         public override void Dispose()
         {

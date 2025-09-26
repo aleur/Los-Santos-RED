@@ -38,13 +38,14 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         public override void Setup()
         {
-            hasExploded = false;
-
+            base.Setup();
+            /*
             RepOnCompletion = 500;
-            DebtOnFail = 0;
             RepOnFail = -2000;
             DaysToComplete = 7;
+            DebtOnFail = 0;*/
             DebugName = "Arson";
+            hasExploded = false;
         }
         public override void Dispose()
         {

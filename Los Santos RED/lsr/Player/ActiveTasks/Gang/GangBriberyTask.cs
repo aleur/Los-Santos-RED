@@ -27,7 +27,6 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private UIMenuItem depositMoney;
         private Zone SelectedZone;
         private GameLocation DepositLocation;
-        public int KillRequirement { get; set; } = 1;
         private bool HasConditions => DepositLocation != null && HiringGangDen != null && SelectedZone != null;
 
         public PlayerTask PlayerTask => CurrentTask;
@@ -40,9 +39,11 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         public override void Setup()
         {
+            base.Setup();
+            /*
             RepOnCompletion = 2000;
             RepOnFail = -2500;
-            DaysToComplete = 7;
+            DaysToComplete = 7;*/
             DebugName = "Gang Bribery";
         }
         public override void Dispose()

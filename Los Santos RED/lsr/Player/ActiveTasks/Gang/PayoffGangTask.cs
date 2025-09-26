@@ -28,10 +28,11 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         public override void Setup()
         {
+            base.Setup();/*
             PaymentAmount = 0;
             DebtOnFail = 0;
             RepOnFail = -500;
-            DaysToComplete = 2;
+            DaysToComplete = 2;*/
             DebugName = "Dead Drop";
         }
         public override void Dispose()

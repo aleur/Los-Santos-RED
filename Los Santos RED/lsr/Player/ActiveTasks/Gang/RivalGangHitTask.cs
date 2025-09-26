@@ -31,10 +31,11 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         public override void Setup()
         {
+            base.Setup();/*
             RepOnCompletion = 2000;
             DebtOnFail = 0;
             RepOnFail = -500;
-            DaysToComplete = 7;
+            DaysToComplete = 7;*/
             DebugName = "Rival Gang Hit";
         }
         public override void Dispose()

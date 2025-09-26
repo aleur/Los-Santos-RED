@@ -66,7 +66,10 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         public virtual void Setup()
         {
-
+            RepOnCompletion = Settings.SettingsManager.TaskSettings.GangRepOnCompletingTask;
+            RepOnFail = Settings.SettingsManager.TaskSettings.GangRepOnFailingTask;
+            DebtOnFail = 0;
+            DaysToComplete = Settings.SettingsManager.TaskSettings.GangDaysToCompleteTask;
         }
         public virtual void Dispose()
         {
