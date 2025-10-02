@@ -218,12 +218,13 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private bool SpawnCar()
         {
             DispatchableVehicle dispatchableVehicle = HiringGang.GetRandomVehicle(0, false, false, true, "", Settings);
-            if(dispatchableVehicle == null)
+            EntryPoint.WriteToConsole($"dispatchableVehicle: {dispatchableVehicle}");
+            if(dispatchableVehicle == null || ImpoundLocation == null)
             {
                 return false;
             }
             SpawnPlace existingSpawn = ImpoundLocation.VehicleImpoundLot.ParkingSpots.PickRandom();
-            if(existingSpawn == null)
+            if (existingSpawn == null)
             {
                 return false;
             }

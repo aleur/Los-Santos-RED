@@ -125,13 +125,14 @@ public class GangTasks : IPlayerTaskGroup
         int rng = new Random().Next(options.Count);
         return options[rng]();
     }
-    public GangTask RandomSimpleTask(Gang gang, GangContact gangContact)
+    public GangTask RandomUntrustedTask(Gang gang, GangContact gangContact) // tasks if you're not friendly yet i guess
     {
         int RandomKillRequirement = new Random().Next(1, 5);
         List<Func<GangTask>> options = new List<Func<GangTask>>{
             () => GangHit(gang, RandomKillRequirement, gangContact, Gangs.GetGang(gang.EnemyGangs.PickRandom())),
             () => GangAmbush(gang, RandomKillRequirement, gangContact, Gangs.GetGang(gang.EnemyGangs.PickRandom())),
             () => GangArson(gang, gangContact),
+            () => GangImpoundTheft(gang, gangContact)
         };
         int rng = new Random().Next(options.Count);
         return options[rng]();

@@ -19,6 +19,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private GangDen HiringGangDen;
         private int GameTimeToWaitBeforeComplications;
         private int HushMoney;
+        private bool HasCollectedHushMoney = false;
         private bool HasAddedComplications;
         private bool WillAddComplications;
         private int KilledMembersAtStart;
@@ -66,7 +67,6 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                     {
                         try
                         {
-                            PickupLoop();
                             Loop();
                             FinishTask();
                         }
@@ -83,34 +83,24 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 }
             }
         }
-        private void PickupLoop()
+        private void OnCollectedHushMoney()
         {
-            while (true)
-            {
-                CurrentTask = PlayerTasks.GetTask(HiringContact?.Name);
-                if (CurrentTask == null || !CurrentTask.IsActive)
-                {
-                    //EntryPoint.WriteToConsoleTestLong($"Task Inactive for {HiringContactName}");
-                    break;
-                }
-                if (HiringGangDen.PickupMoney == 0)
-                {
-                    SendDropOffMessage();
-                    DepositLocation.IsPlayerInterestedInLocation = true;
-                    break;
-                }
-                GameFiber.Sleep(1000);
-            }
+            DepositLocation.IsPlayerInterestedInLocation = true;
+            HasCollectedHushMoney = true;
+            SendDropOffMessage();
         }
         protected override void Loop()
         {
             while (true)
             {
                 CurrentTask = PlayerTasks.GetTask(HiringContact?.Name);
-                if (CurrentTask == null || !CurrentTask.IsActive || HushMoney == 0)
+                if (CurrentTask == null || !CurrentTask.IsActive || CurrentTask.IsReadyForPayment)
                 {
-                    CurrentTask.OnReadyForPayment(false);
                     break;
+                }
+                if (!HasCollectedHushMoney && HiringGangDen.PickupMoney == 0)
+                {
+                    OnCollectedHushMoney();
                 }
                 GameFiber.Sleep(1000);
             }
@@ -143,6 +133,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 location.IsPlayerInterestedInLocation = false;
                 location.PlaySuccessSound();
                 location.DisplayMessage("~g~Reply", "Deposit Successful.");
+                CurrentTask.OnReadyForPayment(false);
             }
             else
             {
