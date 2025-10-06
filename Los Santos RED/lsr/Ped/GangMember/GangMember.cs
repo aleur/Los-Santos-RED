@@ -98,8 +98,13 @@ public class GangMember : PedExt, IWeaponIssuable
         CurrentHealthState.Update(policeRespondable, world);//has a yield if they get damaged, seems ok   
         if (WillGiveMission && PlayerToTask != null && TaskForPlayer == null)
         {
-            TaskForPlayer = PlayerToTask.RelationshipManager.GangRelationships.CurrentGang.ID == Gang.ID ? 
-                PlayerToTask.PlayerTasks.GangTasks.RandomTask(Gang, Gang.Contact) : PlayerToTask.PlayerTasks.GangTasks.RandomUntrustedTask(Gang, Gang.Contact);
+            Gang currentGang = PlayerToTask?.RelationshipManager?.GangRelationships?.CurrentGang;
+            GangTasks gangTasks = PlayerToTask?.PlayerTasks?.GangTasks;
+            if (currentGang != null && gangTasks != null)
+            {
+                TaskForPlayer = currentGang.ID == Gang.ID ?
+                    gangTasks.RandomTask(Gang, Gang.Contact) : gangTasks.RandomUntrustedTask(Gang, Gang.Contact);
+            }
         }
     }
 

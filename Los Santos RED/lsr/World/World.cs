@@ -26,7 +26,6 @@ namespace Mod
         private IInteriors Interiors;
         private IShopMenus ShopMenus;
         private IGangs Gangs;
-        private IStreets Streets;
         private IPlacesOfInterest PlacesOfInterest;
         private List<Blip> CreatedBlips = new List<Blip>();
         private Blip TotalWantedBlip;
@@ -63,6 +62,7 @@ namespace Mod
         public Places Places { get; private set; }
         public IZones Zones { get; set; }
         public IGangTerritories GangTerritories { get; set; }
+        public IStreets Streets { get; set; }
         public int CitizenWantedLevel { get; set; }
         public int TotalWantedLevel { get; set; } = 0;
         public Vector3 PoliceBackupPoint { get; set; }

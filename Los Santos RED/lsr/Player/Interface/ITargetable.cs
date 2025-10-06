@@ -11,6 +11,7 @@ namespace LosSantosRED.lsr.Interface
 {
     public interface ITargetable
     {
+        Ped Pedestrian { get; }
         bool IsInVehicle { get; }
         VehicleExt CurrentVehicle { get; }
         bool IsAttemptingToSurrender { get; }
@@ -68,6 +69,7 @@ namespace LosSantosRED.lsr.Interface
         Vector3 Position { get; }
         bool IsInWantedActiveMode { get; }
         float VehicleSpeedMPH { get; }
+        float VehicleSpeed { get; }
         //bool IsHostile(Gang gang);
     }
 }

@@ -21,6 +21,16 @@ public class GroupSettings : ISettingsDefaultable
     public int AutoArmorMin { get; set; }
     public int AutoArmorMax { get; set; }
     public bool AlwaysSetSpecialist { get; set; }
+    [Description("Maximum distance group members approach before stopping (on foot)")]
+    public float StoppingRange { get; set; }
+    [Description("Enable or disable increased power for group vehicles")]
+    public bool AllowPowerAssist { get; set; }
+    [Description("Controls the braking distance when speeding with gang members. Reduce this value if gang members are constantly crashing into you; increase it if they are staying too far behind.")]
+    public float DecelerationValue { get; set; }
+    [Description("The minimum required braking distance when speeding with gang members, to avoid collisions.")]
+    public float MinBrakingDistance { get; set; }
+    public float MemberVehAbility { get; set; }
+    public float MemberVehAggressiveness { get; set; }
     public float MaxPlayerDistanceDuringCombat { get; set; }
     public float PlayerMoveDistanceToUpdate { get; set; }
     public float MaxPlayerDistanceDuringCombatBeforeForceReturn { get; set; }
@@ -46,6 +56,12 @@ public class GroupSettings : ISettingsDefaultable
         AutoArmorMin = 100;
         AutoArmorMax = 150;
         AlwaysSetSpecialist = true;
+        StoppingRange = 10.0f;
+        AllowPowerAssist = true;
+        DecelerationValue = 8f;
+        MemberVehAbility = 1.0f;
+        MemberVehAggressiveness = 1.0f;
+        MinBrakingDistance = 8f;
 
         MaxPlayerDistanceDuringCombat = 10f;
         PlayerMoveDistanceToUpdate = 4.0f;

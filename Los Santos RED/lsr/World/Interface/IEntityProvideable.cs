@@ -25,6 +25,7 @@ namespace LosSantosRED.lsr.Interface
         ILocationInteractable LocationInteractable { get; }
         IZones Zones { get; }
         IGangTerritories GangTerritories { get; }
+        IStreets Streets { get; }
         bool IsFEJInstalled { get; }
         bool IsTrafficDisabled { get; }
 
