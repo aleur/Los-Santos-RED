@@ -13,9 +13,6 @@ using System.Windows.Forms;
 
 public class PedExt : IComplexTaskable, ISeatAssignable
 {
-    public IPlayerTask TaskForPlayer;
-    public IContactInteractable PlayerToTask;
-    public IPoliceRespondable PlayerToCheck;
     protected ISettingsProvideable Settings;
     protected uint GameTimeSpawned;
     private uint GameTimeCreated = 0;
@@ -160,6 +157,10 @@ public class PedExt : IComplexTaskable, ISeatAssignable
     public virtual int DefaultCombatFlag { get; set; } = 0;
     public virtual int DefaultEnterExitFlag { get; set; } = 0;
 
+    public IPlayerTask TaskForPlayer { get; set; }
+    public IContactInteractable PlayerToTask {  get; set; }
+    public IPoliceRespondable PlayerToCheck { get; set; }
+    public bool IsTargetedByPlayer { get; set; } = false;
 
     public virtual string InteractPrompt(IButtonPromptable player)
     {
@@ -1093,9 +1094,10 @@ public class PedExt : IComplexTaskable, ISeatAssignable
             NativeFunction.Natives.SET_PED_SEEING_RANGE(Pedestrian, Settings.SettingsManager.CivilianSettings.SightDistance);
         }
     }
-    public void AddBlip()
+    public void AddBlip(string name = "Person", System.Drawing.Color color = default, BlipSprite sprite = default)
     {
-        if(!Pedestrian.Exists() || AttachedLSRBlip.Exists())
+        color = (color == System.Drawing.Color.Empty) ? BlipColor : color;
+        if (!Pedestrian.Exists() || AttachedLSRBlip.Exists())
         {
             return;
         }
@@ -1104,10 +1106,11 @@ public class PedExt : IComplexTaskable, ISeatAssignable
         //EntryPoint.WriteToConsole($"PEDEXT BLIP CREATED");
 
         NativeFunction.Natives.BEGIN_TEXT_COMMAND_SET_BLIP_NAME("STRING");
-        NativeFunction.Natives.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(BlipName);
+        NativeFunction.Natives.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME(name);
         NativeFunction.Natives.END_TEXT_COMMAND_SET_BLIP_NAME(myBlip);
-        myBlip.Color = BlipColor;
+        myBlip.Color = color;
         myBlip.Scale = BlipSize;
+        myBlip.Sprite = sprite;
         //if(IsCop)
         //{
         //    myBlip.Sprite = BlipSprite.Police;

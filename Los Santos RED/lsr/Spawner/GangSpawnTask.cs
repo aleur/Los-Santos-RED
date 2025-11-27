@@ -35,7 +35,6 @@ public class GangSpawnTask : SpawnTask
     public bool IsBackupSquad { get; set; } = false;
     public bool IsGeneralBackup { get; set; } = false;
     public int PedSpawnLimit { get; set; } = 99;
-    public List<GangTerritory> GangTerritories { get; set; }
     public GangTerritory GangTerritory { get; set; }
 
     public override void AttemptSpawn()
@@ -88,6 +87,7 @@ public class GangSpawnTask : SpawnTask
                 PedExt Passenger = CreatePerson(OccupantIndex - 1);
                 if (Passenger != null && Passenger.Pedestrian.Exists() && LastCreatedVehicleExists)
                 {
+                    Passenger.IsTargetedByPlayer = IsAmbushTarget;
                     PutPedInVehicle(Passenger, OccupantIndex - 1);
                 }
                 else

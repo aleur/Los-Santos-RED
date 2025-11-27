@@ -114,7 +114,6 @@ public class GangTasks : IPlayerTaskGroup
         int RandomKillRequirement = new Random().Next(1, 5);
         List<Func<GangTask>> options = new List<Func<GangTask>>{
             () => GangHit(gang, RandomKillRequirement, gangContact, Gangs.GetGang(gang.EnemyGangs.PickRandom())),
-            () => GangAmbush(gang, RandomKillRequirement, gangContact, Gangs.GetGang(gang.EnemyGangs.PickRandom())),
             () => GangArson(gang, gangContact),
             () => GangBodyDisposal(gang, gangContact),
             () => GangBribery(gang, gangContact),
@@ -125,12 +124,35 @@ public class GangTasks : IPlayerTaskGroup
         int rng = new Random().Next(options.Count);
         return options[rng]();
     }
+    public GangTask RandomZoneTask(Gang gang, GangContact gangContact, GangTerritoryStatus gtStatus)
+    {
+        List<Func<GangTask>> options = new List<Func<GangTask>>();
+        if (gtStatus.HasEnemyGangScenarios && !gtStatus.IsMainTurf)
+        {
+            options.Add(() => GangAmbush(gang, gangContact,null));
+        }
+        if (gtStatus.HasStores)
+        {
+            options.Add(() => GangRacketeering(gang, gangContact));
+        }
+        int RandomKillRequirement = new Random().Next(1, 5);
+        List<Func<GangTask>> options = new List<Func<GangTask>>()
+        {
+            () => GangHit(gang, RandomKillRequirement, gangContact, Gangs.GetGang(gang.EnemyGangs.PickRandom())),
+            () => GangArson(gang, gangContact),
+            () => GangAmbush(gang, RandomKillRequirement, gangContact, Gangs.GetGang(gang.EnemyGangs.PickRandom())),
+            () => GangBribery(gang, gangContact),
+            () => GangRacketeering(gang, gangContact),
+        };
+        int rng = new Random().Next(options.Count);
+        return options[rng]();
+    }
     public GangTask RandomUntrustedTask(Gang gang, GangContact gangContact) // tasks if you're not friendly yet i guess
     {
         int RandomKillRequirement = new Random().Next(1, 5);
         List<Func<GangTask>> options = new List<Func<GangTask>>{
             () => GangHit(gang, RandomKillRequirement, gangContact, Gangs.GetGang(gang.EnemyGangs.PickRandom())),
-            () => GangAmbush(gang, RandomKillRequirement, gangContact, Gangs.GetGang(gang.EnemyGangs.PickRandom())),
+            () => GangAmbush(gang, gangContact, Gangs.GetGang(gang.EnemyGangs.PickRandom()),RandomKillRequirement),
             () => GangArson(gang, gangContact),
             () => GangImpoundTheft(gang, gangContact)
         };
@@ -155,12 +177,12 @@ public class GangTasks : IPlayerTaskGroup
     }
     public GangTask GangHit(Gang gang, int killRequirement, GangContact gangContact, Gang targetGang)
     {
-        RivalGangHitTask newTask = new RivalGangHitTask(Player, Time, Gangs, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang, targetGang, killRequirement);
+        RivalGangHitTask newTask = new RivalGangHitTask(Player, Time, Gangs, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang, targetGang, killRequirement, GangTerritories, Zones);
         AllGenericGangTasks.Add(newTask);
         newTask.Setup();
         return newTask;
     }
-    public GangTask GangAmbush(Gang gang, int killRequirement, GangContact gangContact, Gang targetGang)
+    public GangTask GangAmbush(Gang gang, GangContact gangContact, Gang targetGang, int killRequirement = 1)
     {
         RivalGangAmbushTask newTask = new RivalGangAmbushTask(Player, Time, Gangs, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, Weapons, Names, PedGroups, ShopMenus, ModItems, PlayerTasks, this, gangContact, gang, targetGang, killRequirement, GangTerritories, Zones);
         RivalGangAmbush.Add(newTask);
@@ -308,7 +330,7 @@ public class GangTasks : IPlayerTaskGroup
 
     public void OnInteractionMenuCreated(GameLocation gameLocation, MenuPool menuPool, UIMenu interactionMenu)
     {
-        EntryPoint.WriteToConsole("Gang Tasks OnTransactionMenuCreated");
+        EntryPoint.WriteToConsole($"Gang Tasks OnTransactionMenuCreated");
         GangRacketeeringTasks.Where(x=> x.PlayerTask != null && x.PlayerTask.IsActive).ToList().ForEach(x => x.OnInteractionMenuCreated(gameLocation, menuPool, interactionMenu));
         GangBriberyTasks.Where(x => x.PlayerTask != null && x.PlayerTask.IsActive).ToList().ForEach(x => x.OnInteractionMenuCreated(gameLocation, menuPool, interactionMenu));
     }

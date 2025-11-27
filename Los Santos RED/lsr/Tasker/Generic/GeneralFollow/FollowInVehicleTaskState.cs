@@ -78,7 +78,7 @@ class FollowInVehicleTaskState : TaskState
 
 
         float PedVehicleSpeed = PedGeneral.Pedestrian.CurrentVehicle.Speed;
-        float TargetSpeed = MathHelper.Lerp(PedVehicleSpeed, Player.VehicleSpeed - 5f, 0.1f);
+        float TargetSpeed = MathHelper.Lerp(PedVehicleSpeed, (Player.VehicleSpeed == 0 ? 5f : Player.VehicleSpeed) - 5f, 0.1f);
         float MaxDistance = BrakingDistance(Player.VehicleSpeed, PedVehicleSpeed);
 
         bool PlayerFelonySpeeding = World.Streets.GetStreet(PedGeneral.Position)?.SpeedLimitMPH != null &&

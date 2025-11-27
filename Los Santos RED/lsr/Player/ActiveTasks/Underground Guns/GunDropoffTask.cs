@@ -43,7 +43,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
 
 
         private GunStore PickUpStore;
-        private bool HasDeadDropAndStore => DeadDrops != null && DeadDrops.Any() && PickUpStore != null;
+        private bool HasDeadDropAndStore => DeadDrops != null && DeadDrops.Any() && DeadDrops.Count() == NumDropoffs && PickUpStore != null;
 
 
         private GunDealerContact Contact;
@@ -321,6 +321,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             {
                 DeadDrops.Add(PlacesOfInterest.GetUsableDeadDrop(World.IsMPMapLoaded, Player.CurrentLocation));
             }
+            EntryPoint.WriteToConsole($"{DeadDrops.Count} DeadDrops SELECTED GunDropoffTask");
         }
         private void GetDelivery()
         {
@@ -388,7 +389,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                     {
                         WeaponItem gun = ModItems.GetRandomWeapon(true);
                         DeliveryWeapons.Add(gun);
-                        SpawnedVehicleExt.WeaponStorage.AddWeapon(Weapons,gun,1);
+                        SpawnedVehicleExt.WeaponStorage.AddWeapon(Weapons,gun);
                     }
 
                     SendVehicleSpawnedMessage();

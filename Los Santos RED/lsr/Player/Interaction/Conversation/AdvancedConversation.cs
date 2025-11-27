@@ -110,6 +110,10 @@ public class AdvancedConversation
             EntryPoint.WriteToConsole("UpdateMenuItems AddRaceMenu");
             AddRaceMenu();
         }
+        if (ConversationSimple.ConversingPed != null && ConversationSimple.ConversingPed.TaskForPlayer != null)
+        {
+            ConversationMenu.AddItem(CreateJobItem());
+        }
         UIMenuItem Cancel = new UIMenuItem("Cancel", "Stop asking questions");
         Cancel.Activated += (menu, item) =>
         {
@@ -164,6 +168,17 @@ public class AdvancedConversation
                 }
             }
         }
+    }
+    private UIMenuItem CreateJobItem()
+    {
+        UIMenuItem ji = new UIMenuItem("Accept Job", $"{ConversationSimple.ConversingPed.TaskForPlayer.DebugName}") { RightLabel = $"~HUD_COLOUR_GREENDARK~$???~s~" };
+        ji.Activated += (sender, selectedItem) =>
+        {
+            ConversationSimple.ConversingPed.TaskForPlayer.Start();
+            sender.Visible = false;
+            ConversationSimple.ConversingPed.WillGiveMission = false;
+        };
+        return ji;
     }
     private void AddGangItemQuestions()
     {

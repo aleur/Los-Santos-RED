@@ -62,12 +62,6 @@ public class TaskSettings : ISettingsDefaultable
     public int GangRepOnFailingTask { get; set; }
     [Description("Reputation gained upon completion of gang task")]
     public int GangRepOnCompletingTask { get; set; }
-    [Description("Days to complete URGENT gang task")]
-    public int GangDaysToCompleteUrgentTask { get; set; }
-    [Description("Reputation lost upon failing URGENT gang task")]
-    public int GangRepOnFailingUrgentTask { get; set; }
-    [Description("Reputation gained upon completion of URGENT gang task")]
-    public int GangRepOnCompletingUrgentTask { get; set; }
     [Description("Percent that you will extort stores in Enemy Territory")]
     public float GangRacketeeringExtortionPercentage { get; set; }
     [Description("Complications Percent of stores calling for enemy backup during extortion.")]
@@ -77,7 +71,7 @@ public class TaskSettings : ISettingsDefaultable
     [Description("Percent of torching stores in Enemy Territory")]
     public float GangArsonEnemyTurfPercentage { get; set; }
     [Description("Multiplies reputation gained by the number of enemies killed during lethal tasks")] // ass explanation but ok
-    public bool GangMultiplyRepByKillCount { get; set; }
+    public bool GangMultiplyRepByKillCount { get; set; } // what is the point of this again? why i ad d this
     public float DrugMeetAmbushPercentageNeutral { get; set; }
     public float DrugMeetAmbushPercentageFriendly { get; set; }
     public float DrugMeetPriceScalarMin { get; set; }
@@ -122,9 +116,6 @@ public class TaskSettings : ISettingsDefaultable
         GangDaysToCompleteTask = 7;
         GangRepOnFailingTask = -1000;
         GangRepOnCompletingTask = 500;
-        GangDaysToCompleteUrgentTask = 2;
-        GangRepOnFailingUrgentTask = -2000;
-        GangRepOnCompletingUrgentTask = 1000;
         GangMultiplyRepByKillCount = true;
         GangRacketeeringExtortionPercentage = 25f;
         GangRacketeeringExtortionComplicationsPercentage = 10f;

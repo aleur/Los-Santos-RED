@@ -32,7 +32,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
 
         protected Gang HiringGang;
         protected PhoneContact HiringContact;
-
+        public Zone TargetZone { get; set; }
         public int PaymentAmount { get; set; }
         public int RepOnCompletion { get; set; }
         public int DebtOnFail { get; set; }
