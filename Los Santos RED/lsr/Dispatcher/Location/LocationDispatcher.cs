@@ -65,11 +65,23 @@ public class LocationDispatcher
     {
         foreach (GameLocation ps in World.Places.ActiveLocations.ToList().Where(x => x.IsEnabled && x.DistanceToPlayer <= x.ActivateDistance && x.IsNearby && !x.IsDispatchFilled && (x.PossibleGroupSpawns != null || x.PossiblePedSpawns != null || x.PossibleVehicleSpawns != null)).ToList())
         {
+            bool CanPedsBeTargetedForAmbush = false, CanVehiclesBeTargetedForTheft = false;
+
+            if (ps is BlankLocation)
+            {
+                BlankLocation bl = (BlankLocation)ps;
+
+                CanPedsBeTargetedForAmbush = bl.CanBeAmbushableTarget;
+                CanVehiclesBeTargetedForTheft = bl.CanBeTheftTarget;
+            }
             if (ps.PossibleGroupSpawns != null)
             {
                 foreach (ConditionalGroup cg in ps.PossibleGroupSpawns)
                 {
                     EntryPoint.WriteToConsole($"ATTEMPTING GROUP SPAWN AT {ps.Name}");
+                    cg.CanBeAmbushableTarget = !CanPedsBeTargetedForAmbush ? false : cg.CanBeAmbushableTarget; // If Scenario can't be targeted, CGroup cannot be targeted. If it can be targeted, default to whatever the player set.
+                    cg.CanBeTheftTarget = !CanVehiclesBeTargetedForTheft ? false : cg.CanBeTheftTarget;
+
                     cg.AttemptSpawn(Player, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World, ps.AssociationID, Weapons, Names, Crimes, PedGroups, ShopMenus, 
                         WeatherReporter, Time, ModItems, ps, DispatchablePeople, DispatchableVehicles);
                     GameFiber.Yield();
@@ -98,8 +110,6 @@ public class LocationDispatcher
                 foreach (ConditionalLocation cl in ps.PossibleVehicleSpawns)
                 {
                     EntryPoint.WriteToConsole($"ATTEMPTING VEHICLE SPAWN AT {ps.Name} {ps.AssociationID}");
-
-
                     cl.AttemptSpawn(Player, false, false, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World, ps.AssociationID, Weapons, Names, Crimes, PedGroups, ShopMenus, 
                         WeatherReporter, Time, ModItems, ps, DispatchablePeople, DispatchableVehicles);
                     GameFiber.Yield();

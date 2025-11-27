@@ -242,7 +242,7 @@ public class PlayerTasks
         }
         return true;
     }
-    private bool RecentlyEndedTask(string contactName)
+    public bool RecentlyEndedTask(string contactName)
     {
         PlayerTask lastTask = LastContactTask.FirstOrDefault(x => x.ContactName.ToLower() == contactName.ToLower());
         if(lastTask == null)

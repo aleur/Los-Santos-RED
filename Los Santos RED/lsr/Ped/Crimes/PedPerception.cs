@@ -40,7 +40,7 @@ public class PedPerception
     }
     public void Update()
     {
-        if (Settings.SettingsManager.CivilianSettings.CheckCivilianCrimes && !PedExt.IsArrested && PedExt.PedViolations.WantedLevel == 0 && PedExt.PedViolations.CurrentlyViolatingWantedLevel == 0 && Settings.SettingsManager.CivilianSettings.AllowCivilinsToCallPoliceOnOtherCivilians)//used to have player.isnotwanted here
+        if (Settings.SettingsManager.CivilianSettings.CheckCivilianCrimes && !PedExt.IsArrested && PedExt.PedViolations.WantedLevel == 0 && PedExt.PedViolations.CurrentlyViolatingWantedLevel == 0 && Settings.SettingsManager.CivilianSettings.AllowCiviliansToCallPoliceOnOtherCivilians)//used to have player.isnotwanted here
         {
             CheckOtherPedCrimes();
         }

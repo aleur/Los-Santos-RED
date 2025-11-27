@@ -20,11 +20,9 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private GangDen HiringGangDen;
         private GameLocation TorchLocation;
         private Gang EnemyGang;
-        private Zone SelectedZone;
         private int GameTimeToWaitBeforeComplications;
         private bool HasAddedComplications;
         private bool WillAddComplications;
-        private PhoneContact PhoneContact;
         private bool hasExploded = false;
         private bool WillTorchEnemyTurf;
         private bool HasConditions => TorchLocation != null && HiringGangDen != null;
@@ -80,7 +78,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 }
                 else
                 {
-                    GangTasks.SendGenericTooSoonMessage(PhoneContact);
+                    GangTasks.SendGenericTooSoonMessage(HiringContact);
                 }
             }
         }
@@ -128,6 +126,37 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         private void GetTorchLocation()
         {
+            if (TargetZone != null)
+            {
+                List<GameLocation> PossibleSpots = PlacesOfInterest.PossibleLocations.RacketeeringTaskLocations().Where(x => x.IsCorrectMap(World.IsMPMapLoaded) && x.ZoneName == TargetZone.DisplayName).ToList();
+                List<GameLocation> AvailableSpots = new List<GameLocation>();
+
+                if (WillTorchEnemyTurf && TargetZone.AssignedGang != null)
+                {
+                    EnemyGang = TargetZone.AssignedGang;
+                }
+                else
+                {
+                    WillTorchEnemyTurf = false;
+                }
+
+                foreach (GameLocation possibleSpot in PossibleSpots)
+                {
+                    if (!PlacesOfInterest.PossibleLocations.PoliceStations.Any(ps => ps.IsSameState(Player.CurrentLocation) && ps.EntrancePosition.DistanceTo2D(possibleSpot.EntrancePosition) < 100f))
+                    {
+                        AvailableSpots.Add(possibleSpot);
+                    }
+                }
+                TorchLocation = AvailableSpots.PickRandom();
+            }
+
+            if (TorchLocation == null) // Fallback
+            {
+                GetRandomTorchLocation();
+            }
+        }
+        private void GetRandomTorchLocation()
+        {
             if (GangTerritories.GetGangTerritory(HiringGang.ID) == null)
             {
                 return;
@@ -140,7 +169,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             List<GameLocation> PossibleSpots = PlacesOfInterest.PossibleLocations.RacketeeringTaskLocations().Where(x => x.IsCorrectMap(World.IsMPMapLoaded) && x.IsSameState(Player.CurrentLocation?.CurrentZone?.GameState)).ToList();
             List<GameLocation> AvailableSpots = new List<GameLocation>();
             List<GangTerritory> availableTerritories = new List<GangTerritory>();
-            EnemyGang = null;
+
             if (WillTorchEnemyTurf)
             {
                 //availableTerritories = hiringGangTerritories.Where(zj => zj.Priority != 0).ToList();
@@ -171,23 +200,20 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 return;
             }
             GangTerritory selectedTerritory = availableTerritories.OrderBy(x => Guid.NewGuid()).FirstOrDefault();
-            if (WillTorchEnemyTurf && EnemyGang == null)
-            {
-                EnemyGang = Zones.GetZone(availableTerritories.FirstOrDefault().ZoneInternalGameName).AssignedGang;
-            }
             if (Zones.GetZone(selectedTerritory.ZoneInternalGameName) != null)
             {
-                SelectedZone = Zones.GetZone(selectedTerritory.ZoneInternalGameName);
+                TargetZone = Zones.GetZone(selectedTerritory.ZoneInternalGameName);
                 foreach (GameLocation possibleSpot in PossibleSpots)
                 {
                     Zone spotZone = Zones.GetZone(possibleSpot.EntrancePosition);
-                    bool isNear = PlacesOfInterest.PossibleLocations.PoliceStations.Any(policeStation => possibleSpot.EntrancePosition.DistanceTo2D(policeStation.EntrancePosition) < 100f);
-                    if (spotZone.InternalGameName == SelectedZone.InternalGameName && !isNear)// && !possibleSpot.HasVendor)
+                    bool isNear = !PlacesOfInterest.PossibleLocations.PoliceStations.Any(ps => ps.IsSameState(Player.CurrentLocation) && ps.EntrancePosition.DistanceTo2D(possibleSpot.EntrancePosition) < 100f);
+                    if (spotZone.InternalGameName == TargetZone.InternalGameName /* && !isNear*/)// && !possibleSpot.HasVendor)
                     {
                         AvailableSpots.Add(possibleSpot);
                     }
                 }
             }
+            else { return; }
             TorchLocation = AvailableSpots.PickRandom();
         }
         private void GetHiringDen()
@@ -230,7 +256,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             else
             {
                 Replies = new List<string>() {
-                $"Burn down {TorchLocation.Name} and remind them they can’t ignore us. You’ll get ~g~${PaymentAmount}~s~ for your work, 10% cut like usual.",
+                $"Burn down {TorchLocation.Name} and remind them they can’t ignore us. You’ll get ~g~${PaymentAmount}~s~ for your work.",
                 $"Set fire to {TorchLocation.Name} to show them we’re not messing around. Your reward: ~g~${PaymentAmount}~s~.",
                 $"Torch {TorchLocation.Name} and let them feel the consequences of defying us. ~g~${PaymentAmount}~s~ for you.",
                 $"Light {TorchLocation.Name} on fire and make them regret their unpaid debts. You’ll get ~g~${PaymentAmount}~s~ for your trouble.",

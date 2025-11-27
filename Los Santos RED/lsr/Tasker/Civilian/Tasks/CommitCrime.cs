@@ -3,33 +3,39 @@ using LosSantosRED.lsr.Interface;
 using Rage;
 using Rage.Native;
 using System.Collections.Generic;
+using System.Linq;
 
 public class CommitCrime : ComplexTask
 {
     private bool NeedsVictim;
     private int NewTargets = 0;
     private uint PreviousTargetHandle;
-    private string SelectedCrime;
     private Ped Target;
     private WeaponInformation ToIssue;
     private IWeapons Weapons;
     private IEntityProvideable World;
+    private IZones Zones;
     private uint GameTimeTimeStartedDealingDrugs;
     private uint GameTimeTimeStartedHarassing;
+    public string SelectedCrime { get; set; }
+    public bool CriminalExists => Ped != null && Ped.Pedestrian.Exists();
+    public bool CloseToPlayer => CriminalExists && Ped.DistanceToPlayer <= 200f;
+    public float DistanceToPlayer => Ped.DistanceToPlayer;
 
-    public CommitCrime(IComplexTaskable ped, ITargetable player, IWeapons weapons, IEntityProvideable world) : base(player, ped, 2000)
+    public CommitCrime(IComplexTaskable ped, ITargetable player, IWeapons weapons, IEntityProvideable world, IZones zones) : base(player, ped, 2000)
     {
         Name = "CommitCrime";
         SubTaskName = "";
         Weapons = weapons;
         World = world;
+        Zones = zones;
 
+        DetermineCrime();
     }
     public bool IsTrafficOnly { get; set; } = false;
     private bool IsPlayerTarget => Target.Exists() && Player.Character.Exists() && Target.Handle == Player.Character.Handle;
     public override void Start()
     {
-        DetermineCrime();
         IssueWeapon();
         StartCrimeTask();
         GameTimeLastRan = Game.GameTime;
@@ -124,15 +130,12 @@ public class CommitCrime : ComplexTask
     private void DetermineCrime()
     {
         List<string> PossibleCrimes = new List<string>();
+        PossibleCrimes.AddRange(new List<string>() { "AssaultingCivilians", "BrandishingWeapon", "FiringWeapon", "AssaultingWithDeadlyWeapon", "PublicIntoxication", "GrandTheftAuto", "Harassment", "AttemptingSuicide", "KillingCivilians", "TerroristActivity", "DealingDrugs" });
         if (Ped != null)
         {
             if (Ped.IsInVehicle || IsTrafficOnly)
             {
                 PossibleCrimes.AddRange(new List<string>() { "FelonySpeeding", "HitCarWithCar", "DrunkDriving" });
-            }
-            else
-            {
-                PossibleCrimes.AddRange(new List<string>() { "AssaultingCivilians", "BrandishingWeapon", "FiringWeapon", "AssaultingWithDeadlyWeapon", "PublicIntoxication", "GrandTheftAuto", "Harassment", "AttemptingSuicide", "KillingCivilians", "TerroristActivity", "DealingDrugs" });
             }
         }
         SelectedCrime = PossibleCrimes.PickRandom();
@@ -176,6 +179,28 @@ public class CommitCrime : ComplexTask
             NativeFunction.CallByName<bool>("TASK_VEHICLE_DRIVE_WANDER", Ped.Pedestrian, Ped.Pedestrian.CurrentVehicle, 42f, (int)eCustomDrivingStyles.SpeedingDriving, 10f);
         }
     }
+    public void SetZoneCriminal(Zone zone, bool blip, RelationshipGroup rg)
+    {
+        if (CriminalExists) return;
+
+        PedExt Criminal = World.Pedestrians.CivilianList.Where(x => x.Pedestrian.Exists() && x.Pedestrian.IsAlive && x.DistanceToPlayer <= 200f && (Zones.GetZone(x.Position) == zone) && x.CanBeTasked && x.CanBeAmbientTasked).FirstOrDefault();//85f//150f
+        if (Criminal != null && Criminal.Pedestrian.Exists())
+        {
+            if (blip && Criminal.Pedestrian.Exists())
+            {
+                Criminal.AddBlip();
+            }
+            Criminal.CanBeAmbientTasked = false;
+            Criminal.WasSetCriminal = true;
+            Criminal.WillCallPolice = false;
+            Criminal.WillCallPoliceIntense = false;
+            Criminal.Pedestrian.RelationshipGroup = rg;
+            Criminal.Pedestrian.IsPersistent = true;
+
+            World.Events.CivilianEvents.CriminalsList.Add(Criminal);
+            Ped = Criminal;
+        }
+    }
     private void GetNewVictim()
     {
         if (Ped.Pedestrian.Exists())
@@ -210,7 +235,7 @@ public class CommitCrime : ComplexTask
             {
                 PreviousTargetHandle = Target.Handle;
                 NewTargets++;
-                //EntryPoint.WriteToConsole($"CommitCrime: {Ped.Pedestrian} Got New Target {Target.Handle}", 5);
+                EntryPoint.WriteToConsole($"{SelectedCrime}: {Ped.Pedestrian} Got New Target {Target.Handle}", 5);
             }
         }
     }
@@ -237,6 +262,7 @@ public class CommitCrime : ComplexTask
     }
     private void IssueWeapon()
     {
+        if (Ped == null) return;
         List<string> WeaponCrimes = new List<string>() { "FiringWeapon", "AssaultingWithDeadlyWeapon", "KillingCivilians", "TerroristActivity", "AttemptingSuicide" };
         bool equipNow = false;
         if (WeaponCrimes.Contains(SelectedCrime))
@@ -260,7 +286,7 @@ public class CommitCrime : ComplexTask
                 }
             }
         }
-        if (ToIssue != null)
+        if (ToIssue != null && Ped.Pedestrian.Exists())
         {
             Ped.Pedestrian.Inventory.GiveNewWeapon(ToIssue.Hash, ToIssue.AmmoAmount, equipNow);
             //EntryPoint.WriteToConsole($"CommitCrime: {Ped.Pedestrian} Issued Weapon {ToIssue.ModelName}", 5);

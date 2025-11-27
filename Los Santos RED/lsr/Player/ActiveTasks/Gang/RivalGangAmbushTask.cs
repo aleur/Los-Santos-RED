@@ -12,29 +12,31 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
 {
     public class RivalGangAmbushTask : GangTask, IPlayerTask
     {
+        private TurfStatus GangTerritoryStatus;
         private IGangTerritories GangTerritories;
         private IZones Zones;
         private GangDen HiringGangDen;
         private Gang TargetGang;
-        private Zone TargetZone;
         private int GameTimeToWaitBeforeComplications;
         private bool HasAddedComplications;
         private bool WillAddComplications;
-        private int KilledMembersAtStart;
-        private int ExternalZoneKills = 0;
-        private int InternalZoneKills = 0;
+        private bool AllTargetsKilled = false;
+        private bool PlayerHasKilled => MembersKilled > 0;
+        private int MembersKilled = 0;
+        private BlankLocation TargetedScenario;
+        private List<GangSpawnTask> TargetSpawns = new List<GangSpawnTask>();
         private int KillRequirement { get; set; } = 1;
-        private bool HasConditions => HiringGangDen != null && TargetZone != null;
-
+        private bool HasConditions => HiringGangDen != null && TargetedScenario != null;
         public bool JoinGangOnComplete { get; set; } = false;
 
         public RivalGangAmbushTask(ITaskAssignable player, ITimeControllable time, IGangs gangs, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, ICrimes crimes, IWeapons weapons, INameProvideable names, IPedGroups pedGroups,
-            IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, Gang hiringGang, Gang targetGang, int killRequirement, IGangTerritories gangTerritories, IZones zones) : base(player, time, gangs, placesOfInterest, activeDrops, settings, world, crimes, weapons, names, pedGroups, shopMenus, modItems, playerTasks, gangTasks, hiringContact, hiringGang)
+            IShopMenus shopMenus, IModItems modItems, PlayerTasks playerTasks, GangTasks gangTasks, PhoneContact hiringContact, Gang hiringGang, Gang targetGang, IGangTerritories gangTerritories, IZones zones, TurfStatus gangTerritoryStatus) : base(player, time, gangs, placesOfInterest, activeDrops, settings, world, crimes, weapons, names, pedGroups, shopMenus, modItems, playerTasks, gangTasks, hiringContact, hiringGang)
         {
             TargetGang = targetGang;
-            KillRequirement = killRequirement;
+            //KillRequirement = killRequirement;
             GangTerritories = gangTerritories;
             Zones = zones;
+            GangTerritoryStatus = gangTerritoryStatus;
         }
         public override void Setup()
         {
@@ -53,11 +55,21 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         {
             if (PlayerTasks.CanStartNewTask(HiringGang?.ContactName))
             {
-                GetTargetZone();
+                if (TargetZone != null && TargetZone.AssignedGang != null && TargetZone.AssignedGang != HiringGang)
+                {
+                    TargetGang = TargetZone.AssignedGang;
+                }
+                else
+                {
+                    GetTargetGang();
+                    GetTargetZone();
+                }
+                GetTargetScenario();
                 GetHiringDen();
                 if (HasConditions)
                 {
                     GetPayment();
+                    UpdateTargetSpawns();
                     SendInitialInstructionsMessage();
                     AddTask();
                     GameFiber PayoffFiber = GameFiber.StartNew(delegate
@@ -85,24 +97,29 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
             while (true)
             {
                 CurrentTask = PlayerTasks.GetTask(HiringContact?.Name);
-                //Game.DisplaySubtitle($"{InternalZoneKills}/{KillRequirement} {ExternalZoneKills} OOZ Kills");
                 if (CurrentTask == null || !CurrentTask.IsActive)
                 {
                     break;
                 }
-                if (Zones.GetZone(Player.Character.Position) != TargetZone)
+                if (TargetedScenario.DistanceToPlayer <= TargetedScenario.ActivateDistance && TargetedScenario.IsNearby && !PlayerHasKilled) // Check if player near -- if not dont account for those recently spawned
                 {
-                    ExternalZoneKills = Player.RelationshipManager.GangRelationships.GetReputation(TargetGang).MembersKilled - KilledMembersAtStart - InternalZoneKills;
+                    UpdateTargetSpawns();
                 }
-                else
+                if (TargetSpawns == null || !TargetSpawns.Any())
                 {
-                    InternalZoneKills = Player.RelationshipManager.GangRelationships.GetReputation(TargetGang).MembersKilled - KilledMembersAtStart - ExternalZoneKills;
+                    GameFiber.Sleep(1000);
+                    continue;
                 }
-                if (InternalZoneKills >= KillRequirement)
+
+                MembersKilled = TargetSpawns.Sum(x => x.CreatedPeople?.Count(y => y.IsDead) ?? 0); // Regardless if player was their killer
+                AllTargetsKilled = !TargetSpawns.Any(x => x.CreatedPeople?.Any(y => !y.IsDead) ?? false);
+
+                if (AllTargetsKilled)
                 {
                     CurrentTask.OnReadyForPayment(true);
                     break;
                 }
+
                 GameFiber.Sleep(1000);
             }
         }
@@ -114,13 +131,68 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 else SetReadyToPickupDeadDrop(); 
             }
         }
-        private void GetTargetZone()
+        private void GetTargetGang()
         {
             if (TargetGang == null)
             {
+                TargetGang = Gangs.GetAllGangs().Where(x => x.ID != HiringGang.ID).PickRandom();
+            }
+        }
+        private void GetTargetScenario()
+        {
+            List<BlankLocation> targetableScenarios = new List<BlankLocation>();
+
+            // Get blank locations where GangConditionalLocation exists
+            foreach (BlankLocation bl in World.Places.ActiveLocations.OfType<BlankLocation>().ToList().Where(x => x.IsEnabled && x.CanBeAmbushableTarget && Zones.GetZone(x.EntrancePosition) == TargetZone).ToList())
+            {
+                bool UsingGroupSpawns = bl.PossibleGroupSpawns != null && bl.PossibleGroupSpawns.Any(),
+                     UsingPedSpawns = bl.PossiblePedSpawns != null && bl.PossiblePedSpawns.Any();
+
+                if (UsingGroupSpawns) // Detailed ambushes (using descriptions)
+                {
+                    List<ConditionalGroup> cgGroup = bl.PossibleGroupSpawns.Where(x => x.CanBeAmbushableTarget && x.PossiblePedSpawns.OfType<GangConditionalLocation>().ToList().Any()).ToList();
+                    
+                    if (cgGroup.Any()) targetableScenarios.Add(bl);
+                }
+                else if (UsingPedSpawns && bl.PossiblePedSpawns.OfType<GangConditionalLocation>().Any()) // Basic ambushes (x amount of members of x gang to kill)
+                {
+                    targetableScenarios.Add(bl);
+                }
+            }
+            TargetedScenario = targetableScenarios.PickRandom();
+        }
+        private void UpdateTargetSpawns()
+        {
+            bool UsingGroupSpawns = TargetedScenario.PossibleGroupSpawns != null && TargetedScenario.PossibleGroupSpawns.Any(),
+                 UsingPedSpawns = TargetedScenario.PossiblePedSpawns != null && TargetedScenario.PossiblePedSpawns.Any();
+
+            TargetSpawns.Clear();
+
+            if (UsingGroupSpawns) // Detailed ambushes (using descriptions)
+            {
+                TargetSpawns.AddRange(TargetedScenario.PossibleGroupSpawns
+                        .Where(x => x.CanBeAmbushableTarget)
+                        .SelectMany(x => x.PossiblePedSpawns.OfType<GangConditionalLocation>())
+                        .Where(x => x.GangSpawnTask != null)
+                        .Select(x => x.GangSpawnTask)
+                );
+            }
+            else if (UsingPedSpawns) // Basic ambushes (x amount of members of x gang to kill)
+            {
+                TargetSpawns.AddRange(TargetedScenario.PossiblePedSpawns
+                    .OfType<GangConditionalLocation>()
+                    .Where(x => x.GangSpawnTask != null)
+                    .Select(x => x.GangSpawnTask)
+                );
+            }
+        }
+        private void GetTargetZone()
+        {
+            if (TargetGang == null || TargetZone != null)
+            {
                 return;
             }
-            List<GangTerritory> totalTerritories = GangTerritories.GetGangTerritory(TargetGang.ID)?.Where(x=> x.Priority == 0).ToList();
+            List<GangTerritory> totalTerritories = GangTerritories.GetGangTerritory(TargetGang.ID)?.Where(x => x.Priority == 0).ToList();
             if(totalTerritories == null || !totalTerritories.Any())
             {
                 return;
@@ -146,11 +218,11 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         protected override void AddTask()
         {
+            TargetedScenario.IsAmbushTarget = true;
             GameTimeToWaitBeforeComplications = RandomItems.GetRandomNumberInt(3000, 10000);
             HasAddedComplications = false;
             WillAddComplications = false;// RandomItems.RandomPercent(Settings.SettingsManager.TaskSettings.RivalGangHitComplicationsPercentage);
             GangReputation gr = Player.RelationshipManager.GangRelationships.GetReputation(TargetGang);
-            KilledMembersAtStart = gr.MembersKilled;
             PlayerTasks.AddTask(HiringContact, PaymentAmount, RepOnCompletion, DebtOnFail, RepOnFail, DaysToComplete,DebugName);
         }
         protected override void SendInitialInstructionsMessage()
