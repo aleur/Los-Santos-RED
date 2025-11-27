@@ -100,6 +100,7 @@ namespace LSR.Vehicles
         public int FuelTankCapacity { get; private set; } = 20;
         public bool AddedToReportedStolenQueue { get; set; }
         public bool CanBeExported { get; set; } = true;
+        public bool AreVehiclesTargeted { get; set; } = false;
         public bool CanHavePlateRandomlyUpdated { get; set; } = true;
         public bool NeedsToBeReportedStolen
         {

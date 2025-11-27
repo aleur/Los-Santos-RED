@@ -46,6 +46,13 @@ public class ConditionalGroup
     public List<ConditionalLocation> PossibleVehicleSpawns { get; set; }
     [XmlIgnore]
     public bool AttemptedSpawn { get; private set; }
+    public bool CanBeAmbushableTarget { get; set; } = true;
+    public bool CanVehiclesBeTarget { get; set; } = true;
+    public float TargetSelectionChance { get; set; } = 100f;
+    [XmlIgnore]
+    public bool IsAmbushTarget { get; set; } = false;
+    [XmlIgnore]
+    public bool AreVehiclesTargeted { get; set; } = false;
     public virtual void AttemptSpawn(IDispatchable player, IAgencies agencies, IGangs gangs, IZones zones, IJurisdictions jurisdictions, IGangTerritories gangTerritories, ISettingsProvideable settings, IEntityProvideable world, string masterAssociationID, 
         IWeapons weapons, INameProvideable names, ICrimes crimes, IPedGroups pedGroups, IShopMenus shopMenus, IWeatherReportable weatherReporter, ITimeControllable time, IModItems modItems,
         GameLocation gameLocation, IDispatchablePeople dispatchablePeople, IDispatchableVehicles dispatchableVehicles)
@@ -78,6 +85,7 @@ public class ConditionalGroup
         {
             foreach (ConditionalLocation cl in PossiblePedSpawns)
             {
+                cl.IsAmbushTarget = CanBeAmbushableTarget && IsAmbushTarget;
                 cl.AttemptSpawn(Player, true, true, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World, masterAssociationID, Weapons, Names, Crimes, PedGroups, ShopMenus, WeatherReporter, Time, ModItems, GameLocation, DispatchablePeople, DispatchableVehicles);
                 GameFiber.Yield();
             }
@@ -87,6 +95,7 @@ public class ConditionalGroup
         {
             foreach (ConditionalLocation cl in PossibleVehicleSpawns)
             {
+                cl.AreVehiclesTargeted = CanVehiclesBeTarget && AreVehiclesTargeted;
                 cl.AttemptSpawn(Player, false, true, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World, masterAssociationID, Weapons, Names, Crimes, PedGroups, ShopMenus, WeatherReporter, Time, ModItems, GameLocation, DispatchablePeople, DispatchableVehicles);
                 GameFiber.Yield();
             }
@@ -113,6 +122,10 @@ public class ConditionalGroup
     }
     public virtual bool DetermineRun()
     {
+        if (IsAmbushTarget || AreVehiclesTargeted)
+        {
+            return true;
+        }
         if (!IsValidTimeToSpawn())
         {
             // EntryPoint.WriteToConsole($"NOT IsValidTimeToSpawn Time:{Time.CurrentHour} {MinHourSpawn} {MaxHourSpawn} IsMinLess:{MinHourSpawn <= MaxHourSpawn}");

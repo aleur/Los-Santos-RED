@@ -216,8 +216,6 @@ public class PossibleLocations
     {
         List<GameLocation> AllLocations = new List<GameLocation>();
         AllLocations.AddRange(Banks);
-        AllLocations.AddRange(ScrapYards);
-        AllLocations.AddRange(CarCrushers);
         AllLocations.AddRange(Hotels);
         AllLocations.AddRange(Restaurants);
         AllLocations.AddRange(Businesses);

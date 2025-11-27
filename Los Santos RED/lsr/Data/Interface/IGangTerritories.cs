@@ -9,10 +9,12 @@ namespace LosSantosRED.lsr.Interface
 {
     public interface IGangTerritories
     {
+        List<GangTerritory> GangTerritoriesList { get; }
         Gang GetRandomGang(string internalGameName, int wantedLevel);
         List<Gang> GetGangs(string internalGameName, int wantedLevel);
         Gang GetMainGang(string internalGameName);
         Gang GetNthGang(string internalGameName, int v);
         List<GangTerritory> GetGangTerritory(string iD);
+        List<GangTerritory> GetGangTerritory(string iD, int priority);
     }
 }

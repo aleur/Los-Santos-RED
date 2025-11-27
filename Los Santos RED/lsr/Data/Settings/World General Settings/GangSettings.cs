@@ -171,6 +171,12 @@ public class GangSettings : ISettingsDefaultable
     public bool AllowNonEnemyTargets { get; set; }
     public bool AllowFlyThroughWindshield { get; set; }
     public float FlyThroughWindshieldPercent { get; set; }
+    [Description("Default maximum time required between gang tasks in gang territories.")]
+    public uint MaximumTimeBetweenGangTasksTerritories { get; set; }
+    [Description("Default minimum time required between gang tasks in gang territories.")]
+    public uint MinimumTimeBetweenGangTasksTerritories { get; set; }
+    [Description("Default gang task frequency if Gang Territory doesn't have one. Set to zero to disable gang tasks. The value [0.0–1.0] scales inversely across the max and min range, higher values return a lower time (more tasks), lower values return a higher time (less tasks).")]
+    public float GangTaskFrequency { get; set; }
 
     public GangSettings()
     {
@@ -322,7 +328,9 @@ public class GangSettings : ISettingsDefaultable
         AllowFlyThroughWindshield = true;
         FlyThroughWindshieldPercent = 13;
 
-
+        MaximumTimeBetweenGangTasksTerritories = 2100000;
+        MinimumTimeBetweenGangTasksTerritories = 300000;
+        GangTaskFrequency = 0.5f;
     }
 
 }

@@ -79,7 +79,7 @@ namespace LosSantosRED.lsr
                 NAudioPlayer2, ModDataFileManager.PlacesOfInterest, ModDataFileManager.Interiors, ModDataFileManager.ModItems, ModDataFileManager.Intoxicants, ModDataFileManager.Gangs, ModDataFileManager.Jurisdictions,
                 ModDataFileManager.GangTerritories, ModDataFileManager.GameSaves, ModDataFileManager.Names, ModDataFileManager.ShopMenus, ModDataFileManager.RelationshipGroups, ModDataFileManager.DanceList, ModDataFileManager.SpeechList,
                 ModDataFileManager.Seats, ModDataFileManager.Agencies, ModDataFileManager.SavedOutfits, ModDataFileManager.VehicleSeatDoorData, ModDataFileManager.Cellphones, ModDataFileManager.Contacts, ModDataFileManager.VehicleRaces, ModDataFileManager.DispatchableVehicles, ModDataFileManager.DispatchablePeople);
-            World.Setup(Player, Player);
+            World.Setup(Player, Player, Player, Player);
             GameFiber.Yield();
             Player.Setup();
             GameFiber.Yield();
@@ -259,8 +259,10 @@ namespace LosSantosRED.lsr
 
                     new ModTask(2000, "Player.GangRelationshipsUpdate", Player.RelationshipManager.GangRelationships.Update, 4),//might become a priority...
                     new ModTask(5000, "Player.Properties.Update", Player.Properties.Update, 5),//might become a priority...
+                    new ModTask(4000, "World.Events.UpdateEvents", World.Events.CivilianEvents.Update, 6), // idk
+                    new ModTask(1000, "World.Events.UpdateEvents", World.Events.GangEvents.Update, 7), // idk
 
-                    new ModTask(1000, "World.Update", World.Update, 6),///????MAYBE BAD?
+                    new ModTask(1000, "World.Update", World.Update, 8),///????MAYBE BAD?
                 }),
                 new ModTaskGroup("RG11:TaskerUpdate", new List<ModTask>()
                 {

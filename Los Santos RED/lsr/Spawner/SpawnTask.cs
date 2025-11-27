@@ -1,15 +1,16 @@
-﻿using LSR.Vehicles;
+﻿using ExtensionsMethods;
+using LosSantosRED.lsr.Interface;
+using LSR.Vehicles;
 using Rage;
 using Rage.Native;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using LosSantosRED.lsr.Interface;
-using System.Drawing;
-using ExtensionsMethods;
 using System.Windows.Media;
+using System.Xml.Serialization;
 using static RAGENativeUI.Elements.UIMenuStatsPanel;
 
 public abstract class SpawnTask
@@ -57,6 +58,8 @@ public abstract class SpawnTask
     public TaskRequirements SpawnRequirement { get; set; }
     public bool SpawnWithAllWeapons { get; set; } = false;
     public bool DoPersistantEntityCheck { get; set; } = true;
+    public bool IsAmbushTarget { get; set; } = false;
+    public bool AreVehiclesTargeted { get; set; } = false;
     public Vector3 Position
     {
         get
@@ -111,6 +114,7 @@ public abstract class SpawnTask
         {
             return;
         }
+        LastCreatedVehicle.AreVehiclesTargeted = AreVehiclesTargeted;
         if (HasPersonToSpawn)
         {
             if (WillAddDriver)
@@ -199,7 +203,7 @@ public abstract class SpawnTask
     }
     protected virtual void AttemptPersonOnlySpawn()
     {
-        CreatePerson(-1);
+        PedExt Person = CreatePerson(-1);
         if (!AllowBuddySpawn)
         {
             return;
@@ -212,7 +216,7 @@ public abstract class SpawnTask
             {
                 SpawnLocation.InitialPosition = Position.Around2D(1f);
                 SpawnLocation.SidewalkPosition = Vector3.Zero;
-                CreatePerson(-1);
+                PedExt p = CreatePerson(-1);
             }
         }    
     }

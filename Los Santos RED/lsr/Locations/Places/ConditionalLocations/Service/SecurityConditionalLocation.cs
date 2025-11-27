@@ -5,11 +5,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 public class SecurityConditionalLocation : ConditionalLocation
 {
     private Agency Agency;
-
+    [XmlIgnore]
+    public SecurityGuardSpawnTask SecuritySpawnTask { get; set; }
     public SecurityConditionalLocation(Vector3 location, float heading, float percentage) : base(location, heading, percentage)
     {
     }
@@ -43,15 +45,17 @@ public class SecurityConditionalLocation : ConditionalLocation
         try
         {
             //EntryPoint.WriteToConsole("RUN SECURITY SPAWN TASK HAS EXECUTED");
-            SecurityGuardSpawnTask securitySpawnTask = new SecurityGuardSpawnTask(Agency, SpawnLocation, DispatchableVehicle, DispatchablePerson, Settings.SettingsManager.SecuritySettings.ShowSpawnedBlips, Settings, Weapons, Names, true, World, Crimes, ModItems, ShopMenus);
-            securitySpawnTask.AllowAnySpawn = true;
-            securitySpawnTask.AllowBuddySpawn = false;
-            securitySpawnTask.ClearVehicleArea = true;
-            securitySpawnTask.SpawnRequirement = TaskRequirements;
-            securitySpawnTask.PlacePedOnGround = DispatchableVehicle == null; //true;
-            securitySpawnTask.AttemptSpawn();
+            SecuritySpawnTask = new SecurityGuardSpawnTask(Agency, SpawnLocation, DispatchableVehicle, DispatchablePerson, Settings.SettingsManager.SecuritySettings.ShowSpawnedBlips, Settings, Weapons, Names, true, World, Crimes, ModItems, ShopMenus);
+            SecuritySpawnTask.AllowAnySpawn = true;
+            SecuritySpawnTask.AllowBuddySpawn = false;
+            SecuritySpawnTask.ClearVehicleArea = true;
+            SecuritySpawnTask.SpawnRequirement = TaskRequirements;
+            SecuritySpawnTask.PlacePedOnGround = DispatchableVehicle == null; //true;
+            SecuritySpawnTask.IsAmbushTarget = IsAmbushTarget;
+            SecuritySpawnTask.AreVehiclesTargeted = AreVehiclesTargeted;
+            SecuritySpawnTask.AttemptSpawn();
             //EntryPoint.WriteToConsole("SECUIRTY RUN SPAWN TASK PRE POST RUN");
-            securitySpawnTask.PostRun(this, GameLocation);
+            SecuritySpawnTask.PostRun(this, GameLocation);
 
             //securitySpawnTask.CreatedPeople.ForEach(x => { EntryPoint.WriteToConsole($"I CREATED SECURITY {x.Handle}"); });
 

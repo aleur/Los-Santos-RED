@@ -516,6 +516,10 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private void GetRobberyInformation()
         {
             List<GameLocation> PossibleSpots = PlacesOfInterest.PossibleLocations.RobberyTaskLocations().Where(x=> (string.IsNullOrEmpty(ForcedLocationType) || ForcedLocationType == "Random" || x.TypeName == ForcedLocationType) && x.IsCorrectMap(World.IsMPMapLoaded) && x.IsSameState(Player.CurrentLocation?.CurrentZone?.GameState)).ToList();
+            if (TargetZone != null)
+            {
+                PossibleSpots = PossibleSpots.Where(x => World.Zones.GetZone(x.EntrancePosition) == TargetZone).ToList();
+            }
             List<GameLocation> AvailableSpots = new List<GameLocation>();
             foreach (GameLocation possibleSpot in PossibleSpots)
             {

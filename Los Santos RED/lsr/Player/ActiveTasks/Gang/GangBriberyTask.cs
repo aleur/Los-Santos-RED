@@ -26,9 +26,8 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private IGangTerritories GangTerritories;
         private IZones Zones;
         private UIMenuItem depositMoney;
-        private Zone SelectedZone;
         private GameLocation DepositLocation;
-        private bool HasConditions => DepositLocation != null && HiringGangDen != null && SelectedZone != null;
+        private bool HasConditions => DepositLocation != null && HiringGangDen != null && TargetZone != null;
 
         public PlayerTask PlayerTask => CurrentTask;
 
@@ -143,12 +142,24 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         private void GetTargetBank()
         {
+            if (TargetZone != null)
+            {
+                DepositLocation = PlacesOfInterest.PossibleLocations.Banks.Where(x => x.ZoneName == TargetZone.DisplayName).PickRandom();
+            }
+
+            if (DepositLocation == null)
+            {
+                GetRandomTargetBank();
+            }
+        }
+        private void GetRandomTargetBank()
+        {
             DepositLocation = PlacesOfInterest.PossibleLocations.Banks.Where(x=>x.IsSameState(Player.CurrentLocation?.CurrentZone?.GameState)).PickRandom();     
             if(DepositLocation  == null)
             {
                 return;
             }
-            SelectedZone = Zones.GetZone(DepositLocation.EntrancePosition);
+            TargetZone = Zones.GetZone(DepositLocation.EntrancePosition);
         }
         private void GetHiringDen()
         {
@@ -189,16 +200,16 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private void SendDropOffMessage()
         {
             List<string> Replies = new List<string>() {
-            $"The {SelectedZone.AssignedLEAgency.ColorPrefix}{SelectedZone.AssignedLEAgency.ShortName}~s~ chief’s been getting a little too curious. A quiet deposit at {DepositLocation.Name} in {SelectedZone.DisplayName} should keep him quiet. Leave ~g~{HushMoney:C0}~s~ there.",
-            $"Word’s spreading that the {SelectedZone.DisplayName} chief’s getting too nosy. Make a discreet deposit at {DepositLocation.Name} with ~g~{HushMoney:C0}~s~ to shut him up.",
-            $"The chief in {SelectedZone.DisplayName} is starting to raise eyebrows. Smooth things over with a small gesture at {DepositLocation.Name}. Leave ~g~{HushMoney:C0}~s~ and walk away clean.",
-            $"The {SelectedZone.AssignedLEAgency.ColorPrefix}{SelectedZone.AssignedLEAgency.ShortName}~s~ chief’s poking around. Make sure he’s properly compensated. Head to {DepositLocation.Name} in {SelectedZone.DisplayName} and drop off ~g~{HushMoney:C0}~s~.",
-            $"The chief's been asking questions in {SelectedZone.DisplayName}. A little cash at {DepositLocation.Name} should keep him distracted. Leave ~g~{HushMoney:C0}~s~.",
-            $"That chief in {SelectedZone.DisplayName} is digging too deep. Drop off ~g~{HushMoney:C0}~s~ at {DepositLocation.Name} and keep things quiet.",
-            $"The {SelectedZone.AssignedLEAgency.ColorPrefix}{SelectedZone.AssignedLEAgency.ShortName}~s~ chief’s starting to get suspicious. A quiet deposit at {DepositLocation.Name} with ~g~{HushMoney:C0}~s~ should calm him down.",
-            $"In {SelectedZone.DisplayName}, the chief’s been sniffing around. Head to {DepositLocation.Name} and leave ~g~{HushMoney:C0}~s~ to keep him from asking any more questions.",
-            $"Too much noise from the {SelectedZone.AssignedLEAgency.ColorPrefix}{SelectedZone.AssignedLEAgency.ShortName}~s~ chief. Make a discreet deposit at {DepositLocation.Name} in {SelectedZone.DisplayName}, leave ~g~{HushMoney:C0}~s~ and everything will be fine.",
-            $"The chief in {SelectedZone.DisplayName} is causing trouble. A quick stop at {DepositLocation.Name} with ~g~{HushMoney:C0}~s~ will smooth things over.",
+            $"The {TargetZone.AssignedLEAgency.ColorPrefix}{TargetZone.AssignedLEAgency.ShortName}~s~ chief’s been getting a little too curious. A quiet deposit at {DepositLocation.Name} in {TargetZone.DisplayName} should keep him quiet. Leave ~g~{HushMoney:C0}~s~ there.",
+            $"Word’s spreading that the {TargetZone.DisplayName} chief’s getting too nosy. Make a discreet deposit at {DepositLocation.Name} with ~g~{HushMoney:C0}~s~ to shut him up.",
+            $"The chief in {TargetZone.DisplayName} is starting to raise eyebrows. Smooth things over with a small gesture at {DepositLocation.Name}. Leave ~g~{HushMoney:C0}~s~ and walk away clean.",
+            $"The {TargetZone.AssignedLEAgency.ColorPrefix}{TargetZone.AssignedLEAgency.ShortName}~s~ chief’s poking around. Make sure he’s properly compensated. Head to {DepositLocation.Name} in {TargetZone.DisplayName} and drop off ~g~{HushMoney:C0}~s~.",
+            $"The chief's been asking questions in {TargetZone.DisplayName}. A little cash at {DepositLocation.Name} should keep him distracted. Leave ~g~{HushMoney:C0}~s~.",
+            $"That chief in {TargetZone.DisplayName} is digging too deep. Drop off ~g~{HushMoney:C0}~s~ at {DepositLocation.Name} and keep things quiet.",
+            $"The {TargetZone.AssignedLEAgency.ColorPrefix}{TargetZone.AssignedLEAgency.ShortName}~s~ chief’s starting to get suspicious. A quiet deposit at {DepositLocation.Name} with ~g~{HushMoney:C0}~s~ should calm him down.",
+            $"In {TargetZone.DisplayName}, the chief’s been sniffing around. Head to {DepositLocation.Name} and leave ~g~{HushMoney:C0}~s~ to keep him from asking any more questions.",
+            $"Too much noise from the {TargetZone.AssignedLEAgency.ColorPrefix}{TargetZone.AssignedLEAgency.ShortName}~s~ chief. Make a discreet deposit at {DepositLocation.Name} in {TargetZone.DisplayName}, leave ~g~{HushMoney:C0}~s~ and everything will be fine.",
+            $"The chief in {TargetZone.DisplayName} is causing trouble. A quick stop at {DepositLocation.Name} with ~g~{HushMoney:C0}~s~ will smooth things over.",
             };
             Player.CellPhone.AddPhoneResponse(HiringContact.Name, HiringContact.IconName, Replies.PickRandom());
         }

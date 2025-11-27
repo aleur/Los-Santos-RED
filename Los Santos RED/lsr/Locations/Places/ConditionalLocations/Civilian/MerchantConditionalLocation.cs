@@ -8,10 +8,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Xml.Serialization;
 
 public class MerchantConditionalLocation : ConditionalLocation
 {
     //protected GameLocation GameLocation;
+    [XmlIgnore]
+    public MerchantSpawnTask MerchantSpawnTask { get; set; }
     public MerchantConditionalLocation(Vector3 location, float heading, float percentage) : base(location, heading, percentage)
     {
 
@@ -24,16 +27,18 @@ public class MerchantConditionalLocation : ConditionalLocation
     {
         try
         {
-            MerchantSpawnTask merchantSpawnTask = new MerchantSpawnTask(SpawnLocation, null, DispatchablePerson, false, false, true, Settings, Crimes, Weapons, Names, World, ModItems, ShopMenus, GameLocation);//, Names, true, Crimes, PedGroups, ShopMenus, World, ModItems, ForceMelee, ForceSidearm, ForceLongGun);// Settings.SettingsManager.Police.SpawnedAmbientPoliceHaveBlip);
-            merchantSpawnTask.PossibleHeads = GameLocation.VendorPossibleHeads;
-            merchantSpawnTask.AllowAnySpawn = true;
-            merchantSpawnTask.AllowBuddySpawn = false;
-            merchantSpawnTask.SetupMenus = false;
-            merchantSpawnTask.SpawnRequirement = TaskRequirements;
-            //merchantSpawnTask.ClearVehicleArea = true;
-            //merchantSpawnTask.PlacePedOnGround = true;
-            merchantSpawnTask.AttemptSpawn();
-            merchantSpawnTask.PostRun(this, GameLocation);
+            MerchantSpawnTask = new MerchantSpawnTask(SpawnLocation, null, DispatchablePerson, false, false, true, Settings, Crimes, Weapons, Names, World, ModItems, ShopMenus, GameLocation);//, Names, true, Crimes, PedGroups, ShopMenus, World, ModItems, ForceMelee, ForceSidearm, ForceLongGun);// Settings.SettingsManager.Police.SpawnedAmbientPoliceHaveBlip);
+            MerchantSpawnTask.PossibleHeads = GameLocation.VendorPossibleHeads;
+            MerchantSpawnTask.AllowAnySpawn = true;
+            MerchantSpawnTask.AllowBuddySpawn = false;
+            MerchantSpawnTask.SetupMenus = false;
+            MerchantSpawnTask.SpawnRequirement = TaskRequirements;
+            //MerchantSpawnTask.ClearVehicleArea = true;
+            //MerchantSpawnTask.PlacePedOnGround = true;
+            MerchantSpawnTask.IsAmbushTarget = IsAmbushTarget;
+            MerchantSpawnTask.AreVehiclesTargeted = AreVehiclesTargeted;
+            MerchantSpawnTask.AttemptSpawn();
+            MerchantSpawnTask.PostRun(this, GameLocation);
             //merchantSpawnTask.CreatedPeople.ForEach(x => { World.Pedestrians.AddEntity(x); x.IsLocationSpawned = true; AddLocationRequirements(x); });
         }
         catch (Exception ex)

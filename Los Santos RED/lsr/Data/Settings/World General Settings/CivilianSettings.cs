@@ -82,12 +82,42 @@ public class CivilianSettings : ISettingsDefaultable
     public bool TaskMissionPeds { get; set; }
     [Description("Allows hold ups and talking of mission or other mod spawned civilians in the world.")]
     public bool AllowMissionPedsToInteract { get; set; }
+    [Description("Disables random crime system (AllowRandomCrimes) and is zone dependent. If min and max times not initialized in Zone, uses MaximumTimeBetweenZoneBasedCrimes and MinimumTimeBetweenZoneBasedCrimes.")]
+    public bool EnableZoneBasedCrime { get; set; }
+    [Description("Default maximum time required between crimes in zones.")]
+    public uint MaximumTimeBetweenCrimesZones { get; set; }
+    [Description("Default minimum time required between crimes in zones.")]
+    public uint MinimumTimeBetweenCrimesZones { get; set; }
+    [Description("Default crime frequency if poor zones doesn't have one. Set to zero to disable crimes. The value [0.0–1.0] scales inversely across the max and min range, higher values return a lower time (more crime), lower values return a higher time (less crime).")]
+    public float CrimeFrequencyPoorZones { get; set; }
+    /*
+    [Description("Maximum time required between crimes in poor zones.")]
+    public uint MaximumTimeBetweenCrimesPoorZones { get; set; }
+    [Description("Minimum time required between crimes in poor zones.")]
+    public uint MinimumTimeBetweenCrimesPoorZones { get; set; }
+    */
+    [Description("Default crime frequency if middle-class zones doesn't have one. Set to zero to disable crimes. The value [0.0–1.0] scales inversely across the max and min range, higher values return a lower time (more crime), lower values return a higher time (less crime).")]
+    public float CrimeFrequencyMiddleZones { get; set; }
+    /*
+    [Description("Maximum time required between crimes in middle income zones.")]
+    public uint MaximumTimeBetweenCrimesMiddleZones { get; set; }
+    [Description("Minimum time required between crimes in middle income zones.")]
+    public uint MinimumTimeBetweenCrimesMiddleZones { get; set; }
+    */
+    [Description("Default crime frequency if rich zones doesn't have one. Set to zero to disable crimes. The value [0.0–1.0] scales inversely across the max and min range, higher values return a lower time (more crime), lower values return a higher time (less crime).")]
+    public float CrimeFrequencyRichZones { get; set; }
+    /*
+    [Description("Maximum time required between crimes in Rich zones.")]
+    public uint MaximumTimeBetweenCrimesRichZones { get; set; }
+    [Description("Minimum time required between crimes in Rich zones.")]
+    public uint MinimumTimeBetweenCrimesRichZones { get; set; }
+    */
     [Description("Allows random crimes to happen in the world.")]
     public bool AllowRandomCrimes { get; set; }
-    [Description("Minumum time required between random crimes..")]
+    [Description("Minimum time required between random crimes..")]
     public uint MinimumTimeBetweenRandomCrimes { get; set; }
 
-    [Description("Minumum time required between random traffic crimes..")]
+    [Description("Minimum time required between random traffic crimes..")]
     public uint MinimumTimeBetweenRandomTrafficCrimes { get; set; }
 
 
@@ -96,7 +126,7 @@ public class CivilianSettings : ISettingsDefaultable
     [Description("Check and enforce crimes committed by ambient citizens. Required for police to react to civilian crimes.")]
     public bool CheckCivilianCrimes { get; set; }
     [Description("Allows civilians to be aware of crimes committed by other civilians and react accordingly. Required for civilians to react to other civilian crimes.")]
-    public bool AllowCivilinsToCallPoliceOnOtherCivilians { get; set; }
+    public bool AllowCiviliansToCallPoliceOnOtherCivilians { get; set; }
 
 
     [Description("Allows civilians to be aware of hurt peds in the world. Required for civilians to call EMS.")]
@@ -303,6 +333,21 @@ public class CivilianSettings : ISettingsDefaultable
         GunshotHearingDistance = 125f;//100f
         TaskMissionPeds = false;
         AllowMissionPedsToInteract = false;
+
+        MaximumTimeBetweenCrimesZones = 2700000;
+        MinimumTimeBetweenCrimesZones = 300000;
+
+        CrimeFrequencyPoorZones = 0.8f;
+        //MaximumTimeBetweenCrimesPoorZones = 1500000;
+        //MinimumTimeBetweenCrimesPoorZones = 300000;
+        CrimeFrequencyMiddleZones = 0.5f;
+        //MaximumTimeBetweenCrimesMiddleZones = 2100000;
+        //MinimumTimeBetweenCrimesMiddleZones = 600000;
+        CrimeFrequencyRichZones = 0.2f;
+        //MaximumTimeBetweenCrimesRichZones = 2700000;
+        //MinimumTimeBetweenCrimesRichZones = 900000;
+
+        EnableZoneBasedCrime = false;
         AllowRandomCrimes = true;
         MinimumTimeBetweenRandomCrimes = 1200000;
 
@@ -310,7 +355,7 @@ public class CivilianSettings : ISettingsDefaultable
         MinimumTimeBetweenRandomTrafficCrimes = 720000;
 
         CheckCivilianCrimes = true;
-        AllowCivilinsToCallPoliceOnOtherCivilians = true;
+        AllowCiviliansToCallPoliceOnOtherCivilians = true;
         AllowAlerts = true;
         ShowRandomCriminalBlips = false;
 

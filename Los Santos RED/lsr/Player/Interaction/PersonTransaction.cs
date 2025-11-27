@@ -284,22 +284,7 @@ public class PersonTransaction : Interaction
             InteractionMenu.AddItem(GetInCar);
             InteractionMenu.AddItem(InviteInCar);
             InteractionMenu.AddItem(Follow);
-            if (Ped.TaskForPlayer != null)
-            {
-                InteractionMenu.AddItem(CreateJobItem());
-            }
         }
-    }
-    private UIMenuItem CreateJobItem()
-    {
-        UIMenuItem ji = new UIMenuItem("Accept Job", $"{Ped.TaskForPlayer.DebugName}") { RightLabel = $"~HUD_COLOUR_GREENDARK~$???~s~" };
-        ji.Activated += (sender, selectedItem) =>
-        {
-            Ped.TaskForPlayer.Start();
-            sender.Visible = false;
-            Ped.WillGiveMission = false;
-        };
-        return ji;
     }
     private void UpdateOptions()
     {

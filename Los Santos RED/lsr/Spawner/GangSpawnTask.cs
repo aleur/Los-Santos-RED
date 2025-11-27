@@ -35,7 +35,6 @@ public class GangSpawnTask : SpawnTask
     public bool IsBackupSquad { get; set; } = false;
     public bool IsGeneralBackup { get; set; } = false;
     public int PedSpawnLimit { get; set; } = 99;
-    public List<GangTerritory> GangTerritories { get; set; }
     public GangTerritory GangTerritory { get; set; }
 
     public override void AttemptSpawn()
@@ -290,6 +289,7 @@ public class GangSpawnTask : SpawnTask
         GangMember.IsHitSquad = IsHitSquad;
         GangMember.IsBackupSquad = IsBackupSquad;
         GangMember.IsGeneralBackup = IsGeneralBackup;
+        GangMember.IsTargetedByPlayer = IsAmbushTarget;
         World.Pedestrians.AddEntity(GangMember);
         if(GangMember.IsHitSquad || GangMember.IsBackupSquad || GangMember.IsGeneralBackup)
         {

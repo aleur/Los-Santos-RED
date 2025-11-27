@@ -85,6 +85,10 @@ public class ConditionalLocation
     public bool AttemptedSpawn { get; private set; }
     [XmlIgnore]
     public bool Ignore { get; private set; }
+    [XmlIgnore]
+    public bool IsAmbushTarget { get; set; } = false;
+    [XmlIgnore]
+    public bool AreVehiclesTargeted { get; set; } = false;
 
     //public virtual void Setup(IAgencies agencies, IGangs gangs, IZones zones, IJurisdictions jurisdictions, IGangTerritories gangTerritories, ISettingsProvideable settings, IEntityProvideable world, string masterAssociationID, IWeapons weapons, INameProvideable names, ICrimes crimes, IPedGroups pedGroups, IShopMenus shopMenus, ITimeControllable time, IModItems modItems)
     //{
@@ -134,7 +138,7 @@ public class ConditionalLocation
         GameLocation = gameLocation;
         DispatchablePeople = dispatchablePeople;
         DispatchableVehicles = dispatchableVehicles;
-        AttemptedSpawn = DetermineRun(force);
+        AttemptedSpawn = IsAmbushTarget || AreVehiclesTargeted ? true : DetermineRun(force);
         if (!AttemptedSpawn)
         {
             return;

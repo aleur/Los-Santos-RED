@@ -90,22 +90,23 @@ public class GangMember : PedExt, IWeaponIssuable
                     {
                         CheckPlayerBusted();
                     }
+                    if (WillGiveMission && PlayerToTask != null && TaskForPlayer == null)
+                    {
+                        Gang currentGang = PlayerToTask?.RelationshipManager?.GangRelationships?.CurrentGang;
+                        GangTasks gangTasks = PlayerToTask?.PlayerTasks?.GangTasks;
+                        if (currentGang != null && gangTasks != null)
+                        {
+                            GangRespect grp = PlayerToTask.RelationshipManager.GangRelationships.GetReputation(currentGang).GangRelationship;
+
+                            TaskForPlayer = grp == GangRespect.Member && grp == GangRespect.Friendly ? gangTasks.RandomTask(Gang, Gang.Contact) : gangTasks.RandomUntrustedTask(Gang, Gang.Contact);
+                        }
+                    }
                 }
                 GameTimeLastUpdated = Game.GameTime;
             }
         }
         ReputationReport.Update(perceptable, world, Settings);
         CurrentHealthState.Update(policeRespondable, world);//has a yield if they get damaged, seems ok   
-        if (WillGiveMission && PlayerToTask != null && TaskForPlayer == null)
-        {
-            Gang currentGang = PlayerToTask?.RelationshipManager?.GangRelationships?.CurrentGang;
-            GangTasks gangTasks = PlayerToTask?.PlayerTasks?.GangTasks;
-            if (currentGang != null && gangTasks != null)
-            {
-                TaskForPlayer = currentGang.ID == Gang.ID ?
-                    gangTasks.RandomTask(Gang, Gang.Contact) : gangTasks.RandomUntrustedTask(Gang, Gang.Contact);
-            }
-        }
     }
 
     public void UpdateSpeech(IPoliceRespondable currentPlayer)
@@ -178,7 +179,7 @@ public class GangMember : PedExt, IWeaponIssuable
 
         WillFlyThroughWindshield = RandomItems.RandomPercent(Settings.SettingsManager.GangSettings.FlyThroughWindshieldPercent);
 
-        if (IsHitSquad || IsBackupSquad || IsGeneralBackup)
+        if (IsHitSquad || IsBackupSquad || IsGeneralBackup || IsTargetedByPlayer)
         {
             WillFight = true;
             WillFightPolice = true;

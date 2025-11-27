@@ -439,8 +439,9 @@ public class CellPhone
     public void AddPhoneResponse(string Name, string Message)
     {
         //string IconName = ContactList.FirstOrDefault(x => x.Name.ToLower() == Name.ToLower())?.IconName;
-        string IconName = Contacts.PossibleContacts.AllContacts().FirstOrDefault(x => x.Name.ToLower() == Name.ToLower())?.IconName;
+        string IconName = Contacts.PossibleContacts.AllContacts().FirstOrDefault(c => c.Name.Equals(Name, StringComparison.OrdinalIgnoreCase))?.IconName ?? "CHAR_BLANK_ENTRY";
         PhoneResponses.Add(new PhoneResponse(Name, IconName, Message, Time.CurrentDateTime));
+        EntryPoint.WriteToConsole($"IconName: {IconName}, Name: {Name}, Message: {Message} TWIN TRIM");
         NativeHelper.DisplayNotificationCustom(IconName, IconName, Name, "~o~Response", Message, NotificationIconTypes.RightJumpingArrow, false);
         PlayPhoneResponseSound();
     }

@@ -12,7 +12,7 @@ public class GangTerritories : IGangTerritories
 {
     private IGangs GangProvider;
     private readonly string GangTurfConfigFileName = "Plugins\\LosSantosRED\\GangTerritories.xml";
-    private List<GangTerritory> GangTerritoriesList = new List<GangTerritory>();
+    public List<GangTerritory> GangTerritoriesList { get; private set; } = new List<GangTerritory>();
     public GangTerritories(IGangs gangProvider)
     {
         GangProvider = gangProvider;
@@ -147,6 +147,18 @@ public class GangTerritories : IGangTerritories
         if (GangTerritoriesList.Any())
         {
             List<GangTerritory> ToReturn = GangTerritoriesList.Where(x => x.GangID.ToLower() == gangID.ToLower()).ToList();
+            return ToReturn;
+        }
+        else
+        {
+            return null;
+        }
+    }
+    public List<GangTerritory> GetGangTerritory(string gangID, int priority)
+    {
+        if (GangTerritoriesList.Any())
+        {
+            List<GangTerritory> ToReturn = GangTerritoriesList.Where(x => x.GangID.ToLower() == gangID.ToLower() && x.Priority == priority).ToList();
             return ToReturn;
         }
         else

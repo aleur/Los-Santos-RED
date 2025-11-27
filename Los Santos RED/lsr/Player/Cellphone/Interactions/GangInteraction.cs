@@ -31,7 +31,6 @@ public class GangInteraction : IContactMenuInteraction
     private UIMenuItem GangMoneyPickup;
     private UIMenuItem GangPizza;
     private UIMenuItem GangRacketeering;
-    private UIMenuItem GangArson;
     private UIMenuItem GangBribery;
     private UIMenuItem GangTaskCancel;
     private Gang ActiveGang;
@@ -51,6 +50,7 @@ public class GangInteraction : IContactMenuInteraction
     private UIMenu CopHitSubMenu;
     private UIMenu GangHitSubMenu;
     private UIMenu GangAmbushSubMenu;
+    private UIMenu GangArsonSubMenu;
     private UIMenu GangTheftSubMenu;
     private UIMenu GangDeliverySubMenu;
     private IModItems ModItems;
@@ -232,6 +232,7 @@ public class GangInteraction : IContactMenuInteraction
         JobsSubMenu.AddItem(GangRandomTask);
         AddGangHitSubMenu();
         AddGangAmbushSubMenu();
+        AddGangArsonSubMenu();
         AddCopHitSubMenu();
         AddGangTheftSubMenu();
         GangMoneyPickup = new UIMenuItem("Money Pickup", "Pickup some cash from a dead drop for the gang and bring it back.") { RightLabel = $"~HUD_COLOUR_GREENDARK~{ActiveGang.PickupPaymentMin:C0}-{ActiveGang.PickupPaymentMax:C0}~s~" };
@@ -273,12 +274,6 @@ public class GangInteraction : IContactMenuInteraction
             Player.PlayerTasks.GangTasks.GangBribery(ActiveGang, GangContact).Start();
             sender.Visible = false;
         };
-        GangArson = new UIMenuItem("Arson", "Torch a building. ~r~WIP~s~") { RightLabel = $"~HUD_COLOUR_GREENDARK~{ActiveGang.ArsonPaymentMin:C0}-{ActiveGang.ArsonPaymentMax:C0}~s~" };
-        GangArson.Activated += (sender, selectedItem) =>
-        {
-            Player.PlayerTasks.GangTasks.GangArson(ActiveGang, GangContact).Start();
-            sender.Visible = false;
-        };
 
         
 
@@ -287,7 +282,6 @@ public class GangInteraction : IContactMenuInteraction
         JobsSubMenu.AddItem(GangMoneyPickup);
         JobsSubMenu.AddItem(GangRacketeering);
         JobsSubMenu.AddItem(GangBribery);
-        JobsSubMenu.AddItem(GangArson);
         //JobsSubMenu.AddItem(GangDelivery); 
         /*
         if (ActiveGang.GangClassification == GangClassification.Mafia)// == "Gambetti" || ActiveGang.ShortName == "Pavano" || ActiveGang.ShortName == "Lupisella" || ActiveGang.ShortName == "Messina" || ActiveGang.ShortName == "Ancelotti")
@@ -319,7 +313,7 @@ public class GangInteraction : IContactMenuInteraction
         UIMenuListScrollerItem<GameLocation> LocationMenu = new UIMenuListScrollerItem<GameLocation>("Location", "Select the location for the meet", PlacesOfInterest.PossibleLocations.DrugMeetLocations().Where(x=> x.IsCorrectMap(World.IsMPMapLoaded) && x.IsSameState(Player.CurrentLocation?.CurrentZone?.GameState)));
         UIMenuNumericScrollerItem<int> quantityScroller = new UIMenuNumericScrollerItem<int>("Quantity", $"Select the total amount to deal", Settings.SettingsManager.TaskSettings.DrugMeetMin, Settings.SettingsManager.TaskSettings.DrugMeetMax, 100) { Value = Settings.SettingsManager.TaskSettings.DrugMeetMin };
         UIMenuListScrollerItem<ModItem> PossibleItemsMenu = new UIMenuListScrollerItem<ModItem>("Item","",ModItems.AllItems().Where(x=> x.ItemType == ItemType.Drugs && x.ItemSubType == ItemSubType.Narcotic));
-        UIMenuListScrollerItem<GangDisplay> DealingGangMenu = new UIMenuListScrollerItem<GangDisplay>("Dealing Gang", GangDescription, GetNonHostilGangDisplay());
+        UIMenuListScrollerItem<GangDisplay> DealingGangMenu = new UIMenuListScrollerItem<GangDisplay>("Dealing Gang", GangDescription, GetNonHostileGangDisplay());
         UIMenuItem DrugMeetupStart = new UIMenuItem("Start", $"Start the task.") { RightLabel = $"~HUD_COLOUR_GREENDARK~?-?~s~" };
         UpdatedDrugMeetSaleRightLabel(DrugMeetupStart, PossibleItemsMenu.SelectedItem, quantityScroller.Value);
         DrugMeetupStart.Activated += (sender, selectedItem) =>
@@ -366,7 +360,7 @@ public class GangInteraction : IContactMenuInteraction
 
         UIMenuNumericScrollerItem<int> quantityScroller = new UIMenuNumericScrollerItem<int>("Quantity", $"Select the total amount to deal", Settings.SettingsManager.TaskSettings.DrugMeetMin, Settings.SettingsManager.TaskSettings.DrugMeetMax, 100) { Value = Settings.SettingsManager.TaskSettings.DrugMeetMin };
         UIMenuListScrollerItem<ModItem> PossibleItemsMenu = new UIMenuListScrollerItem<ModItem>("Item", "", ModItems.AllItems().Where(x => x.ItemType == ItemType.Drugs && x.ItemSubType == ItemSubType.Narcotic));
-        UIMenuListScrollerItem<GangDisplay> DealingGangMenu = new UIMenuListScrollerItem<GangDisplay>("Dealing Gang", GangDescription, GetNonHostilGangDisplay());
+        UIMenuListScrollerItem<GangDisplay> DealingGangMenu = new UIMenuListScrollerItem<GangDisplay>("Dealing Gang", GangDescription, GetNonHostileGangDisplay());
         UIMenuItem DrugMeetupStart = new UIMenuItem("Start", $"Start the task.") { RightLabel = $"~HUD_COLOUR_GREENDARK~?-?~s~" };
 
         UpdatedDrugMeetBuyRightLabel(DrugMeetupStart, PossibleItemsMenu.SelectedItem, quantityScroller.Value);
@@ -518,9 +512,7 @@ public class GangInteraction : IContactMenuInteraction
         return toReturn;
 
     }
-
-
-    private List<GangDisplay> GetNonHostilGangDisplay()
+    private List<GangDisplay> GetNonHostileGangDisplay()
     {
         List<GangDisplay> toReturn = new List<GangDisplay>();
         List<Gang> possibleGangs = Gangs.AllGangs.Where(x => x.ID != ActiveGang.ID).ToList();
@@ -552,7 +544,69 @@ public class GangInteraction : IContactMenuInteraction
         return toReturn;
     }
 
+    private List<TerritoryDisplay> GetTerritoryDisplay(List<GangTerritory> territories = null)
+    {
+        if (territories == null) territories = World.GangTerritories.GangTerritoriesList;
+        List<TerritoryDisplay> toReturn = new List<TerritoryDisplay>();
 
+        foreach (GangTerritory gangTerritory in territories)
+        {
+            GangReputation gr = Player.RelationshipManager.GangRelationships.GetReputation(Gangs.GetGang(gangTerritory.GangID));
+            string extra = "";
+            if (gr != null)
+            {
+                if (gr.IsEnemy)
+                {
+                    extra = "~r~";
+                }
+                else if (gr.GangRelationship == GangRespect.Hostile)
+                {
+                    extra = "~o~";
+                }
+                else if (gr.GangRelationship == GangRespect.Friendly)
+                {
+                    extra = "~g~";
+                }
+                else if (gr.GangRelationship == GangRespect.Member)
+                {
+                    extra = "~b~";
+                }
+                //EntryPoint.WriteToConsole($"REPUTATION: {gr.ReputationLevel}~s~");
+            }
+            //EntryPoint.WriteToConsole($"{extra}{gang.ShortName}~s~");
+            toReturn.Add(new TerritoryDisplay(gangTerritory, $"{extra}{World.Zones.GetZone(gangTerritory.ZoneInternalGameName).DisplayName}~s~"));
+        }
+
+        //toReturn.OrderBy(x => Player.RelationshipManager.GangRelationships.GetReputation(x.Gang)?.IsEnemy).ThenBy(x=> Player.RelationshipManager.GangRelationships.GetReputation(x.Gang)?.ReputationLevel);
+        foreach (TerritoryDisplay gd in toReturn)
+        {
+            EntryPoint.WriteToConsole($"{gd.CurrentFormattedName}");
+        }
+        return toReturn;
+
+    }
+
+    private void AddGangArsonSubMenu()
+    {
+        GangArsonSubMenu = MenuPool.AddSubMenu(JobsSubMenu, "Arson");
+        JobsSubMenu.MenuItems[JobsSubMenu.MenuItems.Count() - 1].Description = $"Torch a building. ~r~WIP~s~";
+        JobsSubMenu.MenuItems[JobsSubMenu.MenuItems.Count() - 1].RightLabel = $"~HUD_COLOUR_GREENDARK~{ActiveGang.ArsonPaymentMin:C0}-{ActiveGang.ArsonPaymentMax:C0}~s~";
+        GangArsonSubMenu.RemoveBanner();
+
+        UIMenuListScrollerItem<Zone> TargetMenu = new UIMenuListScrollerItem<Zone>("Target Zone", $"Choose a target zone", World.Zones.ZoneList);
+
+        UIMenuItem TaskStartMenu = new UIMenuItem("Start", $"Start the task.") { RightLabel = $"~HUD_COLOUR_GREENDARK~{ActiveGang.ArsonPaymentMin:C0}-{ActiveGang.ArsonPaymentMax:C0}~s~" };
+        TaskStartMenu.Activated += (sender, selectedItem) =>
+        {
+            GangTask gt = Player.PlayerTasks.GangTasks.GangArson(ActiveGang, GangContact);
+            gt.TargetZone = TargetMenu.SelectedItem;
+            gt.Start();
+            sender.Visible = false;
+        };
+
+        GangArsonSubMenu.AddItem(TargetMenu);
+        GangArsonSubMenu.AddItem(TaskStartMenu);
+    }
     private void AddGangAmbushSubMenu()
     {
         GangAmbushSubMenu = MenuPool.AddSubMenu(JobsSubMenu, "Ambush");
@@ -561,25 +615,49 @@ public class GangInteraction : IContactMenuInteraction
         GangAmbushSubMenu.RemoveBanner();
         //UIMenuListScrollerItem<Gang> TargetMenu = new UIMenuListScrollerItem<Gang>("Target Gang", $"Choose a target gang", Gangs.AllGangs.Where(x => x.ID != ActiveGang.ID && ActiveGang.EnemyGangs.Contains(x.ID)).ToList());
 
-        UIMenuListScrollerItem<GangDisplay> TargetMenu = new UIMenuListScrollerItem<GangDisplay>("Target Gang", TargetGangDescription, GetGangDisplay());
+        //UIMenuListScrollerItem<GangDisplay> TargetMenu = new UIMenuListScrollerItem<GangDisplay>("Target Gang", TargetGangDescription, GetGangDisplay());
+        /*
+        UIMenu ZonesAmbushSubMenu = MenuPool.AddSubMenu(GangAmbushSubMenu, "Select Zones");
+        GangAmbushSubMenu.MenuItems[GangAmbushSubMenu.MenuItems.Count() - 1].Description = $"Select zones to ambush";
 
-
-
-        UIMenuNumericScrollerItem<int> TargetCountMenu = new UIMenuNumericScrollerItem<int>("Targets", $"Select the number of targets", 1, 3, 1) { Value = 1 };
-        UIMenuItem TaskStartMenu = new UIMenuItem("Start", $"Start the task.") { RightLabel = $"~HUD_COLOUR_GREENDARK~{ActiveGang.HitPaymentMin * TargetCountMenu.Value:C0}-{ActiveGang.HitPaymentMax * TargetCountMenu.Value:C0}~s~" };
-        TaskStartMenu.Activated += (sender, selectedItem) =>
+        foreach (TerritoryDisplay gt in GetTerritoryDisplay(World.GangTerritories.GangTerritoriesList.Where(x => x.GangID == TargetMenu.SelectedItem.Gang.ID).ToList()))
         {
-            Player.PlayerTasks.GangTasks.GangAmbush(ActiveGang, TargetCountMenu.Value, GangContact, TargetMenu.SelectedItem.Gang).Start();
-            sender.Visible = false;
-        };
+            UIMenuCheckboxItem terr = new UIMenuCheckboxItem(gt.CurrentFormattedName, true);
+        }
+        */
+        //UIMenuListScrollerItem<TerritoryDisplay> ZonesMenu = new UIMenuListScrollerItem<TerritoryDisplay>("Target Zone", $"Choose a target zone", GetTerritoryDisplay(World.GangTerritories.GangTerritoriesList.Where(x => x.GangID == TargetMenu.SelectedItem.Gang.ID).ToList()));
+
+
+        /*
+        UIMenuNumericScrollerItem<int> TargetCountMenu = new UIMenuNumericScrollerItem<int>("Targets", $"Select the number of targets", 1, 3, 1) { Value = 1 };*/
+
+
+        UIMenuItem TaskStartMenu = new UIMenuItem("Start", $"Start the task.") { RightLabel = $"~HUD_COLOUR_GREENDARK~{ActiveGang.HitPaymentMin:C0}-{ActiveGang.HitPaymentMax:C0}~s~" };
+
+        /*
         TargetCountMenu.IndexChanged += (sender, oldIndex, newIndex) =>
         {
             TaskStartMenu.RightLabel = $"~HUD_COLOUR_GREENDARK~{ActiveGang.AmbushPaymentMin * TargetCountMenu.Value:C0}-{ActiveGang.AmbushPaymentMax * TargetCountMenu.Value:C0}~s~";
-        };
+        };*/
 
-        GangAmbushSubMenu.AddItem(TargetMenu);
-        GangAmbushSubMenu.AddItem(TargetCountMenu);
+        //GangAmbushSubMenu.AddItem(TargetMenu);
+        //GangAmbushSubMenu.AddItem(ZonesMenu);
+        //GangAmbushSubMenu.AddItem(TargetCountMenu);
         GangAmbushSubMenu.AddItem(TaskStartMenu);
+        List<GangTerritory> ActiveGangTerritories = World.GangTerritories.GangTerritoriesList.Where(x => x.GangID == ActiveGang.ID && x.TurfStatus.EnemyGangsWithScenarios.Any()).ToList();
+        if (!ActiveGangTerritories.Any())
+        {
+            TaskStartMenu.Description = "Unable to start task. No more scenarios available.";
+            TaskStartMenu.Enabled = false;
+        }
+        TaskStartMenu.Activated += (sender, selectedItem) =>
+        {
+            GangTerritory gangTerritory = ActiveGangTerritories.PickRandom();
+            GangTask gt = Player.PlayerTasks.GangTasks.GangAmbush(ActiveGang, GangContact, gangTerritory.TurfStatus.EnemyGangsWithScenarios.PickRandom(), gangTerritory.TurfStatus);
+            gt.TargetZone = World.Zones.GetZone(gangTerritory.ZoneInternalGameName);
+            gt.Start();
+            sender.Visible = false;
+        };
     }
     private void AddGangTheftSubMenu()
     {
@@ -812,6 +890,26 @@ public class GangInteraction : IContactMenuInteraction
             return CurrentFormattedName;
         }
     }
+    private class TerritoryDisplay
+    {
+        public TerritoryDisplay()
+        {
 
+        }
+        public TerritoryDisplay(GangTerritory gangTerritory, string currentFormattedName)
+        {
+            GangTerritory = gangTerritory;
+            CurrentFormattedName = currentFormattedName;
+        }
+
+        public GangTerritory GangTerritory { get; set; }
+        public string CurrentFormattedName { get; set; }
+
+        public override string ToString()
+        {
+            return CurrentFormattedName;
+        }
     }
+
+}
 

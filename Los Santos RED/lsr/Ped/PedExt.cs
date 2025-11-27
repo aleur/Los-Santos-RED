@@ -13,9 +13,6 @@ using System.Windows.Forms;
 
 public class PedExt : IComplexTaskable, ISeatAssignable
 {
-    public IPlayerTask TaskForPlayer;
-    public IContactInteractable PlayerToTask;
-    public IPoliceRespondable PlayerToCheck;
     protected ISettingsProvideable Settings;
     protected uint GameTimeSpawned;
     private uint GameTimeCreated = 0;
@@ -160,6 +157,10 @@ public class PedExt : IComplexTaskable, ISeatAssignable
     public virtual int DefaultCombatFlag { get; set; } = 0;
     public virtual int DefaultEnterExitFlag { get; set; } = 0;
 
+    public IPlayerTask TaskForPlayer { get; set; }
+    public IContactInteractable PlayerToTask {  get; set; }
+    public IPoliceRespondable PlayerToCheck { get; set; }
+    public bool IsTargetedByPlayer { get; set; } = false;
 
     public virtual string InteractPrompt(IButtonPromptable player)
     {
@@ -474,7 +475,7 @@ public class PedExt : IComplexTaskable, ISeatAssignable
     public virtual bool CanBeLooted { get; set; } = true;
     public virtual bool CanBeDragged { get; set; } = true;
     public virtual bool CanPlayRadioInAnimation => false;
-    public virtual string BlipName => "Person";
+    public virtual string BlipName { get; set; } = "Person";
     public bool AlwaysHasLongGun { get; set; } = false;
     public bool IsBeingHeldAsHostage { get; set; } = false;
     public bool GeneratesBodyAlerts { get; set; } = true;
@@ -1093,9 +1094,9 @@ public class PedExt : IComplexTaskable, ISeatAssignable
             NativeFunction.Natives.SET_PED_SEEING_RANGE(Pedestrian, Settings.SettingsManager.CivilianSettings.SightDistance);
         }
     }
-    public void AddBlip()
+    public void AddBlip(BlipSprite? BlipSprite = null)
     {
-        if(!Pedestrian.Exists() || AttachedLSRBlip.Exists())
+        if (!Pedestrian.Exists() || AttachedLSRBlip.Exists())
         {
             return;
         }
@@ -1108,6 +1109,7 @@ public class PedExt : IComplexTaskable, ISeatAssignable
         NativeFunction.Natives.END_TEXT_COMMAND_SET_BLIP_NAME(myBlip);
         myBlip.Color = BlipColor;
         myBlip.Scale = BlipSize;
+        if (BlipSprite != null) myBlip.Sprite = (BlipSprite)BlipSprite;
         //if(IsCop)
         //{
         //    myBlip.Sprite = BlipSprite.Police;

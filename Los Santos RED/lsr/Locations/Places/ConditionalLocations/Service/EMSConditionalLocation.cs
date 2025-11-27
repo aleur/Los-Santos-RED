@@ -5,11 +5,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 public class EMSConditionalLocation : ConditionalLocation
 {
     private Agency Agency;
-
+    [XmlIgnore]
+    public EMTSpawnTask EMTSpawnTask { get; set; }
     public EMSConditionalLocation(Vector3 location, float heading, float percentage) : base(location, heading, percentage)
     {
     }
@@ -46,15 +48,16 @@ public class EMSConditionalLocation : ConditionalLocation
     {
         try
         {
-            EMTSpawnTask eMTSpawnTask = new EMTSpawnTask(Agency, SpawnLocation, DispatchableVehicle, DispatchablePerson, Settings.SettingsManager.EMSSettings.ShowSpawnedBlips, Settings, Weapons, Names, true, World, ModItems, ShopMenus);
-            eMTSpawnTask.AllowAnySpawn = true;
-            eMTSpawnTask.AllowBuddySpawn = false;
-            eMTSpawnTask.SpawnRequirement = TaskRequirements;
-            eMTSpawnTask.ClearVehicleArea = true;
-            eMTSpawnTask.PlacePedOnGround = DispatchableVehicle == null;// true;
-            eMTSpawnTask.AttemptSpawn();
-
-            eMTSpawnTask.PostRun(this, GameLocation);
+            EMTSpawnTask = new EMTSpawnTask(Agency, SpawnLocation, DispatchableVehicle, DispatchablePerson, Settings.SettingsManager.EMSSettings.ShowSpawnedBlips, Settings, Weapons, Names, true, World, ModItems, ShopMenus);
+            EMTSpawnTask.AllowAnySpawn = true;
+            EMTSpawnTask.AllowBuddySpawn = false;
+            EMTSpawnTask.SpawnRequirement = TaskRequirements;
+            EMTSpawnTask.ClearVehicleArea = true;
+            EMTSpawnTask.PlacePedOnGround = DispatchableVehicle == null;// true;
+            EMTSpawnTask.IsAmbushTarget = IsAmbushTarget;
+            EMTSpawnTask.AreVehiclesTargeted = AreVehiclesTargeted;
+            EMTSpawnTask.AttemptSpawn();
+            EMTSpawnTask.PostRun(this, GameLocation);
             //eMTSpawnTask.CreatedPeople.ForEach(x => { World.Pedestrians.AddEntity(x); x.IsLocationSpawned = true; AddLocationRequirements(x); });
             //eMTSpawnTask.CreatedPeople.ForEach(x => World.Pedestrians.AddEntity(x));
             //eMTSpawnTask.CreatedVehicles.ForEach(x => x.AddVehicleToList(World));//why twice?

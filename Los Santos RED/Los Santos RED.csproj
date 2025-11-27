@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>LosSantosRED</RootNamespace>
     <AssemblyName>Los Santos RED</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -106,7 +107,6 @@
     </Reference>
     <Reference Include="RagePluginHookSDK">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Grand Theft Auto V\SDK\RagePluginHookSDK.dll</HintPath>
-      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -1273,6 +1273,10 @@
     <Compile Include="lsr\Weather\IWeatherReportable.cs" />
     <Compile Include="lsr\Weather\WeatherForecast.cs" />
     <Compile Include="lsr\World\eRandomEventType.cs" />
+    <Compile Include="lsr\World\Events\CivilianEvents.cs" />
+    <Compile Include="lsr\World\Events\GangEvents.cs" />
+    <Compile Include="lsr\World\Events\Events.cs" />
+    <Compile Include="lsr\World\Events\TurfStatus.cs" />
     <Compile Include="lsr\World\Interface\IEntityProvideable.cs" />
     <Compile Include="lsr\Time\ITimeControllable.cs" />
     <Compile Include="lsr\World\Interface\IEntityLoggable.cs" />

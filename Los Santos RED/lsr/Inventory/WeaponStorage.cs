@@ -127,7 +127,7 @@ public class WeaponStorage
             EntryPoint.WriteToConsole($"AddedStoredWeapon {wi.Hash}");
         }
     }
-    public void AddWeapon(IWeapons weapons, WeaponItem toAdd, int amount)
+    public void AddWeapon(IWeapons weapons, WeaponItem toAdd, int amount = 1, WeaponVariation weaponVariation = null)
     {
         Weapons = weapons;
         for (int i = 0; i < amount; i++)
@@ -143,10 +143,9 @@ public class WeaponStorage
                 EntryPoint.WriteToConsole("NoWeaponModel");
                 continue;
             }
-            WeaponVariation weaponVariation = new WeaponVariation(0);
-            if (RandomItems.RandomPercent(Settings.SettingsManager.PlayerOtherSettings.PercentageToGetRandomWeaponVariation))
+            if (weaponVariation == null)
             {
-                weaponVariation = weapons.GetRandomVariation((uint)wi.Hash, Settings.SettingsManager.PlayerOtherSettings.PercentageToGetComponentInRandomVariation);
+                weaponVariation = new WeaponVariation(0);
             }
             StoredWeapons.Add(new StoredWeapon((uint)wi.Hash, Vector3.Zero, weaponVariation, wi.AmmoAmount));
             EntryPoint.WriteToConsole($"AddedStoredWeapon {wi.Hash}");

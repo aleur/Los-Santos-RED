@@ -38,7 +38,7 @@ public class Zone
         Type = type;
     }
 
-
+    public override string ToString() => DisplayName;
     public string InternalGameName { get; set; }
     public string DisplayName { get; set; }
     public string CountyID { get; set; }
@@ -84,6 +84,19 @@ public class Zone
 
     public string DealerMenuContainerID { get; set; }
     public string CustomerMenuContainerID { get; set; }
+    [XmlIgnore]
+    public uint LastUpdateTime { get; set; }
+    [XmlIgnore]
+    public long TimeUntilNextCrime { get; set; }
+    [XmlIgnore]
+    public CommitCrime Crime { get; set; }
+    // Citizen Crime Events : Defaults to Global Settings if not set
+    [XmlIgnore]
+    public float CrimeFrequency { get; set; } = -1.0f;
+    [XmlIgnore]
+    public uint? MinCrimeTime { get; set; }
+    [XmlIgnore]
+    public uint? MaxCrimeTime { get; set; }
 
     public bool IsLowPop => Type == eLocationType.Rural || Type == eLocationType.Wilderness;
     public void StoreData(IGangTerritories gangTerritories, IJurisdictions jurisdictions, IShopMenus shopMenus)
@@ -188,6 +201,61 @@ public class Zone
         }
         return null;
     }
+    public void DefaultCrimeSettings(ISettingsProvideable settings)
+    {
+        if (CrimeFrequency < 0)
+        {
+            if (Economy == eLocationEconomy.Poor)
+            {
+                CrimeFrequency = settings.SettingsManager.CivilianSettings.CrimeFrequencyPoorZones;
+            }
+            else if (Economy == eLocationEconomy.Middle)
+            {
+                CrimeFrequency = settings.SettingsManager.CivilianSettings.CrimeFrequencyMiddleZones;
+            }
+            else if (Economy == eLocationEconomy.Rich)
+            {
+                CrimeFrequency = settings.SettingsManager.CivilianSettings.CrimeFrequencyRichZones;
+            }
+        }
+
+        if (!MaxCrimeTime.HasValue)
+        {
+            MaxCrimeTime = settings.SettingsManager.CivilianSettings.MaximumTimeBetweenCrimesZones;
+            /*
+            if (Economy == eLocationEconomy.Poor)
+            {
+                MaxCrimeTime = settings.SettingsManager.CivilianSettings.MaximumTimeBetweenCrimesPoorZones;
+            }
+            else if (Economy == eLocationEconomy.Middle)
+            {
+                MaxCrimeTime = settings.SettingsManager.CivilianSettings.MaximumTimeBetweenCrimesMiddleZones;
+            }
+            else if (Economy == eLocationEconomy.Rich)
+            {
+                MaxCrimeTime = settings.SettingsManager.CivilianSettings.MaximumTimeBetweenCrimesRichZones;
+            }
+            */
+        }
+        if (!MinCrimeTime.HasValue)
+        {
+            MinCrimeTime = settings.SettingsManager.CivilianSettings.MinimumTimeBetweenCrimesZones;
+            /*
+            if (Economy == eLocationEconomy.Poor)
+            {
+                MinCrimeTime = settings.SettingsManager.CivilianSettings.MinimumTimeBetweenCrimesPoorZones;
+            }
+            else if (Economy == eLocationEconomy.Middle)
+            {
+                MinCrimeTime = settings.SettingsManager.CivilianSettings.MinimumTimeBetweenCrimesMiddleZones;
+            }
+            else if (Economy == eLocationEconomy.Rich)
+            {
+                MinCrimeTime = settings.SettingsManager.CivilianSettings.MinimumTimeBetweenCrimesRichZones;
+            }
+            */
+        }
+    }
     public string GetFullLocationName(IDisplayable Player, ISettingsProvideable settings, string CurrentDefaultTextColor)
     {
 
@@ -231,5 +299,34 @@ public class Zone
         }
         return initialDisplay;
     }
+    public void UpdateCrime(ITargetable targetable, bool enableBlips, RelationshipGroup rg)
+    {
+        long deltaTime = Game.GameTime - LastUpdateTime;
+        LastUpdateTime = Game.GameTime;
 
+        TimeUntilNextCrime -= deltaTime;
+        if (targetable.CurrentLocation.CurrentZone == this)
+        {
+            EntryPoint.WriteToConsole($"{TimeUntilNextCrime} left till {Crime.SelectedCrime} in {DisplayName}");
+        }
+
+        if (TimeUntilNextCrime <= 60000 && !Crime.CriminalExists)
+        {
+            Crime.SetZoneCriminal(this, enableBlips, rg);
+        }
+
+        if (TimeUntilNextCrime <= 0f)
+        {
+            //Game.DisplayNotification("CHAR_BLANK_ENTRY", "CHAR_BLANK_ENTRY", "~o~Crime!", "Los Santos ~r~RED", $"{Crime.SelectedCrime} committed in {DisplayName}");
+            if (Crime.CloseToPlayer) // If player in zone, simulate crime.
+            {
+                Game.DisplayNotification("CHAR_GANGAPP", "CHAR_GANGAPP", "~o~CrimeWatch", "Los Santos ~r~RED", $"{Crime.SelectedCrime} committed in {DisplayName}, Distance: {Crime.DistanceToPlayer}");
+                Crime.Start();
+                EntryPoint.WriteToConsole($"{Crime.SelectedCrime} committed in {DisplayName}, Distance: {Crime.DistanceToPlayer}");
+            }
+
+            //EntryPoint.WriteToConsole($"{Crime.SelectedCrime} committed in {DisplayName}");
+            Crime = null;
+        }
+    }
 }

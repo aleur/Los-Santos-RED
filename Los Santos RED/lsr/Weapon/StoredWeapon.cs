@@ -40,7 +40,7 @@ public class StoredWeapon
 
     public void GiveToPlayer(IWeapons weapons)
     {
-        Game.LocalPlayer.Character.Inventory.GiveNewWeapon(WeaponHash, 0, false);
+        Game.LocalPlayer.Character.Inventory.GiveNewWeapon((WeaponHash)WeaponHash, 0, false);
         if (Game.LocalPlayer.Character.Inventory.Weapons.Contains(WeaponHash))
         {
             WeaponInformation Gun2 = weapons.GetWeapon((uint)WeaponHash);
@@ -59,6 +59,14 @@ public class StoredWeapon
         WeaponItem = WeaponInformation != null ? modItems.GetWeapon(WeaponInformation.ModelName) : modItems.GetWeapon(WeaponHash);
 
 
+        foreach (UIMenuItem menu in headerMenu.MenuItems)
+        {
+            if (menu.Text == DisplayName)
+            {
+                EntryPoint.WriteToConsole($"SUBMENU {menu.Text} ALREADY EXISTS");
+                return;
+            }
+        }
         weaponStorageSubMenu = menuPool.AddSubMenu(headerMenu, DisplayName);
         weaponStorageSubMenuItem = headerMenu.MenuItems[headerMenu.MenuItems.Count() - 1];
         weaponStorageSubMenuItem.Description = DisplayDesription;
