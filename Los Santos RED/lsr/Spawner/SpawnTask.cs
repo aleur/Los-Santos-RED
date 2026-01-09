@@ -58,7 +58,7 @@ public abstract class SpawnTask
     public TaskRequirements SpawnRequirement { get; set; }
     public bool SpawnWithAllWeapons { get; set; } = false;
     public bool DoPersistantEntityCheck { get; set; } = true;
-    public bool IsAmbushTarget { get; set; } = false;
+    public bool ArePedsTargeted { get; set; } = false;
     public bool AreVehiclesTargeted { get; set; } = false;
     public Vector3 Position
     {

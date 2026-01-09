@@ -609,10 +609,43 @@ public class GangInteraction : IContactMenuInteraction
     }
     private void AddGangAmbushSubMenu()
     {
+
         GangAmbushSubMenu = MenuPool.AddSubMenu(JobsSubMenu, "Ambush");
         JobsSubMenu.MenuItems[JobsSubMenu.MenuItems.Count() - 1].Description = $"Ambush any rival hoods seen in an area";
         JobsSubMenu.MenuItems[JobsSubMenu.MenuItems.Count() - 1].RightLabel = $"~HUD_COLOUR_GREENDARK~{ActiveGang.HitPaymentMin:C0}-{ActiveGang.HitPaymentMax:C0}~s~";
         GangAmbushSubMenu.RemoveBanner();
+
+        List<string> targetTypes = new List<string>() {"Random"};
+
+        List<GangTerritory> ActiveGangTerritories = World.GangTerritories.GangTerritoriesList.Where(x => x.GangID == ActiveGang.ID).ToList();
+
+        if (ActiveGangTerritories.Any(x=> x.TurfStatus.EnemyGangScenarios.Any(sc => sc.IsEnabled)))
+        {
+            targetTypes.Add("Gang");
+        }
+        if (ActiveGangTerritories.Any(x => x.TurfStatus.PoliceTargetScenarios.Any(sc => sc.IsEnabled)))
+        {
+            targetTypes.Add("Police");
+        }
+        if (ActiveGangTerritories.Any(x => x.TurfStatus.OrganizationTargetScenarios.Any(sc => sc.IsEnabled)))
+        {
+            targetTypes.Add("Organization");
+        }
+        if (ActiveGangTerritories.Any(x => x.TurfStatus.CivilianTargetScenarios.Any(sc => sc.IsEnabled)))
+        {
+            targetTypes.Add("Civilian");
+        }
+        if (ActiveGangTerritories.Any(x => x.TurfStatus.DignitaryTargetScenarios.Any(sc => sc.IsEnabled)))
+        {
+            targetTypes.Add("Dignitary");
+        }
+        if (ActiveGangTerritories.Any(x => x.TurfStatus.WitnessTargetScenarios.Any(sc => sc.IsEnabled)))
+        {
+            targetTypes.Add("Witness");
+        }
+
+        UIMenuListScrollerItem<string> AmbushTypesScroller = new UIMenuListScrollerItem<string>("Ambush Type", $"Choose a target type.", targetTypes);
+        UIMenuCheckboxItem requireAllDead = new UIMenuCheckboxItem("Kill All?", false, "If enabled, you must kill all of the targets.");
         //UIMenuListScrollerItem<Gang> TargetMenu = new UIMenuListScrollerItem<Gang>("Target Gang", $"Choose a target gang", Gangs.AllGangs.Where(x => x.ID != ActiveGang.ID && ActiveGang.EnemyGangs.Contains(x.ID)).ToList());
 
         //UIMenuListScrollerItem<GangDisplay> TargetMenu = new UIMenuListScrollerItem<GangDisplay>("Target Gang", TargetGangDescription, GetGangDisplay());
@@ -641,19 +674,20 @@ public class GangInteraction : IContactMenuInteraction
         };*/
 
         //GangAmbushSubMenu.AddItem(TargetMenu);
-        //GangAmbushSubMenu.AddItem(ZonesMenu);
-        //GangAmbushSubMenu.AddItem(TargetCountMenu);
+        GangAmbushSubMenu.AddItem(AmbushTypesScroller);
+        GangAmbushSubMenu.AddItem(requireAllDead);
         GangAmbushSubMenu.AddItem(TaskStartMenu);
-        List<GangTerritory> ActiveGangTerritories = World.GangTerritories.GangTerritoriesList.Where(x => x.GangID == ActiveGang.ID && x.TurfStatus.EnemyGangsWithScenarios.Any()).ToList();
-        if (!ActiveGangTerritories.Any())
+        if (!ActiveGangTerritories.Any() || targetTypes.Count == 1)
         {
             TaskStartMenu.Description = "Unable to start task. No more scenarios available.";
             TaskStartMenu.Enabled = false;
         }
         TaskStartMenu.Activated += (sender, selectedItem) =>
         {
-            GangTerritory gangTerritory = ActiveGangTerritories.PickRandom();
-            GangTask gt = Player.PlayerTasks.GangTasks.GangAmbush(ActiveGang, GangContact, gangTerritory.TurfStatus.EnemyGangsWithScenarios.PickRandom(), gangTerritory.TurfStatus);
+            string target = AmbushTypesScroller.SelectedItem == "Random" ? targetTypes.Where(x => x != "Random").PickRandom() : AmbushTypesScroller.SelectedItem;
+
+            GangTerritory gangTerritory = ActiveGangTerritories.Where(x => x.TurfStatus.GetTargetScenario(target) != null).PickRandom();
+            GangTask gt = Player.PlayerTasks.GangTasks.GangAmbush(ActiveGang, GangContact, gangTerritory.TurfStatus, target, requireAllDead.Checked);
             gt.TargetZone = World.Zones.GetZone(gangTerritory.ZoneInternalGameName);
             gt.Start();
             sender.Visible = false;

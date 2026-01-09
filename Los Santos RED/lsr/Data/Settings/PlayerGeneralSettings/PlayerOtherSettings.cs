@@ -157,6 +157,10 @@ public class PlayerOtherSettings : ISettingsDefaultable
     public float OrbitCameraSensitivity { get; set; }
     public float OrbitCameraInitialVerticalOffset { get; set; }
     public float OrbitCameraInitialHorizontalOffset { get; set; }
+    [Description("If enabled, you can move your camera when entering locations.")]
+    public bool AllowCameraControlWhenEntering { get; set; }
+    [Description("If enabled, you can move your camera when exiting locations.")]
+    public bool AllowCameraControlWhenExiting { get; set; }
 
     [OnDeserialized()]
     private void SetValuesOnDeserialized(StreamingContext context)
@@ -285,6 +289,8 @@ public class PlayerOtherSettings : ISettingsDefaultable
         OrbitCameraSensitivity = 1.0f;
         OrbitCameraInitialVerticalOffset = 100f;
         OrbitCameraInitialHorizontalOffset = 65f;
+        AllowCameraControlWhenEntering = false;
+        AllowCameraControlWhenExiting = false;
     }
 
 }

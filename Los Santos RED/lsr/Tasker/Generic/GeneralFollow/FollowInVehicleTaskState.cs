@@ -102,7 +102,7 @@ class FollowInVehicleTaskState : TaskState
             if (PedGeneral.DistanceToPlayer <= MaxDistance)
             {
                 //NativeFunction.Natives.TASK_VEHICLE_FOLLOW(PedGeneral.Pedestrian, PedGeneral.Pedestrian.CurrentVehicle, Player.Character, Player.VehicleSpeed, (int)eCustomDrivingStyles.RacingNew, MaxDistance);
-                NativeFunction.Natives.TASK_VEHICLE_ESCORT(PedGeneral.Pedestrian, PedGeneral.Pedestrian.CurrentVehicle, Player.CurrentVehicle.Vehicle, -1, TargetSpeed, (int)eCustomDrivingStyles.RacingNew, MaxDistance, 20, 20.0f);
+                NativeFunction.Natives.TASK_VEHICLE_ESCORT(PedGeneral.Pedestrian, PedGeneral.Pedestrian.CurrentVehicle, Player.CurrentVehicle.Vehicle, -1, Player.VehicleSpeed, (int)eCustomDrivingStyles.RacingNew, MaxDistance, 20, MaxDistance);
                 return;
             }
 

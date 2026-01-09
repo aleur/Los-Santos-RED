@@ -1137,7 +1137,7 @@ public class GameLocation : ILocationDispatchable
         MenuPool.Add(InteractionMenu);
         CanInteract = false;
         Player.OnInteractionMenuCreated(this, MenuPool, InteractionMenu);
-        EntryPoint.WriteToConsole($"{Name} Interaction Created");
+        //EntryPoint.WriteToConsole($"{Name} Interaction Created");
     }
     public void DisposeInteractionMenu()
     {

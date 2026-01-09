@@ -97,8 +97,10 @@ public class GangMember : PedExt, IWeaponIssuable
                         if (currentGang != null && gangTasks != null)
                         {
                             GangRespect grp = PlayerToTask.RelationshipManager.GangRelationships.GetReputation(currentGang).GangRelationship;
+                            //GangTerritory gant = world.GangTerritories.GetGangTerritory(Gang.ID).FirstOrDefault(gt => gt.ZoneInternalGameName == world.Zones.GetZone(Pedestrian.Position).InternalGameName); nah 
+                            //GangTask memberTask = gant?.TurfStatus.HasZoneTasks != null ? gangTasks.RandomZoneTask(Gang, Gang.Contact, gant.TurfStatus) : gangTasks.RandomTask(Gang,Gang.Contact);
 
-                            TaskForPlayer = grp == GangRespect.Member && grp == GangRespect.Friendly ? gangTasks.RandomTask(Gang, Gang.Contact) : gangTasks.RandomUntrustedTask(Gang, Gang.Contact);
+                            TaskForPlayer = grp == GangRespect.Member && grp == GangRespect.Friendly ? gangTasks.RandomTask(Gang,Gang.Contact) : gangTasks.RandomUntrustedTask(Gang, Gang.Contact);
                         }
                     }
                 }

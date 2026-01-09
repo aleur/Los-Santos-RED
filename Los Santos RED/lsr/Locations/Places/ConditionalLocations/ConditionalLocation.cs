@@ -43,6 +43,7 @@ public class ConditionalLocation
     protected IDispatchablePeople DispatchablePeople;
     protected IDispatchableVehicles DispatchableVehicles;
 
+
     public ConditionalLocation()
     {
     }
@@ -53,8 +54,7 @@ public class ConditionalLocation
         Percentage = percentage;
     }
     public bool HasDispatchablePerson => DispatchablePerson != null;
-
-
+    public SpawnTask LocationSpawnTask => SpawnTask;
     public bool IsEmptyVehicleSpawn => DispatchablePerson == null;
     public Vector3 Location { get; set; }
     public float Heading { get; set; }
@@ -86,7 +86,7 @@ public class ConditionalLocation
     [XmlIgnore]
     public bool Ignore { get; private set; }
     [XmlIgnore]
-    public bool IsAmbushTarget { get; set; } = false;
+    public bool ArePedsTargeted { get; set; } = false;
     [XmlIgnore]
     public bool AreVehiclesTargeted { get; set; } = false;
 
@@ -138,7 +138,7 @@ public class ConditionalLocation
         GameLocation = gameLocation;
         DispatchablePeople = dispatchablePeople;
         DispatchableVehicles = dispatchableVehicles;
-        AttemptedSpawn = IsAmbushTarget || AreVehiclesTargeted ? true : DetermineRun(force);
+        AttemptedSpawn = DetermineRun(force || ArePedsTargeted || AreVehiclesTargeted);
         if (!AttemptedSpawn)
         {
             return;

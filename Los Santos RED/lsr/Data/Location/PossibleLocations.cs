@@ -218,7 +218,6 @@ public class PossibleLocations
         AllLocations.AddRange(Banks);
         AllLocations.AddRange(Hotels);
         AllLocations.AddRange(Restaurants);
-        AllLocations.AddRange(Businesses);
         AllLocations.AddRange(Pharmacies);
         AllLocations.AddRange(Dispensaries);
         AllLocations.AddRange(HeadShops);

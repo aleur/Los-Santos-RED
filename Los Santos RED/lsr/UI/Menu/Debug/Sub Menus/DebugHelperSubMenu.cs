@@ -37,6 +37,7 @@ public class DebugHelperSubMenu : DebugSubMenu
     private ModDataFileManager ModDataFileManager;
     private IGangs Gangs;
     private UIMenu HelperMenuItem;
+    private Blip RadiusBlip;
 
     public DebugHelperSubMenu(UIMenu debug, MenuPool menuPool, IActionable player, IEntityProvideable world, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, ITimeControllable time, IPoliceRespondable policeRespondable, ModDataFileManager modDataFileManager, IGangs gangs) : base(debug, menuPool, player)
     {
@@ -376,9 +377,43 @@ public class DebugHelperSubMenu : DebugSubMenu
         UIMenuItem clearTimecycle = new UIMenuItem("Clear Timecycle", "");
         clearTimecycle.Activated += (menu, item) =>
         {
+            setTimecycleModifier.RightLabel = "";
             NativeFunction.CallByName<int>("CLEAR_TIMECYCLE_MODIFIER");
         };
         HelperMenuItem.AddItem(clearTimecycle);
+
+        UIMenuItem createRadiusBlip = new UIMenuItem("Create Radius Blip", "");
+        createRadiusBlip.Activated += (menu, item) =>
+        {
+            if (!RadiusBlip.Exists())
+            {
+                string radiusInput = NativeHelper.GetKeyboardInput("");
+                if (float.TryParse(radiusInput, out float radius))
+                {
+                    RadiusBlip = new Blip(Player.Character.Position, radius)
+                    {
+                        Name = "Test Blip",
+                        Color = Color.Yellow,
+                        Alpha = 0.25f
+                    };
+                    NativeFunction.Natives.BEGIN_TEXT_COMMAND_SET_BLIP_NAME("STRING");
+                    NativeFunction.Natives.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME("Test Blip");
+                    NativeFunction.Natives.END_TEXT_COMMAND_SET_BLIP_NAME(RadiusBlip);
+                    NativeFunction.Natives.SET_BLIP_AS_SHORT_RANGE((uint)RadiusBlip.Handle, true);
+                }
+            }
+        };
+        HelperMenuItem.AddItem(createRadiusBlip);
+
+        UIMenuItem deleteRadiusBlip = new UIMenuItem("Delete Radius Blip", "");
+        deleteRadiusBlip.Activated += (menu, item) =>
+        {
+            if (RadiusBlip.Exists())
+            {
+                RadiusBlip.Delete();
+            }
+        };
+        HelperMenuItem.AddItem(deleteRadiusBlip);
 
         UIMenuItem playAudioRef = new UIMenuItem("Set Audio Ref", "");
         playAudioRef.Activated += (menu, item) =>

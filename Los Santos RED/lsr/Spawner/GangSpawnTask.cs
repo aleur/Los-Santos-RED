@@ -289,7 +289,7 @@ public class GangSpawnTask : SpawnTask
         GangMember.IsHitSquad = IsHitSquad;
         GangMember.IsBackupSquad = IsBackupSquad;
         GangMember.IsGeneralBackup = IsGeneralBackup;
-        GangMember.IsTargetedByPlayer = IsAmbushTarget;
+        GangMember.IsTargetedByPlayer = ArePedsTargeted;
         World.Pedestrians.AddEntity(GangMember);
         if(GangMember.IsHitSquad || GangMember.IsBackupSquad || GangMember.IsGeneralBackup)
         {

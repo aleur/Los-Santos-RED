@@ -22,11 +22,14 @@ public class BlankLocation : GameLocation
     public override bool ShowsMarker { get; set; } = false;
     public override bool IsBlipEnabled { get; set; } = false;
     public override float ActivateDistance { get; set; } = 300f;
-    public bool CanBeAmbushableTarget { get; set; } = true;
+    public string MissionTargetType { get; set; }
+    public bool CanPedsBeTargeted { get; set; } = true;
+    public List<string> AvailablePedAmbushMissions { get; set; }
+    public bool CanVehiclesBeTargeted { get; set; } = false;
+    public List<string> AvailableVehicleAmbushMissions { get; set; }
     public bool WillSelectMultipleTargetGroups { get; set; } = true;
-    public bool CanVehiclesBeTarget { get; set; } = false;
     [XmlIgnore]
-    public bool IsAmbushTarget { get; set; } = false;
+    public bool ArePedsTargeted { get; set; } = false;
     [XmlIgnore]
     public bool AreVehiclesTargeted { get; set; } = false;
     public BlankLocation(Vector3 _EntrancePosition, float _EntranceHeading, string _Name, string _Description) : base(_EntrancePosition, _EntranceHeading, _Name, _Description)

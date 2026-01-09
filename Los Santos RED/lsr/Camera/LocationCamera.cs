@@ -319,27 +319,30 @@ public class LocationCamera
         {
             return;
         }
-        Vector3 ToLookAtPos = NativeHelper.GetOffsetPosition(Store.EntrancePosition, Store.EntranceHeading + 90f, 2f);
-        EgressCamPosition = NativeHelper.GetOffsetPosition(ToLookAtPos, Store.EntranceHeading, 1f);
-        EgressCamPosition += new Vector3(0f, 0f, 0.4f);
-        ToLookAtPos += new Vector3(0f, 0f, 0.4f);
         Vector3 EntranceStartWalkPosition = NativeHelper.GetOffsetPosition(Store.EntrancePosition, Store.EntranceHeading + 90f, 3f);
 
-        if (!EntranceCam.Exists())
+        if (!EntranceCam.Exists() && !Settings.SettingsManager.PlayerOtherSettings.AllowCameraControlWhenEntering)
         {
+            Vector3 ToLookAtPos = NativeHelper.GetOffsetPosition(Store.EntrancePosition, Store.EntranceHeading + 90f, 2f);
+            EgressCamPosition = NativeHelper.GetOffsetPosition(ToLookAtPos, Store.EntranceHeading, 1f);
+            EgressCamPosition += new Vector3(0f, 0f, 0.4f);
+            ToLookAtPos += new Vector3(0f, 0f, 0.4f);
+
             EntranceCam = new Camera(false);
+
+            EntranceCam.Position = EgressCamPosition;
+            EntranceCam.Rotation = Store.CameraRotation;
+            EntranceCam.Direction = Store.CameraDirection;
+            EntranceCam.FOV = EgressCamFOV;
+
+            _direction = (ToLookAtPos - EgressCamPosition).ToNormalized();
+            EntranceCam.Direction = _direction;
+            EntranceCam.Active = true;
         }
 
-        EntranceCam.Position = EgressCamPosition;
-        EntranceCam.Rotation = Store.CameraRotation;
-        EntranceCam.Direction = Store.CameraDirection;
-        EntranceCam.FOV = EgressCamFOV;
         Player.Character.Position = EntranceStartWalkPosition;
         Player.Character.Heading = Store.EntranceHeading - 180f;
 
-        _direction = (ToLookAtPos - EgressCamPosition).ToNormalized();
-        EntranceCam.Direction = _direction;
-        EntranceCam.Active = true;
 
         Game.LocalPlayer.Character.Tasks.GoStraightToPosition(Store.EntrancePosition, 1.0f, Store.EntranceHeading - 180f, 1.0f, 3000);
 
@@ -372,31 +375,29 @@ public class LocationCamera
         {
             return;
         }
-        Vector3 ToLookAtPos = NativeHelper.GetOffsetPosition(Store.EntrancePosition, Store.EntranceHeading + 90f, 2f);
-        EgressCamPosition = NativeHelper.GetOffsetPosition(ToLookAtPos, Store.EntranceHeading, 1f);
-        EgressCamPosition += new Vector3(0f, 0f, 0.4f);
-        ToLookAtPos += new Vector3(0f, 0f, 0.4f);
-        Vector3 EntranceEndWalkPosition = NativeHelper.GetOffsetPosition(Store.EntrancePosition, Store.EntranceHeading + 90f, 3f);
+        Vector3 EntranceEndWalkPosition = NativeHelper.GetOffsetPosition(Store.EntrancePosition, Store.EntranceHeading + 90f, 2f);
 
-
-
-        if (!EntranceCam.Exists())
+        if (!EntranceCam.Exists() && !Settings.SettingsManager.PlayerOtherSettings.AllowCameraControlWhenExiting)
         {
+            Vector3 ToLookAtPos = NativeHelper.GetOffsetPosition(Store.EntrancePosition, Store.EntranceHeading + 90f, 2f);
+            EgressCamPosition = NativeHelper.GetOffsetPosition(ToLookAtPos, Store.EntranceHeading, 1f);
+            EgressCamPosition += new Vector3(0f, 0f, 0.4f);
+            ToLookAtPos += new Vector3(0f, 0f, 0.4f);
+
             EntranceCam = new Camera(false);
+
+            EntranceCam.Position = EgressCamPosition;
+            EntranceCam.Rotation = Store.CameraRotation;
+            EntranceCam.Direction = Store.CameraDirection;
+            EntranceCam.FOV = EgressCamFOV;
+
+            _direction = (ToLookAtPos - EgressCamPosition).ToNormalized();
+            EntranceCam.Direction = _direction;
+            EntranceCam.Active = true;
         }
 
-        EntranceCam.Position = EgressCamPosition;
-        EntranceCam.Rotation = Store.CameraRotation;
-        EntranceCam.Direction = Store.CameraDirection;
-        EntranceCam.FOV = EgressCamFOV;
         Player.Character.Position = Store.EntrancePosition;
         Player.Character.Heading = Store.EntranceHeading;
-
-
-
-        _direction = (ToLookAtPos - EgressCamPosition).ToNormalized();
-        EntranceCam.Direction = _direction;
-        EntranceCam.Active = true;
 
         Player.Character.IsVisible = true;
         NativeFunction.Natives.CLEAR_FOCUS();
