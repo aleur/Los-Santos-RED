@@ -10,8 +10,6 @@ using System.Xml.Serialization;
 public class FireConditionalLocation : ConditionalLocation
 {
     private Agency Agency;
-    [XmlIgnore]
-    public FireFighterSpawnTask FireFighterSpawnTask { get; set; }
     public FireConditionalLocation(Vector3 location, float heading, float percentage) : base(location, heading, percentage)
     {
     }
@@ -48,16 +46,17 @@ public class FireConditionalLocation : ConditionalLocation
     {
         try
         {
-            FireFighterSpawnTask = new FireFighterSpawnTask(Agency, SpawnLocation, DispatchableVehicle, DispatchablePerson, Settings.SettingsManager.FireSettings.ShowSpawnedBlips, Settings, Weapons, Names, true, World, ModItems, ShopMenus);
-            FireFighterSpawnTask.AllowAnySpawn = true;
-            FireFighterSpawnTask.AllowBuddySpawn = false;
-            FireFighterSpawnTask.SpawnRequirement = TaskRequirements;
-            FireFighterSpawnTask.ClearVehicleArea = true;
-            FireFighterSpawnTask.PlacePedOnGround = DispatchableVehicle == null;// true;
-            FireFighterSpawnTask.IsAmbushTarget = IsAmbushTarget;
-            FireFighterSpawnTask.AreVehiclesTargeted = AreVehiclesTargeted;
-            FireFighterSpawnTask.AttemptSpawn();
-            FireFighterSpawnTask.PostRun(this, GameLocation);
+            FireFighterSpawnTask fireFighterSpawnTask = new FireFighterSpawnTask(Agency, SpawnLocation, DispatchableVehicle, DispatchablePerson, Settings.SettingsManager.FireSettings.ShowSpawnedBlips, Settings, Weapons, Names, true, World, ModItems, ShopMenus);
+            fireFighterSpawnTask.AllowAnySpawn = true;
+            fireFighterSpawnTask.AllowBuddySpawn = false;
+            fireFighterSpawnTask.SpawnRequirement = TaskRequirements;
+            fireFighterSpawnTask.ClearVehicleArea = true;
+            fireFighterSpawnTask.PlacePedOnGround = DispatchableVehicle == null;// true;
+            fireFighterSpawnTask.IsAmbushTarget = IsAmbushTarget;
+            fireFighterSpawnTask.AreVehiclesTargeted = AreVehiclesTargeted;
+            fireFighterSpawnTask.AttemptSpawn();
+            fireFighterSpawnTask.PostRun(this, GameLocation);
+            SpawnTask = fireFighterSpawnTask;
             //fireFighterSpawnTask.CreatedPeople.ForEach(x => { World.Pedestrians.AddEntity(x); x.IsLocationSpawned = true; AddLocationRequirements(x); });
             //fireFighterSpawnTask.CreatedVehicles.ForEach(x => x.AddVehicleToList(World));//World.Vehicles.AddEntity(x, ResponseType.Fire));
         }

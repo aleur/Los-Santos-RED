@@ -22,9 +22,21 @@ public class BlankLocation : GameLocation
     public override bool ShowsMarker { get; set; } = false;
     public override bool IsBlipEnabled { get; set; } = false;
     public override float ActivateDistance { get; set; } = 300f;
+    public string MissionTargetType { get; set; }
     public bool CanBeAmbushableTarget { get; set; } = true;
-    public bool WillSelectMultipleTargetGroups { get; set; } = true;
+    public List<string> AvailablePedAmbushMissions { get; set; }
+    /* Missions
+     * Kill
+     * Kidnap
+     * Assault
+     */
     public bool CanVehiclesBeTarget { get; set; } = false;
+    public List<string> AvailableVehicleAmbushMissions { get; set; }
+    /* Missions
+     * Steal
+     * Destroy
+     */
+    public bool WillSelectMultipleTargetGroups { get; set; } = true;
     [XmlIgnore]
     public bool IsAmbushTarget { get; set; } = false;
     [XmlIgnore]

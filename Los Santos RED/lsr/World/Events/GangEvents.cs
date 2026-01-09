@@ -58,6 +58,21 @@ public class GangEvents
         {
             gt.LastUpdateTime = Game.GameTime;
             gt.DefaultTaskSettings(Settings);
+
+            Gang gang = Gangs.GetGang(gt.GangID);
+            if (gt.TaskFrequency == 0 || gang == null) continue; // No gang tasks if frequency is zero.
+
+            gt.TurfStatus = new TurfStatus(World, Zones, PlacesOfInterest, GangTerritories, Gangs, gt, gang);
+            gt.TurfStatus.Setup();
+
+            GangTask gangTask = Player.PlayerTasks.GangTasks.RandomZoneTask(gang, gang.Contact, gt.TurfStatus);
+            if (gangTask == null) continue;
+
+            gt.GangTask = gangTask;
+            gt.GangTask.TargetZone = Zones.GetZone(gt.ZoneInternalGameName);
+            gt.TimeUntilNextTask = GetNextTaskTime(gt);
+
+            EntryPoint.WriteToConsole($"{gt.ZoneInternalGameName}:{gt.GangID} setup with GangTask: {gt.GangTask.DebugName}, Countdown: {gt.TimeUntilNextTask}, ");
         }
     }
     public void Dispose()
@@ -77,16 +92,9 @@ public class GangEvents
             Gang gang = Gangs.GetGang(gt.GangID);
             if (gt.TaskFrequency == 0 || gang == null) continue; // No gang tasks if frequency is zero.
 
-            if (gt.TurfStatus == null)
-            {
-                gt.TurfStatus = new TurfStatus(World, Zones, PlacesOfInterest, GangTerritories, Gangs, gt, gang);
-            }
-            else
-            {
-                gt.TurfStatus.Update();
-            }
 
-            /*
+            gt.TurfStatus.Update();
+
             if (gt.GangTask == null)
             {
                 GangTask gangTask = Player.PlayerTasks.GangTasks.RandomZoneTask(gang, gang.Contact, gt.TurfStatus);
@@ -101,7 +109,7 @@ public class GangEvents
             else
             {
                 gt.UpdateTask(Player, gang);
-            }*/
+            }
             updated++;
             if (updated >= 5)//15)//5
             {

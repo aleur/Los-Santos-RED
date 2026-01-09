@@ -117,6 +117,7 @@ public class LocationDispatcher
                 {
                     EntryPoint.WriteToConsole($"ATTEMPTING VEHICLE SPAWN AT {ps.Name} {ps.AssociationID}");
 
+                    cl.IsAmbushTarget = AmbushTarget;
                     cl.AreVehiclesTargeted = VehicleTarget;
                     cl.AttemptSpawn(Player, false, VehicleTarget, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World, ps.AssociationID, Weapons, Names, Crimes, PedGroups, ShopMenus, 
                         WeatherReporter, Time, ModItems, ps, DispatchablePeople, DispatchableVehicles);

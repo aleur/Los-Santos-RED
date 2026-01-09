@@ -25,6 +25,7 @@ public class CivilianSpawnTask : SpawnTask
     {
         try
         {
+            EntryPoint.WriteToConsole($"CIVILIAN SPAWN TASK Veh:{VehicleType?.ModelName} Ped:{PersonType?.ModelName}");
             GameFiber.Yield();
             if (IsInvalidSpawnPosition)
             {

@@ -73,6 +73,16 @@ public class CivilianEvents
         {
             zone.LastUpdateTime = Game.GameTime;
             zone.DefaultCrimeSettings(Settings);
+
+            if (zone.CrimeFrequency == 0) continue; // No crime if frequency is zero.
+
+            CommitCrime crime = new CommitCrime(null, Targetable, Weapons, PedProvider, Zones);
+
+            crime.SetZoneCriminal(zone, Settings.SettingsManager.CivilianSettings.ShowRandomCriminalBlips, CriminalsRG);
+            zone.Crime = crime;
+            zone.TimeUntilNextCrime = GetNextCrimeTime(zone);
+
+            EntryPoint.WriteToConsole($"{zone.DisplayName} setup with Crime: {crime.SelectedCrime}, Countdown: {zone.TimeUntilNextCrime}, ");
         }
     }
     public void Update() // Allow player to enable and disable random zone events. If disabled stick to random crimes

@@ -54,7 +54,7 @@ public class VehicleBodyManager
                 continue;
             }
             VehicleDoorSeatData vdsd = vehicleSeatDoorData?.VehicleDoorSeatDataList?.Where(x => x.SeatID == seatindex).FirstOrDefault();
-            if(vdsd == null)
+            if(vdsd == null || pedExtOnSeat == null)
             {
                 continue;
             }

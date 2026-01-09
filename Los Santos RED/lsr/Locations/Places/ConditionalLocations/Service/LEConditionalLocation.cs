@@ -13,8 +13,6 @@ public class LEConditionalLocation : ConditionalLocation
     private Agency Agency;
     public override int MinWantedLevelSpawn { get; set; } = 0;
     public override int MaxWantedLevelSpawn { get; set; } = 4;
-    [XmlIgnore]
-    public LESpawnTask LESpawnTask { get; set; }
     public LEConditionalLocation(Vector3 location, float heading, float percentage) : base(location, heading, percentage)
     {
     }
@@ -50,7 +48,7 @@ public class LEConditionalLocation : ConditionalLocation
         try
         {
             EntryPoint.WriteToConsole("ATTEMPT LE SPAWN CONDITIONAL LOCATION");
-            LESpawnTask = new LESpawnTask(Agency, SpawnLocation, DispatchableVehicle, DispatchablePerson, Settings.SettingsManager.PoliceSpawnSettings.ShowSpawnedBlips, Settings, Weapons, Names, RandomItems.RandomPercent(Settings.SettingsManager.PoliceSpawnSettings.AddOptionalPassengerPercentage), World, ModItems, false, ShopMenus);
+            LESpawnTask LESpawnTask = new LESpawnTask(Agency, SpawnLocation, DispatchableVehicle, DispatchablePerson, Settings.SettingsManager.PoliceSpawnSettings.ShowSpawnedBlips, Settings, Weapons, Names, RandomItems.RandomPercent(Settings.SettingsManager.PoliceSpawnSettings.AddOptionalPassengerPercentage), World, ModItems, false, ShopMenus);
             LESpawnTask.AllowAnySpawn = true;
             LESpawnTask.AllowBuddySpawn = false;
             LESpawnTask.ClearVehicleArea = true;
@@ -61,6 +59,7 @@ public class LEConditionalLocation : ConditionalLocation
             LESpawnTask.AttemptSpawn();
             GameFiber.Yield();
             LESpawnTask.PostRun(this, GameLocation);
+            SpawnTask = LESpawnTask;
             //spawnTask.CreatedPeople.ForEach(x => { World.Pedestrians.AddEntity(x); x.IsLocationSpawned = true; AddLocationRequirements(x); GameLocation?.AddSpawnedPed(x); });
             //spawnTask.CreatedVehicles.ForEach(x => { x.AddVehicleToList(World); x.WasSpawnedEmpty = DispatchablePerson == null;GameLocation?.AddSpawnedVehicle(x);   } ) ;//World.Vehicles.AddEntity(x, ResponseType.LawEnforcement));
             Player.OnLawEnforcementSpawn(Agency, DispatchableVehicle, DispatchablePerson);

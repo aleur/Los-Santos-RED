@@ -10,8 +10,6 @@ using System.Xml.Serialization;
 public class EMSConditionalLocation : ConditionalLocation
 {
     private Agency Agency;
-    [XmlIgnore]
-    public EMTSpawnTask EMTSpawnTask { get; set; }
     public EMSConditionalLocation(Vector3 location, float heading, float percentage) : base(location, heading, percentage)
     {
     }
@@ -48,19 +46,20 @@ public class EMSConditionalLocation : ConditionalLocation
     {
         try
         {
-            EMTSpawnTask = new EMTSpawnTask(Agency, SpawnLocation, DispatchableVehicle, DispatchablePerson, Settings.SettingsManager.EMSSettings.ShowSpawnedBlips, Settings, Weapons, Names, true, World, ModItems, ShopMenus);
-            EMTSpawnTask.AllowAnySpawn = true;
-            EMTSpawnTask.AllowBuddySpawn = false;
-            EMTSpawnTask.SpawnRequirement = TaskRequirements;
-            EMTSpawnTask.ClearVehicleArea = true;
-            EMTSpawnTask.PlacePedOnGround = DispatchableVehicle == null;// true;
-            EMTSpawnTask.IsAmbushTarget = IsAmbushTarget;
-            EMTSpawnTask.AreVehiclesTargeted = AreVehiclesTargeted;
-            EMTSpawnTask.AttemptSpawn();
-            EMTSpawnTask.PostRun(this, GameLocation);
-            //eMTSpawnTask.CreatedPeople.ForEach(x => { World.Pedestrians.AddEntity(x); x.IsLocationSpawned = true; AddLocationRequirements(x); });
-            //eMTSpawnTask.CreatedPeople.ForEach(x => World.Pedestrians.AddEntity(x));
-            //eMTSpawnTask.CreatedVehicles.ForEach(x => x.AddVehicleToList(World));//why twice?
+            EMTSpawnTask emtSpawnTask = new EMTSpawnTask(Agency, SpawnLocation, DispatchableVehicle, DispatchablePerson, Settings.SettingsManager.EMSSettings.ShowSpawnedBlips, Settings, Weapons, Names, true, World, ModItems, ShopMenus);
+            emtSpawnTask.AllowAnySpawn = true;
+            emtSpawnTask.AllowBuddySpawn = false;
+            emtSpawnTask.SpawnRequirement = TaskRequirements;
+            emtSpawnTask.ClearVehicleArea = true;
+            emtSpawnTask.PlacePedOnGround = DispatchableVehicle == null;// true;
+            emtSpawnTask.IsAmbushTarget = IsAmbushTarget;
+            emtSpawnTask.AreVehiclesTargeted = AreVehiclesTargeted;
+            emtSpawnTask.AttemptSpawn();
+            emtSpawnTask.PostRun(this, GameLocation);
+            SpawnTask = emtSpawnTask;
+            //emtSpawnTask.CreatedPeople.ForEach(x => { World.Pedestrians.AddEntity(x); x.IsLocationSpawned = true; AddLocationRequirements(x); });
+            //emtSpawnTask.CreatedPeople.ForEach(x => World.Pedestrians.AddEntity(x));
+            //emtSpawnTask.CreatedVehicles.ForEach(x => x.AddVehicleToList(World));//why twice?
         }
         catch (Exception ex)
         {

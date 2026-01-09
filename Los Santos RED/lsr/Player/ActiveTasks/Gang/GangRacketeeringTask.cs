@@ -460,7 +460,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 CollectMoney(gameLocation);
             };
             interactionMenu.AddItem(collectMoney);
-            EntryPoint.WriteToConsole("Gang Racketerering Task OnTransactionMenuCreated CREATED");
+            EntryPoint.WriteToConsole("Gang Racketeerering Task OnTransactionMenuCreated CREATED");
         }
     }
 }

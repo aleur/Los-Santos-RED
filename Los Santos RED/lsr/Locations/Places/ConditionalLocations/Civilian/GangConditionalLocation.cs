@@ -11,8 +11,6 @@ public class GangConditionalLocation : ConditionalLocation
 {
     private Gang Gang;
     public bool TerritorySpawnsForceMainGang { get; set; } = false;
-    [XmlIgnore]
-    public GangSpawnTask GangSpawnTask { get; set; }
     public GangConditionalLocation(Vector3 location, float heading, float percentage) : base(location, heading, percentage)
     {
     }
@@ -26,20 +24,21 @@ public class GangConditionalLocation : ConditionalLocation
         try
         {
             GameFiber.Yield();
-            GangSpawnTask = new GangSpawnTask(Gang, SpawnLocation, DispatchableVehicle, DispatchablePerson, Settings.SettingsManager.GangSettings.ShowSpawnedBlip, Settings, Weapons, Names, true, Crimes, PedGroups, ShopMenus, World, ModItems, ForceMelee, ForceSidearm, ForceLongGun);// Settings.SettingsManager.Police.SpawnedAmbientPoliceHaveBlip);
-            GangSpawnTask.AllowAnySpawn = true;
-            GangSpawnTask.AllowBuddySpawn = false;
-            GangSpawnTask.SpawnRequirement = TaskRequirements;
-            GangSpawnTask.ClearVehicleArea = true;
-            GangSpawnTask.PlacePedOnGround = DispatchableVehicle == null;// true;
-            GangSpawnTask.IsAmbushTarget = IsAmbushTarget;
-            GangSpawnTask.AreVehiclesTargeted = AreVehiclesTargeted;
-            GangSpawnTask.AttemptSpawn();
-            foreach (PedExt created in GangSpawnTask.CreatedPeople)
+            GangSpawnTask gangSpawnTask = new GangSpawnTask(Gang, SpawnLocation, DispatchableVehicle, DispatchablePerson, Settings.SettingsManager.GangSettings.ShowSpawnedBlip, Settings, Weapons, Names, true, Crimes, PedGroups, ShopMenus, World, ModItems, ForceMelee, ForceSidearm, ForceLongGun);// Settings.SettingsManager.Police.SpawnedAmbientPoliceHaveBlip);
+            gangSpawnTask.AllowAnySpawn = true;
+            gangSpawnTask.AllowBuddySpawn = false;
+            gangSpawnTask.SpawnRequirement = TaskRequirements;
+            gangSpawnTask.ClearVehicleArea = true;
+            gangSpawnTask.PlacePedOnGround = DispatchableVehicle == null;// true;
+            gangSpawnTask.IsAmbushTarget = IsAmbushTarget;
+            gangSpawnTask.AreVehiclesTargeted = AreVehiclesTargeted;
+            gangSpawnTask.AttemptSpawn();
+            foreach (PedExt created in gangSpawnTask.CreatedPeople)
             {
                 World.Pedestrians.AddEntity(created);
             }
-            GangSpawnTask.PostRun(this, GameLocation);
+            gangSpawnTask.PostRun(this, GameLocation);
+            SpawnTask = gangSpawnTask;
             //gangSpawnTask.CreatedPeople.ForEach(x => { World.Pedestrians.AddEntity(x); x.IsLocationSpawned = true; AddLocationRequirements(x); });
             //gangSpawnTask.CreatedVehicles.ForEach(x => x.AddVehicleToList(World));//World.Vehicles.AddEntity(x, ResponseType.None));
         }

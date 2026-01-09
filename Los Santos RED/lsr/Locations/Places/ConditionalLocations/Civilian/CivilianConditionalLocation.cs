@@ -13,8 +13,6 @@ using System.Xml.Serialization;
 public class CivilianConditionalLocation : ConditionalLocation
 {
     //protected GameLocation GameLocation;
-    [XmlIgnore]
-    public CivilianSpawnTask CivilianSpawnTask { get; set; }
     public string OverrideDispatchableVehicleGroupID { get; set; }
     public string OverrideDispatchablePersonGroupID { get; set; }
     public CivilianConditionalLocation(Vector3 location, float heading, float percentage) : base(location, heading, percentage)
@@ -30,15 +28,16 @@ public class CivilianConditionalLocation : ConditionalLocation
         EntryPoint.WriteToConsole("CIVILIAN CONDITIONAL SPAWN TASK RUN START");
         try
         {
-            CivilianSpawnTask = new CivilianSpawnTask(SpawnLocation, DispatchableVehicle, DispatchablePerson, false, false, true, Settings, Crimes, Weapons, Names, World, ModItems, ShopMenus);//, Names, true, Crimes, PedGroups, ShopMenus, World, ModItems, ForceMelee, ForceSidearm, ForceLongGun);// Settings.SettingsManager.Police.SpawnedAmbientPoliceHaveBlip);
-            CivilianSpawnTask.PossibleHeads = GameLocation.VendorPossibleHeads;
-            CivilianSpawnTask.AllowAnySpawn = true;
-            CivilianSpawnTask.AllowBuddySpawn = false;
-            CivilianSpawnTask.SpawnRequirement = TaskRequirements;
-            CivilianSpawnTask.IsAmbushTarget = IsAmbushTarget;
-            CivilianSpawnTask.AreVehiclesTargeted = AreVehiclesTargeted;
-            CivilianSpawnTask.AttemptSpawn();
-            CivilianSpawnTask.PostRun(this, GameLocation);
+            CivilianSpawnTask civilianSpawnTask = new CivilianSpawnTask(SpawnLocation, DispatchableVehicle, DispatchablePerson, false, false, true, Settings, Crimes, Weapons, Names, World, ModItems, ShopMenus);//, Names, true, Crimes, PedGroups, ShopMenus, World, ModItems, ForceMelee, ForceSidearm, ForceLongGun);// Settings.SettingsManager.Police.SpawnedAmbientPoliceHaveBlip);
+            civilianSpawnTask.PossibleHeads = GameLocation.VendorPossibleHeads;
+            civilianSpawnTask.AllowAnySpawn = true;
+            civilianSpawnTask.AllowBuddySpawn = false;
+            civilianSpawnTask.SpawnRequirement = TaskRequirements;
+            civilianSpawnTask.IsAmbushTarget = IsAmbushTarget;
+            civilianSpawnTask.AreVehiclesTargeted = AreVehiclesTargeted;
+            civilianSpawnTask.AttemptSpawn();
+            civilianSpawnTask.PostRun(this, GameLocation);
+            SpawnTask = civilianSpawnTask; // ref
             //merchantSpawnTask.CreatedPeople.ForEach(x => { World.Pedestrians.AddEntity(x); x.IsLocationSpawned = true; AddLocationRequirements(x); });
         }
         catch (Exception ex)
