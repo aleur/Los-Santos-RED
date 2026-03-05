@@ -5,12 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 public class GangConditionalLocation : ConditionalLocation
 {
     private Gang Gang;
     public bool TerritorySpawnsForceMainGang { get; set; } = false;
-
     public GangConditionalLocation(Vector3 location, float heading, float percentage) : base(location, heading, percentage)
     {
     }
@@ -30,12 +30,15 @@ public class GangConditionalLocation : ConditionalLocation
             gangSpawnTask.SpawnRequirement = TaskRequirements;
             gangSpawnTask.ClearVehicleArea = true;
             gangSpawnTask.PlacePedOnGround = DispatchableVehicle == null;// true;
+            gangSpawnTask.ArePedsTargeted = ArePedsTargeted;
+            gangSpawnTask.AreVehiclesTargeted = AreVehiclesTargeted;
             gangSpawnTask.AttemptSpawn();
             foreach (PedExt created in gangSpawnTask.CreatedPeople)
             {
                 World.Pedestrians.AddEntity(created);
             }
             gangSpawnTask.PostRun(this, GameLocation);
+            SpawnTask = gangSpawnTask;
             //gangSpawnTask.CreatedPeople.ForEach(x => { World.Pedestrians.AddEntity(x); x.IsLocationSpawned = true; AddLocationRequirements(x); });
             //gangSpawnTask.CreatedVehicles.ForEach(x => x.AddVehicleToList(World));//World.Vehicles.AddEntity(x, ResponseType.None));
         }

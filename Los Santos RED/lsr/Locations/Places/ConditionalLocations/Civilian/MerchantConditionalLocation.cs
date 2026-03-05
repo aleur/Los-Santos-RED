@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Xml.Serialization;
 
 public class MerchantConditionalLocation : ConditionalLocation
 {
@@ -32,8 +33,12 @@ public class MerchantConditionalLocation : ConditionalLocation
             merchantSpawnTask.SpawnRequirement = TaskRequirements;
             //merchantSpawnTask.ClearVehicleArea = true;
             //merchantSpawnTask.PlacePedOnGround = true;
+            merchantSpawnTask.ArePedsTargeted = ArePedsTargeted;
+            merchantSpawnTask.AreVehiclesTargeted = AreVehiclesTargeted;
             merchantSpawnTask.AttemptSpawn();
             merchantSpawnTask.PostRun(this, GameLocation);
+            SpawnTask = merchantSpawnTask; // ref
+            //merchantSpawnTask.CreatedPeople.ForEach(x => { World.Pedestrians.AddEntity(x); x.IsLocationSpawned = true; AddLocationRequirements(x); });
         }
         catch (Exception ex)
         {

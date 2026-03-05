@@ -712,6 +712,7 @@ namespace Mod
             Game.LocalPlayer.HasControl = true;
             BeingArrested = false;
             HealthState.Reset();
+            Crafting.Reset();
             if (resetActivites)
             {
                 ActivityManager.Reset();

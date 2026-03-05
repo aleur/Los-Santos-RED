@@ -89,13 +89,13 @@ public class DebugCrimeSubMenu : DebugSubMenu
         UIMenuItem StartRandomCrime = new UIMenuItem("Start Random Crime", "Trigger a random crime around the map.");
         StartRandomCrime.Activated += (menu, item) =>
         {
-            Tasker.CreateCrime(false);
+            World.Events.CivilianEvents.CreateCrime(false);
             menu.Visible = false;
         };
         UIMenuItem StartRandomTrafficCrime = new UIMenuItem("Start Random Traffic Crime", "Trigger a random traffic crime around the map.");
         StartRandomTrafficCrime.Activated += (menu, item) =>
         {
-            Tasker.CreateCrime(true);
+            World.Events.CivilianEvents.CreateCrime(true);
             menu.Visible = false;
         };
 

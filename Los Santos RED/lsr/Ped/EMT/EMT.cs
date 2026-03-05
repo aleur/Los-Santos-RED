@@ -28,9 +28,10 @@ public class EMT : PedExt
     public bool IsRespondingToInvestigation { get; set; }
 
     public override bool CanCurrentlyRacePlayer => false;
-    public override void Update(IPerceptable perceptable, IPoliceRespondable policeRespondable, Vector3 placeLastSeen, IEntityProvideable world)
+    public override void Update(IPerceptable perceptable, IPoliceRespondable policeRespondable, IContactInteractable contactInteractable, Vector3 placeLastSeen, IEntityProvideable world)
     {
         PlayerToCheck = policeRespondable;
+        PlayerToTask = contactInteractable;
         if(!Pedestrian.Exists())
         {
             return;

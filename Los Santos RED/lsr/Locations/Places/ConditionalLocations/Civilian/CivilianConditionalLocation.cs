@@ -8,11 +8,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using System.Xml.Serialization;
 
 public class CivilianConditionalLocation : ConditionalLocation
 {
     //protected GameLocation GameLocation;
-
     public string OverrideDispatchableVehicleGroupID { get; set; }
     public string OverrideDispatchablePersonGroupID { get; set; }
     public CivilianConditionalLocation(Vector3 location, float heading, float percentage) : base(location, heading, percentage)
@@ -33,8 +33,11 @@ public class CivilianConditionalLocation : ConditionalLocation
             civilianSpawnTask.AllowAnySpawn = true;
             civilianSpawnTask.AllowBuddySpawn = false;
             civilianSpawnTask.SpawnRequirement = TaskRequirements;
+            civilianSpawnTask.ArePedsTargeted = ArePedsTargeted;
+            civilianSpawnTask.AreVehiclesTargeted = AreVehiclesTargeted;
             civilianSpawnTask.AttemptSpawn();
             civilianSpawnTask.PostRun(this, GameLocation);
+            SpawnTask = civilianSpawnTask; // ref
             //merchantSpawnTask.CreatedPeople.ForEach(x => { World.Pedestrians.AddEntity(x); x.IsLocationSpawned = true; AddLocationRequirements(x); });
         }
         catch (Exception ex)

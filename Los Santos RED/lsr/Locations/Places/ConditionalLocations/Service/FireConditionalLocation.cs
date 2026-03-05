@@ -5,11 +5,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 public class FireConditionalLocation : ConditionalLocation
 {
     private Agency Agency;
-
     public FireConditionalLocation(Vector3 location, float heading, float percentage) : base(location, heading, percentage)
     {
     }
@@ -52,8 +52,11 @@ public class FireConditionalLocation : ConditionalLocation
             fireFighterSpawnTask.SpawnRequirement = TaskRequirements;
             fireFighterSpawnTask.ClearVehicleArea = true;
             fireFighterSpawnTask.PlacePedOnGround = DispatchableVehicle == null;// true;
+            fireFighterSpawnTask.ArePedsTargeted = ArePedsTargeted;
+            fireFighterSpawnTask.AreVehiclesTargeted = AreVehiclesTargeted;
             fireFighterSpawnTask.AttemptSpawn();
             fireFighterSpawnTask.PostRun(this, GameLocation);
+            SpawnTask = fireFighterSpawnTask;
             //fireFighterSpawnTask.CreatedPeople.ForEach(x => { World.Pedestrians.AddEntity(x); x.IsLocationSpawned = true; AddLocationRequirements(x); });
             //fireFighterSpawnTask.CreatedVehicles.ForEach(x => x.AddVehicleToList(World));//World.Vehicles.AddEntity(x, ResponseType.Fire));
         }

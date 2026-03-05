@@ -6,6 +6,7 @@ using RAGENativeUI.Elements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 public class PersonTransaction : Interaction
 {
@@ -208,7 +209,6 @@ public class PersonTransaction : Interaction
         }
         Transaction.UseAccounts = useAccounts;// Ped.ShopMenu != null || !Ped.ShopMenu.Items.Any(x => x.IsIllicilt);
         Transaction.CreateTransactionMenu(Player, ModItems, World, Settings, Weapons, Time);
-
     }
     private void CheckButtonPrompts()
     {
@@ -278,11 +278,12 @@ public class PersonTransaction : Interaction
         GetInCar = new UIMenuItem("Get In Car", "Get in the car to do the deal");
         InviteInCar = new UIMenuItem("Invite In Car", "Invite them in the car to do the deal");
         Follow = new UIMenuItem("Follow", "Have the ped follow you to somewhere more discreet");
+
         if (Ped != null && Ped.HasMenu && Ped.ShopMenu.Items.Any(x=> x.IsIllicilt) && Ped.IsTrustingOfPlayer)
         {
             InteractionMenu.AddItem(GetInCar);
             InteractionMenu.AddItem(InviteInCar);
-            InteractionMenu.AddItem(Follow);   
+            InteractionMenu.AddItem(Follow);
         }
     }
     private void UpdateOptions()

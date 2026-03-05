@@ -375,6 +375,7 @@ public class GangRelationships
             if (showNotification)
             {
                 Game.DisplayHelp($"Joined {CurrentGang.FullName}");
+                Player.CellPhone.AddPhoneResponse(gang.ContactName, gang.Contact.IconName, "You're with us now. Do your job, and you might move up the ranks. And if you don't, we'll put you under. Welcome to the crew.");
             }
         }
     }

@@ -127,6 +127,30 @@ public class WeaponStorage
             EntryPoint.WriteToConsole($"AddedStoredWeapon {wi.Hash}");
         }
     }
+    public void AddWeapon(IWeapons weapons, WeaponItem toAdd, int amount = 1, WeaponVariation weaponVariation = null)
+    {
+        Weapons = weapons;
+        for (int i = 0; i < amount; i++)
+        {
+            if (toAdd == null)
+            {
+                EntryPoint.WriteToConsole("NoWeaponItem");
+                continue;
+            }
+            WeaponInformation wi = weapons.GetWeapon(toAdd.ModelName);
+            if (wi == null)
+            {
+                EntryPoint.WriteToConsole("NoWeaponModel");
+                continue;
+            }
+            if (weaponVariation == null)
+            {
+                weaponVariation = new WeaponVariation(0);
+            }
+            StoredWeapons.Add(new StoredWeapon((uint)wi.Hash, Vector3.Zero, weaponVariation, wi.AmmoAmount));
+            EntryPoint.WriteToConsole($"AddedStoredWeapon {wi.Hash}");
+        }
+    }
 
     public void OnImpounded(bool hasValidCCW, IWeapons weapons)
     {

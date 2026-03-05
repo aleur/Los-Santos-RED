@@ -101,9 +101,13 @@ public class GroupMember
         {
             PedExt.Pedestrian.Armor = RandomItems.GetRandomNumberInt(Settings.SettingsManager.GroupSettings.AutoArmorMin, Settings.SettingsManager.GroupSettings.AutoArmorMax);
         }
-        if(Settings.SettingsManager.GroupSettings.AlwaysSetSpecialist)
+        if (Settings.SettingsManager.GroupSettings.AlwaysSetSpecialist)
         {
             SetSpecialist();
+        }
+        if (Settings.SettingsManager.GroupSettings.AlwaysSetSpecialist)
+        {
+            PowerAssist(Targetable.VehicleSpeedMPH);
         }
         //Set combat defensive
         NativeFunction.Natives.SET_PED_COMBAT_MOVEMENT(PedExt.Pedestrian, 1);
@@ -218,5 +222,16 @@ public class GroupMember
         }
     }
 
+    public void PowerAssist(float playerVehicleSpeedMPH)
+    {
+        if (PedExt.IsDriver && PedExt.DistanceToPlayer <= 200f && playerVehicleSpeedMPH >= 20f && !PedExt.IsInHelicopter && PedExt.Pedestrian.Exists())
+        {
+            Vehicle car = PedExt.Pedestrian.CurrentVehicle;
+            if (car.Exists())
+            {
+                NativeFunction.Natives.SET_VEHICLE_CHEAT_POWER_INCREASE(car, 2.0f);
+            }
+        }
+    }
 }
 

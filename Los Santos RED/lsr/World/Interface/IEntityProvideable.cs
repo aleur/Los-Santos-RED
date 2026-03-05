@@ -22,9 +22,11 @@ namespace LosSantosRED.lsr.Interface
         bool AnyFiresNearPlayer { get; }
         List<SpawnError> SpawnErrors { get; }
         ModDataFileManager ModDataFileManager { get; }
+        Events Events { get; }
         ILocationInteractable LocationInteractable { get; }
         IZones Zones { get; }
         IGangTerritories GangTerritories { get; }
+        IStreets Streets { get; }
         bool IsFEJInstalled { get; }
         bool IsTrafficDisabled { get; }
 

@@ -18,9 +18,6 @@ namespace Mod
         private ITargetable Player;
         private IWeapons Weapons;
         private ISettingsProvideable Settings;
-        private uint GameTimeLastGeneratedCrime;
-        private uint RandomCrimeRandomTime;
-        private uint RandomTrafficCrimeRandomTime;
         //private List<PedExt> PossibleTargets;
         //private Cop ClosestCopToPlayer;
         private IPlacesOfInterest PlacesOfInterest;
@@ -31,7 +28,6 @@ namespace Mod
         private GangTasker GangTasker;
         private CivilianTasker CivilianTasker;
         private EMTTasker EMTTasker;
-        private PedExt CurrentCriminal;
         private FirefighterTasker FirefighterTasker;
 
 
@@ -42,15 +38,8 @@ namespace Mod
         private uint MaxTimeBetweenCivUpdates = 0;
         private uint GameTimeLastTaskedPolice;
         private uint GameTimeLastTaskedCivilians;
-        private uint GameTimeLastGeneratedTrafficCrime;
 
-        public RelationshipGroup CriminalsRG { get; set; }
         public RelationshipGroup ZombiesRG { get; set; }
-        private bool IsTimeToCreateCrime => Game.GameTime - GameTimeLastGeneratedCrime >= (Settings.SettingsManager.CivilianSettings.MinimumTimeBetweenRandomCrimes + RandomCrimeRandomTime);
-
-
-
-        private bool IsTimeToCreateTrrafficCrime => Game.GameTime - GameTimeLastGeneratedTrafficCrime >= (Settings.SettingsManager.CivilianSettings.MinimumTimeBetweenRandomTrafficCrimes + RandomTrafficCrimeRandomTime);
         public string TaskerDebug => $"Cop Max: {MaxTimeBetweenCopUpdates} Avg: {AverageTimeBetweenCopUpdates} Civ Max: {MaxTimeBetweenCivUpdates} Avg: {AverageTimeBetweenCivUpdates}";
         public Tasker(IEntityProvideable pedProvider, ITargetable player, IWeapons weapons, ISettingsProvideable settings, IPlacesOfInterest placesOfInterest)
         {
@@ -58,8 +47,6 @@ namespace Mod
             Player = player;
             Weapons = weapons;
             Settings = settings;
-            GameTimeLastGeneratedCrime = Game.GameTime;
-            RandomCrimeRandomTime = RandomItems.GetRandomNumber(0, 240000);//between 0 and 4 minutes randomly added
             PlacesOfInterest = placesOfInterest;
             CopTasker = new CopTasker(this, PedProvider, player, weapons, settings, PlacesOfInterest);
             GangTasker = new GangTasker(this, PedProvider, player, weapons, settings, PlacesOfInterest);
@@ -74,10 +61,6 @@ namespace Mod
         }
         public void Setup()
         {
-            CriminalsRG = new RelationshipGroup("CRIMINALS");
-            RelationshipGroup.Cop.SetRelationshipWith(CriminalsRG, Relationship.Hate);
-            CriminalsRG.SetRelationshipWith(RelationshipGroup.Cop, Relationship.Hate);
-
             ZombiesRG = new RelationshipGroup("ZOMBIES");
 
 
@@ -99,19 +82,6 @@ namespace Mod
         }
         public void UpdateCivilians()
         {
-            if (Settings.SettingsManager.CivilianSettings.AllowRandomCrimes)
-            {
-                if (IsTimeToCreateCrime)
-                {
-                    CreateCrime(false);
-                    GameFiber.Yield();
-                }
-                else if(IsTimeToCreateTrrafficCrime)
-                {
-                    CreateCrime(true);
-                    GameFiber.Yield();
-                }
-            }
             CivilianTasker.Update();
             GameFiber.Yield();//TR 29
             GangTasker.Update();
@@ -130,10 +100,6 @@ namespace Mod
             {
                 EntryPoint.WriteToConsole($"Tasker.UpdateCivilians Ran Time Since {Game.GameTime - GameTimeLastTaskedCivilians}", 5);
             }
-            if (CurrentCriminal != null && CurrentCriminal.CurrentTask?.Name == "CommitCrime")
-            {
-                CurrentCriminal.CurrentTask?.Update();
-            }
             GameTimeLastTaskedCivilians = Game.GameTime;
         }
         public void UpdatePolice()
@@ -145,55 +111,5 @@ namespace Mod
             }
             GameTimeLastTaskedPolice = Game.GameTime;
         }
-        public void CreateCrime(bool isTrafficOnly)
-        {
-            PedExt Criminal = PedProvider.Pedestrians.GangMemberList.Where(x => x.Pedestrian.Exists() && x.Pedestrian.IsAlive && x.DistanceToPlayer <= 200f && x.CanBeTasked && x.CanBeAmbientTasked && ((isTrafficOnly && x.IsDriver && x.IsInVehicle) || (!isTrafficOnly && !x.IsInVehicle))).FirstOrDefault();//85f//150f
-            if (Criminal == null)
-            {
-                Criminal = PedProvider.Pedestrians.CivilianList.Where(x => x.Pedestrian.Exists() && x.Pedestrian.IsAlive && x.DistanceToPlayer <= 200f && x.CanBeTasked && x.CanBeAmbientTasked && ((isTrafficOnly && x.IsDriver && x.IsInVehicle) || (!isTrafficOnly && !x.IsInVehicle))).FirstOrDefault();//85f//150f
-            }
-            if (Criminal != null && Criminal.Pedestrian.Exists())
-            {
-                if (Settings.SettingsManager.CivilianSettings.ShowRandomCriminalBlips && Criminal.Pedestrian.Exists())
-                {
-                    Criminal.AddBlip();
-                    //Blip myBlip = Criminal.Pedestrian.AttachBlip();
-                    //EntryPoint.WriteToConsole($"CRIME PED BLIP BLIP CREATED");
-                    //myBlip.Color = Color.Red;
-                    //myBlip.Sprite = BlipSprite.CriminalWanted;
-                    //myBlip.Scale = 1.0f;
-                    //NativeFunction.Natives.BEGIN_TEXT_COMMAND_SET_BLIP_NAME("STRING");
-                    //NativeFunction.Natives.ADD_TEXT_COMPONENT_SUBSTRING_PLAYER_NAME("Criminal");
-                    //NativeFunction.Natives.END_TEXT_COMMAND_SET_BLIP_NAME(myBlip);
-                    //PedProvider.AddBlip(myBlip);
-                }
-                Criminal.CanBeAmbientTasked = false;
-                Criminal.WasSetCriminal = true;
-                Criminal.WillCallPolice = false;
-                Criminal.WillCallPoliceIntense = false;
-
-                if (!Criminal.IsGangMember)
-                {
-                    //Criminal.Pedestrian.IsPersistent = true;
-                    Criminal.Pedestrian.RelationshipGroup = CriminalsRG;
-                }
-                Criminal.CurrentTask = new CommitCrime(Criminal, Player, Weapons, PedProvider) { IsTrafficOnly = isTrafficOnly };
-                Criminal.CurrentTask.Start();
-
-                if (isTrafficOnly)
-                {
-                    GameTimeLastGeneratedTrafficCrime = Game.GameTime;
-                    RandomTrafficCrimeRandomTime = RandomItems.GetRandomNumber(0, 240000);
-                }
-                else
-                {
-                    GameTimeLastGeneratedCrime = Game.GameTime;
-                    RandomCrimeRandomTime = RandomItems.GetRandomNumber(0, 240000);//between 0 and 4 minutes randomly added
-                                                                                   //EntryPoint.WriteToConsole("TASKER: GENERATED CRIME", 5);
-                }
-            }
-        }
-       
-
     }
 }

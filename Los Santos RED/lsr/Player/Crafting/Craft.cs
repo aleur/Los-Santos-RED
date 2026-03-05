@@ -24,6 +24,7 @@ namespace Mod
         public bool IsCrafting { get; private set; } = false;
         public CraftingMenu CraftingMenu { get; set; }
         public ICraftableItems CraftableItems;
+        public List<(int, CraftableItem)> UnfinishedCrafts { get; set; } = new List<(int, CraftableItem)> ();
 
         public Crafting(Player player, ICraftableItems craftableItems, IModItems modItems, ISettingsProvideable settings, IWeapons weapons)
         {
@@ -37,6 +38,10 @@ namespace Mod
         {
             SetupCraftableLookup();
             Player.Crafting = this;
+        }
+        public void Reset()
+        {
+            UnfinishedCrafts.Clear();
         }
         private void SetupCraftableLookup()
         {
@@ -68,7 +73,7 @@ namespace Mod
         {
             foreach (Ingredient ingredient in craftItem.CraftableItem.Ingredients)
             {
-                if (ingredient.IsConsumed)
+                if (ingredient.IsConsumed && ingredient.Quantity * quantity > 0)
                 {
                     Player.Inventory.Remove(Player.Inventory.ItemsList.Find(x=>x.ModItem.Name == ingredient.IngredientName).ModItem, ingredient.Quantity * quantity);
                 }
@@ -97,7 +102,7 @@ namespace Mod
 
             NativeFunction.CallByName<uint>("TASK_PLAY_ANIM", Player.Character, dictionary, animation, 4.0f, -4.0f, -1, 1, 0, false, false, false);
         }
-        public void CraftItem(string productName, int quantity = 1, string craftingFlag = null)
+        public void CraftItem(CraftableItem craftableItem, int quantity, int multiplier = 1, string craftingFlag = null)
         {
             if (IsCrafting)
             {
@@ -105,70 +110,74 @@ namespace Mod
                 return;
             }
             Player.ActivityManager.StopDynamicActivity();
-            CraftableItemLookupModel craftItem = CraftableItems.CraftablesLookup[productName];
 
-
-            if (craftItem == null)
+            if (craftableItem == null)
             {
                 Game.DisplayHelp("Cannot start crafting.");
                 return;
             }
 
-            CraftableItem finalCraftableItem = craftItem.CraftableItem;
+            string productName = craftableItem.Name;
+            ModItem itemToGive = ModItems.Get(craftableItem.Resultant);
 
-            if (finalCraftableItem == null)
+            if (itemToGive == null)
             {
                 Game.DisplayHelp("Cannot start crafting.");
                 return;
             }
 
-            ModItem itemToGive = ModItems.Get(finalCraftableItem.Resultant);
+            CraftingMenu.Hide(); 
 
-            if(itemToGive == null)
-            {
-                Game.DisplayHelp("Cannot start crafting.");
-                return;
-            }
+            CraftableItemLookupModel craftItem = CraftableItems.CraftablesLookup[craftableItem.Name];
+            DeductIngredientsFromInventory(craftItem, multiplier);
 
-            int finalQuantity = quantity * (finalCraftableItem.SingleUnit ? 1 : finalCraftableItem.ResultantAmount);
-
-            CraftingMenu.Hide();
-            DeductIngredientsFromInventory(craftItem, quantity);
             Player.IsSetDisabledControlsWithCamera = true;
             IsCrafting = true;
 
-            PerformAnimation(finalCraftableItem);
+            PerformAnimation(craftableItem);
 
-            if (!string.IsNullOrEmpty(finalCraftableItem.CrimeId))
+            if (!string.IsNullOrEmpty(craftableItem.CrimeId))
             {
-                Player.Violations.SetContinuouslyViolating(finalCraftableItem.CrimeId);
+                Player.Violations.SetContinuouslyViolating(craftableItem.CrimeId);
             }
 
 
-
             uint GameTimeStartedCrafting = Game.GameTime;
+
             Player.ButtonPrompts.AttemptAddPrompt("craftingStop", "Stop Crafting", "stopcraftingprompt1", Settings.SettingsManager.KeySettings.InteractCancel, 999);
+            Player.ButtonPrompts.AttemptAddPrompt("craftingPause", "Put Away", "putawayprompt1", Settings.SettingsManager.KeySettings.InteractStart, 999);
+
             if (Settings.SettingsManager.ActivitySettings.AllowSkippingCrafting) 
             {
                 Player.ButtonPrompts.AttemptAddPrompt("craftingStop", "Skip Crafting", "skipcraftingprompt1", Settings.SettingsManager.KeySettings.InteractStart, 999);
             }
             int craftedQuantity = 0;
-            EntryPoint.WriteToConsole($"craftedQuantity{craftedQuantity} finalQuantity{finalQuantity}");
-            while (craftedQuantity < finalQuantity)//Game.GameTime - GameTimeStartedCrafting <= (finalCraftableItem.Cooldown * finalQuantity))
+            EntryPoint.WriteToConsole($"craftedQuantity{craftedQuantity} quantity{quantity}");
+            while (craftedQuantity < quantity)//Game.GameTime - GameTimeStartedCrafting <= (craftableItem.Cooldown * quantity))
             {
-                if (!Player.IsAliveAndFree || Player.IsUnconscious || Player.ButtonPrompts.IsPressed("stopcraftingprompt1") || (Settings.SettingsManager.ActivitySettings.AllowSkippingCrafting && Player.ButtonPrompts.IsPressed("skipcraftingprompt1")))
+                if (!Player.IsAliveAndFree || Player.IsUnconscious || Player.ButtonPrompts.IsPressed("stopcraftingprompt1") || Player.ButtonPrompts.IsPressed("putawayprompt1") || (Settings.SettingsManager.ActivitySettings.AllowSkippingCrafting && Player.ButtonPrompts.IsPressed("skipcraftingprompt1")))
                 {
-                    IsCrafting = false;
-                    if (!string.IsNullOrEmpty(finalCraftableItem.CrimeId))
-                    {
-                        Player.Violations.StopContinuouslyViolating(finalCraftableItem.CrimeId);
-                    }
+                    if (!string.IsNullOrEmpty(craftableItem.CrimeId)) Player.Violations.StopContinuouslyViolating(craftableItem.CrimeId);
+
                     Player.IsSetDisabledControlsWithCamera = false;
 
-                    if(Player.ButtonPrompts.IsPressed("stopcraftingprompt1"))
+                    string Message;
+                    if (Player.ButtonPrompts.IsPressed("stopcraftingprompt1"))
                     {
-                        Player.ButtonPrompts.RemovePrompts("craftingStop");
-                        Game.DisplayHelp("Crafting cancelled.");
+                        TimerBarPool.Remove(ProgressBar);
+                        Message = "Crafting cancelled.";
+                        // Give back ingredients if none crafted
+                        if (craftedQuantity == 0)
+                        {
+                            foreach (Ingredient ingredient in craftableItem.Ingredients) Player.Inventory.Add(ModItems.Get(ingredient.IngredientName), ingredient.Quantity * multiplier);
+                        }
+                    }
+                    else if (Player.ButtonPrompts.IsPressed("putawayprompt1"))
+                    {
+                        TimerBarPool.Remove(ProgressBar);
+                        Message = "Crafting paused: item put away.";
+                        UnfinishedCrafts.Add((quantity-craftedQuantity, craftableItem));
+                        Game.DisplaySubtitle($"Crafted {productName} - {craftedQuantity} {itemToGive.MeasurementName}(s)");
                     }
                     if(Player.ButtonPrompts.IsPressed("skipcraftingprompt1"))
                     {
@@ -179,25 +188,31 @@ namespace Mod
                     }
                     else
                     {
-                        Game.DisplayHelp("Crafting failed.");
+                        TimerBarPool.Remove(ProgressBar);
+                        Message = "Crafting failed.";
                     }
-                    
+                    Game.DisplayHelp(Message);
+
+
+                    Player.ButtonPrompts.RemovePrompts("craftingPause");
+                    Player.ButtonPrompts.RemovePrompts("craftingStop");
                     NativeFunction.Natives.CLEAR_PED_TASKS(Player.Character);
+                    IsCrafting = false;
+
                     return;
                 }
-
-                float currentPercentage = (float)(Game.GameTime - GameTimeStartedCrafting) / (float)finalCraftableItem.Cooldown;
-                if (Game.GameTime - GameTimeStartedCrafting >= finalCraftableItem.Cooldown)
+                float currentPercentage = (float)(Game.GameTime - GameTimeStartedCrafting) / (float)craftableItem.Cooldown;
+                if (Game.GameTime - GameTimeStartedCrafting >= craftableItem.Cooldown)
                 {
                     GameTimeStartedCrafting = Game.GameTime;
                     itemToGive.AddToPlayerInventory(Player, 1);
                     NativeHelper.PlaySuccessSound();
                     craftedQuantity++;
-                    if (craftedQuantity < finalQuantity)
+                    if (craftedQuantity < quantity)
                     {
-                        Game.DisplaySubtitle($"Crafted {productName} {craftedQuantity}/{finalQuantity} {itemToGive.MeasurementName}(s)", finalCraftableItem.Cooldown);
+                        Game.DisplaySubtitle($"Crafted {productName} {craftedQuantity}/{quantity} {itemToGive.MeasurementName}(s)", craftableItem.Cooldown);
                     }
-                    EntryPoint.WriteToConsole($"CRAFTED ONE craftedQuantity{craftedQuantity} finalQuantity{finalQuantity}");
+                    EntryPoint.WriteToConsole($"CRAFTED ONE craftedQuantity{craftedQuantity} quantity{quantity}");
                 }
 
 
@@ -205,15 +220,14 @@ namespace Mod
             }
 
 
+            Player.ButtonPrompts.RemovePrompts("craftingPause");
             Player.ButtonPrompts.RemovePrompts("craftingStop");   
             NativeFunction.Natives.CLEAR_PED_TASKS(Player.Character);
             IsCrafting = false; 
-            if (!string.IsNullOrEmpty(finalCraftableItem.CrimeId))
-            {
-                Player.Violations.StopContinuouslyViolating(finalCraftableItem.CrimeId);
-            }
+
+            if (!string.IsNullOrEmpty(craftableItem.CrimeId)) Player.Violations.StopContinuouslyViolating(craftableItem.CrimeId);
             Player.IsSetDisabledControlsWithCamera = false;
-            Game.DisplaySubtitle($"Crafted {productName} - {finalQuantity} {itemToGive.MeasurementName}(s)");
+            Game.DisplaySubtitle($"Crafted {productName} - {quantity} {itemToGive.MeasurementName}(s)");
         }
     }
 }

@@ -26,7 +26,6 @@ namespace Mod
         private IInteriors Interiors;
         private IShopMenus ShopMenus;
         private IGangs Gangs;
-        private IStreets Streets;
         private IPlacesOfInterest PlacesOfInterest;
         private List<Blip> CreatedBlips = new List<Blip>();
         private Blip TotalWantedBlip;
@@ -54,6 +53,7 @@ namespace Mod
             Pedestrians = new Pedestrians(agencies, zones, jurisdictions, settings, names, relationshipGroups, weapons, crimes, shopMenus, Gangs, GangTerritories, this);
             Vehicles = new Vehicles(agencies, zones, jurisdictions, settings, plateTypes, modItems, this, associations);
             Places = new Places(this, zones, jurisdictions, settings, placesOfInterest, weapons, crimes, time, shopMenus, interiors, gangs, gangTerritories, streets, agencies, names, pedGroups, locationTypes, plateTypes, associations, contacts, ModDataFileManager.ModItems, modDataFileManager.IssueableWeapons, modDataFileManager.Heads, modDataFileManager.DispatchablePeople, modDataFileManager.ClothesNames);
+            Events = new Events(this, zones, jurisdictions, settings, placesOfInterest, weapons, crimes, time, shopMenus, interiors, gangs, gangTerritories, streets, agencies, names, pedGroups, locationTypes, plateTypes, associations, contacts, ModDataFileManager.ModItems, modDataFileManager.IssueableWeapons, modDataFileManager.Heads, modDataFileManager.DispatchablePeople, modDataFileManager.ClothesNames);
             SpawnErrors = new List<SpawnError>();
         }
         public bool IsMPMapLoaded { get; private set; }
@@ -61,8 +61,10 @@ namespace Mod
         public Vehicles Vehicles { get; private set; }
         public Pedestrians Pedestrians { get; private set; }
         public Places Places { get; private set; }
+        public Events Events { get; private set; }
         public IZones Zones { get; set; }
         public IGangTerritories GangTerritories { get; set; }
+        public IStreets Streets { get; set; }
         public int CitizenWantedLevel { get; set; }
         public int TotalWantedLevel { get; set; } = 0;
         public Vector3 PoliceBackupPoint { get; set; }
@@ -82,12 +84,13 @@ namespace Mod
 
 
         public bool IsTrafficDisabled => isTrafficDisabled;
-        public void Setup(IInteractionable player, ILocationInteractable locationInteractable)
+        public void Setup(IInteractionable player, ILocationInteractable locationInteractable, IContactInteractable contactInteractable, ITargetable targetable)
         {
             DetermineMap();
             Pedestrians.Setup();
             LocationInteractable = locationInteractable;
             Places.Setup(player, locationInteractable);
+            Events.Setup(contactInteractable, targetable);
             Vehicles.Setup();
             AddBlipsToMap();
             SetMemoryItems();
@@ -179,6 +182,7 @@ namespace Mod
         }
         public void Dispose()
         {
+            Events.Dispose();
             Places.Dispose();
             Pedestrians.Dispose();
             Vehicles.Dispose();

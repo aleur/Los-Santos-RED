@@ -43,6 +43,7 @@ public class ConditionalLocation
     protected IDispatchablePeople DispatchablePeople;
     protected IDispatchableVehicles DispatchableVehicles;
 
+
     public ConditionalLocation()
     {
     }
@@ -53,8 +54,7 @@ public class ConditionalLocation
         Percentage = percentage;
     }
     public bool HasDispatchablePerson => DispatchablePerson != null;
-
-
+    public SpawnTask LocationSpawnTask => SpawnTask;
     public bool IsEmptyVehicleSpawn => DispatchablePerson == null;
     public Vector3 Location { get; set; }
     public float Heading { get; set; }
@@ -85,6 +85,10 @@ public class ConditionalLocation
     public bool AttemptedSpawn { get; private set; }
     [XmlIgnore]
     public bool Ignore { get; private set; }
+    [XmlIgnore]
+    public bool ArePedsTargeted { get; set; } = false;
+    [XmlIgnore]
+    public bool AreVehiclesTargeted { get; set; } = false;
 
     //public virtual void Setup(IAgencies agencies, IGangs gangs, IZones zones, IJurisdictions jurisdictions, IGangTerritories gangTerritories, ISettingsProvideable settings, IEntityProvideable world, string masterAssociationID, IWeapons weapons, INameProvideable names, ICrimes crimes, IPedGroups pedGroups, IShopMenus shopMenus, ITimeControllable time, IModItems modItems)
     //{
@@ -134,7 +138,7 @@ public class ConditionalLocation
         GameLocation = gameLocation;
         DispatchablePeople = dispatchablePeople;
         DispatchableVehicles = dispatchableVehicles;
-        AttemptedSpawn = DetermineRun(force);
+        AttemptedSpawn = DetermineRun(force || ArePedsTargeted || AreVehiclesTargeted);
         if (!AttemptedSpawn)
         {
             return;

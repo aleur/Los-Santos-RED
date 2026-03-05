@@ -4,11 +4,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LosSantosRED.lsr.Interface
+public enum TargetType
 {
-    public interface ITaskerable
-    {
-        string TaskerDebug { get; }
-
-    }
+    Gang,
+    Police,
+    Organization,
+    Civilian,
+    Dignitary,
+    Witness
 }

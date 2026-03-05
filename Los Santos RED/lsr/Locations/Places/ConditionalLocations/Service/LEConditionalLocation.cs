@@ -6,6 +6,7 @@ using System.Linq;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
 public class LEConditionalLocation : ConditionalLocation
 {
@@ -47,15 +48,18 @@ public class LEConditionalLocation : ConditionalLocation
         try
         {
             EntryPoint.WriteToConsole("ATTEMPT LE SPAWN CONDITIONAL LOCATION");
-            LESpawnTask spawnTask = new LESpawnTask(Agency, SpawnLocation, DispatchableVehicle, DispatchablePerson, Settings.SettingsManager.PoliceSpawnSettings.ShowSpawnedBlips, Settings, Weapons, Names, RandomItems.RandomPercent(Settings.SettingsManager.PoliceSpawnSettings.AddOptionalPassengerPercentage), World, ModItems, false, ShopMenus, Crimes);
-            spawnTask.AllowAnySpawn = true;
-            spawnTask.AllowBuddySpawn = false;
-            spawnTask.ClearVehicleArea = true;
-            spawnTask.SpawnRequirement = TaskRequirements;
-            spawnTask.PlacePedOnGround = DispatchableVehicle == null;// true;
-            spawnTask.AttemptSpawn();
+            LESpawnTask LESpawnTask = new LESpawnTask(Agency, SpawnLocation, DispatchableVehicle, DispatchablePerson, Settings.SettingsManager.PoliceSpawnSettings.ShowSpawnedBlips, Settings, Weapons, Names, RandomItems.RandomPercent(Settings.SettingsManager.PoliceSpawnSettings.AddOptionalPassengerPercentage), World, ModItems, false, ShopMenus, Crimes);
+            LESpawnTask.AllowAnySpawn = true;
+            LESpawnTask.AllowBuddySpawn = false;
+            LESpawnTask.ClearVehicleArea = true;
+            LESpawnTask.SpawnRequirement = TaskRequirements;
+            LESpawnTask.PlacePedOnGround = DispatchableVehicle == null;// true;
+            LESpawnTask.ArePedsTargeted = ArePedsTargeted;
+            LESpawnTask.AreVehiclesTargeted = AreVehiclesTargeted;
+            LESpawnTask.AttemptSpawn();
             GameFiber.Yield();
-            spawnTask.PostRun(this, GameLocation);
+            LESpawnTask.PostRun(this, GameLocation);
+            SpawnTask = LESpawnTask;
             //spawnTask.CreatedPeople.ForEach(x => { World.Pedestrians.AddEntity(x); x.IsLocationSpawned = true; AddLocationRequirements(x); GameLocation?.AddSpawnedPed(x); });
             //spawnTask.CreatedVehicles.ForEach(x => { x.AddVehicleToList(World); x.WasSpawnedEmpty = DispatchablePerson == null;GameLocation?.AddSpawnedVehicle(x);   } ) ;//World.Vehicles.AddEntity(x, ResponseType.LawEnforcement));
             Player.OnLawEnforcementSpawn(Agency, DispatchableVehicle, DispatchablePerson);

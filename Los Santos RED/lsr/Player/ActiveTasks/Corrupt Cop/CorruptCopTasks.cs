@@ -59,21 +59,21 @@ public class CorruptCopTasks : IPlayerTaskGroup
         WitnessEliminationTask WitnessEliminationTask = new WitnessEliminationTask(Player, Time, Gangs, PlayerTasks, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, Names, Weapons, ShopMenus, contact);
         AllTasks.Add(WitnessEliminationTask);
         WitnessEliminationTask.Setup();
-        WitnessEliminationTask.Start(contact); 
+        WitnessEliminationTask.Start(); 
     }
     public void StartCopHitTask(CorruptCopContact contact, Agency targetAgency, int killRequirement)
     {
         CopHitCopTask CopHitTask = new CopHitCopTask(Player, Time, Gangs, PlayerTasks, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, contact,targetAgency, killRequirement);
         AllTasks.Add(CopHitTask);
         CopHitTask.Setup();
-        CopHitTask.Start(contact);
+        CopHitTask.Start();
     }
     public void StartCopGangHitTask(CorruptCopContact contact, Gang targetGang, int killRequirement)
     {
         CopGangHitTask CopGangHitTask = new CopGangHitTask(Player, Time, Gangs, PlayerTasks, PlacesOfInterest, ActiveDrops, Settings, World, Crimes, contact, targetGang, killRequirement);
         AllTasks.Add(CopGangHitTask);
         CopGangHitTask.Setup();
-        CopGangHitTask.Start(contact);
+        CopGangHitTask.Start();
     }
 
     public void OnInteractionMenuCreated(GameLocation gameLocation, MenuPool menuPool, UIMenu interactionMenu)

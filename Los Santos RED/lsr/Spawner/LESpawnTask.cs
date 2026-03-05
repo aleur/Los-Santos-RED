@@ -125,6 +125,7 @@ public class LESpawnTask : SpawnTask
         LastCreatedVehicle = CreateVehicle();
         if (LastCreatedVehicleExists)
         {
+            LastCreatedVehicle.AreVehiclesTargeted = AreVehiclesTargeted;
             if (HasPersonToSpawn)
             {
                 if (WillAddDriver)
@@ -133,6 +134,7 @@ public class LESpawnTask : SpawnTask
                     PedExt Person = CreatePerson(-1);
                     if (Person != null && Person.Pedestrian.Exists() && LastCreatedVehicleExists)
                     {
+                        Person.IsTargetedByPlayer = ArePedsTargeted;
                         PutPedInVehicle(Person, -1);
                         if (WillAddPassengers)
                         {
@@ -198,6 +200,7 @@ public class LESpawnTask : SpawnTask
             PedExt Passenger = CreatePerson(seatIndex);
             if (Passenger != null && Passenger.Pedestrian.Exists() && LastCreatedVehicleExists)
             {
+                Passenger.IsTargetedByPlayer = ArePedsTargeted;
                 PutPedInVehicle(Passenger, seatIndex);
             }
             else

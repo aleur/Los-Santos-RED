@@ -118,12 +118,12 @@
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="NAudio">
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Grand Theft Auto V\NAudio.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Grand Theft Auto V\NAudio.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="PresentationCore" />
     <Reference Include="RAGENativeUI">
-      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Grand Theft Auto V\RAGENativeUI.dll</HintPath>
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Grand Theft Auto V\RAGENativeUI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="RagePluginHookSDK">
@@ -261,6 +261,7 @@
     <Compile Include="lsr\Locations\Interiors\Residence\Trophy\DisplaySlot.cs" />
     <Compile Include="lsr\Locations\Interiors\Theft\AnimationPreInteract.cs" />
     <Compile Include="lsr\Locations\Interiors\Residence\Trophy\DisplayInteract.cs" />
+    <Compile Include="lsr\Data\Location\TargetType.cs" />
     <Compile Include="lsr\Locations\Other\GangTerritory.cs" />
     <Compile Include="lsr\Locations\Places\ConditionalLocations\Civilian\CivilianConditionalLocation.cs" />
     <Compile Include="lsr\Locations\Places\GameLocations\BodyExport.cs" />
@@ -293,6 +294,7 @@
     <Compile Include="lsr\Player\ActiveTasks\Gang\GangBriberyTask.cs" />
     <Compile Include="lsr\Player\ActiveTasks\Gang\Generic\DrugMeetTask.cs" />
     <Compile Include="lsr\Player\ActiveTasks\Generic Contact\PayoffContactTask.cs" />
+    <Compile Include="lsr\Player\ActiveTasks\Underground Guns\GunDropoffTask.cs" />
     <Compile Include="lsr\Player\Activity\ForceDoorActivity.cs" />
     <Compile Include="lsr\Player\Activity\HideableObject.cs" />
     <Compile Include="lsr\Player\Activity\HidingActivity.cs" />
@@ -965,7 +967,7 @@
     <Compile Include="lsr\Player\ActiveTasks\Gang\PayoffGangTask.cs" />
     <Compile Include="lsr\Player\ActiveTasks\Gang\RivalGangHitTask.cs" />
     <Compile Include="lsr\Player\ActiveTasks\Gang\RivalGangVehicleTheftTask.cs" />
-    <Compile Include="lsr\Player\ActiveTasks\Underground Guns\GunPickupTask.cs" />
+    <Compile Include="lsr\Player\ActiveTasks\Underground Guns\GunTransportTask.cs" />
     <Compile Include="lsr\Player\ActiveTasks\Underground Guns\UndergroundGunsTasks.cs" />
     <Compile Include="lsr\Player\ActiveTasks\Corrupt Cop\WitnessEliminationTask.cs" />
     <Compile Include="lsr\Player\Activity\ActivityManager.cs" />
@@ -1327,6 +1329,10 @@
     <Compile Include="lsr\Weather\IWeatherReportable.cs" />
     <Compile Include="lsr\Weather\WeatherForecast.cs" />
     <Compile Include="lsr\World\eRandomEventType.cs" />
+    <Compile Include="lsr\World\Events\CivilianEvents.cs" />
+    <Compile Include="lsr\World\Events\GangEvents.cs" />
+    <Compile Include="lsr\World\Events\Events.cs" />
+    <Compile Include="lsr\World\Events\TurfStatus.cs" />
     <Compile Include="lsr\World\Interface\IEntityProvideable.cs" />
     <Compile Include="lsr\Time\ITimeControllable.cs" />
     <Compile Include="lsr\World\Interface\IEntityLoggable.cs" />

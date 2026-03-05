@@ -9,6 +9,7 @@ public interface IMenuProvideable
 {
     bool IsDisplayingMenu { get; }
     bool IsPressingActionWheelButton { get; set; }
+    void ToggleCraftingMenu();
     void ToggleMenu();
     void ToggleDebugMenu();
     void ToggleAltMenu();

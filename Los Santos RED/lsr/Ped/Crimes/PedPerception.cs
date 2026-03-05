@@ -40,7 +40,7 @@ public class PedPerception
     }
     public void Update()
     {
-        if (Settings.SettingsManager.CivilianSettings.CheckCivilianCrimes && !PedExt.IsArrested && PedExt.PedViolations.WantedLevel == 0 && PedExt.PedViolations.CurrentlyViolatingWantedLevel == 0 && Settings.SettingsManager.CivilianSettings.AllowCivilinsToCallPoliceOnOtherCivilians)//used to have player.isnotwanted here
+        if (Settings.SettingsManager.CivilianSettings.CheckCivilianCrimes && !PedExt.IsArrested && PedExt.PedViolations.WantedLevel == 0 && PedExt.PedViolations.CurrentlyViolatingWantedLevel == 0 && Settings.SettingsManager.CivilianSettings.AllowCiviliansToCallPoliceOnOtherCivilians)//used to have player.isnotwanted here
         {
             CheckOtherPedCrimes();
         }
@@ -78,7 +78,7 @@ public class PedPerception
         if (!PedExt.IsGangMember && (PedExt.WillCallPolice || (PedExt.WillCallPoliceIntense && CurrentCriminal.WantedLevel >= 3)))
         {
             uint VehicleWitnessed = 0;
-            uint WeaponWitnessed = 0;
+            uint? WeaponWitnessed = 0;
             WitnessedLocation = CurrentCriminal.Pedestrian.Position;
             if (DistanceToCurrentCriminal <= 60f)
             {
@@ -91,9 +91,9 @@ public class PedPerception
                 {
                     VehicleWitnessed = tryingToEnter.Handle;
                 }
-                uint currentWeapon = 0;
+                uint? currentWeapon = 0;
                 NativeFunction.Natives.GET_CURRENT_PED_WEAPON<bool>(CurrentCriminal.Pedestrian, out currentWeapon, true);
-                if (currentWeapon != 2725352035 && currentWeapon != 0)
+                if (currentWeapon != null && currentWeapon != 2725352035 && currentWeapon != 0)
                 {
                     WeaponWitnessed = currentWeapon;
                 }

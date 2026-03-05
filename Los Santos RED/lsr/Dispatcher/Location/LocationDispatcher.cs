@@ -64,11 +64,25 @@ public class LocationDispatcher
     {
         foreach (GameLocation ps in World.Places.ActiveLocations.ToList().Where(x => x.IsEnabled && x.DistanceToPlayer <= x.ActivateDistance && x.IsNearby && !x.IsDispatchFilled && (x.PossibleGroupSpawns != null || x.PossiblePedSpawns != null || x.PossibleVehicleSpawns != null)).ToList())
         {
-            if (ps.PossibleGroupSpawns != null)
+            bool CanPedsBeTargeted = false, CanVehiclesBeTargeted = false;
+            bool AmbushTarget = false, VehicleTarget = false;
+
+            if (ps is BlankLocation)
+            {
+                BlankLocation bl = (BlankLocation)ps;
+
+                CanPedsBeTargeted = bl.CanPedsBeTargeted;
+                CanVehiclesBeTargeted = bl.CanVehiclesBeTargeted;
+                AmbushTarget = bl.ArePedsTargeted;
+                VehicleTarget = bl.AreVehiclesTargeted;
+            }
+            if (ps.PossibleGroupSpawns != null && ps.PossibleGroupSpawns.Any()) // MUST BE .Any() or else this will always run regardless if PossibleGroupSpawns was initialized.
             {
                 foreach (ConditionalGroup cg in ps.PossibleGroupSpawns)
                 {
                     EntryPoint.WriteToConsole($"ATTEMPTING GROUP SPAWN AT {ps.Name}");
+                    cg.CanPedsBeTargeted = !CanPedsBeTargeted ? false : cg.CanPedsBeTargeted; // If Scenario can't be targeted, CGroup cannot be targeted. If it can be targeted, default to whatever the player set.
+                    cg.CanVehiclesBeTargeted = !CanVehiclesBeTargeted ? false : cg.CanVehiclesBeTargeted;
                     cg.AttemptSpawn(Player, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World, ps.AssociationID, Weapons, Names, Crimes, PedGroups, ShopMenus, 
                         WeatherReporter, Time, ModItems, ps, DispatchablePeople, DispatchableVehicles);
                     GameFiber.Yield();
@@ -78,11 +92,11 @@ public class LocationDispatcher
             //{
             //    GameFiber.Yield();
             //}
-            if (ps.PossiblePedSpawns != null)
+            if (ps.PossiblePedSpawns?.Any() != null)
             {
                 foreach (ConditionalLocation cl in ps.PossiblePedSpawns)
                 {
-                    EntryPoint.WriteToConsole($"ATTEMPTING PED SPAWN AT {ps.Name}");
+                    EntryPoint.WriteToConsole($"ATTEMPTING PED SPAWN AT {ps.Name} {ps.AssociationID}");
                     cl.AttemptSpawn(Player, true, false, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World, ps.AssociationID, Weapons, Names, Crimes, PedGroups,ShopMenus,
                         WeatherReporter, Time, ModItems, ps, DispatchablePeople, DispatchableVehicles);
                     GameFiber.Yield();
@@ -92,13 +106,11 @@ public class LocationDispatcher
             //{
             //    GameFiber.Yield();
             //}
-            if (ps.PossibleVehicleSpawns != null)
+            if (ps.PossibleVehicleSpawns?.Any() != null)
             {
                 foreach (ConditionalLocation cl in ps.PossibleVehicleSpawns)
                 {
                     EntryPoint.WriteToConsole($"ATTEMPTING VEHICLE SPAWN AT {ps.Name} {ps.AssociationID}");
-
-
                     cl.AttemptSpawn(Player, false, false, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World, ps.AssociationID, Weapons, Names, Crimes, PedGroups, ShopMenus, 
                         WeatherReporter, Time, ModItems, ps, DispatchablePeople, DispatchableVehicles);
                     GameFiber.Yield();
