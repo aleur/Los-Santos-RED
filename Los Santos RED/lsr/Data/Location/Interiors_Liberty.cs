@@ -52,17 +52,17 @@ public class Interiors_Liberty
         //Serialization.SerializeParam(lcEastInteriors, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LibertyConfigFolder}\\Variations\\East\\Interiors_{StaticStrings.LibertyConfigSuffix}East.xml");
         //LCPP 4949.947f, -3750.0441f, -0.000197f / 4950.0030f, -3749.9990f, 0.0000f
 
-        PossibleInteriors lppInteriors = LibertyCityInteriors.Copy();
-        foreach (Interior interior in lppInteriors.AllInteriors())
-        {
-            interior.AddDistanceOffset(new Vector3(4949.947f, -3750.0441f, -0.000197f));
-        }
+        //PossibleInteriors lppInteriors = LibertyCityInteriors.Copy();
+        //foreach (Interior interior in lppInteriors.AllInteriors())
+        //{
+        //    interior.AddDistanceOffset(new Vector3(4949.947f, -3750.0441f, -0.000197f));
+        //}
 
-        foreach (Interior intloc in LSInteriors.PossibleInteriors.AllInteriors())
-        {
-            intloc.AddLocation(lppInteriors);
-        }
-        Serialization.SerializeParam(lppInteriors, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LPPConfigFolder}\\Interiors_{StaticStrings.LPPConfigSuffix}.xml");
+        //foreach (Interior intloc in LSInteriors.PossibleInteriors.AllInteriors())
+        //{
+        //    intloc.AddLocation(lppInteriors);
+        //}
+        //Serialization.SerializeParam(lppInteriors, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LPPConfigFolder}\\Interiors_{StaticStrings.LPPConfigSuffix}.xml");
     }
 
     private void Banks()
@@ -129,11 +129,11 @@ public class Interiors_Liberty
                 SearchLocations = new List<Vector3>(){new Vector3(217.8289f, 27.17734f, 15.40732f),new Vector3(236.4546f, 23.64848f, 15.40731f),new Vector3(232.7605f, 19.77981f, 8.907292f)},
                 IsWeaponRestricted = true,Doors =  new List<InteriorDoor>() {
 
-                    new InteriorDoor(3863802474,new Vector3(210.2651f, 30.79712f, 15.64099f)) { LockWhenClosed = true },//Left 1
-                    new InteriorDoor(866127123,new Vector3(210.2651f, 23.80737f, 15.64099f)) { LockWhenClosed = true },//Left 2
+                    new InteriorDoor(3863802474,new Vector3(210.2651f, 30.79712f, 15.64099f)) { LockWhenClosed = true, InteractPostion = new Vector3(209.6162f, 29.29886f, 15.40798f), InteractHeader =  269.3144f },//Left 1
+                    new InteriorDoor(866127123,new Vector3(210.2651f, 23.80737f, 15.64099f)) { LockWhenClosed = true, InteractPostion = new Vector3(209.6162f, 29.29886f, 15.40798f), InteractHeader =  269.3144f },//Left 2
 
-                    new InteriorDoor(3863802474,new Vector3(210.2651f, 26.80957f, 15.64099f)) { LockWhenClosed = true },//Right 1
-                    new InteriorDoor(866127123,new Vector3(210.2651f, 27.79492f, 15.64099f)) { LockWhenClosed = true },//Right 2
+                    new InteriorDoor(3863802474,new Vector3(210.2651f, 26.80957f, 15.64099f)) { LockWhenClosed = true, InteractPostion = new Vector3(209.5247f, 25.24335f, 15.40798f), InteractHeader =  274.8498f },//Right 1
+                    new InteriorDoor(866127123,new Vector3(210.2651f, 27.79492f, 15.64099f)) { LockWhenClosed = true, InteractPostion = new Vector3(209.5247f, 25.24335f, 15.40798f), InteractHeader =  274.8498f },//Right 2
                 },
                 BankDrawerInteracts = new List<BankDrawerInteract>()
                 {
@@ -320,7 +320,7 @@ public class Interiors_Liberty
                 },
             Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(4114682006,new Vector3(-202.3672f, 950.2361f, 10.64464f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
+                    new InteriorDoor(4114682006,new Vector3(-202.3672f, 950.2361f, 10.64464f)) { LockWhenClosed = true, InteractPostion = new Vector3(-203.7027f, 949.735f, 10.35582f), InteractHeader =  221.8035f },
                 },
         },
             new Interior(80386, "Steinway Beer Garden")
@@ -342,7 +342,7 @@ public class Interiors_Liberty
                 },
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(261592072,new Vector3(1387.857f, 1229.011f, 35.76453f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
+                    new InteriorDoor(261592072,new Vector3(1387.857f, 1229.011f, 35.76453f)) { LockWhenClosed = true, InteractPostion = new Vector3(1389.304f, 1229.447f, 35.39936f), InteractHeader =  40.90462f },
                 },
             },
             new Interior(164866, "Comrades Bar")
@@ -351,9 +351,9 @@ public class Interiors_Liberty
                 IsWeaponRestricted = true,
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(387699963,new Vector3(1166.586f, 4.418087f, 15.73469f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },//front
-                    new InteriorDoor(387699963,new Vector3(1185.835f, 2.27493f, 15.73483f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },//rear
-                    new InteriorDoor(387699963,new Vector3(1181.423f, 0.7771521f, 15.73488f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },//inside
+                    new InteriorDoor(387699963,new Vector3(1166.586f, 4.418087f, 15.73469f)) { LockWhenClosed = true, InteractPostion = new Vector3(1165.954f, 3.142823f, 15.31947f), InteractHeader =  271.4469f },//front
+                    new InteriorDoor(387699963,new Vector3(1185.835f, 2.27493f, 15.73483f)) { LockWhenClosed = true, InteractPostion = new Vector3(1186.548f, 0.9338498f, 15.48608f), InteractHeader =  86.19847f },//rear
+                    new InteriorDoor(387699963,new Vector3(1181.423f, 0.7771521f, 15.73488f)) { LockWhenClosed = false },//inside, leaving unlocked
                 },
             },
         });
@@ -402,8 +402,8 @@ public class Interiors_Liberty
                 },
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(3477273845, new Vector3(1435.569f, -184.5796f, 16.70291f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },//Left
-                    new InteriorDoor(2464449593, new Vector3(1438.569f, -184.5796f, 16.70291f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },//Right
+                    new InteriorDoor(3477273845, new Vector3(1435.569f, -184.5796f, 16.70291f)) { LockWhenClosed = true, InteractPostion = new Vector3(1437.046f, -185.2265f, 16.44082f), InteractHeader =  359.2231f },//Left
+                    new InteriorDoor(2464449593, new Vector3(1438.569f, -184.5796f, 16.70291f)) { LockWhenClosed = true, InteractPostion = new Vector3(1437.046f, -185.2265f, 16.44082f), InteractHeader =  359.2231f },//Right
                 },
             }, //Firefly Island, Broker
             new Interior(92162, "Memory Lanes")
@@ -446,8 +446,8 @@ public class Interiors_Liberty
                 },
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(3477273845, new Vector3(-335.7781f, 570.1655f, 5.075134f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },//Left
-                    new InteriorDoor(2464449593, new Vector3(-335.7781f, 573.1655f, 5.075134f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },//Right
+                    new InteriorDoor(3477273845, new Vector3(-335.7781f, 570.1655f, 5.075134f)) { LockWhenClosed = true, InteractPostion = new Vector3(-334.9954f, 571.699f, 4.812612f), InteractHeader =  85.92f },//Left
+                    new InteriorDoor(2464449593, new Vector3(-335.7781f, 573.1655f, 5.075134f)) { LockWhenClosed = true, InteractPostion = new Vector3(-334.9954f, 571.699f, 4.812612f), InteractHeader =  85.92f },//Right
                 },
             }, //Golden Pier, Westminster, Algonquin
         });
@@ -525,8 +525,8 @@ public class Interiors_Liberty
                 },
             Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(1285262331, new Vector3(1123.339f, 11.90283f, 16.15447f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },//front
-                    new InteriorDoor(3232592925,new Vector3(1129.916f, 0.764942f, 16.14832f)){ NeedsDefaultUnlock = true, LockWhenClosed = true },//side
+                    new InteriorDoor(1285262331, new Vector3(1123.339f, 11.90283f, 16.15447f)) { LockWhenClosed = true, InteractPostion = new Vector3(1121.918f, 12.4994f, 15.88348f), InteractHeader =  181.2442f },//front
+                    new InteriorDoor(3232592925,new Vector3(1129.916f, 0.764942f, 16.14832f)){ LockWhenClosed = true, InteractPostion = new Vector3(1130.648f, 9.627102f, 15.8834f), InteractHeader =  90.8119f },//side
                 },
             },
             new Interior(121346,"Homebrew Cafe")
@@ -534,9 +534,9 @@ public class Interiors_Liberty
                 IsTrespassingWhenClosed = true,
                 IsWeaponRestricted = true,
                 Doors = new List<InteriorDoor>()
-                {
-                    new InteriorDoor(1542565804,new Vector3(14.60596f, -9.044677f, -2.845501f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
-                },
+                {// 1713.114 Y:547.4352 Z:25.46173
+                    new InteriorDoor(1542565804,new Vector3(1713.114f, 547.4352f, 25.46173f)) { LockWhenClosed = true, InteractPostion = new Vector3(1713.765f, 548.7235f, 25.15047f), InteractHeader =  90.93526f },
+                },// mlo coords 14.60596f, -9.044677f, -2.845501f
             },
             //Internet Cafe
             new Interior(50178, "tw@ - Broker")
@@ -558,7 +558,7 @@ public class Interiors_Liberty
                 },
             Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(149395267,new Vector3(1213.555f, 323.2911f, 24.4437f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
+                    new InteriorDoor(149395267,new Vector3(1213.555f, 323.2911f, 24.4437f)) { LockWhenClosed = true, InteractPostion = new Vector3(1213.897f, 324.8548f, 23.94502f), InteractHeader =  108.8264f },
                 },
             },
             new Interior(166914, "tw@ - Bercham")
@@ -580,7 +580,7 @@ public class Interiors_Liberty
                 },
             Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(149395267,new Vector3(-1343.255f, 958.8583f, 25.6938f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
+                    new InteriorDoor(149395267,new Vector3(-1343.255f, 958.8583f, 25.6938f)) { LockWhenClosed = true, InteractPostion = new Vector3(-1344.439f, 957.9964f, 25.4449f), InteractHeader =  239.4922f },
                 },
             },
             new Interior(66562, "tw@ - North Holland")
@@ -602,7 +602,7 @@ public class Interiors_Liberty
                 },
             Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(149395267,new Vector3(-101.2136f, 1887.003f, 13.16315f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
+                    new InteriorDoor(149395267,new Vector3(-101.2136f, 1887.003f, 13.16315f)) { LockWhenClosed = true, InteractPostion = new Vector3(-101.8362f, 1885.581f, 12.93234f), InteractHeader =  270.338f },
                 },
             },
             //Superstar Cafe
@@ -625,7 +625,7 @@ public class Interiors_Liberty
                 },
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(149395267, new Vector3(2.432138f, 534.061f, 14.95663f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
+                    new InteriorDoor(149395267, new Vector3(2.432138f, 534.061f, 14.95663f)) { LockWhenClosed = true, InteractPostion = new Vector3(3.803246f, 533.3376f, 14.7085f), InteractHeader =  359.7f },
                 },
             },
             new Interior(133890, "Superstar Cafe - Lancaster")
@@ -647,7 +647,7 @@ public class Interiors_Liberty
                 },
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(149395267, new Vector3(265.2527f, 1473.275f, 14.89747f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
+                    new InteriorDoor(149395267, new Vector3(265.2527f, 1473.275f, 14.89747f)) { LockWhenClosed = true, InteractPostion = new Vector3(266.0204f, 1474.626f, 14.6643f), InteractHeader =  88.53088f },
                 },
             },
         });
@@ -663,7 +663,7 @@ public class Interiors_Liberty
                 IsWeaponRestricted = true,
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(725112888, new Vector3(-160.1238f, 891.2871f, 14.65746f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
+                    new InteriorDoor(725112888, new Vector3(-160.1238f, 891.2871f, 14.65746f)) { LockWhenClosed = true, InteractPostion = new Vector3(-161.437f, 890.6624f, 14.40997f), InteractHeader =  0.6936182f },
                 },
             },
             new Interior(12034, "Hercules")
@@ -672,7 +672,7 @@ public class Interiors_Liberty
                 IsWeaponRestricted = true,
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(1316667213, new Vector3(-202.1077f, 851.3904f, 11.95598f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
+                    new InteriorDoor(1316667213, new Vector3(-202.1077f, 851.3904f, 11.95598f)) { LockWhenClosed = true, InteractPostion = new Vector3(-202.6341f, 850.1314f, 11.71385f), InteractHeader =  268.2976f },
                 },
             },
             new Interior(126210, "Maisonette 9")
@@ -681,7 +681,7 @@ public class Interiors_Liberty
                 IsWeaponRestricted = true,
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(4119540397, new Vector3(-229.8753f, 646.3377f, 10.14345f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
+                    new InteriorDoor(4119540397, new Vector3(-229.8753f, 646.3377f, 10.14345f)) { LockWhenClosed = true, InteractPostion = new Vector3(-228.9978f, 647.7842f, 9.85927f), InteractHeader =  90.188f },
                 },
             },
             //Strip Club
@@ -714,8 +714,8 @@ public class Interiors_Liberty
                 },
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(358597415, new Vector3(1436.133f, 2204.258f, 17.97499f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },//main
-                    new InteriorDoor(2881168431, new Vector3(1381.678f, 2163.791f, 16.97499f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },//rear
+                    new InteriorDoor(358597415, new Vector3(1436.133f, 2204.258f, 17.97499f)) { LockWhenClosed = true, InteractPostion = new Vector3(1435.715f, 2205.704f, 17.48218f), InteractHeader =  136.5321f },//main
+                    new InteriorDoor(2881168431, new Vector3(1381.678f, 2163.791f, 16.97499f)) { LockWhenClosed = true, InteractPostion = new Vector3(1382.104f, 2162.303f, 16.71525f), InteractHeader =  312.7093f },//rear
                 },
             }, //Northern Gardens, Bohan
             new Interior(67586, "Honkers Gentlemen's Club")
@@ -767,7 +767,7 @@ public class Interiors_Liberty
             },
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(2881168431, new Vector3(-1341.933f, 519.5435f, 10.26201f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
+                    new InteriorDoor(2881168431, new Vector3(-1341.933f, 519.5435f, 10.26201f)) { LockWhenClosed = true, InteractPostion = new Vector3(-1342.58f, 520.7891f, 10.01917f), InteractHeader =  269.5884f },
                 },
             }, //Tudor, Alderney 
         });
@@ -814,6 +814,17 @@ public class Interiors_Liberty
         {
             new ResidenceInterior(152578,"Playboy X Penthouse") {
                 IsTeleportEntry = true,
+                ClearPositions = new List<Vector3>()
+                {
+                    new Vector3(-184.1548f, 1961.992f, 38.51996f),//inside
+                    new Vector3(-183.8999f, 1960.78f, 38.51996f),//inside
+                    new Vector3(-185.9561f, 1948.199f, 38.03967f),//outside 
+                    new Vector3(-185.6841f, 1946.752f, 38.03876f),// outside 
+                    new Vector3(-185.4692f, 1945.574f, 38.0397f),//outside 
+                    new Vector3(-184.8408f, 1946.914f, 38.03957f),//outside 
+                    new Vector3(-183.7612f, 1945.778f, 38.03967f),//outside 
+                    new Vector3(-183.9858f, 1946.752f, 38.0394f),//outside 
+                },
                 InteriorEgressPosition = new Vector3(-188.2347f, 1961.426f, 38.96125f),
                 InteriorEgressHeading = 179.2488f,
                 InteractPoints = new List<InteriorInteract>(){
@@ -827,8 +838,10 @@ public class Interiors_Liberty
                     new CraftInteriorInteract("Stove",new Vector3(-180.0553f, 1962.973f, 38.96647f), 1.711152f, "Stove")
                     {
                         CraftingFlag = "Stove",
-                        AutoCamera = false,
-                        CameraPosition = Vector3.Zero,
+                        AutoCamera = true,
+                        CameraPosition = new Vector3(-180.4922f, 1961.207f, 39.88343f),
+                        CameraDirection = new Vector3(0.44477f, 0.8541482f, -0.2694632f),
+                        CameraRotation = new Rotator(-15.63233f, 7.535821E-06f, -27.50679f)
                     }
                 },
                 InventoryInteracts = new List<InventoryInteract>()
@@ -870,10 +883,15 @@ public class Interiors_Liberty
             },
             new ResidenceInterior(142850,"Studio Apartment") {
                 IsTeleportEntry = true,
-                InteriorEgressPosition = new Vector3(333.9883f, 1345.539f, 45.0461f),
+                ClearPositions = new List<Vector3>()
+                {
+                    new Vector3(339.9005f, 1344.516f, 44.05374f),// chair1
+                    new Vector3(339.562f, 1346.509f, 44.05374f),// chair2
+                },
+                InteriorEgressPosition = new Vector3(334.1107f, 1345.541f, 45.04599f),
                 InteriorEgressHeading = 267.9149f,
                 InteractPoints = new List<InteriorInteract>(){
-                    new ExitInteriorInteract("studioaptExit1",new Vector3(333.9883f, 1345.539f, 45.0461f), 91.86633f ,"Exit") ,
+                    new ExitInteriorInteract("studioaptExit1",new Vector3(334.1107f, 1345.541f, 45.04599f), 91.86633f ,"Exit") ,
                     new StandardInteriorInteract("studioaptStandard1",new Vector3(337.8049f, 1345.959f, 45.04611f), 270.5879f,"Interact")
                     {
                         CameraPosition = new Vector3(335.7429f, 1347.893f, 46.22897f),
@@ -883,8 +901,10 @@ public class Interiors_Liberty
                     new CraftInteriorInteract("Stove",new Vector3(332.1798f, 1354.332f, 45.04601f), 93.00458f, "Stove")
                     {
                         CraftingFlag = "Stove",
-                        AutoCamera = false,
-                        CameraPosition = Vector3.Zero,
+                        AutoCamera = true,
+                        CameraPosition = new Vector3(333.8228f, 1353.756f, 46.14905f),
+                        CameraDirection = new Vector3(-0.875756f, 0.2937503f, -0.3830956f),
+                    CameraRotation = new Rotator(-22.52556f, 3.74337E-05f, 71.45727f)
                     }
                 },
                 InventoryInteracts = new List<InventoryInteract>()
@@ -924,8 +944,14 @@ public class Interiors_Liberty
                     },
                 },
             },
-            new ResidenceInterior(39170,"South Bohan Apartment") {// Door is non functioning,Can walk through/can cause interior issues
+            new ResidenceInterior(39170,"South Bohan Apartment") {// Inside Door is non functioning,Can walk through/can cause interior issues
                 IsTeleportEntry = false,
+                ClearPositions = new List<Vector3>()
+                {
+                    new Vector3(842.86f, 1902.804f, 16.46414f),// couch 
+                    new Vector3(836.1785f, 1903.79f, 16.47628f),// table chair1 
+                    new Vector3(836.8679f, 1904.958f, 16.47628f),// table chair2 
+                },
                 InteriorEgressPosition = new Vector3(841.2067f, 1899.031f, 17.49082f),
                 InteriorEgressHeading = 0.9092442f,
                 InteractPoints = new List<InteriorInteract>(){
@@ -939,12 +965,14 @@ public class Interiors_Liberty
                     {
                         CraftingFlag = "Stove",
                         AutoCamera = false,
-                        CameraPosition = Vector3.Zero,
+                        CameraPosition = new Vector3(846.6514f, 1901.495f, 18.51601f),
+                        CameraDirection = new Vector3(0.002083805f, -0.9392081f, -0.343342f),
+                        CameraRotation = new Rotator(-20.08062f, 2.485638E-08f, -179.8729f)
                     }
                 },
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(261592072,new Vector3(835.2046f, 1894.023f, 11.785f)) { LockWhenClosed = true, NeedsDefaultUnlock = true },//90.81429f)
+                    new InteriorDoor(261592072,new Vector3(835.2046f, 1894.023f, 11.785f)) { LockWhenClosed = true, InteractPostion = new Vector3(834.7411f, 1894.236f, 11.27866f), InteractHeader =  267.7977f },
                 },
                 InventoryInteracts = new List<InventoryInteract>()
                 {
@@ -998,12 +1026,14 @@ public class Interiors_Liberty
                     {
                         CraftingFlag = "Stove",
                         AutoCamera = false,
-                        CameraPosition = Vector3.Zero,
+                        CameraPosition = new Vector3(1125.352f, -6.974065f, 20.50294f),
+                        CameraDirection = new Vector3(-0.01129704f, 0.9287074f, -0.3706412f),
+                        CameraRotation = new Rotator(-21.75517f, -5.745287E-08f, 0.6969265f)
                     }
                 },
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(2181386400,new Vector3(1134.176f, -10.53613f, 15.40443f)) { LockWhenClosed = true, NeedsDefaultUnlock = true },//90.81429f)
+                    new InteriorDoor(2181386400,new Vector3(1134.176f, -10.53613f, 15.40443f)) { LockWhenClosed = true, InteractPostion = new Vector3(1134.878f, -11.84601f, 15.19358f), InteractHeader =  95.04967f },
                 },
                 InventoryInteracts = new List<InventoryInteract>()
                 {
@@ -1057,12 +1087,14 @@ public class Interiors_Liberty
                     {
                         CraftingFlag = "Stove",
                         AutoCamera = false,
-                        CameraPosition = Vector3.Zero,
+                        CameraPosition = new Vector3(-725.342f, 1384.767f, 20.04454f),
+                        CameraDirection = new Vector3(0.9395224f, -0.001058639f, -0.3424857f),
+                        CameraRotation = new Rotator(-20.02839f, 5.910299E-07f, -90.06456f)
                     }
                 },
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(2124429686,new Vector3(-725.5925f, 1387.102f, 14.23296f)) { LockWhenClosed = true, NeedsDefaultUnlock = true },//90.81429f)
+                    new InteriorDoor(2124429686,new Vector3(-725.5925f, 1387.102f, 14.23296f)) { LockWhenClosed = true, InteractPostion = new Vector3(-724.3206f, 1387.768f, 13.8159f), InteractHeader =  180.6516f },
                 },
                 InventoryInteracts = new List<InventoryInteract>()
                 {
@@ -1127,12 +1159,14 @@ public class Interiors_Liberty
                     {
                         CraftingFlag = "Stove",
                         AutoCamera = false,
-                        CameraPosition = Vector3.Zero,
+                        CameraPosition = new Vector3(-197.08f, 1891.902f, 17.43028f),
+                        CameraDirection = new Vector3(-0.008799502f, 0.9579368f, -0.2868444f),
+                        CameraRotation = new Rotator(-16.66913f, -1.392539E-08f, 0.5262979f)
                     }
                 },
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(2842627855,new Vector3(-201.5826f, 1884.088f, 16.70837f)) { LockWhenClosed = true, NeedsDefaultUnlock = true },//90.81429f)
+                    new InteriorDoor(2842627855,new Vector3(-201.5826f, 1884.088f, 16.70837f)) { LockWhenClosed = true, InteractPostion = new Vector3(-202.0608f, 1882.679f, 16.45212f), InteractHeader =  271.76f },
                 },
                 InventoryInteracts = new List<InventoryInteract>()
                 {
@@ -1195,7 +1229,9 @@ public class Interiors_Liberty
                     {
                         CraftingFlag = "Stove",
                         AutoCamera = false,
-                        CameraPosition = Vector3.Zero,
+                        CameraPosition = new Vector3(223.7284f, 1275.418f, 63.57302f),
+                        CameraDirection = new Vector3(-0.9374399f, 0.007484701f, -0.3480669f),
+                        CameraRotation = new Rotator(-20.36912f, -2.547174E-06f, 89.54255f)
                     }
                 },
                 InventoryInteracts = new List<InventoryInteract>()
@@ -1272,7 +1308,9 @@ public class Interiors_Liberty
                     {
                         CraftingFlag = "Stove",
                         AutoCamera = false,
-                        CameraPosition = Vector3.Zero,
+                        CameraPosition = new Vector3(1053.231f, 641.4006f, 30.3391f),
+                        CameraDirection = new Vector3(0.8549131f, -0.4375533f, -0.2786946f),
+                        CameraRotation = new Rotator(-16.18231f, 0f, -117.1038f)
                     }
                 },
                 InventoryInteracts = new List<InventoryInteract>()
@@ -1334,7 +1372,7 @@ public class Interiors_Liberty
                 InteriorEgressHeading = 87.70292f,
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(3727781305,new Vector3(99.66792f, 1877.964f, 21.05347f)) { LockWhenClosed = true },
+                    new InteriorDoor(3727781305,new Vector3(99.66792f, 1877.964f, 21.05347f)) { LockWhenClosed = true, InteractPostion = new Vector3(99.19421f, 1876.634f, 20.79411f), InteractHeader = 271.009f },
                 },
                 InteractPoints = new List<InteriorInteract>(){
                     new StandardInteriorInteract("singrmaptStandard1",new Vector3(99.91463f, 1876.959f, 32.79693f), 95.84647f,"Interact")
@@ -1395,7 +1433,7 @@ public class Interiors_Liberty
                 InteriorEgressHeading = 165.7377f,
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(106751028,new Vector3(-309.8293f, 1743.489f, 97.78454f)) { LockWhenClosed = true },
+                    new InteriorDoor(106751028,new Vector3(-309.8293f, 1743.489f, 97.78454f)) { LockWhenClosed = true, InteractPostion = new Vector3(-308.5601f, 1743.859f, 97.53454f), InteractHeader = 171.5726f },
                 },
                 InteractPoints = new List<InteriorInteract>(){
                     new ExitInteriorInteract("westaptExit1",new Vector3(-302.7182f, 1751.083f, 97.53461f), 342.735f,"Exit") ,
@@ -1416,7 +1454,9 @@ public class Interiors_Liberty
                     {
                         CraftingFlag = "Stove",
                         AutoCamera = false,
-                        CameraPosition = Vector3.Zero,
+                        CameraPosition = new Vector3(-311.8942f, 1724.423f, 98.63117f),
+                        CameraDirection = new Vector3(0.1515174f, 0.9152469f, -0.3733171f),
+                        CameraRotation = new Rotator(-21.92034f, -2.300771E-07f, -9.399954f)
                     }
                 },
                 InventoryInteracts = new List<InventoryInteract>()
@@ -1470,7 +1510,16 @@ public class Interiors_Liberty
                 },
             }, // Top of Westminister Towers
             new ResidenceInterior(133890,"720 Savannah Ave") {
+                ClearPositions = new List<Vector3>()
+                    {
+                        new Vector3(1603.894f, 1019.785f, 32.11328f),// chairs1 
+                        new Vector3(1603.909f, 1020.651f, 32.11328f),// 2 
+                        new Vector3(1604.738f, 1021.636f, 32.11328f ),// 3 
+                        new Vector3(1605.625f, 1020.938f, 32.11328f),// 4 
+                        new Vector3(1605.534f, 1020.076f, 32.11328f),// 5 
+                    },
                 InteractPoints = new List<InteriorInteract>(){
+
                     new StandardInteriorInteract("SavannahStandard1",new Vector3(1615.303f, 1019.263f, 33.12494f), 89.94624f,"Interact")
                     {
                         UseNavmesh =false,
@@ -1482,12 +1531,14 @@ public class Interiors_Liberty
                     {
                         CraftingFlag = "Stove",
                         AutoCamera = false,
-                        CameraPosition = Vector3.Zero,
+                        CameraPosition = new Vector3(1602.177f, 1019.422f, 34.12709f),
+                        CameraDirection = new Vector3(-0.02492519f, -0.9452553f, -0.3253785f),
+                        CameraRotation = new Rotator(-18.98851f, -5.643165E-08f, 178.4895f)
                     }
                 },
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(2124429686,new Vector3(1621.135f, 1022.895f, 33.36455f)) { LockWhenClosed = true },
+                    new InteriorDoor(2124429686,new Vector3(1621.135f, 1022.895f, 33.36455f)) { LockWhenClosed = true, InteractPostion = new Vector3(1621.782f, 1024.177f, 33.11462f), InteractHeader = 90.00978f },
                 },
                 InventoryInteracts = new List<InventoryInteract>()
                 {
@@ -1544,6 +1595,16 @@ public class Interiors_Liberty
                 },
             },
             new ResidenceInterior(113666,"15 Cariboo Ave") {
+                ClearPositions = new List<Vector3>()
+                    {
+                        new Vector3(-1002.648f, 2034.278f, 25.07441f),// chairs1
+                        new Vector3(-1000.751f, 2035.232f, 25.07441f),// 2
+                        new Vector3(-1001.838f, 2038.526f, 25.07441f ),// 3
+                        new Vector3(-1005.254f, 2043.892f, 25.07441f),// 4
+                        new Vector3(-1007.597f, 2049.994f, 25.07441f),// 5
+                        new Vector3(-1005.81f, 2050.669f, 25.07441f),// 6
+                        new Vector3( -1003.572f, 2051.382f, 25.07441f),// 7
+                    },
                 InteractPoints = new List<InteriorInteract>(){
                     new StandardInteriorInteract("CaribooStandard1",new Vector3(-1008.025f, 2037.689f, 26.06386f), 357.4294f,"Interact")
                     {
@@ -1556,13 +1617,15 @@ public class Interiors_Liberty
                     {
                         CraftingFlag = "Stove",
                         AutoCamera = false,
-                        CameraPosition = Vector3.Zero,
+                        CameraPosition = new Vector3(-1011.723f, 2050.741f, 27.16678f),
+                        CameraDirection = new Vector3(-0.02082958f, 0.9259633f, -0.3770387f),
+                        CameraRotation = new Rotator(-22.15037f, -5.761282E-08f, 1.288653f)
                     }
                 },
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(2842627855,new Vector3(-1007.584f, 2053.532f, 26.31434f)) { LockWhenClosed = true },
-                    new InteriorDoor(2842627855,new Vector3(-1009.093f, 2033.457f, 26.31434f)) { LockWhenClosed = true },
+                    new InteriorDoor(2842627855,new Vector3(-1007.584f, 2053.532f, 26.31434f)) { LockWhenClosed = true, InteractPostion = new Vector3(-1008.994f, 2054.166f, 25.93528f), InteractHeader = 179.6472f },// rear door
+                    new InteriorDoor(2842627855,new Vector3(-1009.093f, 2033.457f, 26.31434f)) { LockWhenClosed = true, InteractPostion = new Vector3(-1007.761f, 2032.976f, 25.93528f), InteractHeader = 359.6205f },// front door
                 },
                 InventoryInteracts = new List<InventoryInteract>()
                 {
@@ -1637,12 +1700,14 @@ public class Interiors_Liberty
                     {
                         CraftingFlag = "Stove",
                         AutoCamera = false,
-                        CameraPosition = Vector3.Zero,
+                        CameraPosition = new Vector3(-1714.636f, 428.1001f, 8.326542f),
+                        CameraDirection = new Vector3(-0.9214435f, 0.03472181f, -0.3869577f),
+                        CameraRotation = new Rotator(-22.76533f, 2.893449E-07f, 87.842f)
                     }
                 },
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(2842627855,new Vector3(-1715.748f, 432.6584f, 7.456361f)) { LockWhenClosed = true },
+                    new InteriorDoor(2842627855,new Vector3(-1715.748f, 432.6584f, 7.456361f)) { LockWhenClosed = true, InteractPostion = new Vector3(-1714.44f, 433.1804f, 6.931404f), InteractHeader = 182.0966f },
                 },
                 InventoryInteracts = new List<InventoryInteract>()
                 {
@@ -1714,12 +1779,14 @@ public class Interiors_Liberty
                     {
                         CraftingFlag = "Stove",
                         AutoCamera = false,
-                        CameraPosition = Vector3.Zero,
+                        CameraPosition = new Vector3(106.7872f, 1983.799f, 23.89832f),
+                        CameraDirection = new Vector3(0.7054998f, 0.5933805f, -0.3875173f),
+                        CameraRotation = new Rotator(-22.80011f, -1.85228E-06f, -49.93354f)
                     }
                 },
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(1033979537,new Vector3(111.0986f, 1994.754f, 23.0294f)) { LockWhenClosed = true },
+                    new InteriorDoor(1033979537,new Vector3(111.0986f, 1994.754f, 23.0294f)) { LockWhenClosed = true, InteractPostion = new Vector3(112.5238f, 1994.287f, 22.77756f), InteractHeader = 139.5212f },
                 },
                 InventoryInteracts = new List<InventoryInteract>()
                 {
@@ -1784,12 +1851,14 @@ public class Interiors_Liberty
                     {
                         CraftingFlag = "Stove",
                         AutoCamera = false,
-                        CameraPosition = Vector3.Zero,
+                        CameraPosition = new Vector3(107.1061f, 2023.655f, 23.85375f),
+                        CameraDirection = new Vector3(-0.6293289f, -0.6892445f, -0.3590086f),
+                        CameraRotation = new Rotator(-21.03932f, -1.829513E-06f, 137.6017f)
                     }
                 },
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(1033979537,new Vector3(116.0862f, 2005.068f, 23.02524f)) { LockWhenClosed = true },
+                    new InteriorDoor(1033979537,new Vector3(116.0862f, 2005.068f, 23.02524f)) { LockWhenClosed = true, InteractPostion = new Vector3(117.4977f, 2005.62f, 22.81196f), InteractHeader = 48.2888f },
                 },
                 InventoryInteracts = new List<InventoryInteract>()
                 {
@@ -1848,12 +1917,14 @@ public class Interiors_Liberty
                     {
                         CraftingFlag = "Stove",
                         AutoCamera = false,
-                        CameraPosition = Vector3.Zero,
+                        CameraPosition = new Vector3(136.4559f, 1967.387f, 23.8466f),
+                        CameraDirection = new Vector3(0.6388482f, -0.6774699f, -0.3645648f),
+                        CameraRotation = new Rotator(-21.3808f, 0f, -136.6806f)
                     }
                 },
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(1033979537,new Vector3(146.4752f, 1963.102f, 21.77833f)) { LockWhenClosed = true },
+                    new InteriorDoor(1033979537,new Vector3(146.4752f, 1963.102f, 21.77833f)) { LockWhenClosed = true, InteractPostion = new Vector3(146.9632f, 1961.854f, 22.77775f), InteractHeader = 45.67448f },
                 },
                 InventoryInteracts = new List<InventoryInteract>()
                 {
@@ -1912,12 +1983,14 @@ public class Interiors_Liberty
                     {
                         CraftingFlag = "Stove",
                         AutoCamera = false,
-                        CameraPosition = Vector3.Zero,
+                        CameraPosition = new Vector3(174.6859f, 1967.542f, 23.87333f),
+                        CameraDirection = new Vector3(0.5384172f, 0.7526636f, -0.3789519f),
+                        CameraRotation = new Rotator(-22.26878f, -6.458082E-06f, -35.578f)
                     }
                 },
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(1033979537,new Vector3(157.9027f, 1958.24f, 23.01703f)) { LockWhenClosed = true },
+                    new InteriorDoor(1033979537,new Vector3(157.9027f, 1958.24f, 23.01703f)) { LockWhenClosed = true, InteractPostion = new Vector3(158.3927f, 1956.881f, 22.80881f), InteractHeader = 313.7017f },
                 },
                 InventoryInteracts = new List<InventoryInteract>()
                 {
@@ -1972,12 +2045,14 @@ public class Interiors_Liberty
                     {
                         CraftingFlag = "Stove",
                         AutoCamera = false,
-                        CameraPosition = Vector3.Zero,
+                        CameraPosition = new Vector3(170.5612f, 1944.962f, 23.88007f),
+                        CameraDirection = new Vector3(-0.6436245f, 0.6620793f, -0.3839252f),
+                        CameraRotation = new Rotator(-22.57703f, 0f, 44.19024f)
                     }
                 },
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(1033979537,new Vector3(159.4342f, 1949.132f, 23.01737f)) { LockWhenClosed = true },
+                    new InteriorDoor(1033979537,new Vector3(159.4342f, 1949.132f, 23.01737f)) { LockWhenClosed = true, InteractPostion = new Vector3(159.9611f, 1950.364f, 22.7778f), InteractHeader = 229.2052f },
                 },
                 InventoryInteracts = new List<InventoryInteract>()
                 {
@@ -2068,15 +2143,15 @@ public class Interiors_Liberty
                         ViolatingCrimeID = StaticStrings.ArmedRobberyCrimeID,
                    },
                 },
-            Doors = new List<InteriorDoor>()
+                Doors = new List<InteriorDoor>()
                 { 
                     //FRONT
-                    new InteriorDoor(3024662465, new Vector3(1890.526f, 718.3006f, 25.46795f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
-                    new InteriorDoor(1050821746,new Vector3(1890.525f, 721.31f, 25.46795f)){ NeedsDefaultUnlock = true, LockWhenClosed = true },
+                    new InteriorDoor(3024662465, new Vector3(1890.526f, 718.3006f, 25.46795f)) { LockWhenClosed = true, InteractPostion = new Vector3(1891.37f, 719.9232f, 25.21249f), InteractHeader =  91.13265f },
+                    new InteriorDoor(1050821746,new Vector3(1890.525f, 721.31f, 25.46795f)){ LockWhenClosed = true, InteractPostion = new Vector3(1891.37f, 719.9232f, 25.21249f), InteractHeader =  91.13265f },
 
                     //SIDE
-                    new InteriorDoor(3024662465,new Vector3(1880.79f, 727.7058f, 25.4694f)){ NeedsDefaultUnlock = true,LockWhenClosed = true },
-                    new InteriorDoor(1050821746,new Vector3(1877.78f, 727.7051f, 25.4694f)){ NeedsDefaultUnlock = true,LockWhenClosed = true },
+                    new InteriorDoor(3024662465,new Vector3(1880.79f, 727.7058f, 25.4694f)){ LockWhenClosed = true, InteractPostion = new Vector3(1879.267f, 728.341f, 25.20951f), InteractHeader =  184.4957f },
+                    new InteriorDoor(1050821746,new Vector3(1877.78f, 727.7051f, 25.4694f)){ LockWhenClosed = true, InteractPostion = new Vector3(1879.267f, 728.341f, 25.20951f), InteractHeader =  184.4957f },
                 },
         },
             new Interior(156674, "Burger Shot")
@@ -2119,12 +2194,12 @@ public class Interiors_Liberty
                 Doors = new List<InteriorDoor>()
                 { 
                     //FRONT
-                    new InteriorDoor(3024662465, new Vector3(682.1537f, 2010.148f, 16.57166f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
-                    new InteriorDoor(1050821746,new Vector3(679.548f, 2008.642f, 16.57166f)){ NeedsDefaultUnlock = true, LockWhenClosed = true },
+                    new InteriorDoor(3024662465, new Vector3(682.1537f, 2010.148f, 16.57166f)) { LockWhenClosed = true, InteractPostion = new Vector3(680.4663f, 2009.99f, 16.2782f), InteractHeader =  209.0549f },
+                    new InteriorDoor(1050821746,new Vector3(679.548f, 2008.642f, 16.57166f)){ LockWhenClosed = true, InteractPostion = new Vector3(680.4663f, 2009.99f, 16.2782f), InteractHeader =  209.0549f  },
 
                     //SIDE
-                    new InteriorDoor(3024662465,new Vector3(678.8769f, 1997.013f, 16.57312f)){ NeedsDefaultUnlock = true,LockWhenClosed = true },
-                    new InteriorDoor(1050821746,new Vector3(680.3821f, 1994.407f, 16.57312f)){ NeedsDefaultUnlock = true,LockWhenClosed = true },
+                    new InteriorDoor(3024662465,new Vector3(678.8769f, 1997.013f, 16.57312f)){ LockWhenClosed = true, InteractPostion = new Vector3(679.0428f, 1995.31f, 16.17371f), InteractHeader =  300.8616f },
+                    new InteriorDoor(1050821746,new Vector3(680.3821f, 1994.407f, 16.57312f)){ LockWhenClosed = true, InteractPostion = new Vector3(679.0428f, 1995.31f, 16.17371f), InteractHeader =  300.8616f },
                 },
             },
             new Interior(112642, "Burger Shot - Star Junction")
@@ -2167,12 +2242,12 @@ public class Interiors_Liberty
                 Doors = new List<InteriorDoor>()
                 { 
                     //FRONT
-                    new InteriorDoor(3024662465, new Vector3(52.81819f, 782.7084f, 15.07604f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
-                    new InteriorDoor(1050821746,new Vector3(52.81909f, 779.699f, 15.07604f)){ NeedsDefaultUnlock = true, LockWhenClosed = true },
+                    new InteriorDoor(3024662465, new Vector3(52.81819f, 782.7084f, 15.07604f)) { LockWhenClosed = true, InteractPostion = new Vector3(52.20511f, 781.1636f, 14.78392f), InteractHeader =  268.3859f },
+                    new InteriorDoor(1050821746,new Vector3(52.81909f, 779.699f, 15.07604f)){ LockWhenClosed = true, InteractPostion = new Vector3(52.20511f, 781.1636f, 14.78392f), InteractHeader =  268.3859f },
 
                     //SIDE
-                    new InteriorDoor(3024662465,new Vector3(62.55469f, 773.3032f, 15.0775f)){ NeedsDefaultUnlock = true,LockWhenClosed = true },
-                    new InteriorDoor(1050821746,new Vector3(65.56396f, 773.304f, 15.0775f)){ NeedsDefaultUnlock = true,LockWhenClosed = true },
+                    new InteriorDoor(3024662465,new Vector3(62.55469f, 773.3032f, 15.0775f)){ LockWhenClosed = true, InteractPostion = new Vector3(64.03662f, 772.5679f, 14.81727f), InteractHeader =  1.025352f },
+                    new InteriorDoor(1050821746,new Vector3(65.56396f, 773.304f, 15.0775f)){ LockWhenClosed = true, InteractPostion = new Vector3(64.03662f, 772.5679f, 14.81727f), InteractHeader =  1.025352f },
                 },
             },
             new Interior(109570, "Burger Shot - North Holland")
@@ -2215,12 +2290,12 @@ public class Interiors_Liberty
                 Doors = new List<InteriorDoor>()
                 { 
                     //FRONT
-                    new InteriorDoor(3024662465, new Vector3(-203.0016f, 1689.371f, 13.30298f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
-                    new InteriorDoor(1050821746,new Vector3(-203.0007f, 1686.362f, 13.30298f)){ NeedsDefaultUnlock = true, LockWhenClosed = true },
+                    new InteriorDoor(3024662465, new Vector3(-203.0016f, 1689.371f, 13.30298f)) { LockWhenClosed = true, InteractPostion = new Vector3(-203.6271f, 1687.827f, 12.93117f), InteractHeader =  269.634f },
+                    new InteriorDoor(1050821746,new Vector3(-203.0007f, 1686.362f, 13.30298f)){ LockWhenClosed = true, InteractPostion = new Vector3(-203.6271f, 1687.827f, 12.93117f), InteractHeader =  269.634f},
 
                     //SIDE
-                    new InteriorDoor(3024662465,new Vector3(-193.2651f, 1679.966f, 13.30444f)){ NeedsDefaultUnlock = true,LockWhenClosed = true },
-                    new InteriorDoor(1050821746,new Vector3(-190.2559f, 1679.967f, 13.30444f)){ NeedsDefaultUnlock = true,LockWhenClosed = true },
+                    new InteriorDoor(3024662465,new Vector3(-193.2651f, 1679.966f, 13.30444f)){ LockWhenClosed = true, InteractPostion = new Vector3(-191.7585f, 1679.296f, 13.03956f), InteractHeader =  1.602684f },
+                    new InteriorDoor(1050821746,new Vector3(-190.2559f, 1679.967f, 13.30444f)){ LockWhenClosed = true, InteractPostion = new Vector3(-191.7585f, 1679.296f, 13.03956f), InteractHeader =  1.602684f },
                 },
             },
             new Interior(134402, "Burger Shot - Bohan")
@@ -2263,12 +2338,12 @@ public class Interiors_Liberty
                 Doors = new List<InteriorDoor>()
                 { 
                     //FRONT
-                    new InteriorDoor(3024662465, new Vector3(1339.871f, 2089.535f, 17.16349f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
-                    new InteriorDoor(1050821746,new Vector3(1337.764f, 2087.387f, 17.16349f)){ NeedsDefaultUnlock = true, LockWhenClosed = true },
+                    new InteriorDoor(3024662465, new Vector3(1339.871f, 2089.535f, 17.16349f)) { LockWhenClosed = true, InteractPostion = new Vector3(1338.266f, 2088.965f, 16.89853f), InteractHeader =  222.9802f },
+                    new InteriorDoor(1050821746,new Vector3(1337.764f, 2087.387f, 17.16349f)){ LockWhenClosed = true, InteractPostion = new Vector3(1338.266f, 2088.965f, 16.89853f), InteractHeader =  222.9802f },
 
                     //SIDE
-                    new InteriorDoor(3024662465,new Vector3(1340.234f, 2076.003f, 17.16495f)){ NeedsDefaultUnlock = true,LockWhenClosed = true },
-                    new InteriorDoor(1050821746,new Vector3(1342.382f, 2073.896f, 17.16495f)){ NeedsDefaultUnlock = true,LockWhenClosed = true },
+                    new InteriorDoor(3024662465,new Vector3(1340.234f, 2076.003f, 17.16495f)){ LockWhenClosed = true, InteractPostion = new Vector3(1340.842f, 2074.518f, 16.9092f), InteractHeader =  318.4266f },
+                    new InteriorDoor(1050821746,new Vector3(1342.382f, 2073.896f, 17.16495f)){ LockWhenClosed = true, InteractPostion = new Vector3(1340.842f, 2074.518f, 16.9092f), InteractHeader =  318.4266f },
                 },
             },
             new Interior(105986, "Burger Shot - The Meat Quarter")
@@ -2311,12 +2386,12 @@ public class Interiors_Liberty
                 Doors = new List<InteriorDoor>()
                 { 
                     //FRONT
-                    new InteriorDoor(3024662465, new Vector3(-377.9356f, 640.6149f, 5.067126f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
-                    new InteriorDoor(1050821746,new Vector3(-380.945f, 640.614f, 5.067126f)){ NeedsDefaultUnlock = true, LockWhenClosed = true },
+                    new InteriorDoor(3024662465, new Vector3(-377.9356f, 640.6149f, 5.067126f)) { LockWhenClosed = true, InteractPostion = new Vector3(-379.4298f, 641.2764f, 4.813266f), InteractHeader =  179.37f },
+                    new InteriorDoor(1050821746,new Vector3(-380.945f, 640.614f, 5.067126f)){ LockWhenClosed = true, InteractPostion = new Vector3(-379.4298f, 641.2764f, 4.813266f), InteractHeader =  179.37f },
 
                     //SIDE
-                    new InteriorDoor(3024662465,new Vector3(-387.3408f, 630.8784f, 5.068586f)){ NeedsDefaultUnlock = true,LockWhenClosed = true },
-                    new InteriorDoor(1050821746,new Vector3(-387.3401f, 627.8691f, 5.068586f)){ NeedsDefaultUnlock = true,LockWhenClosed = true },
+                    new InteriorDoor(3024662465,new Vector3(-387.3408f, 630.8784f, 5.068586f)){ LockWhenClosed = true, InteractPostion = new Vector3(-388.0878f, 629.3203f, 4.8128f), InteractHeader =  269.4388f },
+                    new InteriorDoor(1050821746,new Vector3(-387.3401f, 627.8691f, 5.068586f)){ LockWhenClosed = true, InteractPostion = new Vector3(-388.0878f, 629.3203f, 4.8128f), InteractHeader =  269.4388f },
                 },
             },
             new Interior(59650, "Burger Shot - Alderney")
@@ -2360,12 +2435,12 @@ public class Interiors_Liberty
                 Doors = new List<InteriorDoor>()
                 { 
                     //FRONT
-                    new InteriorDoor(3024662465, new Vector3(-769.3442f, 2107.357f, 24.56997f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
-                    new InteriorDoor(1050821746,new Vector3(-766.3348f, 2107.358f, 24.56997f)){ NeedsDefaultUnlock = true, LockWhenClosed = true },
+                    new InteriorDoor(3024662465, new Vector3(-769.3442f, 2107.357f, 24.56997f)) { LockWhenClosed = true, InteractPostion = new Vector3(-767.7616f, 2106.561f, 24.01298f), InteractHeader =  2.218765f },
+                    new InteriorDoor(1050821746,new Vector3(-766.3348f, 2107.358f, 24.56997f)){ LockWhenClosed = true, InteractPostion = new Vector3(-767.7616f, 2106.561f, 24.01298f), InteractHeader =  2.218765f },
 
                     //SIDE
-                    new InteriorDoor(3024662465,new Vector3(-759.939f, 2117.094f, 24.57142f)){ NeedsDefaultUnlock = true,LockWhenClosed = true },
-                    new InteriorDoor(1050821746,new Vector3(-759.9397f, 2120.103f, 24.57142f)){ NeedsDefaultUnlock = true,LockWhenClosed = true },
+                    new InteriorDoor(3024662465,new Vector3(-759.939f, 2117.094f, 24.57142f)){ LockWhenClosed = true, InteractPostion = new Vector3(-759.1531f, 2118.691f, 24.01298f), InteractHeader =  92.3487f },
+                    new InteriorDoor(1050821746,new Vector3(-759.9397f, 2120.103f, 24.57142f)){ LockWhenClosed = true, InteractPostion = new Vector3(-759.1531f, 2118.691f, 24.01298f), InteractHeader =  92.3487f },
                 },
             },
             //CluckingBell
@@ -2420,8 +2495,8 @@ public class Interiors_Liberty
                 Doors = new List<InteriorDoor>()
                 { 
                     //FRONT
-                    new InteriorDoor(903328250, new Vector3(1430.997f, 868.5421f, 25.34809f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
-                    new InteriorDoor(2862357381,new Vector3(1427.997f, 868.5419f, 25.34809f)){ NeedsDefaultUnlock = true, LockWhenClosed = true },
+                    new InteriorDoor(903328250, new Vector3(1430.997f, 868.5421f, 25.34809f)) { LockWhenClosed = true, InteractPostion = new Vector3(1429.503f, 869.0898f, 24.88265f), InteractHeader =  179.5632f },
+                    new InteriorDoor(2862357381,new Vector3(1427.997f, 868.5419f, 25.34809f)){ LockWhenClosed = true, InteractPostion = new Vector3(1429.503f, 869.0898f, 24.88265f), InteractHeader =  179.5632f },
 
                 },
             },
@@ -2476,8 +2551,8 @@ public class Interiors_Liberty
                 Doors = new List<InteriorDoor>()
                 { 
                     //FRONT
-                    new InteriorDoor(903328250, new Vector3(100.2493f, 567.9032f, 15.04786f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
-                    new InteriorDoor(2862357381,new Vector3(101.026F, 565.0051F, 15.04786f)){ NeedsDefaultUnlock = true, LockWhenClosed = true },
+                    new InteriorDoor(903328250, new Vector3(100.2493f, 567.9032f, 15.04786f)) { LockWhenClosed = true, InteractPostion = new Vector3(100.1194f, 566.3207f, 14.7643f), InteractHeader =  278.8802f },
+                    new InteriorDoor(2862357381,new Vector3(101.026F, 565.0051F, 15.04786f)){ LockWhenClosed = true, InteractPostion = new Vector3(100.1194f, 566.3207f, 14.7643f), InteractHeader =  278.8802f },
 
                 },
             },
@@ -2521,15 +2596,15 @@ public class Interiors_Liberty
                    },
                 Doors = new List<InteriorDoor>()
                 {
-                   new InteriorDoor(2762578800,new Vector3(1194.172f, 204.5459f, 20.12718f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },//cabaret_door_l 
-                   new InteriorDoor(1985756882,new Vector3(1197.172f, 204.5459f, 20.12718f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },//cabaret_door_r 
-                   new InteriorDoor(3971243973,new Vector3(1194.117f, 209.6353f, 20.14878f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },//inside
-                   new InteriorDoor(3971243973,new Vector3(1197.115f, 209.6353f, 20.14878f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },//inside
-                   new InteriorDoor(3971243973,new Vector3(1200.812f, 203.7319f, 20.12878f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },//inside
-                   new InteriorDoor(3971243973,new Vector3(1185.197f, 232.5177f, 18.51646f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },//inside
-                   new InteriorDoor(3971243973,new Vector3(1191.784f, 243.1203f, 16.10701f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },//inside
-                   new InteriorDoor(2881168431,new Vector3(1206.35f, 236.5193f, 22.01962f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },//rear_door
-                   new InteriorDoor(2881168431,new Vector3(1206.35f, 233.5154f, 22.01962f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },//rear_door
+                   new InteriorDoor(2762578800,new Vector3(1194.172f, 204.5459f, 20.12718f)) { LockWhenClosed = true, InteractPostion = new Vector3(1195.692f, 203.9843f, 19.83916f), InteractHeader =  0.9077622f },//cabaret_door_l 
+                   new InteriorDoor(1985756882,new Vector3(1197.172f, 204.5459f, 20.12718f)) { LockWhenClosed = true, InteractPostion = new Vector3(1195.692f, 203.9843f, 19.83916f), InteractHeader =  0.9077622f },//cabaret_door_r 
+                   new InteriorDoor(3971243973,new Vector3(1194.117f, 209.6353f, 20.14878f)) { LockWhenClosed = false },//inside
+                   new InteriorDoor(3971243973,new Vector3(1197.115f, 209.6353f, 20.14878f)) { LockWhenClosed = false },//inside
+                   new InteriorDoor(3971243973,new Vector3(1200.812f, 203.7319f, 20.12878f)) { LockWhenClosed = false },//inside
+                   new InteriorDoor(3971243973,new Vector3(1185.197f, 232.5177f, 18.51646f)) { LockWhenClosed = false },//inside
+                   new InteriorDoor(3971243973,new Vector3(1191.784f, 243.1203f, 16.10701f)) { LockWhenClosed = false },//inside
+                   new InteriorDoor(2881168431,new Vector3(1206.35f, 236.5193f, 22.01962f)) { LockWhenClosed = true, InteractPostion = new Vector3(1207.143f, 235.0798f, 21.7587f), InteractHeader = 90.25123f },//rear_door
+                   new InteriorDoor(2881168431,new Vector3(1206.35f, 233.5154f, 22.01962f)) { LockWhenClosed = true, InteractPostion = new Vector3(1207.143f, 235.0798f, 21.7587f), InteractHeader = 90.25123f },//rear_door
                 },
             },
             new Interior(85506, "Mr Fuk's - Alderney City")
@@ -2547,7 +2622,7 @@ public class Interiors_Liberty
         new Interior(176898, "Bohan Fire Station") { },
         });
     }
-    private void Stores()
+    private void Stores() 
     {
         LibertyCityInteriors.GeneralInteriors.AddRange(new List<Interior>()
         {
@@ -2556,23 +2631,33 @@ public class Interiors_Liberty
             {
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(807349477, new Vector3(1295.643f, 579.8269f, 34.49496f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
+                    new InteriorDoor(807349477, new Vector3(1295.643f, 579.8269f, 34.49496f)) { LockWhenClosed = true, InteractPostion = new Vector3(1294.988f, 581.1146f, 34.08521f), InteractHeader =  270.3782f },
                 },
             },// GunStore - Downtown Broker
             new Interior(92674, "Underground Guns")
             {
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(807349477, new Vector3(311.2178f, 150.6089f, 11.41267f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
+                    new InteriorDoor(807349477, new Vector3(311.2178f, 150.6089f, 11.41267f)) { LockWhenClosed = true, InteractPostion = new Vector3(310.7386f, 151.9175f, 11.1628f), InteractHeader =  270.1091f },
                 },
             }, // GunStore - Chinatown, Algonquin
             new Interior(101890, "Underground Guns")
             {
                 Doors = new List<InteriorDoor>()
                 {
-                    new InteriorDoor(807349477, new Vector3(-1094.076f, 802.6436f, 14.86613f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
+                    new InteriorDoor(807349477, new Vector3(-1094.076f, 802.6436f, 14.86613f)) { LockWhenClosed = true, InteractPostion = new Vector3(-1095.341f, 801.733f, 14.62144f), InteractHeader =  358.68f },
                 },
             },// GunStore -  Port Tudor, Alderney
+
+            // Clothing Store
+            new Interior(120834, "Russian Store")
+            {
+                Doors = new List<InteriorDoor>()
+                {  
+                    new InteriorDoor(377940039, new Vector3(1130.476f, 49.30932f, 16.11984f )) { LockWhenClosed = true, InteractPostion = new Vector3(1131.061f, 50.76342f, 15.86016f), InteractHeader =  90.57141f },
+                    new InteriorDoor(3762420618, new Vector3(1130.476f, 52.31177f, 16.11984f)) { LockWhenClosed = true, InteractPostion = new Vector3(1131.061f, 50.76342f, 15.86016f), InteractHeader =  90.57141f },
+                },
+            },
         });
     }
 

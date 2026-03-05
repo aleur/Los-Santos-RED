@@ -10,6 +10,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Media;
 
 
@@ -42,7 +43,8 @@ public class Interiors : IInteriors
         {
             EntryPoint.WriteToConsole($"No Interiors config found, creating default", 0);
             DefaultConfig();
-            DefaultConfig_LibertyCity();
+            //DefaultConfig_LibertyCity();
+            DefaultConfig_LibertyCityPP();
         }
         //Load Additive
         foreach (FileInfo fileInfo in LSRDirectory.GetFiles("Interiors+_*.xml").OrderByDescending(x => x.Name))
@@ -58,6 +60,11 @@ public class Interiors : IInteriors
     private void DefaultConfig_LibertyCity()
     {
         Interiors_Liberty interiors_Liberty = new Interiors_Liberty(this);
+        interiors_Liberty.DefaultConfig();
+    }
+    private void DefaultConfig_LibertyCityPP()
+    {
+        Interiors_LibertyPP interiors_Liberty = new Interiors_LibertyPP(this);
         interiors_Liberty.DefaultConfig();
     }
     private void DefaultConfig()
@@ -84,7 +91,7 @@ public class Interiors : IInteriors
     }
     public Interior GetInteriorByInternalID(int id)
     {
-        return PossibleInteriors.AllInteriors().Where(x => x.InternalID == id).FirstOrDefault();
+        return PossibleInteriors.AllInteriors().Where(x => x.CheckMatchingIDs(id)).FirstOrDefault();
     }
     private void BarberShops()
     {
@@ -94,7 +101,7 @@ public class Interiors : IInteriors
                 new BarberShopInterior(-99099,"Barber Shop")
                 {
                     IsTeleportEntry = true,
-                    
+
                     ForceAutoInteractName = "genericheaircutinteract1",
                     InteriorEgressPosition = new Vector3(123.7631f, -745.737f, 242.152f),
                     InteriorEgressHeading = 216.5336f,
@@ -133,7 +140,7 @@ public class Interiors : IInteriors
                     },
                     Doors = new List<InteriorDoor>()
                     {
-                        new InteriorDoor(2450522579, new Vector3(-280.7851f, 6232.782f, 31.84548f)) { NeedsDefaultUnlock = true,LockWhenClosed = true }
+                        new InteriorDoor(2450522579, new Vector3(-280.7851f, 6232.782f, 31.84548f)) { NeedsDefaultUnlock = true,LockWhenClosed = true, InteractPostion = new Vector3(-281.9294f, 6232.255f, 31.69074f), InteractHeader =  221.1075f }
                     }
                 },
 
@@ -152,7 +159,7 @@ public class Interiors : IInteriors
                     },
                     Doors = new List<InteriorDoor>()
                     {
-                        new InteriorDoor(2450522579, new Vector3(-1287.857f, -1115.742f, 7.140073f)) { NeedsDefaultUnlock = true,LockWhenClosed = true }
+                        new InteriorDoor(2450522579, new Vector3(-1287.857f, -1115.742f, 7.140073f)) { NeedsDefaultUnlock = true,LockWhenClosed = true, InteractPostion = new Vector3(-1288.312f, -1117.012f, 6.985244f), InteractHeader =  266.5429f }
                     }
                 },
                 new BarberShopInterior(37378,"Bob Mulet Rockford Hills")
@@ -170,8 +177,8 @@ public class Interiors : IInteriors
                     },
                     Doors = new List<InteriorDoor>()
                     {
-                        new InteriorDoor(2631455204,new Vector3(-823.2001f, -187.0831f, 37.81895f)) { NeedsDefaultUnlock = true,LockWhenClosed = true },
-                        new InteriorDoor(145369505,new Vector3(-822.4442f, -188.3924f, 37.81895f)) { NeedsDefaultUnlock = true,LockWhenClosed = true }
+                        new InteriorDoor(2631455204,new Vector3(-823.2001f, -187.0831f, 37.81895f)) { NeedsDefaultUnlock = true,LockWhenClosed = true, InteractPostion = new Vector3(-823.0435f, -187.9848f, 37.56468f), InteractHeader =  299.3479f },
+                        new InteriorDoor(145369505,new Vector3(-822.4442f, -188.3924f, 37.81895f)) { NeedsDefaultUnlock = true,LockWhenClosed = true, InteractPostion = new Vector3(-823.0435f, -187.9848f, 37.56468f), InteractHeader =  299.3479f }
                     }
                 },
                 new BarberShopInterior(102146,"Herr Kutz Davis")
@@ -188,7 +195,7 @@ public class Interiors : IInteriors
                     },
                     Doors = new List<InteriorDoor>()
                     {
-                        new InteriorDoor(2450522579,new Vector3(132.5569f, -1710.996f, 29.44157f)) { NeedsDefaultUnlock = true,LockWhenClosed = true }
+                        new InteriorDoor(2450522579,new Vector3(132.5569f, -1710.996f, 29.44157f)) { NeedsDefaultUnlock = true,LockWhenClosed = true, InteractPostion = new Vector3(133.1569f, -1712.003f, 29.29169f), InteractHeader =  309.559f }
                     }
                 },
                 new BarberShopInterior(112642,"Herr Kutz Mirror Park")
@@ -205,7 +212,7 @@ public class Interiors : IInteriors
                     },
                     Doors = new List<InteriorDoor>()
                     {
-                        new InteriorDoor(2450522579,new Vector3(1207.873f, -470.0363f, 66.358f)) { NeedsDefaultUnlock = true,LockWhenClosed = true }
+                        new InteriorDoor(2450522579,new Vector3(1207.873f, -470.0363f, 66.358f)) { NeedsDefaultUnlock = true,LockWhenClosed = true, InteractPostion = new Vector3(1207.132f, -471.0517f, 66.14108f), InteractHeader =  240.7409f }
                     }
                 },
                 new BarberShopInterior(10242,"O'Sheas Sandy Shores")
@@ -222,7 +229,7 @@ public class Interiors : IInteriors
                     },
                     Doors = new List<InteriorDoor>()
                     {
-                        new InteriorDoor(2450522579,new Vector3(1932.952f, 3725.154f, 32.9944f)) { NeedsDefaultUnlock = true,LockWhenClosed = true }
+                        new InteriorDoor(2450522579,new Vector3(1932.952f, 3725.154f, 32.9944f)) { NeedsDefaultUnlock = true,LockWhenClosed = true, InteractPostion = new Vector3(1934.125f, 3725.319f, 32.79781f), InteractHeader =  17.98306f }
                     }
                 },
 
@@ -240,9 +247,51 @@ public class Interiors : IInteriors
                     },
                     Doors = new List<InteriorDoor>()
                     {
-                        new InteriorDoor(2450522579,new Vector3(-29.86917f, -148.1571f, 57.22648f)) { NeedsDefaultUnlock = true,LockWhenClosed = true,CanBeForcedOpenByPlayer = true }
+                        new InteriorDoor(2450522579,new Vector3(-29.86917f, -148.1571f, 57.22648f)) { NeedsDefaultUnlock = true,LockWhenClosed = true,CanBeForcedOpenByPlayer = true, InteractPostion = new Vector3(-30.95186f, -147.3276f, 57.07709f), InteractHeader =  156.1858f }
                     }
                 },
+
+                ////Mansion Barbers
+
+                //new BarberShopInterior(-303617,"Tongva Barber")
+                //{
+                //    HaircutInteracts = new List<SalonInteract>() {
+                //        new SalonInteract("tongvabarbinteract1",new Vector3(-2594.096f, 1872.925f, 163.7214f), 0f,"Get Haircut") 
+                //        {
+                //            AnimEnterPosition = new Vector3(-2595.234f, 1871.887f, 162.8809f),
+                //            AnimEnterRotation = new Vector3(0f, 0f, 273.2366f),
+                //            CameraPosition = new Vector3(-2595.043f, 1870.634f, 164.4818f),
+                //            CameraDirection = new Vector3(-0.0850094f, 0.9428065f, -0.3223186f),
+                //            CameraRotation = new Rotator(-18.8032f, -2.254768E-07f, 5.152217f),
+                //        }
+                //    },
+                //},
+                //new BarberShopInterior(-302593,"Richman Barber")
+                //{
+                //    HaircutInteracts = new List<SalonInteract>() {
+                //        new SalonInteract("richmanbarbinteract1",new Vector3(-1628.255f, 478.7032f, 125.5676f), 0f,"Get Haircut")  //-1627.189 Y:477.7808 Z:124.567
+                //        {
+                //            AnimEnterPosition = new Vector3(-1627.189f, 477.7808f, 124.707f),
+                //            AnimEnterRotation = new Vector3(0f, 0f, 12.71191f),
+                //            CameraPosition = new Vector3(-1625.825f, 478.3083f, 126.284f),
+                //            CameraDirection = new Vector3(-0.9175177f, -0.2848633f, -0.2775143f),
+                //            CameraRotation = new Rotator(-16.11191f, 3.421416E-05f, 107.2481f),
+                //        }
+                //    },
+                //},
+                //new BarberShopInterior(-304385,"Vinewood Barber")
+                //{
+                //    HaircutInteracts = new List<SalonInteract>() {
+                //        new SalonInteract("vinewoodabarbinteract1",new Vector3(552.8044f, 713.3463f, 198.7077f), 0f,"Get Haircut") // 552.3773 Y:711.9999 Z:197.7071
+                //        {
+                //            AnimEnterPosition = new Vector3(552.3773f, 711.9999f, 197.8471f),
+                //            AnimEnterRotation = new Vector3(0f, 0f, 304.1495f),
+                //            CameraPosition = new Vector3(553.2754f, 710.8562f, 199.635f),
+                //            CameraDirection = new Vector3(-0.5736591f, 0.7597603f, -0.3060711f),
+                //            CameraRotation = new Rotator(-17.82262f, 8.071315E-06f, 37.05473f),
+                //        }
+                //    },
+                //},
             }
         ); ;
     }
@@ -253,20 +302,7 @@ public class Interiors : IInteriors
             //Barber
 
             //Clothes
-            new Interior(19458,"Sub Urban") {IsTrespassingWhenClosed = true, IsWeaponRestricted = true, },
-            new Interior(22786, "BINCO Textile City",
-                new List<string>() {  },
-                new List<string>() {  },
-                new List<InteriorDoor>() {
-                    new InteriorDoor(3146141106, new Vector3(418.5713f,-808.674f,29.64108f)) { CanBeForcedOpenByPlayer = true },
-                    new InteriorDoor(868499217, new Vector3(418.5713f,-806.3979f,29.64108f)) { CanBeForcedOpenByPlayer = true } }) { IsTrespassingWhenClosed = true,IsWeaponRestricted = true, },//doesntwork?
-            new Interior(10754,"Sub Urban") {IsTrespassingWhenClosed = true, IsWeaponRestricted = true, },
-            new Interior(1282,"Ponsonby") { IsTrespassingWhenClosed = true,IsWeaponRestricted = true, },
-            new Interior(14338,"Ponsonby") { IsTrespassingWhenClosed = true,IsWeaponRestricted = true, },
-            new Interior(22786,"Binco") { IsTrespassingWhenClosed = true,IsWeaponRestricted = true, },
-            new Interior(96266,"Suburban") {IsTrespassingWhenClosed = true, IsWeaponRestricted = true, },//suburban harmony
-            new Interior(17154,"Binco") { IsTrespassingWhenClosed = true,IsWeaponRestricted = true, },
-            new Interior(88066,"Discount Store") { IsTrespassingWhenClosed = true,IsWeaponRestricted = true, },
+
 
             //Ammunations
             new Interior(-555,"Ammunation Vespucci Boulevard",
@@ -560,17 +596,23 @@ public class Interiors : IInteriors
             },
 
             //Liquor
-            new Interior(33026,"Scoops Liquor Barn") { IsTrespassingWhenClosed = true,IsWeaponRestricted = true,
-
+            new Interior(33026,"Scoops Liquor Barn", // Added Door
+                new List<string>() {  },
+                new List<string>() {  },
+                new List<InteriorDoor>() {
+                    new InteriorDoor(3082015943, new Vector3(1167.129f,2703.754f,38.30173f)){ LockWhenClosed = true, InteractPostion = new Vector3(1166.135f, 2703.446f, 38.17941f), InteractHeader = 3.388772f },
+                }) {
+                IsTrespassingWhenClosed = true,IsWeaponRestricted = true,
             InteractPoints = new List<InteriorInteract>()
                 {
+                    GenerateSafeDrillingInteract("scoopsbarnsafe1",new Vector3(1169.116f, 2717.82f, 37.15765f),267.4221f), // added safe
                     Generate247Interact1("scoopsitemtheft1",new Vector3(1166.253f, 2708.812f, 38.15771f), 359.1691f),
                     Generate247Interact4("scoopsitemtheft4",new Vector3(1166.231f, 2707.29f, 38.15771f), 95.36868f),
                 },
 
             },
             new Interior(104450,"Liquor Ace"){
-IsTrespassingWhenClosed = true,
+            IsTrespassingWhenClosed = true,
             IsWeaponRestricted = true,
             InteractPoints = new List<InteriorInteract>()
                 {
@@ -583,7 +625,7 @@ IsTrespassingWhenClosed = true,
                 new List<string>() {  },
                 new List<string>() {  },
                 new List<InteriorDoor>() {
-                    new InteriorDoor(3082015943, new Vector3(-1226.894f,-903.1218f,12.47039f)){ LockWhenClosed = true },
+                    new InteriorDoor(3082015943, new Vector3(-1226.894f,-903.1218f,12.47039f)){ LockWhenClosed = true, InteractPostion = new Vector3(-1226.444f, -902.2642f, 12.28599f), InteractHeader = 216.2369f },
                 }) { IsTrespassingWhenClosed = true,IsWeaponRestricted = true,
 
                 InteractPoints = new List<InteriorInteract>()
@@ -601,7 +643,7 @@ IsTrespassingWhenClosed = true,
                 new List<string>() {  },
                 new List<string>() {  },
                 new List<InteriorDoor>() {
-                    new InteriorDoor(3082015943, new Vector3(-2973.535f,390.1414f,15.18735f)){ LockWhenClosed = true },
+                    new InteriorDoor(3082015943, new Vector3(-2973.535f,390.1414f,15.18735f)){ LockWhenClosed = true, InteractPostion = new Vector3(-2973.862f, 391.0587f, 15.03532f), InteractHeader = 268.62f },
                 }) {
                 IsTrespassingWhenClosed = true,IsWeaponRestricted = true,
                 InteractPoints = new List<InteriorInteract>()
@@ -616,7 +658,7 @@ IsTrespassingWhenClosed = true,
                 new List<string>() {  },
                 new List<string>() {  },
                 new List<InteriorDoor>() {
-                    new InteriorDoor(3082015943, new Vector3(-1490.411f,-383.8453f,40.30745f)){ LockWhenClosed = true },
+                    new InteriorDoor(3082015943, new Vector3(-1490.411f,-383.8453f,40.30745f)){ LockWhenClosed = true, InteractPostion = new Vector3(-1491.395f, -383.5826f, 40.15629f), InteractHeader = 318.9207f },
                 }) { IsTrespassingWhenClosed = true,IsWeaponRestricted = true,
 
                 InteractPoints = new List<InteriorInteract>()
@@ -633,7 +675,7 @@ IsTrespassingWhenClosed = true,
                 new List<string>() {  },
                 new List<string>() {  },
                 new List<InteriorDoor>() {
-                    new InteriorDoor(3082015943, new Vector3(1141.038f,-980.3225f,46.55986f)) { LockWhenClosed = true },
+                    new InteriorDoor(3082015943, new Vector3(1141.038f,-980.3225f,46.55986f)) { LockWhenClosed = true, InteractPostion = new Vector3(1141.588f, -981.139f, 46.41001f), InteractHeader = 102.0588f },
                 }) { IsTrespassingWhenClosed = true,IsWeaponRestricted = true,
 
                 InteractPoints = new List<InteriorInteract>()
@@ -924,6 +966,21 @@ IsTrespassingWhenClosed = true,
     }
     private void Residence()
     {
+
+        List<MoneyEntitySet> DefaultVaultMoneyEntitySets = new List<MoneyEntitySet>()
+        {
+            new MoneyEntitySet("SET_BASE_VAULT_00",0,1999999),
+            new MoneyEntitySet("SET_BASE_VAULT_01",1,24999),
+            new MoneyEntitySet("SET_BASE_VAULT_02",25000,74999),
+            new MoneyEntitySet("SET_BASE_VAULT_03",75000,249999),
+            new MoneyEntitySet("SET_BASE_VAULT_04",250000,499999),
+            new MoneyEntitySet("SET_BASE_VAULT_05",500000,999999),
+            new MoneyEntitySet("SET_BASE_VAULT_06",1000000,1999999),
+            new MoneyEntitySet("SET_BASE_VAULT_07",2000000,2999999),
+            new MoneyEntitySet("SET_BASE_VAULT_08",3000000,3999999),
+            new MoneyEntitySet("SET_BASE_VAULT_09",4000000,999999999),
+        };
+
         PossibleInteriors.ResidenceInteriors.AddRange(new List<ResidenceInterior>()
         {
             //Apartments
@@ -7286,6 +7343,936 @@ IsTrespassingWhenClosed = true,
             new Vector3(-43.14818f,-583.9168f,78.83031f),
             },
             },
+
+            // Mansion Update - Safe House in The Hills
+            //Styles
+            //    cali 
+            //        "set_style_cali",
+            //        "set_style_cali_tint"
+            //        "set_elev_cali",
+            //        "set_art_coastal",
+            //        "set_trophy_planter",
+            //        "set_shelving_planter"
+
+            //    loft 
+            //        "set_style_loft",
+            //        "set_style_loft_tint",
+            //        "set_elev_loft",
+            //        "set_art_loft",
+            //        "set_loft_trophy_planter",
+            //        "set_loft_shelving_planter"
+
+            //    holly 
+            //        "set_style_holly",
+            //        "set_style_reg_tint",
+            //        "set_elev_holly",
+            //        "set_art_regency",
+            //        "set_reg_shelving_planter",
+            //        "set_reg_trophy_planter"
+
+
+            new MansionInterior(304385, "Vinewood Mansion") // 304641 Mansion Lower // 304897 Garage
+            {
+                IsTeleportEntry = false,
+                InternalInteriorCoordinates = new Vector3(539.7012f, 749.0894f, 201.3616f),
+                DisabledInteriorCoords = new Vector3(0f, 0f, 0f),
+                RequestIPLs = new List<string>()
+                {
+                    "m25_2_ch2_04_mansion_interior_b",
+                    "m25_2_ch2_04_mansion_interior_c",
+                    "apa_ch2_04_mansion_furniture",
+                    "apa_ch2_04_mansion_firepit",
+                    "m25_2_east_mansion_gym",
+                    "m25_2_east_dog_house"
+                },
+                InteriorSets = new List<string>()
+                {
+                    "set_style_loft",
+                    "set_style_loft_tint",
+                    "set_art_loft",
+                    "set_elev_loft",
+                    "set_loft_trophy_planter",
+                    "set_loft_shelving_planter",
+                    "set_loft_arcade_blocker",// remove for access to arcade
+                    "set_loft_podium_blocker", // remove to view podium
+                    "set_wallpaper_subtle",
+                    // "set_xmas", // optional event
+                    "set_ai_tablets_03",
+                    "set_pet_dog",
+                    "set_pet_cat",
+                    "SET_ELEV_STD",
+                    "SET_BASE_VAULT_00", // 0-9
+                    "SET_VAULT_DOOR_OPEN"  // _Closed or _Open
+                },
+                InteriorTintColor = 0, // 0 = white, 1 = green, 2 = purple, 3 = pink
+                InteriorWallpaperColor = 3, // 1 pink, 2 purple, 3 green, 
+                LinkedInteriorCoords = new List<Vector3>()
+                {
+                    new Vector3(547.4955f, 734.136f, 190.5045f), // Lower level
+                    new Vector3(548.6964f, 766.8868f, 186.076f)  // Garage
+                },
+                NeedsActivation = true,
+                NeedsSetDisabled = false,
+                MaxUpdateDistance = 75f,
+                IsTrespassingWhenClosed = true,
+                MoneyInteriorCoords = new Vector3(547.4955f, 734.136f, 190.5045f),
+                MoneyEntitySets = DefaultVaultMoneyEntitySets,
+                AudioEmitters = new List<AudioEmitter>()
+                {
+                    new AudioEmitter($"se_dlc25-2_mansion_lobby_loc_3","Lobby (1)"),
+                    new AudioEmitter($"se_dlc25-2_mansion_arcade_loc_3","Arcade"),
+                    new AudioEmitter($"se_dlc25-2_mansion_cigar_room_loc_3","Cigar Room"),
+                    new AudioEmitter($"se_dlc25-2_mansion_gallery_loc_3","Gallery"),
+                    new AudioEmitter($"se_dlc25-2_mansion_guest_bedroom_loc_3","Guest Bedroom"),
+                    new AudioEmitter($"se_dlc25-2_mansion_kitchen_loc_3","Kitchen"),
+                    new AudioEmitter($"se_dlc25-2_mansion_master_bedroom_loc_3","Master Bedroom"),
+                    new AudioEmitter($"se_dlc25-2_mansion_office_loc_3","Office"),
+                    new AudioEmitter($"se_dlc25-2_mansion_trophy_room_loc_3","Trophy Room"),
+                    new AudioEmitter($"se_dlc25-2_basement_lobby_02_loc_3","Lobby (2)"),
+                    new AudioEmitter($"se_dlc25-2_basement_lobby_03_loc_3","Lobby (3)"),
+                    new AudioEmitter($"se_dlc25-2_basement_club_01_loc_3","Club (1)"),
+                    new AudioEmitter($"se_dlc25-2_basement_club_02_loc_3","Club (2)"),
+                    new AudioEmitter($"se_dlc25-2_basement_garage_loc_3","Garage"),
+                    new AudioEmitter($"se_dlc25-2_basement_garage_top_loc_3","Garage Top"),
+                    new AudioEmitter($"se_dlc25-2_basement_mod_garage_loc_3","Mod Garage"),
+                },
+                Doors = new List<InteriorDoor>()
+                {
+                    //Front Gates
+                    new InteriorDoor(546378757,new Vector3(540.4052f, 772.7877f, 202.3633f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },// Left Gate
+                    new InteriorDoor(3045375478,new Vector3(537.0177f, 777.0928f, 202.3633f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },// Right Gate
+                    //Front Main Door
+                    new InteriorDoor(1214652241,new Vector3(537.6889f, 748.1211f, 202.7288f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                    // Front Side Door
+                    new InteriorDoor(1214652241,new Vector3(562.1526f, 735.7503f, 202.7288f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                    //The Glass Door Collection.   why so many R!!!
+                    // Side Door 
+                    new InteriorDoor(1902523249,new Vector3(571.6558f, 717.3541f, 197.7076f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                    //Rear Doors
+                    new InteriorDoor(610346728,new Vector3(554.7199f, 713.9336f, 202.791f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                    new InteriorDoor(610346728,new Vector3(551.3597f, 714.9407f, 202.791f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+
+                    new InteriorDoor(610346728,new Vector3(547.3989f, 716.1801f, 202.791f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                    new InteriorDoor(610346728,new Vector3(544.0388f, 717.1873f, 202.791f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+
+                    new InteriorDoor(644312889,new Vector3(532.6902f, 734.4709f, 202.7914f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                    new InteriorDoor(644312889,new Vector3(527.1413f, 741.4933f, 202.7914f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                    // Rear Ground level doors
+                    new InteriorDoor(379718506,new Vector3(527.2657f, 741.3351f, 199.0974f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                    new InteriorDoor(379718506,new Vector3(533.6911f, 733.0539f, 199.0974f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+
+                    new InteriorDoor(459707559,new Vector3(534.0909f, 727.2502f, 197.7076f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                },
+                InteractPoints = new List<InteriorInteract>()
+                {
+                    new StandardInteriorInteract()
+                    {
+                        Name = "VineManStandard1",
+                        Position = new Vector3(556.9463f, 717.9183f, 202.3616f),
+                        Heading = 71.28945f,
+                        CameraPosition = new Vector3(556.2785f, 718.1345f, 203.2843f),
+                        CameraDirection = new Vector3(-0.9419408f, 0.2881967f, -0.1723081f),
+                        CameraRotation = new Rotator(-9.922045f, -3.293602E-05f, 72.98796f),
+                        ButtonPromptText = "Mansion Control",
+                        UseNavmesh = false,
+                    },
+
+                    new AudioEmitterInteract()
+                    {
+                        Name = "vineManRadio1",
+                        Position = new Vector3(559.986f, 735.6894f, 202.3616f), 
+                        Heading =  340.6097f,
+                        ButtonPromptText = "Radio Control",
+                        UseNavmesh = false,
+                        CameraPosition = new Vector3(558.4035f, 734.8576f, 203.3967f), 
+                        CameraDirection = new Vector3(0.7726462f, 0.5604747f, -0.2981373f), 
+                        CameraRotation = new Rotator(-17.34576f, 2.683351E-06f, -54.04301f),
+                    },
+
+                    new SinkInteract()
+                    {
+                        Name = "VineManSink1",
+                        Position = new Vector3(568.7961f, 729.5415f, 198.7077f),
+                        Heading = 249.9514f,
+                        CameraPosition = new Vector3(568.2829f, 731.0812f, 199.936f),
+                        CameraDirection = new Vector3(0.2307573f, -0.9096405f, -0.3454059f),
+                        CameraRotation = new Rotator(-20.20658f, 9.097668E-07f, -165.7655f),
+                        ButtonPromptText = "Use Sink",
+                        UseNavmesh = false,
+                    },
+                    new SinkInteract()
+                    {
+                        Name = "VineManSink2",
+                        Position = new Vector3(568.4394f, 728.1791f, 198.7077f),
+                        Heading = 250.4398f,
+                        CameraPosition = new Vector3(568.2829f, 731.0812f, 199.936f),
+                        CameraDirection = new Vector3(0.2307573f, -0.9096405f, -0.3454059f),
+                        CameraRotation = new Rotator(-20.20658f, 9.097668E-07f, -165.7655f),
+                        ButtonPromptText = "Use Sink",
+                        UseNavmesh = false,
+                    },
+                    new SinkInteract()
+                    {
+                        Name = "VineManSink3",
+                        Position = new Vector3(527.9149f, 751.3004f, 198.7078f),
+                        Heading = 311.8061f,
+                        CameraPosition = new Vector3(526.5371f, 751.9152f, 199.9375f),
+                        CameraDirection = new Vector3(0.8850042f, -0.1360552f, -0.44526f),
+                        CameraRotation = new Rotator(-26.43998f, -1.430264E-06f, -98.73988f),
+                        ButtonPromptText = "Use Sink",
+                        UseNavmesh = false,
+                    },
+                    new SinkInteract()
+                    {
+                        Name = "VineManSink4",
+                        Position = new Vector3(548.546f, 733.1766f, 198.7077f),
+                        Heading = 307.4635f,
+                        CameraPosition = new Vector3(548.9492f, 731.7667f, 199.6707f),
+                        CameraDirection = new Vector3(0.1043601f, 0.9066385f, -0.4087977f),
+                        CameraRotation = new Rotator(-24.12933f, 4.677571E-07f, -6.566227f),
+                        ButtonPromptText = "Use Sink",
+                        UseNavmesh = false,
+                    },
+                    new ToiletInteract()
+                    {
+                        Name = "VineManToilet1",
+                        Position = new Vector3(566.4648f, 723.4943f, 198.7077f),
+                        Heading = 71.65858f,
+                        CameraPosition = new Vector3(568.6635f, 722.3741f, 200.0983f),
+                        CameraDirection = new Vector3(-0.7594374f, 0.4847547f, -0.4338982f),
+                        CameraRotation = new Rotator(-25.7152f, -1.231912E-05f, 57.4496f),
+                        ButtonPromptText = "Use Toilet",
+                        UseNavmesh = false,
+                    },
+                    new ToiletInteract()
+                    {
+                        Name = "VineManToilet2",
+                        Position = new Vector3(526.5916f, 753.1428f, 198.7078f),
+                        Heading = 303.6657f,
+                        CameraPosition = new Vector3(526.7256f, 751.1488f, 199.6905f),
+                        CameraDirection = new Vector3(0.1396634f, 0.8952051f, -0.4232045f),
+                        CameraRotation = new Rotator(-25.03706f, -1.413479E-06f, -8.867388f),
+                        ButtonPromptText = "Use Toilet",
+                        UseNavmesh = false,
+                    },
+                    new ToiletInteract()
+                    {
+                        Name = "VineManToilet3",
+                        Position = new Vector3(547.0101f, 733.7941f, 198.7077f),
+                        Heading = 34.09992f,
+                        CameraPosition = new Vector3(548.9147f, 733.4722f, 199.794f),
+                        CameraDirection = new Vector3(-0.8088776f, 0.3496555f, -0.4727134f),
+                        CameraRotation = new Rotator(-28.21058f, 2.228374E-05f, 66.62251f),
+                        ButtonPromptText = "Use Toilet",
+                        UseNavmesh = false,
+                    },
+                },
+                OutfitInteracts = new List<OutfitInteract>()
+                {
+                    new OutfitInteract()
+                    {
+                        Name = "VineManOutfit1",
+                        Position = new Vector3(563.8438f, 728.3643f, 198.7077f),
+                        Heading = 162.8777f,
+                        CameraPosition = new Vector3(563.2036f, 726.1241f, 199.6131f),
+                        CameraDirection = new Vector3(0.3225141f, 0.872908f, -0.3660823f),
+                        CameraRotation = new Rotator(-21.47421f, -1.972542E-05f, -20.2778f),
+                        ButtonPromptText = "Change Outfit",
+                    },
+                    new OutfitInteract()
+                    {
+                        Name = "VineManOutfit2",
+                        Position = new Vector3(522.7722f, 750.9181f, 198.7078f),
+                        Heading = 216.0308f,
+                        CameraPosition = new Vector3(524.2657f, 749.1966f, 199.4991f),
+                        CameraDirection = new Vector3(-0.5652148f, 0.751561f, -0.3401299f),
+                        CameraRotation = new Rotator(-19.88478f, -3.268454E-05f, 36.94516f),
+                        ButtonPromptText = "Change Outfit",
+                    },
+                },
+                InventoryInteracts = new List<InventoryInteract>()
+                {
+                    new InventoryInteract("VineManCash",new Vector3(561.9986f, 740.5093f, 187.0761f), 70.07521f,"Access Cash")
+                    {
+                        CanAccessCash = true,
+                        CanAccessItems = false,
+                        CanAccessWeapons = false,
+                        CameraPosition = new Vector3(559.2673f, 741.267f, 187.7953f),
+                        CameraDirection = new Vector3(0.9154354f, -0.3126789f, -0.2533968f),
+                        CameraRotation = new Rotator(-14.67861f, -1.014965E-05f, -108.8583f)
+                    },
+                    new InventoryInteract("VineManInventory",new Vector3(546.2561f, 720.489f, 202.3625f), 257.3846f ,"Access Items")
+                    {
+                        CanAccessItems = true,
+                        CanAccessCash = false,
+                        CanAccessWeapons = false,
+                        CameraPosition = new Vector3(545.6318f, 722.8356f, 203.4903f),
+                        CameraDirection = new Vector3(0.2099156f, -0.9504443f, -0.2293272f),
+                        CameraRotation = new Rotator(-13.25746f, -4.605039E-06f, -167.5456f)
+                    },
+                    new InventoryInteract("VineManWeapons",new Vector3(555.1046f, 744.7869f, 191.5046f), 73.7746f ,"Access Weapons")
+                    {
+                        CanAccessWeapons = true,
+                        CanAccessCash = false,
+                        CanAccessItems = false,
+                        CameraPosition = new Vector3(555.7337f, 741.4341f, 192.6279f),
+                        CameraDirection = new Vector3(-0.1983978f, 0.9519771f, -0.2331909f),
+                        CameraRotation = new Rotator(-13.48501f, 3.29242E-06f, 11.77228f)
+                    },
+                },
+                RestInteracts = new List<RestInteract>()
+                {
+                    new RestInteract()
+                    {
+                        Name = "VineManRest1",
+                        Position = new Vector3(559.1583f, 715.5945f, 198.7077f),
+                        Heading = 345.1967f,
+                        CameraPosition = new Vector3(562.3942f, 714.9716f, 199.9915f),
+                        CameraDirection = new Vector3(-0.5556331f, 0.6874091f, -0.4676971f),
+                        CameraRotation = new Rotator(-27.88491f, 5.795572E-06f, 38.94863f),
+                        ButtonPromptText = "Sleep",
+                    },
+                    new RestInteract()
+                    {
+                        Name = "VineManRest2",
+                        Position = new Vector3(533.7569f, 743.2491f, 198.7077f),
+                        Heading = 129.4636f,
+                        CameraPosition = new Vector3(531.8244f, 745.6447f, 199.7839f),
+                        CameraDirection = new Vector3(-0.01646183f, -0.9022155f, -0.4309713f),
+                        CameraRotation = new Rotator(-25.52922f, 1.614369E-05f, 178.9547f),
+                        ButtonPromptText = "Sleep",
+                    },
+                },
+                TrophyInteracts = new List<DisplayInteract>()
+                {
+                    new DisplayInteract("VinewoodTrophy", new Vector3(548.5652f, 739.2119f, 198.7076f), 345.7989f, "Manage Trophies")
+                    {
+                        CameraPosition = new Vector3(539.2967f, 738.8112f, 199.5518f),
+                        CameraDirection = new Vector3(-0.7532488f, -0.6125796f, -0.2395045f),
+                        CameraRotation = new Rotator(-13.8573f, 0f, 129.1197f),
+                        CabinetData = new CabinetData
+                        {
+                            CabinetCameraPosition = new Vector3(539.2967f, 738.8112f, 199.5518f),
+                            CabinetCameraDirection = new Vector3(-0.7532488f, -0.6125796f, -0.2395045f),
+                            CabinetCameraRotation = new Rotator(-13.8573f, 8.353992E-06f, 129.1197f),
+                            //TrophyHeading = 128.529f,
+                            Slots = new List<DisplaySlot>
+                            {
+                                new DisplaySlot { SlotID = 1, Position = new Vector3(537.8293f, 735.0106f, 198.73f), Rotation = 128.529f, CameraPosition = new Vector3(538.6434f, 735.7286f, 199.2184f), CameraDirection = new Vector3(-0.7748819f, -0.6112047f, -0.1612045f), CameraRotation = new Rotator(-9.276819f, 6.055617E-06f, 128.2654f) },
+                                new DisplaySlot { SlotID = 2, Position = new Vector3(537.2085f, 735.796f, 198.73f), Rotation = 128.529f, CameraPosition = new Vector3(538.0245f, 736.5135f, 199.2184f), CameraDirection = new Vector3(-0.7748819f, -0.6112047f, -0.1612045f), CameraRotation = new Rotator(-9.276819f, 6.055617E-06f, 128.2654f) },
+                                new DisplaySlot { SlotID = 3, Position = new Vector3(536.5898f, 736.5798f, 198.73f), Rotation = 128.529f, CameraPosition = new Vector3(537.4056f, 737.2984f, 199.2184f), CameraDirection = new Vector3(-0.7748819f, -0.6112047f, -0.1612045f), CameraRotation = new Rotator(-9.276819f, 6.055617E-06f, 128.2654f) },
+                                new DisplaySlot { SlotID = 4, Position = new Vector3(535.9694f, 737.3654f, 198.73f), Rotation = 128.529f, CameraPosition = new Vector3(536.8177f, 738.0441f, 199.2184f), CameraDirection = new Vector3(-0.7748819f, -0.6112047f, -0.1612045f), CameraRotation = new Rotator(-9.276819f, 6.055617E-06f, 128.2654f) },
+                                new DisplaySlot { SlotID = 5, Position = new Vector3(535.3489f, 738.1505f, 198.73f), Rotation = 128.529f, CameraPosition = new Vector3(536.1988f, 738.829f, 199.2184f), CameraDirection = new Vector3(-0.7748819f, -0.6112047f, -0.1612045f), CameraRotation = new Rotator(-9.276819f, 6.055617E-06f, 128.2654f) }
+                            }
+                        }
+                    },
+                },
+            },
+            new MansionInterior(302593, "Richman Mansion") // 303105 Mansion Lower - 302849 Garage - 303361 underground TP garage
+            {
+                IsTeleportEntry = false,
+                InternalInteriorCoordinates = new Vector3(-1666.368f, 478.9271f, 128.2216f),
+                DisabledInteriorCoords = new Vector3(0f, 0f, 0f),
+                RequestIPLs = new List<string>()
+                {
+                    "m25_2_ch1_06e_mansion_interior_b",
+                    "m25_2_ch1_06e_mansion_interior_c",
+                    "m25_2_ch1_06e_mansion_interior_d",// underground garage??  - require TP
+                    "hei_ch1_06e_mansion_furniture",
+                    "hei_ch1_06e_mansion_firepit",
+                    "m25_2_mansion_gym",
+                    "m25_2_dog_house"
+                },
+                InteriorSets = new List<string>()
+                {
+                    "set_style_cali",
+                    "set_style_cali_tint",
+                    "set_art_regency",
+                    "set_trophy_planter",
+                    "set_shelving_planter",
+                    "set_arcade_blocker",// remove for access to arcade
+                    "set_podium_blocker", // remove to view car podium
+                    "set_wallpaper_coastal",
+                    "set_elev_cali",
+                    // "set_xmas", // optional event
+                    "set_ai_tablets_02",
+                    "set_pet_dog",
+                    "set_pet_cat",
+                    "SET_ELEV_STD",
+                    "SET_BASE_VAULT_00", // 0-9
+                    "SET_VAULT_DOOR_OPEN"  // _Closed or _Open
+                },
+                InteriorTintColor = 0, // 0 = white, 1 = green, 2 = purple, 3 = pink
+                InteriorWallpaperColor = 1, // 1 pink, 2 purple, 3 green, 
+                LinkedInteriorCoords = new List<Vector3>()
+                {
+                    new Vector3(-1649.63f, 480.9779f, 117.3645f), // Lower level
+                    new Vector3(-1679.877f, 493.596f, 112.9351f),  // Garage
+                    new Vector3(-1679.877f, 493.596f, 56.45712f)  // UG Garage TP
+                },
+                NeedsActivation = true,
+                NeedsSetDisabled = false,
+                MaxUpdateDistance = 75f,
+                IsTrespassingWhenClosed = true,
+                MoneyInteriorCoords = new Vector3(-1649.63f, 480.9779f, 117.3645f),
+                MoneyEntitySets = DefaultVaultMoneyEntitySets,
+                AudioEmitters = new List<AudioEmitter>()
+                {
+                    new AudioEmitter($"se_dlc25-2_mansion_lobby_loc_2","Lobby (1)"),
+                    new AudioEmitter($"se_dlc25-2_mansion_arcade_loc_2","Arcade"),
+                    new AudioEmitter($"se_dlc25-2_mansion_cigar_room_loc_2","Cigar Room"),
+                    new AudioEmitter($"se_dlc25-2_mansion_gallery_loc_2","Gallery"),
+                    new AudioEmitter($"se_dlc25-2_mansion_guest_bedroom_loc_2","Guest Bedroom"),
+                    new AudioEmitter($"se_dlc25-2_mansion_kitchen_loc_2","Kitchen"),
+                    new AudioEmitter($"se_dlc25-2_mansion_master_bedroom_loc_2","Master Bedroom"),
+                    new AudioEmitter($"se_dlc25-2_mansion_office_loc_2","Office"),
+                    new AudioEmitter($"se_dlc25-2_mansion_trophy_room_loc_2","Trophy Room"),
+                    new AudioEmitter($"se_dlc25-2_basement_lobby_02_loc_2","Lobby (2)"),
+                    new AudioEmitter($"se_dlc25-2_basement_lobby_03_loc_2","Lobby (3)"),
+                    new AudioEmitter($"se_dlc25-2_basement_club_01_loc_2","Club (1)"),
+                    new AudioEmitter($"se_dlc25-2_basement_club_02_loc_2","Club (2)"),
+                    new AudioEmitter($"se_dlc25-2_basement_garage_loc_2","Garage"),
+                    new AudioEmitter($"se_dlc25-2_basement_garage_top_loc_2","Garage Top"),
+                    new AudioEmitter($"se_dlc25-2_basement_mod_garage_loc_2","Mod Garage"),
+                },
+                Doors = new List<InteriorDoor>()
+                {
+                    //Front Gates
+                    new InteriorDoor(546378757,new Vector3(-1688.234f, 487.7502f, 129.2232f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },// Left Gate
+                    new InteriorDoor(3045375478,new Vector3(-1693.499f, 486.2354f, 129.2232f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },// Right Gate
+                    //Front Main Door
+                    new InteriorDoor(1214652241,new Vector3(-1666f, 476.703f, 129.5887f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                    // Front Side Door
+                    new InteriorDoor(1214652241,new Vector3(-1645.998f, 495.2693f, 129.5887f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                    //The Glass Door Collection.   why so many R!!!
+                    // Side Door 
+                    new InteriorDoor(1902523249,new Vector3(-1625.437f, 497.7122f, 124.5675f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                    //Rear Doors
+                    new InteriorDoor(610346728,new Vector3(-1628.177f, 480.6531f, 129.6509f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                    new InteriorDoor(610346728,new Vector3(-1630.3f, 477.8601f, 129.6509f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+
+                    new InteriorDoor(610346728,new Vector3(-1632.85f, 474.5861f, 129.6509f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                    new InteriorDoor(610346728,new Vector3(-1634.973f, 471.7931f, 129.6509f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+
+                    new InteriorDoor(644312889,new Vector3(-1655f, 467.2318f, 129.6514f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                    new InteriorDoor(644312889,new Vector3(-1663.663f, 464.5003f, 129.6514f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                    // Rear Ground level doors
+                    new InteriorDoor(379718506,new Vector3(-1663.471f, 464.5612f, 125.9573f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                    new InteriorDoor(379718506,new Vector3(-1653.461f, 467.6718f, 125.9573f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+
+                    new InteriorDoor(459707559,new Vector3(-1647.886f, 466.0095f, 124.5675f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                },
+                InteractPoints = new List<InteriorInteract>()
+                {
+                    new StandardInteriorInteract()
+                    {
+                        Name = "RichManStandard1",
+                        Position = new Vector3(-1631.088f, 484.1435f, 129.2215f),
+                        Heading = 141.9888f,
+                        CameraPosition = new Vector3(-1631.583f, 483.4824f, 130.491f),
+                        CameraDirection = new Vector3(-0.5921783f, -0.7821652f, -0.1937588f),
+                        CameraRotation = new Rotator(-11.17223f, -4.351328E-06f, 142.8706f),
+                        ButtonPromptText = "Mansion Control",
+                        UseNavmesh = false,
+                    },
+                    new AudioEmitterInteract()
+                    {
+                        Name = "richManRadio1",
+                        Position = new Vector3(-1646.744f, 493.4464f, 129.2216f),
+                        Heading =  58.19645f,
+                        ButtonPromptText = "Radio Control",
+                        UseNavmesh = false,
+                        CameraPosition = new Vector3(-1646.32f, 490.8949f, 130.3006f), 
+                        CameraDirection = new Vector3(-0.2820303f, 0.9240854f, -0.2579244f), 
+                        CameraRotation = new Rotator(-14.94694f, 1.767345E-06f, 16.97216f),
+                    },
+                    new SinkInteract()
+                    {
+                        Name = "RichManSink1",
+                        Position = new Vector3(-1637.824f, 499.3179f, 125.5676f),
+                        Heading = 318.8713f,
+                        CameraPosition = new Vector3(-1639.7f, 499.3607f, 126.9005f),
+                        CameraDirection = new Vector3(0.9257138f, -0.01213465f, -0.3780301f),
+                        CameraRotation = new Rotator(-22.21172f, 1.440949E-06f, -90.75101f),
+                        ButtonPromptText = "Use Sink",
+                        UseNavmesh = false,
+                    },
+                    new SinkInteract()
+                    {
+                        Name = "RichManSink2",
+                        Position = new Vector3(-1636.724f, 498.4678f, 125.5676f),
+                        Heading = 323.2496f,
+                        CameraPosition = new Vector3(-1639.7f, 499.3607f, 126.9005f),
+                        CameraDirection = new Vector3(0.9257138f, -0.01213465f, -0.3780301f),
+                        CameraRotation = new Rotator(-22.21172f, 1.440949E-06f, -90.75101f),
+                        ButtonPromptText = "Use Sink",
+                        UseNavmesh = false,
+                    },
+                    new SinkInteract()
+                    {
+                        Name = "RichManSink3",
+                        Position = new Vector3(-1672.613f, 468.6583f, 125.5678f),
+                        Heading = 15.08837f,
+                        CameraPosition = new Vector3(-1673.647f, 467.2804f, 126.6939f),
+                        CameraDirection = new Vector3(0.3734254f, 0.7615845f, -0.5296626f),
+                        CameraRotation = new Rotator(-31.98266f, -4.026245E-06f, -26.11996f),
+                        ButtonPromptText = "Use Sink",
+                        UseNavmesh = false,
+                    },
+                    new SinkInteract()
+                    {
+                        Name = "RichManSink4",
+                        Position = new Vector3(-1648.391f, 481.6124f, 125.5676f),
+                        Heading = 15.1032f,
+                        CameraPosition = new Vector3(-1646.669f, 481.0813f, 126.5789f),
+                        CameraDirection = new Vector3(-0.7772382f, 0.4752269f, -0.4123834f),
+                        CameraRotation = new Rotator(-24.35464f, 1.593192E-05f, 58.55713f),
+                        ButtonPromptText = "Use Sink",
+                        UseNavmesh = false,
+                    },
+                    new ToiletInteract()
+                    {
+                        Name = "RichManToilet1",
+                        Position = new Vector3(-1633.065f, 495.0471f, 125.5676f),
+                        Heading = 142.2997f,
+                        CameraPosition = new Vector3(-1631.229f, 496.305f, 126.4559f),
+                        CameraDirection = new Vector3(-0.7603783f, -0.5334623f, -0.370463f),
+                        CameraRotation = new Rotator(-21.74417f, -5.515052E-06f, 125.0525f),
+                        ButtonPromptText = "Use Toilet",
+                        UseNavmesh = false,
+                    },
+                    new ToiletInteract()
+                    {
+                        Name = "RichManToilet2",
+                        Position = new Vector3(-1674.741f, 468.1071f, 125.5678f),
+                        Heading = 21.22382f,
+                        CameraPosition = new Vector3(-1672.877f, 467.3521f, 126.58f),
+                        CameraDirection = new Vector3(-0.7499061f, 0.4907002f, -0.4436825f),
+                        CameraRotation = new Rotator(-26.33908f, -5.71606E-06f, 56.80132f),
+                        ButtonPromptText = "Use Toilet",
+                        UseNavmesh = false,
+                    },
+                    new ToiletInteract()
+                    {
+                        Name = "RichManToilet3",
+                        Position = new Vector3(-1649.5f, 480.3549f, 125.5676f),
+                        Heading = 102.1732f,
+                        CameraPosition = new Vector3(-1648.073f, 482.0002f, 126.6711f),
+                        CameraDirection = new Vector3(-0.650461f, -0.6093656f, -0.4534028f),
+                        CameraRotation = new Rotator(-26.96222f, -4.789454E-06f, 133.1317f),
+                        ButtonPromptText = "Use Toilet",
+                        UseNavmesh = false,
+                    },
+                },
+                OutfitInteracts = new List<OutfitInteract>()
+                {
+                    new OutfitInteract()
+                    {
+                        Name = "RichManOutfit1",
+                        Position = new Vector3(-1638.374f, 494.2638f, 125.5676f),
+                        Heading = 233.8339f,
+                        CameraPosition = new Vector3(-1636.61f, 492.9518f, 126.3909f),
+                        CameraDirection = new Vector3(-0.7163812f, 0.5986869f, -0.3582904f),
+                        CameraRotation = new Rotator(-20.99524f, 7.315889E-06f, 50.11416f),
+                        ButtonPromptText = "Change Outfit",
+                    },
+                    new OutfitInteract()
+                    {
+                        Name = "RichManOutfit2",
+                        Position = new Vector3(-1673.138f, 464.4393f, 125.5774f),
+                        Heading = 283.2098f,
+                        CameraPosition = new Vector3(-1671.012f, 465.0901f, 126.3334f),
+                        CameraDirection = new Vector3(-0.9119738f, -0.2431012f, -0.3304627f),
+                        CameraRotation = new Rotator(-19.29686f, 4.522973E-07f, 104.926f),
+                        ButtonPromptText = "Change Outfit",
+                    },
+                },
+                InventoryInteracts = new List<InventoryInteract>()
+                {
+                    new InventoryInteract("RichManCash",new Vector3(-1650.519f, 496.7319f, 113.9361f), 141.1508f,"Access Cash")
+                    {
+                        CanAccessCash = true,
+                        CanAccessItems = false,
+                        CanAccessWeapons = false,
+                        CameraPosition = new Vector3(-1652.662f, 493.7836f, 115.5617f),
+                        CameraDirection = new Vector3(0.6016333f, 0.7298114f, -0.3246732f),
+                        CameraRotation = new Rotator(-18.94578f, 1.08321E-05f, -39.50109f)
+                    },
+                    new InventoryInteract("RichManInventory",new Vector3(-1637.131f, 475.1227f, 129.2224f), 322.4516f ,"Access Items")
+                    {
+                        CanAccessItems = true,
+                        CanAccessCash = false,
+                        CanAccessWeapons = false,
+                        CameraPosition = new Vector3(-1639.214f, 475.4368f, 130.2755f),
+                        CameraDirection = new Vector3(0.9597504f, -0.07396424f, -0.27094f),
+                        CameraRotation = new Rotator(-15.72021f, 4.434744E-07f, -94.40685f)
+                    },
+                    new InventoryInteract("RichManWeapons",new Vector3(-1656.811f, 491.8578f, 118.3647f), 143.089f ,"Access Weapons")
+                    {
+                        CanAccessWeapons = true,
+                        CanAccessCash = false,
+                        CanAccessItems = false,
+                        CameraPosition = new Vector3(-1654.153f, 491.1298f, 119.3278f),
+                        CameraDirection = new Vector3(-0.9729856f, 0.1047977f, -0.20571f),
+                        CameraRotation = new Rotator(-11.87106f, -3.271621E-06f, 83.85252f)
+                    },
+                },
+                RestInteracts = new List<RestInteract>()
+                {
+                    new RestInteract()
+                    {
+                        Name = "RichManRest1",
+                        Position = new Vector3(-1628.169f, 485.2527f, 125.5676f),
+                        Heading = 55.12185f,
+                        CameraPosition = new Vector3(-1626.336f, 487.9178f, 126.8432f),
+                        CameraDirection = new Vector3(-0.8441857f, -0.2577846f, -0.4699975f),
+                        CameraRotation = new Rotator(-28.03413f, 1.209081E-05f, 106.9808f),
+                        ButtonPromptText = "Sleep",
+                    },
+                    new RestInteract()
+                    {
+                        Name = "RichManRest2",
+                        Position = new Vector3(-1662.965f, 471.2917f, 125.5676f),
+                        Heading = 194.4916f,
+                        CameraPosition = new Vector3(-1665.626f, 470.5981f, 126.5776f),
+                        CameraDirection = new Vector3(0.8449312f, -0.3228377f, -0.4264588f),
+                        CameraRotation = new Rotator(-25.24304f, -9.439106E-07f, -110.9112f),
+                        ButtonPromptText = "Sleep",
+                    },
+                },
+                TrophyInteracts = new List<DisplayInteract>()
+                {
+                    new DisplayInteract("RichmanTrophy", new Vector3(-1654.08f, 483.7208f, 125.5676f), 53.3514f, "Manage Trophies")
+                    {
+                        CameraPosition = new Vector3(-1656.854f, 475.0268f, 126.2049f),
+                        CameraDirection = new Vector3(0.3005681f, -0.9286817f, -0.2172768f),
+                        CameraRotation = new Rotator(-12.54914f, 0f, -162.0658f),
+                        CabinetData = new CabinetData
+                        {
+                            CabinetCameraPosition = new Vector3(-1656.854f, 475.0268f, 126.2049f),
+                            CabinetCameraDirection = new Vector3(0.3005681f, -0.9286817f, -0.2172768f),
+                            CabinetCameraRotation = new Rotator(-12.54914f, 2.186674E-07f, -162.0658f),
+                            //TrophyHeading = 197.7647f,
+                            Slots = new List<DisplaySlot>
+                            {
+                                new DisplaySlot { SlotID = 1, Position = new Vector3(-1653.841f, 472.2335f, 125.59f), Rotation = 197.7647f, CameraPosition = new Vector3(-1654.183f, 473.2792f, 126.0424f), CameraDirection = new Vector3(0.298961f, -0.9462714f, -0.123259f), CameraRotation = new Rotator(-7.080229f, -5.592172E-06f, -162.4668f) },
+                                new DisplaySlot { SlotID = 2, Position = new Vector3(-1654.795f, 471.9278f, 125.59f), Rotation = 197.7647f, CameraPosition = new Vector3(-1655.186f, 472.9626f, 126.0424f), CameraDirection = new Vector3(0.298961f, -0.9462714f, -0.123259f), CameraRotation = new Rotator(-7.080229f, -5.592172E-06f, -162.4668f) },
+                                new DisplaySlot { SlotID = 3, Position = new Vector3(-1655.746f, 471.6235f, 125.59f), Rotation = 197.7647f, CameraPosition = new Vector3(-1656.093f, 472.6762f, 126.0424f), CameraDirection = new Vector3(0.298961f, -0.9462714f, -0.123259f), CameraRotation = new Rotator(-7.080229f, -5.592172E-06f, -162.4668f) },
+                                new DisplaySlot { SlotID = 4, Position = new Vector3(-1656.699f, 471.3182f, 125.59f), Rotation = 197.7647f, CameraPosition = new Vector3(-1657.047f, 472.3747f, 126.0424f), CameraDirection = new Vector3(0.298961f, -0.9462714f, -0.123259f), CameraRotation = new Rotator(-7.080229f, -5.592172E-06f, -162.4668f) },
+                                new DisplaySlot { SlotID = 5, Position = new Vector3(-1657.652f, 471.0128f, 125.59f), Rotation = 197.7647f, CameraPosition = new Vector3(-1658.002f, 472.0732f, 126.0424f), CameraDirection = new Vector3(0.298961f, -0.9462714f, -0.123259f), CameraRotation = new Rotator(-7.080229f, -5.592172E-06f, -162.4668f) }
+                            }
+                        },
+                    },
+                },
+            },
+            new MansionInterior(303617, "Tongva Estate") // 303873 Mansion Lower - 304129 Garage 
+            {
+                IsTeleportEntry = false,
+                InternalInteriorCoordinates = new Vector3(-2586.065f, 1909.995f, 166.3754f),
+                DisabledInteriorCoords = new Vector3(0f, 0f, 0f),
+                RequestIPLs = new List<string>()
+                {
+                    "m25_2_ch1_09_mansion_interior_b",
+                    "m25_2_ch1_09_mansion_interior_c",
+                    "hei_ch1_09_mansion_furniture",
+                    "hei_ch1_09_mansion_firepit",
+                    "m25_2_tongva_mansion_gym",
+                    "m25_2_tongva_dog_house",
+                },
+                InteriorSets = new List<string>()
+                {
+                    "set_style_holly",
+                    "set_style_reg_tint",
+                    "set_art_coastal",
+                    "set_reg_trophy_planter",
+                    "set_reg_shelving_planter",
+                    "set_reg_arcade_blocker",// remove for access to arcade
+                    "set_reg_podium_blocker", // remove to view car podium
+                    //"set_wallpaper_coastal",
+                    "set_elev_holly",
+                    // "set_xmas", // optional event
+                    "set_ai_tablets_01",
+                    "set_pet_dog",
+                    "set_pet_cat",
+                    "SET_ELEV_STD",
+                    "SET_BASE_VAULT_00", // 0-9 
+                    "SET_VAULT_DOOR_OPEN"  // _Closed or _Open
+                },
+                InteriorTintColor = 0, // 0 = white, 1 = green, 2 = purple, 3 = pink
+                InteriorWallpaperColor = 2, // 1 pink, 2 purple, 3 green, 
+                LinkedInteriorCoords = new List<Vector3>()
+                {
+                    new Vector3(-2587.496f, 1893.193f, 155.5183f), // Lower level
+                    new Vector3(-2568.934f, 1920.203f, 151.0898f),  // Garage
+                },
+                NeedsActivation = true,
+                NeedsSetDisabled = false,
+                MaxUpdateDistance = 75f,
+                IsTrespassingWhenClosed = true,
+                MoneyInteriorCoords = new Vector3(-2587.496f, 1893.193f, 155.5183f),
+                MoneyEntitySets = DefaultVaultMoneyEntitySets,
+                AudioEmitters = new List<AudioEmitter>()
+                {
+                    new AudioEmitter($"se_dlc25-2_mansion_lobby_loc_1","Lobby (1)"),
+                    new AudioEmitter($"se_dlc25-2_mansion_arcade_loc_1","Arcade"),
+                    new AudioEmitter($"se_dlc25-2_mansion_cigar_room_loc_1","Cigar Room"),
+                    new AudioEmitter($"se_dlc25-2_mansion_gallery_loc_1","Gallery"),
+                    new AudioEmitter($"se_dlc25-2_mansion_guest_bedroom_loc_1","Guest Bedroom"),
+                    new AudioEmitter($"se_dlc25-2_mansion_kitchen_loc_1","Kitchen"),
+                    new AudioEmitter($"se_dlc25-2_mansion_master_bedroom_loc_1","Master Bedroom"),
+                    new AudioEmitter($"se_dlc25-2_mansion_office_loc_1","Office"),
+                    new AudioEmitter($"se_dlc25-2_mansion_trophy_room_loc_1","Trophy Room"),
+                    new AudioEmitter($"se_dlc25-2_basement_lobby_02_loc_1","Lobby (2)"),
+                    new AudioEmitter($"se_dlc25-2_basement_lobby_03_loc_1","Lobby (3)"),
+                    new AudioEmitter($"se_dlc25-2_basement_club_01_loc_1","Club (1)"),
+                    new AudioEmitter($"se_dlc25-2_basement_club_02_loc_1","Club (2)"),
+                    new AudioEmitter($"se_dlc25-2_basement_garage_loc_1","Garage"),
+                    new AudioEmitter($"se_dlc25-2_basement_garage_top_loc_1","Garage Top"),
+                    new AudioEmitter($"se_dlc25-2_basement_mod_garage_loc_1","Mod Garage"),
+                },
+                Doors = new List<InteriorDoor>()
+                {
+                    //Front Gates
+                    new InteriorDoor(546378757,new Vector3(-2559.125f, 1910.828f, 169.0264f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },// Left Gate
+                    new InteriorDoor(3045375478,new Vector3(-2556.632f, 1915.706f, 169.0264f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },// Right Gate
+                    //Front Main Door
+                    new InteriorDoor(1214652241,new Vector3(-2588.283f, 1910.256f, 167.7426f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                    // Front Side Door
+                    new InteriorDoor(1214652241,new Vector3(-2574.255f, 1886.703f, 167.7426f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                    //The Glass Door Collection.   why so many R!!!
+                    // Side Door 
+                    new InteriorDoor(1902523249,new Vector3(-2576.088f, 1866.078f, 162.7214f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                    //Rear Doors
+                    new InteriorDoor(610346728,new Vector3(-2592.22f, 1872.264f, 167.8047f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                    new InteriorDoor(610346728,new Vector3(-2594.518f, 1874.915f, 167.8047f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+
+                    new InteriorDoor(610346728,new Vector3(-2597.198f, 1878.084f, 167.8047f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                    new InteriorDoor(610346728,new Vector3(-2599.496f, 1880.734f, 167.8047f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+
+                    new InteriorDoor(644312889,new Vector3(-2599.817f, 1901.408f, 167.8052f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                    new InteriorDoor(644312889,new Vector3(-2600.74f, 1910.311f, 167.8052f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                    // Rear Ground level doors
+                    new InteriorDoor(379718506,new Vector3(-2600.719f, 1910.111f, 164.1112f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                    new InteriorDoor(379718506,new Vector3(-2599.731f, 1899.676f, 164.1112f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+
+                    new InteriorDoor(459707559,new Vector3(-2602.503f, 1894.561f, 162.7214f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = false },
+                },
+                // Dining Room Table Chairs - commented out for now, might be useful later
+                //PropSpawns = new List<PropSpawn>()
+                //{
+                //     new PropSpawn("m25_2_prop_m52_diningchair_01a", new SpawnPlace(new Vector3(-2594.86f, 1890.23f, 166.99f), 5.99999952f)){ PlaceOnGround = true },
+                //     new PropSpawn("m25_2_prop_m52_diningchair_01a", new SpawnPlace(new Vector3(-2593.56f, 1890.36f, 166.99f), 5.99999952f)){ PlaceOnGround = true },
+                //     new PropSpawn("m25_2_prop_m52_diningchair_01a", new SpawnPlace(new Vector3(-2592.39429f, 1890.48f, 166.99f), 5.99999952f)){ PlaceOnGround = true },
+                //     new PropSpawn("m25_2_prop_m52_diningchair_01a", new SpawnPlace(new Vector3(-2591.30737f, 1890.6f, 166.99f), 5.99999952f)){ PlaceOnGround = true },
+
+                //     new PropSpawn("m25_2_prop_m52_diningchair_01a", new SpawnPlace(new Vector3(-2594.71f, 1888.92f, 166.99f), -173.999985f)){ PlaceOnGround = true },
+                //     new PropSpawn("m25_2_prop_m52_diningchair_01a", new SpawnPlace(new Vector3(-2593.44f, 1889.04f, 166.99f), -173.999985f)){ PlaceOnGround = true },
+                //     new PropSpawn("m25_2_prop_m52_diningchair_01a", new SpawnPlace(new Vector3(-2592.3f, 1889.16321f, 166.99f), -173.999985f)){ PlaceOnGround = true },
+                //     new PropSpawn("m25_2_prop_m52_diningchair_01a", new SpawnPlace(new Vector3(-2591.19f, 1889.29f, 166.99f), -173.999985f)){ PlaceOnGround = true },
+                //},
+                InteractPoints = new List<InteriorInteract>()
+                {
+                    new StandardInteriorInteract()
+                    {
+                        Name = "TongvaManStandard1",
+                        Position = new Vector3(-2588.221f, 1874.424f, 167.3754f),
+                        Heading = 37.08359f,
+                        CameraPosition = new Vector3(-2588.287f, 1874.523f, 168.5065f),
+                        CameraDirection = new Vector3(-0.6003212f, 0.7630259f, -0.2395956f),
+                        CameraRotation = new Rotator(-13.86267f, 2.638163E-06f, 38.19439f),
+                        ButtonPromptText = "Mansion Control",
+                        UseNavmesh = false,
+                    },
+                    new AudioEmitterInteract()
+                    {
+                        Name = "TongvaManRadio1",
+                        Position = new Vector3(-2575.946f, 1887.959f, 167.3755f),
+                        Heading =  313.3403f,
+                        ButtonPromptText = "Radio Control",
+                        UseNavmesh = false,
+                        CameraPosition = new Vector3(-2577.902f, 1887.922f, 168.3668f), 
+                        CameraDirection = new Vector3(0.962104f, 0.06839093f, -0.2639669f), 
+                        CameraRotation = new Rotator(-15.30557f, -6.970706E-06f, -85.93398f),
+                    },
+                    new SinkInteract()
+                    {
+                        Name = "TongvaManSink1",
+                        Position = new Vector3(-2571.971f, 1877.887f, 163.7215f),
+                        Heading = 218.5177f,
+                        CameraPosition = new Vector3(-2571.743f, 1879.326f, 164.9517f),
+                        CameraDirection = new Vector3(-0.1614727f, -0.869786f, -0.4662604f),
+                        CameraRotation = new Rotator(-27.79183f, -8.203353E-06f, 169.483f),
+                        ButtonPromptText = "Use Sink",
+                        UseNavmesh = false,
+                    },
+                    new SinkInteract()
+                    {
+                        Name = "TongvaManSink2",
+                        Position = new Vector3(-2573.052f, 1876.918f, 163.7215f),
+                        Heading = 213.1772f,
+                        CameraPosition = new Vector3(-2571.743f, 1879.326f, 164.9517f),
+                        CameraDirection = new Vector3(-0.1614727f, -0.869786f, -0.4662604f),
+                        CameraRotation = new Rotator(-27.79183f, -8.203353E-06f, 169.483f),
+                        ButtonPromptText = "Use Sink",
+                        UseNavmesh = false,
+                    },
+                    new SinkInteract()
+                    {
+                        Name = "TongvaManSink3",
+                        Position = new Vector3(-2594.821f, 1918.202f, 163.7216f),
+                        Heading = 275.5909f,
+                        CameraPosition = new Vector3(-2595.677f, 1919.255f, 164.8872f),
+                        CameraDirection = new Vector3(0.6860619f, -0.5078313f, -0.5209861f),
+                        CameraRotation = new Rotator(-31.39842f, -1.000244E-06f, -126.5093f),
+                        ButtonPromptText = "Use Sink",
+                        UseNavmesh = false,
+                    },
+                    new SinkInteract()
+                    {
+                        Name = "TongvaManSink4",
+                        Position = new Vector3(-2587.126f, 1891.847f, 163.7215f),
+                        Heading = 275.9665f,
+                        CameraPosition = new Vector3(-2588.06f, 1892.928f, 164.8409f),
+                        CameraDirection = new Vector3(0.7002586f, -0.5184285f, -0.4907849f),
+                        CameraRotation = new Rotator(-29.39218f, 2.841728E-05f, -126.514f),
+                        ButtonPromptText = "Use Sink",
+                        UseNavmesh = false,
+                    },
+                    new ToiletInteract()
+                    {
+                        Name = "TongvaManToilet1",
+                        Position = new Vector3(-2577.099f, 1874.065f, 163.7215f),
+                        Heading = 38.75992f,
+                        CameraPosition = new Vector3(-2576.473f, 1872.285f, 164.5299f),
+                        CameraDirection = new Vector3(-0.2683225f, 0.8737446f, -0.4056764f),
+                        CameraRotation = new Rotator(-23.93352f, 1.401134E-06f, 17.07146f),
+                        ButtonPromptText = "Use Toilet",
+                        UseNavmesh = false,
+                    },
+                    new ToiletInteract()
+                    {
+                        Name = "TongvaManToilet2",
+                        Position = new Vector3(-2594.964f, 1920.429f, 163.7216f),
+                        Heading = 275.4833f,
+                        CameraPosition = new Vector3(-2595.956f, 1918.648f, 164.4876f),
+                        CameraDirection = new Vector3(0.6178432f, 0.6872252f, -0.3820881f),
+                        CameraRotation = new Rotator(-22.46309f, -2.494453E-05f, -41.95682f),
+                        ButtonPromptText = "Use Toilet",
+                        UseNavmesh = false,
+                    },
+                    new ToiletInteract()
+                    {
+                        Name = "TongvaManToilet3",
+                        Position = new Vector3(-2588.123f, 1893.235f, 163.7215f),
+                        Heading = 6.980606f,
+                        CameraPosition = new Vector3(-2586.716f, 1892.097f, 164.6647f),
+                        CameraDirection = new Vector3(-0.542122f, 0.7053415f, -0.4567243f),
+                        CameraRotation = new Rotator(-27.17593f, -9.597185E-07f, 37.5457f),
+                        ButtonPromptText = "Use Toilet",
+                        UseNavmesh = false,
+                    },
+                },
+                OutfitInteracts = new List<OutfitInteract>()
+                {
+                    new OutfitInteract()
+                    {
+                        Name = "TongvaManOutfit1",
+                        Position = new Vector3(-2576.785f, 1879.506f, 163.7375f),
+                        Heading = 125.5254f,
+                        CameraPosition = new Vector3(-2578.385f, 1878.097f, 164.4855f),
+                        CameraDirection = new Vector3(0.7255976f, 0.5931448f, -0.3488372f),
+                        CameraRotation = new Rotator(-20.41621f, -3.461798E-05f, -50.73548f),
+                        ButtonPromptText = "Change Outfit",
+                    },
+                    new OutfitInteract()
+                    {
+                        Name = "TongvaManOutfit2",
+                        Position = new Vector3(-2598.941f, 1919.988f, 163.7313f),
+                        Heading = 183.4191f,
+                        CameraPosition = new Vector3(-2598.72f, 1917.806f, 164.4619f),
+                        CameraDirection = new Vector3(-0.03982368f, 0.9475648f, -0.3170725f),
+                        CameraRotation = new Rotator(-18.48598f, 1.069016E-06f, 2.406576f),
+                        ButtonPromptText = "Change Outfit",
+                    },
+                },
+                InventoryInteracts = new List<InventoryInteract>()
+                {
+                    new InventoryInteract("TongvaManCash",new Vector3(-2571.802f, 1890.763f, 152.09f), 40.03425f,"Access Cash")
+                    {
+                        CanAccessCash = true,
+                        CanAccessItems = false,
+                        CanAccessWeapons = false,
+                        CameraPosition = new Vector3(-2574.604f, 1893.93f, 153.5698f),
+                        CameraDirection = new Vector3(0.6034796f, -0.7421095f, -0.2916949f),
+                        CameraRotation = new Rotator(-16.95945f, 2.588514E-05f, -140.8822f)
+                    },
+                    new InventoryInteract("TongvaManInventory",new Vector3(-2595.618f, 1882.083f, 167.3763f), 217.928f ,"Access Items")
+                    {
+                        CanAccessItems = true,
+                        CanAccessCash = false,
+                        CanAccessWeapons = false,
+                        CameraPosition = new Vector3(-2595.13f, 1884.447f, 168.5531f),
+                        CameraDirection = new Vector3(-0.1384349f, -0.9126551f, -0.3845731f),
+                        CameraRotation = new Rotator(-22.61724f, 4.624518E-07f, 171.3749f)
+                    },
+                    new InventoryInteract("TongvaManWeapons",new Vector3(-2575.402f, 1898.142f, 156.5184f), 42.3088f ,"Access Weapons")
+                    {
+                        CanAccessWeapons = true,
+                        CanAccessCash = false,
+                        CanAccessItems = false,
+                        CameraPosition = new Vector3(-2576.197f, 1895.23f, 157.5323f),
+                        CameraDirection = new Vector3(0.2255414f, 0.9533221f, -0.2007687f),
+                        CameraRotation = new Rotator(-11.58191f, 8.715189E-06f, -13.31056f)
+                    },
+                },
+                RestInteracts = new List<RestInteract>()
+                {
+                    new RestInteract()
+                    {
+                        Name = "TongvaManRest1",
+                        Position = new Vector3(-2587.608f, 1871.429f, 163.7215f),
+                        Heading = 305.516f,
+                        CameraPosition = new Vector3(-2585.669f, 1869.515f, 164.6172f),
+                        CameraDirection = new Vector3(-0.1609594f, 0.9028355f, -0.398723f),
+                        CameraRotation = new Rotator(-23.49837f, 1.070625E-05f, 10.10861f),
+                        ButtonPromptText = "Sleep",
+                    },
+                    new RestInteract()
+                    {
+                        Name = "TongvaManRest2",
+                        Position = new Vector3(-2594.129f, 1908.17f, 163.7215f),
+                        Heading = 93.20876f,
+                        CameraPosition = new Vector3(-2594.396f, 1910.733f, 164.615f),
+                        CameraDirection = new Vector3(-0.4609557f, -0.7899873f, -0.404277f),
+                        CameraRotation = new Rotator(-23.84583f, 2.426987E-05f, 149.7365f),
+                        ButtonPromptText = "Sleep",
+                    },
+                },
+                TrophyInteracts = new List<DisplayInteract>()
+                {
+                new DisplayInteract("TongvaTrophy", new Vector3(-2583.869f, 1896.979f, 163.7214f), 312.7611f, "Manage Trophies")
+                    {
+                        CameraPosition = new Vector3(-2591.883f, 1901.446f, 164.3784f),
+                        CameraDirection = new Vector3(-0.9708887f, -0.09680843f, -0.2190962f),
+                        CameraRotation = new Rotator(-12.65596f, 0f, 95.69421f),
+                        CabinetData = new CabinetData
+                        {
+                            CabinetCameraPosition = new Vector3(-2591.883f, 1901.446f, 164.3784f),
+                            CabinetCameraDirection = new Vector3(-0.9708887f, -0.09680843f, -0.2190962f),
+                            CabinetCameraRotation = new Rotator(-12.65596f, 4.37517E-07f, 95.69421f),
+                            //TrophyHeading = 96.0f,
+                            Slots = new List<DisplaySlot>
+                            {
+                                new DisplaySlot { SlotID = 1, Position = new Vector3(-2595.189f, 1899.111f, 163.742f), Rotation = 96.0f, CameraPosition = new Vector3(-2594.049f, 1899.246f, 164.1613f), CameraDirection = new Vector3(-0.9913322f, -0.09000064f, -0.0957096f), CameraRotation = new Rotator(-5.492163f, 3.69888E-06f, 95.18752f) },
+                                new DisplaySlot { SlotID = 2, Position = new Vector3(-2595.292f, 1900.106f, 163.742f), Rotation = 96.0f, CameraPosition = new Vector3(-2594.141f, 1900.243f, 164.1613f), CameraDirection = new Vector3(-0.9913322f, -0.09000064f, -0.0957096f), CameraRotation = new Rotator(-5.492163f, 3.69888E-06f, 95.18752f) },
+                                new DisplaySlot { SlotID = 3, Position = new Vector3(-2595.395f, 1901.1f, 163.742f), Rotation = 96.0f, CameraPosition = new Vector3(-2594.234f, 1901.239f, 164.1613f), CameraDirection = new Vector3(-0.9913208f, -0.08587798f, -0.09953921f), CameraRotation = new Rotator(-5.712637f, 2.09146E-06f, 94.95116f) },
+                                new DisplaySlot { SlotID = 4, Position = new Vector3(-2595.498f, 1902.095f, 163.742f), Rotation = 96.0f, CameraPosition = new Vector3(-2594.322f, 1902.235f, 164.1613f), CameraDirection = new Vector3(-0.9913208f, -0.08587798f, -0.09953921f), CameraRotation = new Rotator(-5.712637f, 2.09146E-06f, 94.95116f) },
+                                new DisplaySlot { SlotID = 5, Position = new Vector3(-2595.601f, 1903.091f, 163.742f), Rotation = 96.0f, CameraPosition = new Vector3(-2594.41f, 1903.231f, 164.1613f), CameraDirection = new Vector3(-0.9911417f, -0.08792067f, -0.0995392f), CameraRotation = new Rotator(-5.712636f, 2.037833E-06f, 95.06924f) }
+                            }
+                        }
+                    },
+                },
+            },
         });
     }
     private void Banks()
@@ -7352,10 +8339,10 @@ IsTrespassingWhenClosed = true,
                 SearchLocations = new List<Vector3>() { new Vector3(-355.2124f, -47.33231f, 49.03636f) },
                 IsTrespassingWhenClosed = true,
                IsWeaponRestricted = true, Doors =  new List<InteriorDoor>() {
-                   new InteriorDoor(2121050683,new Vector3(-353.2158f,-53.87801f,49.03653f)) { ForceRotateOpen = true },//unknown door1
-                   new InteriorDoor(73386408,new Vector3(-348.8109f, -47.26213f, 49.38759f)) { LockWhenClosed = true },//Front Door1
-                   new InteriorDoor(3142793112,new Vector3(-351.2598f, -46.41221f, 49.38765f)) { LockWhenClosed = true },//Front Door1
-                   new InteriorDoor(4163212883, new Vector3(-355.3892f, -51.06768f, 49.31105f)) { ForceRotateOpen = true },//teller door
+                   new InteriorDoor(2121050683,new Vector3(-353.2158f,-53.87801f,49.03653f)) { ForceRotateOpen = true, InteractPostion = new Vector3(-353.9555f, -54.50634f, 49.04526f), InteractHeader = 255.9796f },//unknown door1
+                   new InteriorDoor(73386408,new Vector3(-348.8109f, -47.26213f, 49.38759f)) { DoorGroupName = "frontDoor", LockWhenClosed = true, InteractPostion = new Vector3(-349.7116f, -45.93815f, 49.03682f), InteractHeader = 162.9344f },//Front Door1
+                   new InteriorDoor(3142793112,new Vector3(-351.2598f, -46.41221f, 49.38765f)) { DoorGroupName = "frontDoor",LockWhenClosed = true, InteractPostion = new Vector3(-349.7116f, -45.93815f, 49.03682f), InteractHeader = 162.9344f },//Front Door1
+                   new InteriorDoor(4163212883, new Vector3(-355.3892f, -51.06768f, 49.31105f)) { LockWhenClosed = true,ForceRotateOpen = true },//teller door
                 },
                 BankDrawerInteracts = new List<BankDrawerInteract>()
                 {
@@ -7419,10 +8406,10 @@ IsTrespassingWhenClosed = true,
                IsTrespassingWhenClosed = true,IsWeaponRestricted = true
                ,SearchLocations = new List<Vector3>() { new Vector3(145.943f, -1037.929f, 29.36783f) }//,new Vector3(150.2974f, -1046.151f, 29.34631f) }
                , Doors =  new List<InteriorDoor>() {
-                    new InteriorDoor(2121050683,new Vector3(148.2597f,-1045.38f,29.34628f)) { ForceRotateOpen = true, },
-                    new InteriorDoor(3142793112,new Vector3(149.6298f, -1037.231f, 29.71915f)){ LockWhenClosed = true, } ,//Front Door1
-                    new InteriorDoor(73386408,new Vector3(152.0632f, -1038.124f, 29.71909f)) { LockWhenClosed = true, } ,//Front Door2
-                    new InteriorDoor(4163212883, new Vector3(145.4186f,-1041.813f,29.64255f)) { ForceRotateOpen = true },//teller door
+                    new InteriorDoor(2121050683,new Vector3(148.2597f,-1045.38f,29.34628f)) { ForceRotateOpen = true, InteractPostion = new Vector3(146.8517f, -1044.938f, 29.37783f), InteractHeader = 243.6279f },
+                    new InteriorDoor(3142793112,new Vector3(149.6298f, -1037.231f, 29.71915f)){ DoorGroupName = "frontDoor",LockWhenClosed = true, InteractPostion = new Vector3(151.1552f, -1036.979f, 29.33911f), InteractHeader =  159.3992f } ,//Front Door1
+                    new InteriorDoor(73386408,new Vector3(152.0632f, -1038.124f, 29.71909f)) { DoorGroupName = "frontDoor",LockWhenClosed = true, InteractPostion = new Vector3(151.1552f, -1036.979f, 29.33911f), InteractHeader =  159.3992f } ,//Front Door2
+                    new InteriorDoor(4163212883, new Vector3(145.4186f,-1041.813f,29.64255f)) { LockWhenClosed = true,ForceRotateOpen = true, InteractPostion = new Vector3(144.9844f, -1041.089f, 29.36791f), InteractHeader = 246.9139f },//teller door
                 },
                 BankDrawerInteracts = new List<BankDrawerInteract>()
                 {
@@ -7484,10 +8471,10 @@ IsTrespassingWhenClosed = true,
                 IsTrespassingWhenClosed = true,IsWeaponRestricted = true,
                 SearchLocations = new List<Vector3>() { new Vector3(310.2834f, -276.4164f, 54.16457f) },
                 Doors =  new List<InteriorDoor>() {
-                    new InteriorDoor(2121050683,new Vector3(311.8455f, -283.0915f, 54.16475f)) { ForceRotateOpen = true, },
-                    new InteriorDoor(73386408,new Vector3(316.3925f, -276.4888f, 54.5158f)) { LockWhenClosed = true }, //Front Door1
-                    new InteriorDoor(3142793112,new Vector3(313.9587f, -275.5965f, 54.51586f)) { LockWhenClosed = true }, //Front Door2
-                    new InteriorDoor(4163212883, new Vector3(309.7491f, -280.1797f, 54.43926f)) { ForceRotateOpen = true },//teller door
+                    new InteriorDoor(2121050683,new Vector3(311.8455f, -283.0915f, 54.16475f)) { ForceRotateOpen = true, InteractPostion = new Vector3(311.313f, -283.8194f, 54.16523f), InteractHeader =  250.7064f },//Vault Door
+                    new InteriorDoor(73386408,new Vector3(316.3925f, -276.4888f, 54.5158f)) { DoorGroupName = "frontDoor",LockWhenClosed = true, InteractPostion = new Vector3(315.026f, -275.6472f, 53.92545f), InteractHeader =  165.5958f }, //Front Door1
+                    new InteriorDoor(3142793112,new Vector3(313.9587f, -275.5965f, 54.51586f)) { DoorGroupName = "frontDoor",LockWhenClosed = true, InteractPostion = new Vector3(315.026f, -275.6472f, 53.92545f), InteractHeader =  165.5958f }, //Front Door2
+                    new InteriorDoor(4163212883, new Vector3(309.7491f, -280.1797f, 54.43926f)) { ForceRotateOpen = true, InteractPostion = new Vector3(309.6064f, -279.3072f, 54.16461f), InteractHeader =  257.4634f },//teller door
                 },
                 BankDrawerInteracts = new List<BankDrawerInteract>()
                 {
@@ -7549,10 +8536,65 @@ IsTrespassingWhenClosed = true,
                IsTrespassingWhenClosed = true,IsWeaponRestricted = true,
                 SearchLocations = new List<Vector3>() { new Vector3(-2963.338f, 477.7827f, 15.69686f) },
                 Doors =  new List<InteriorDoor>() {
-                    new InteriorDoor(2121050683,new Vector3(-2957.66f, 482.8094f, 15.67528f)) { ForceRotateOpen = true, },
-                    new InteriorDoor(3142793112,new Vector3(-2965.821f, 481.6297f, 16.04816f)) { LockWhenClosed = true , CanBeForcedOpenByPlayer = true, }, //Front Door1
-                    new InteriorDoor(73386408,new Vector3(-2965.71f, 484.2195f, 16.0481f)) { LockWhenClosed = true, CanBeForcedOpenByPlayer = true, }, //Front Door2
-                    new InteriorDoor(4163212883, new Vector3(-2960.176f, 479.0105f, 15.97156f)) { ForceRotateOpen = true },//teller door
+                    new InteriorDoor(2121050683,new Vector3(-2957.66f, 482.8094f, 15.67528f)) { ForceRotateOpen = true, InteractPostion = new Vector3(-2957.055f, 481.725f, 15.69703f), InteractHeader =  351.4251f },//Vault Door sp door
+                    new InteriorDoor(3142793112,new Vector3(-2965.821f, 481.6297f, 16.04816f)) { DoorGroupName = "frontDoor",LockWhenClosed = true , CanBeForcedOpenByPlayer = true, InteractPostion = new Vector3(-2966.152f, 482.6152f, 15.69272f), InteractHeader =  269.5416f  }, //Front Door1
+                    new InteriorDoor(73386408,new Vector3(-2965.71f, 484.2195f, 16.0481f)) { DoorGroupName = "frontDoor",LockWhenClosed = true, CanBeForcedOpenByPlayer = true, InteractPostion = new Vector3(-2966.152f, 482.6152f, 15.69272f), InteractHeader =  269.5416f }, //Front Door2
+                    new InteriorDoor(4163212883, new Vector3(-2960.176f, 479.0105f, 15.97156f)) { ForceRotateOpen = true, InteractPostion = new Vector3(-2960.875f, 478.6606f, 15.69693f), InteractHeader =  357.0348f },//teller door
+                },
+                BankDrawerInteracts = new List<BankDrawerInteract>()
+                {
+                    new BankDrawerInteract("fleeca4Drawer1",new Vector3(-2960.644f, 482.839f, 15.69701f), 81.83675f,"Steal from Drawer") { AutoCamera = false },
+                },
+                InteractPoints = new List < InteriorInteract > () {
+                    new ItemTheftInteract() {
+                        PossibleItems = SafetyDepositBoxStealItems,
+                        MinItems = SafetyDepositBoxStealMinItems,
+                        MaxItems = SafetyDepositBoxStealMaxItems,
+                        ViolatingCrimeID = StaticStrings.ArmedRobberyCrimeID,
+                        Name = "fleeca4vaultleft",
+                        Position = NativeHelper.GetOffsetPosition(new Vector3( - 2954.013f, 486.0489f, 15.67541f),360f-358.9159f,-.4f),
+                        Heading = 358.9159f,
+                        ButtonPromptText = "Rob",
+                        UseNavmesh = false,
+                        HasPreInteractRequirement = true,
+                        ItemUsePreInteract = new DrillUsePreInteract(),
+                    },
+                    new ItemTheftInteract() {
+                        PossibleItems = SafetyDepositBoxStealItems,
+                        MinItems = SafetyDepositBoxStealMinItems,
+                        MaxItems = SafetyDepositBoxStealMaxItems,
+                        ViolatingCrimeID = StaticStrings.ArmedRobberyCrimeID,
+                        Name = "fleeca4vaultright",
+                        Position = NativeHelper.GetOffsetPosition(new Vector3( - 2954.152f, 482.4714f, 15.67532f),360f-171.9128f,-.4f),
+                        Heading = 171.9128f,
+                        ButtonPromptText = "Rob",
+                        UseNavmesh = false,
+                        HasPreInteractRequirement = true,
+                        ItemUsePreInteract = new DrillUsePreInteract(),
+                    },
+                    new ItemTheftInteract() {
+                        PossibleItems = SafetyDepositBoxStealItems,
+                        MinItems = SafetyDepositBoxStealMinItems,
+                        MaxItems = SafetyDepositBoxStealMaxItems,
+                        ViolatingCrimeID = StaticStrings.ArmedRobberyCrimeID,
+                        Name = "fleeca4vaulttop",
+                        Position = NativeHelper.GetOffsetPosition(new Vector3( - 2952.514f, 484.314f, 15.67538f),360f-264.5385f,-.4f),
+                        Heading = 264.5385f,
+                        ButtonPromptText = "Rob",
+                        UseNavmesh = false,
+                        HasPreInteractRequirement = true,
+                        ItemUsePreInteract = new DrillUsePreInteract(),
+                    },
+                },
+            },
+            new BankInterior(202262,"Fleeca Bank") { // duplicate for MP Vault door 
+               IsTrespassingWhenClosed = true,IsWeaponRestricted = true,
+                SearchLocations = new List<Vector3>() { new Vector3(-2963.338f, 477.7827f, 15.69686f) },
+                Doors =  new List<InteriorDoor>() {
+                    new InteriorDoor(4231427725,new Vector3(-2957.66f, 482.8094f, 15.67528f)) { ForceRotateOpen = true, InteractPostion = new Vector3(-2957.055f, 481.725f, 15.69703f), InteractHeader =  351.4251f },//Vault Door mp door
+                    new InteriorDoor(3142793112,new Vector3(-2965.821f, 481.6297f, 16.04816f)) { DoorGroupName = "frontDoor",LockWhenClosed = true , CanBeForcedOpenByPlayer = true, InteractPostion = new Vector3(-2966.152f, 482.6152f, 15.69272f), InteractHeader =  269.5416f  }, //Front Door1
+                    new InteriorDoor(73386408,new Vector3(-2965.71f, 484.2195f, 16.0481f)) { DoorGroupName = "frontDoor",LockWhenClosed = true, CanBeForcedOpenByPlayer = true, InteractPostion = new Vector3(-2966.152f, 482.6152f, 15.69272f), InteractHeader =  269.5416f }, //Front Door2
+                    new InteriorDoor(4163212883, new Vector3(-2960.176f, 479.0105f, 15.97156f)) { ForceRotateOpen = true, InteractPostion = new Vector3(-2960.875f, 478.6606f, 15.69693f), InteractHeader =  357.0348f },//teller door
                 },
                 BankDrawerInteracts = new List<BankDrawerInteract>()
                 {
@@ -7602,10 +8644,10 @@ IsTrespassingWhenClosed = true,
             },
             new BankInterior(90626,"Fleeca Bank") {
                IsTrespassingWhenClosed = true,IsWeaponRestricted = true, SearchLocations = new List<Vector3>() {new Vector3(1180.423f, 2705.902f, 38.08785f) }, Doors =  new List<InteriorDoor>() {
-                   new InteriorDoor(2121050683,new Vector3(1174.963f, 2711.711f, 38.06625f)) { ForceRotateOpen = true, },
-                   new InteriorDoor(3142793112,new Vector3(1176.495f, 2703.613f, 38.43911f)) { LockWhenClosed = true },
-                   new InteriorDoor(73386408,new Vector3(1173.903f, 2703.613f, 38.43904f)) { LockWhenClosed = true },
-                    new InteriorDoor(4163212883, new Vector3(1178.87f, 2709.365f, 38.36251f)) { ForceRotateOpen = true },//teller door
+                   new InteriorDoor(2121050683,new Vector3(1174.963f, 2711.711f, 38.06625f)) { ForceRotateOpen = true, InteractPostion = new Vector3(1176.058f, 2712.343f, 38.08799f), InteractHeader =  89.52586f }, // vault door
+                   new InteriorDoor(3142793112,new Vector3(1176.495f, 2703.613f, 38.43911f)) { DoorGroupName = "frontDoor",LockWhenClosed = true, InteractPostion = new Vector3(1175.468f, 2703.274f, 38.17256f), InteractHeader =  1.289581f },
+                   new InteriorDoor(73386408,new Vector3(1173.903f, 2703.613f, 38.43904f)) { DoorGroupName = "frontDoor",LockWhenClosed = true, InteractPostion = new Vector3(1175.468f, 2703.274f, 38.17256f), InteractHeader =  1.289581f },
+                    new InteriorDoor(4163212883, new Vector3(1178.87f, 2709.365f, 38.36251f)) { ForceRotateOpen = true, InteractPostion = new Vector3(1179.211f, 2708.674f, 38.08788f), InteractHeader =  93.75737f },//teller door
                 },
                 BankDrawerInteracts = new List<BankDrawerInteract>()
                 {
@@ -7655,10 +8697,10 @@ IsTrespassingWhenClosed = true,
             },
             new BankInterior(87810,"Fleeca Bank") {
                IsTrespassingWhenClosed = true,IsWeaponRestricted = true, SearchLocations = new List<Vector3>() {new Vector3(-1217.313f, -331.7081f, 37.7808f) }, Doors =  new List<InteriorDoor>() {
-                   new InteriorDoor(2121050683,new Vector3( - 1210.374f, -335.0283f, 37.75924f)) { ForceRotateOpen = true, },
-                   new InteriorDoor(3142793112,new Vector3(-1215.386f, -328.5237f, 38.13211f)) { LockWhenClosed = true },
-                   new InteriorDoor(73386408,new Vector3(-1213.074f, -327.3524f, 38.13205f)) { LockWhenClosed = true },
-                    new InteriorDoor(4163212883, new Vector3(-1214.906f, -334.7281f, 38.05551f)) { ForceRotateOpen = true },//teller door
+                   new InteriorDoor(2121050683,new Vector3(-1210.374f, -335.0283f, 37.75924f)) { ForceRotateOpen = true, InteractPostion = new Vector3(-1210.954f, -336.0472f, 37.78099f), InteractHeader =  300.011f},//vault door
+                   new InteriorDoor(3142793112,new Vector3(-1215.386f, -328.5237f, 38.13211f)) { DoorGroupName = "frontDoor",LockWhenClosed = true, InteractPostion = new Vector3(-1214.562f, -327.7575f, 37.72295f), InteractHeader =  211.7525f },
+                   new InteriorDoor(73386408,new Vector3(-1213.074f, -327.3524f, 38.13205f)) { DoorGroupName = "frontDoor",LockWhenClosed = true, InteractPostion = new Vector3(-1214.562f, -327.7575f, 37.72295f), InteractHeader =  211.7525f  },
+                    new InteriorDoor(4163212883, new Vector3(-1214.906f, -334.7281f, 38.05551f)) { ForceRotateOpen = true, InteractPostion = new Vector3(-1215.494f, -334.2195f, 37.78087f), InteractHeader =  298.9969f },//teller door
                 },
                 BankDrawerInteracts = new List<BankDrawerInteract>()
                 {
@@ -7713,29 +8755,29 @@ IsTrespassingWhenClosed = true,
                 IsTrespassingWhenClosed = true,IsWeaponRestricted = true,Doors =  new List<InteriorDoor>() {
 
 
-                    
-                    
 
 
 
 
-                    new InteriorDoor(2253282288,new Vector3(232.6054f, 214.1584f, 106.4049f)) { LockWhenClosed = true },//FRONT ENTRANCE RIGHT
-                    new InteriorDoor(2253282288,new Vector3(231.5075f, 216.5148f, 106.4049f)) { LockWhenClosed = true },//FRONT ENTRANCE LEFT
+                    new InteriorDoor(2253282288,new Vector3(232.6054f, 214.1584f, 106.4049f)) { DoorGroupName = "frontDoor",LockWhenClosed = true, InteractPostion = new Vector3(231.7552f, 214.8078f, 106.28f), InteractHeader =  301.2537f },//FRONT ENTRANCE RIGHT
+                    new InteriorDoor(2253282288,new Vector3(231.5075f, 216.5148f, 106.4049f)) { DoorGroupName = "frontDoor",LockWhenClosed = true, InteractPostion = new Vector3(231.7552f, 214.8078f, 106.28f), InteractHeader =  301.2537f },//FRONT ENTRANCE LEFT
 
-                    new InteriorDoor(1335309163,new Vector3(260.6518f, 203.2292f, 106.4328f)) { LockWhenClosed = true },//BACK ENTRANCE LEFT
-                    new InteriorDoor(1335309163,new Vector3(258.2093f, 204.119f, 106.4328f)) { LockWhenClosed = true },//BACK ENTRANCE RIGHT
+                    new InteriorDoor(1335309163,new Vector3(260.6518f, 203.2292f, 106.4328f)) { DoorGroupName = "frontDoor",LockWhenClosed = true, InteractPostion = new Vector3(259.5241f, 203.1226f, 106.2802f), InteractHeader =  344.0826f },//BACK ENTRANCE LEFT
+                    new InteriorDoor(1335309163,new Vector3(258.2093f, 204.119f, 106.4328f)) { DoorGroupName = "frontDoor",LockWhenClosed = true, InteractPostion = new Vector3(259.5241f, 203.1226f, 106.2802f), InteractHeader =  344.0826f },//BACK ENTRANCE RIGHT
 
-                    new InteriorDoor(1289409051,new Vector3(262.1981f, 222.5188f, 106.4296f)){ LockWhenClosed = true },//gate to teller
-                    new InteriorDoor(1655182495,new Vector3(251.8576f, 221.0655f, 101.8324f)){ LockWhenClosed = true },//FIRST GATE AFTER VAULT
-                    new InteriorDoor(1655182495,new Vector3(261.3004f, 214.5051f, 101.8324f)){ LockWhenClosed = true },//SECOND GATE AFTER VAULT
+                    //new InteriorDoor(4072696575,new Vector3(256.3116f, 220.6579f, 106.4296f)){ LockWhenClosed = true, InteractPostion = new Vector3(257.3379f, 219.594f, 106.2863f), InteractHeader =  340.1839f },// First gate to Teller area
+                    new InteriorDoor(1289409051,new Vector3(262.1981f, 222.5188f, 106.4296f)){ LockWhenClosed = true, InteractPostion = new Vector3(261.3234f, 221.3495f, 106.2831f), InteractHeader =  251.4932f }, // Second gate to Vault within teller area
+                    new InteriorDoor(1655182495,new Vector3(251.8576f, 221.0655f, 101.8324f)){ LockWhenClosed = true, InteractPostion = new Vector3(252.8438f, 221.1251f, 101.6834f), InteractHeader =  165.1844f }, // Third gate after Vault door
+                    new InteriorDoor(1655182495,new Vector3(261.3004f, 214.5051f, 101.8324f)){ LockWhenClosed = true, InteractPostion = new Vector3(261.2419f, 215.4917f, 101.6834f), InteractHeader =  253.4986f }, // Forth gate inside vault to Lockbox table
 
 
-                    new InteriorDoor(961976194,new Vector3(255.2283f, 223.976f, 102.3932f)) { ForceRotateOpen = true, LockWhenClosed = true, },//VAULT DOOR
+                    new InteriorDoor(961976194,new Vector3(255.2283f, 223.976f, 102.3932f)) { ForceRotateOpen = true, LockWhenClosed = true, InteractPostion = new Vector3(253.5679f, 225.1372f, 101.8757f), InteractHeader =  165.1394f },//VAULT DOOR
 
 
                     //new InteriorDoor(1956494919,new Vector3(266.3624f, 217.5697f, 110.4328f)) { ForceRotateOpen = true, LockWhenClosed = true, },//?
                     //new InteriorDoor(4072696575,new Vector3(256.3116f, 220.6579f, 106.4296f)) { ForceRotateOpen = true, LockWhenClosed = true, },//?
                     //new InteriorDoor(4072696575, new Vector3(256.3116f,220.6579f,106.4296f)) { LockWhenClosed = true },//teller door
+                    // 3048744503
                 },
                 BankDrawerInteracts = new List<BankDrawerInteract>()
                 {
@@ -7890,10 +8932,12 @@ IsTrespassingWhenClosed = true,
             },
 
             new BankInterior(42754,"Blaine County Savings") {
-                IsTrespassingWhenClosed = true,IsWeaponRestricted = true,SearchLocations = new List<Vector3>() {new Vector3(-106.8916f, 6474.261f, 31.62672f) }, Doors =  new List<InteriorDoor>() {
-                    new InteriorDoor(3110375179, new Vector3(-108.9147f,6469.105f,31.91028f)) { LockWhenClosed = true },//teller
-                    new InteriorDoor(2628496933, new Vector3(-109.65f,6462.11f,31.98499f)) { LockWhenClosed = true },//FRONT 1
-                    new InteriorDoor(3941780146, new Vector3(-111.48f,6463.94f,31.98499f)) { LockWhenClosed = true },//FRONT 2
+                IsTrespassingWhenClosed = true,IsWeaponRestricted = true,SearchLocations = new List<Vector3>() {new Vector3(-106.8916f, 6474.261f, 31.62672f) },
+                Doors =  new List<InteriorDoor>()
+                {
+                    new InteriorDoor(3110375179, new Vector3(-108.9147f,6469.105f,31.91028f)) { LockWhenClosed = true, InteractPostion = new Vector3(-109.216f, 6468.348f, 31.62672f), InteractHeader =  46.74528f },//teller
+                    new InteriorDoor(2628496933, new Vector3(-109.65f,6462.11f,31.98499f)) { DoorGroupName = "frontDoor",LockWhenClosed = true, InteractPostion = new Vector3(-110.5739f, 6462.542f, 31.64077f), InteractHeader =  316.1779f },//FRONT 1
+                    new InteriorDoor(3941780146, new Vector3(-111.48f,6463.94f,31.98499f)) { DoorGroupName = "frontDoor",LockWhenClosed = true, InteractPostion = new Vector3(-110.5739f, 6462.542f, 31.64077f), InteractHeader =  316.1779f },//FRONT 2
                 },
                 BankDrawerInteracts = new List<BankDrawerInteract>()
                 {
@@ -7945,751 +8989,497 @@ IsTrespassingWhenClosed = true,
     }
     private void ClothingShops()
     {
+        List<TheftInteractItem> VangelicoPossibleItems = new List<TheftInteractItem>() {
+                                new TheftInteractItem() {
+                                    ModItemName = "Fake Gold Ring",
+                                    MinItems = 6,
+                                    MaxItems = 6,
+                                    Percentage = 100,
+                                },
+                                new TheftInteractItem() {
+                                    ModItemName = "Gold Ring",
+                                    MinItems = 8,
+                                    MaxItems = 8,
+                                    Percentage = 100,
+                                },
+                                new TheftInteractItem() {
+                                    ModItemName = "Fake Silver Ring",
+                                    MinItems = 3,
+                                    MaxItems = 3,
+                                    Percentage = 100,
+                                },
+                                new TheftInteractItem() {
+                                    ModItemName = "Silver Ring",
+                                    MinItems = 5,
+                                    MaxItems = 5,
+                                    Percentage = 100,
+                                }
+                                };
+
+        ItemUsePreInteract SmashGlassPreInteract = new AnimationPreInteract() { StartAnimations = new List<AnimationBundle>() { new AnimationBundle("missheist_jewel", "fp_smash_case_necklace", 16, 8.0f, -8.0f) } };
+
         PossibleInteriors.GeneralInteriors.AddRange(new List<Interior>()
         {
-                new Interior(82690, "Vangelico")
+                
+        });
+
+
+        PossibleInteriors.ClothingShopInteriors.AddRange(new List<ClothingShopInterior>()
+        {
+            new ClothingShopInterior(14338,"Ponsonby Rockford Hills")
+            {
+                IsTrespassingWhenClosed = true,
+                IsWeaponRestricted = true,
+                Doors = new List<InteriorDoor>() {
+                    new InteriorDoor(2372686273,new Vector3(-715.6154f, -157.2561f, 37.67493f)) { InteractPostion = new Vector3(-717.0651f, -157.011f, 36.98803f), InteractHeader = 300.4046f, CanBeForcedOpenByPlayer = true },
+                    new InteriorDoor(2372686273,new Vector3(-716.6755f, -155.42f, 37.67493f)) { InteractPostion = new Vector3(-717.0651f, -157.011f, 36.98803f), InteractHeader = 300.4046f, CanBeForcedOpenByPlayer = true }, },
+                TryOnInteracts = new List<TryOnInteract>()
                 {
-                    LocalID = 82690,
-                    Name = "Vangelico",
-                    Doors = new List<InteriorDoor>()
-                    {
-                        new InteriorDoor()
-                        {
-                            Position = new Vector3(-631.1723f, -236.7114f, 38.06244f),
-                            LockWhenClosed = true,
-                        },
-                        new InteriorDoor()
-                        {
-                            Position = new Vector3(-630.4095f, -237.7712f, 38.0971f),
-                            LockWhenClosed = true,
-                        },
-                    },
-                    IsTrespassingWhenClosed = true,IsWeaponRestricted = true,
-                    InteractPoints = new List<InteriorInteract>()
-                    {
-                        new ItemTheftInteract() {
-                            PossibleItems = new List < TheftInteractItem > () {
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Gold Ring",
-                                    MinItems = 6,
-                                    MaxItems = 6,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Gold Ring",
-                                    MinItems = 8,
-                                    MaxItems = 8,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Silver Ring",
-                                    MinItems = 3,
-                                    MaxItems = 3,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Silver Ring",
-                                    MinItems = 5,
-                                    MaxItems = 5,
-                                    Percentage = 100,
-                                },
-                            },
-                            MinItems = 4,
-                            MaxItems = 5,
-                            ViolatingCrimeID = "JewelRobbery",
-                            Name = "vngFrontR1",
-                            Position = new Vector3( - 626.624f, -238.5478f, 38.05702f),
-                            Heading = 211.9446f,
-                            ButtonPromptText = "Rob",
-                            UseNavmesh = false,
-                        },
-                        new ItemTheftInteract() {
-                            PossibleItems = new List < TheftInteractItem > () {
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Gold Ring",
-                                    MinItems = 6,
-                                    MaxItems = 6,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Gold Ring",
-                                    MinItems = 8,
-                                    MaxItems = 8,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Silver Ring",
-                                    MinItems = 3,
-                                    MaxItems = 3,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Silver Ring",
-                                    MinItems = 5,
-                                    MaxItems = 5,
-                                    Percentage = 100,
-                                },
-                            },
-                            MinItems = 4,
-                            MaxItems = 5,
-                            ViolatingCrimeID = "JewelRobbery",
-                            Name = "vngFrontR2",
-                            Position = new Vector3( - 625.6374f, -237.7162f, 38.05702f),
-                            Heading = 207.4052f,
-                            ButtonPromptText = "Rob",
-                            UseNavmesh = false,
-                        },
-                        new ItemTheftInteract() {
-                            PossibleItems = new List < TheftInteractItem > () {
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Gold Ring",
-                                    MinItems = 6,
-                                    MaxItems = 6,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Gold Ring",
-                                    MinItems = 8,
-                                    MaxItems = 8,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Silver Ring",
-                                    MinItems = 3,
-                                    MaxItems = 3,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Silver Ring",
-                                    MinItems = 5,
-                                    MaxItems = 5,
-                                    Percentage = 100,
-                                },
-                            },
-                            MinItems = 4,
-                            MaxItems = 5,
-                            ViolatingCrimeID = "JewelRobbery",
-                            Name = "vngMidL1",
-                            Position = new Vector3( - 627.9446f, -233.8257f, 38.05702f),
-                            Heading = 212.1647f,
-                            ButtonPromptText = "Rob",
-                            UseNavmesh = false,
-                        },
-                        new ItemTheftInteract() {
-                            PossibleItems = new List < TheftInteractItem > () {
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Gold Ring",
-                                    MinItems = 6,
-                                    MaxItems = 6,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Gold Ring",
-                                    MinItems = 8,
-                                    MaxItems = 8,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Silver Ring",
-                                    MinItems = 3,
-                                    MaxItems = 3,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Silver Ring",
-                                    MinItems = 5,
-                                    MaxItems = 5,
-                                    Percentage = 100,
-                                },
-                            },
-                            MinItems = 4,
-                            MaxItems = 5,
-                            ViolatingCrimeID = "JewelRobbery",
-                            Name = "vngMidL2",
-                            Position = new Vector3( - 626.9693f, -233.037f, 38.05702f),
-                            Heading = 212.0368f,
-                            ButtonPromptText = "Rob",
-                            UseNavmesh = false,
-                        },
-                        new ItemTheftInteract() {
-                            PossibleItems = new List < TheftInteractItem > () {
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Gold Ring",
-                                    MinItems = 6,
-                                    MaxItems = 6,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Gold Ring",
-                                    MinItems = 8,
-                                    MaxItems = 8,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Silver Ring",
-                                    MinItems = 3,
-                                    MaxItems = 3,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Silver Ring",
-                                    MinItems = 5,
-                                    MaxItems = 5,
-                                    Percentage = 100,
-                                },
-                            },
-                            MinItems = 4,
-                            MaxItems = 5,
-                            ViolatingCrimeID = "JewelRobbery",
-                            Name = "vngMidR1",
-                            Position = new Vector3( - 626.7f, -235.4685f, 38.05702f),
-                            Heading = 33.27945f,
-                            ButtonPromptText = "Rob",
-                            UseNavmesh = false,
-                        },
-                        new ItemTheftInteract() {
-                            PossibleItems = new List < TheftInteractItem > () {
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Gold Ring",
-                                    MinItems = 6,
-                                    MaxItems = 6,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Gold Ring",
-                                    MinItems = 8,
-                                    MaxItems = 8,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Silver Ring",
-                                    MinItems = 3,
-                                    MaxItems = 3,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Silver Ring",
-                                    MinItems = 5,
-                                    MaxItems = 5,
-                                    Percentage = 100,
-                                },
-                            },
-                            MinItems = 4,
-                            MaxItems = 5,
-                            ViolatingCrimeID = "JewelRobbery",
-                            Name = "vngMidR2",
-                            Position = new Vector3( - 625.7751f, -234.5709f, 38.05702f),
-                            Heading = 32.57174f,
-                            ButtonPromptText = "Rob",
-                            UseNavmesh = false,
-                        },
-                        new ItemTheftInteract() {
-                            PossibleItems = new List < TheftInteractItem > () {
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Gold Ring",
-                                    MinItems = 6,
-                                    MaxItems = 6,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Gold Ring",
-                                    MinItems = 8,
-                                    MaxItems = 8,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Silver Ring",
-                                    MinItems = 3,
-                                    MaxItems = 3,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Silver Ring",
-                                    MinItems = 5,
-                                    MaxItems = 5,
-                                    Percentage = 100,
-                                },
-                            },
-                            MinItems = 4,
-                            MaxItems = 5,
-                            ViolatingCrimeID = "JewelRobbery",
-                            Name = "vngCenter1",
-                            Position = new Vector3( - 623.116f, -233.0139f, 38.05702f),
-                            Heading = 306.5918f,
-                            ButtonPromptText = "Rob",
-                            UseNavmesh = false,
-                        },
-                        new ItemTheftInteract() {
-                            PossibleItems = new List < TheftInteractItem > () {
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Gold Ring",
-                                    MinItems = 6,
-                                    MaxItems = 6,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Gold Ring",
-                                    MinItems = 8,
-                                    MaxItems = 8,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Silver Ring",
-                                    MinItems = 3,
-                                    MaxItems = 3,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Silver Ring",
-                                    MinItems = 5,
-                                    MaxItems = 5,
-                                    Percentage = 100,
-                                },
-                            },
-                            MinItems = 4,
-                            MaxItems = 5,
-                            ViolatingCrimeID = "JewelRobbery",
-                            Name = "vngCenter2",
-                            Position = new Vector3( - 620.101f, -233.5278f, 38.05702f),
-                            Heading = 37.02949f,
-                            ButtonPromptText = "Rob",
-                            UseNavmesh = false,
-                        },
-                        new ItemTheftInteract() {
-                            PossibleItems = new List < TheftInteractItem > () {
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Gold Ring",
-                                    MinItems = 6,
-                                    MaxItems = 6,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Gold Ring",
-                                    MinItems = 8,
-                                    MaxItems = 8,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Silver Ring",
-                                    MinItems = 3,
-                                    MaxItems = 3,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Silver Ring",
-                                    MinItems = 5,
-                                    MaxItems = 5,
-                                    Percentage = 100,
-                                },
-                            },
-                            MinItems = 4,
-                            MaxItems = 5,
-                            ViolatingCrimeID = "JewelRobbery",
-                            Name = "vngCenter3",
-                            Position = new Vector3( - 619.5614f, -230.3965f, 38.05702f),
-                            Heading = 126.2357f,
-                            ButtonPromptText = "Rob",
-                            UseNavmesh = false,
-                        },
-                        new ItemTheftInteract() {
-                            PossibleItems = new List < TheftInteractItem > () {
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Gold Ring",
-                                    MinItems = 6,
-                                    MaxItems = 6,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Gold Ring",
-                                    MinItems = 8,
-                                    MaxItems = 8,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Silver Ring",
-                                    MinItems = 3,
-                                    MaxItems = 3,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Silver Ring",
-                                    MinItems = 5,
-                                    MaxItems = 5,
-                                    Percentage = 100,
-                                },
-                            },
-                            MinItems = 4,
-                            MaxItems = 5,
-                            ViolatingCrimeID = "JewelRobbery",
-                            Name = "vngCenter4",
-                            Position = new Vector3( - 621.0455f, -228.5942f, 38.05702f),
-                            Heading = 122.6166f,
-                            ButtonPromptText = "Rob",
-                            UseNavmesh = false,
-                        },
-                        new ItemTheftInteract() {
-                            PossibleItems = new List < TheftInteractItem > () {
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Gold Ring",
-                                    MinItems = 6,
-                                    MaxItems = 6,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Gold Ring",
-                                    MinItems = 8,
-                                    MaxItems = 8,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Silver Ring",
-                                    MinItems = 3,
-                                    MaxItems = 3,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Silver Ring",
-                                    MinItems = 5,
-                                    MaxItems = 5,
-                                    Percentage = 100,
-                                },
-                            },
-                            MinItems = 4,
-                            MaxItems = 5,
-                            ViolatingCrimeID = "JewelRobbery",
-                            Name = "vngCenter5",
-                            Position = new Vector3( - 624.0377f, -228.1052f, 38.05702f),
-                            Heading = 217.7205f,
-                            ButtonPromptText = "Rob",
-                            UseNavmesh = false,
-                        },
-                        new ItemTheftInteract() {
-                            PossibleItems = new List < TheftInteractItem > () {
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Gold Ring",
-                                    MinItems = 6,
-                                    MaxItems = 6,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Gold Ring",
-                                    MinItems = 8,
-                                    MaxItems = 8,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Silver Ring",
-                                    MinItems = 3,
-                                    MaxItems = 3,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Silver Ring",
-                                    MinItems = 5,
-                                    MaxItems = 5,
-                                    Percentage = 100,
-                                },
-                            },
-                            MinItems = 4,
-                            MaxItems = 5,
-                            ViolatingCrimeID = "JewelRobbery",
-                            Name = "vngCenter6",
-                            Position = new Vector3( - 624.5729f, -231.036f, 38.05702f),
-                            Heading = 307.6254f,
-                            ButtonPromptText = "Rob",
-                            UseNavmesh = false,
-                        },
-                        new ItemTheftInteract() {
-                            PossibleItems = new List < TheftInteractItem > () {
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Gold Ring",
-                                    MinItems = 6,
-                                    MaxItems = 6,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Gold Ring",
-                                    MinItems = 8,
-                                    MaxItems = 8,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Silver Ring",
-                                    MinItems = 3,
-                                    MaxItems = 3,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Silver Ring",
-                                    MinItems = 5,
-                                    MaxItems = 5,
-                                    Percentage = 100,
-                                },
-                            },
-                            MinItems = 4,
-                            MaxItems = 5,
-                            ViolatingCrimeID = "JewelRobbery",
-                            Name = "vngOuter1",
-                            Position = new Vector3( - 624.9713f, -227.9358f, 38.05702f),
-                            Heading = 35.42755f,
-                            ButtonPromptText = "Rob",
-                            UseNavmesh = false,
-                        },
-                        new ItemTheftInteract() {
-                            PossibleItems = new List < TheftInteractItem > () {
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Gold Ring",
-                                    MinItems = 6,
-                                    MaxItems = 6,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Gold Ring",
-                                    MinItems = 8,
-                                    MaxItems = 8,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Silver Ring",
-                                    MinItems = 3,
-                                    MaxItems = 3,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Silver Ring",
-                                    MinItems = 5,
-                                    MaxItems = 5,
-                                    Percentage = 100,
-                                },
-                            },
-                            MinItems = 4,
-                            MaxItems = 5,
-                            ViolatingCrimeID = "JewelRobbery",
-                            Name = "vngOuter2",
-                            Position = new Vector3( - 623.9496f, -227.0906f, 38.05702f),
-                            Heading = 34.9143f,
-                            ButtonPromptText = "Rob",
-                            UseNavmesh = false,
-                        },
-                        new ItemTheftInteract() {
-                            PossibleItems = new List < TheftInteractItem > () {
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Gold Ring",
-                                    MinItems = 6,
-                                    MaxItems = 6,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Gold Ring",
-                                    MinItems = 8,
-                                    MaxItems = 8,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Silver Ring",
-                                    MinItems = 3,
-                                    MaxItems = 3,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Silver Ring",
-                                    MinItems = 5,
-                                    MaxItems = 5,
-                                    Percentage = 100,
-                                },
-                            },
-                            MinItems = 4,
-                            MaxItems = 5,
-                            ViolatingCrimeID = "JewelRobbery",
-                            Name = "vngOuter3",
-                            Position = new Vector3( - 620.6199f, -226.6056f, 38.05702f),
-                            Heading = 306.7109f,
-                            ButtonPromptText = "Rob",
-                            UseNavmesh = false,
-                        },
-                        new ItemTheftInteract() {
-                            PossibleItems = new List < TheftInteractItem > () {
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Gold Ring",
-                                    MinItems = 6,
-                                    MaxItems = 6,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Gold Ring",
-                                    MinItems = 8,
-                                    MaxItems = 8,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Silver Ring",
-                                    MinItems = 3,
-                                    MaxItems = 3,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Silver Ring",
-                                    MinItems = 5,
-                                    MaxItems = 5,
-                                    Percentage = 100,
-                                },
-                            },
-                            MinItems = 4,
-                            MaxItems = 5,
-                            ViolatingCrimeID = "JewelRobbery",
-                            Name = "vngOuter4",
-                            Position = new Vector3( - 619.5996f, -227.6832f, 38.05702f),
-                            Heading = 297.4792f,
-                            ButtonPromptText = "Rob",
-                            UseNavmesh = false,
-                        },
-                        new ItemTheftInteract() {
-                            PossibleItems = new List < TheftInteractItem > () {
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Gold Ring",
-                                    MinItems = 6,
-                                    MaxItems = 6,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Gold Ring",
-                                    MinItems = 8,
-                                    MaxItems = 8,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Silver Ring",
-                                    MinItems = 3,
-                                    MaxItems = 3,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Silver Ring",
-                                    MinItems = 5,
-                                    MaxItems = 5,
-                                    Percentage = 100,
-                                },
-                            },
-                            MinItems = 4,
-                            MaxItems = 5,
-                            ViolatingCrimeID = "JewelRobbery",
-                            Name = "vngOuter5",
-                            Position = new Vector3( - 618.4504f, -229.4612f, 38.05702f),
-                            Heading = 296.6827f,
-                            ButtonPromptText = "Rob",
-                            UseNavmesh = false,
-                        },
-                        new ItemTheftInteract() {
-                            PossibleItems = new List < TheftInteractItem > () {
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Gold Ring",
-                                    MinItems = 6,
-                                    MaxItems = 6,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Gold Ring",
-                                    MinItems = 8,
-                                    MaxItems = 8,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Silver Ring",
-                                    MinItems = 3,
-                                    MaxItems = 3,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Silver Ring",
-                                    MinItems = 5,
-                                    MaxItems = 5,
-                                    Percentage = 100,
-                                },
-                            },
-                            MinItems = 4,
-                            MaxItems = 5,
-                            ViolatingCrimeID = "JewelRobbery",
-                            Name = "vngOuter6",
-                            Position = new Vector3( - 617.5781f, -230.695f, 38.05702f),
-                            Heading = 296.4518f,
-                            ButtonPromptText = "Rob",
-                            UseNavmesh = false,
-                        },
-                        new ItemTheftInteract() {
-                            PossibleItems = new List < TheftInteractItem > () {
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Gold Ring",
-                                    MinItems = 6,
-                                    MaxItems = 6,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Gold Ring",
-                                    MinItems = 8,
-                                    MaxItems = 8,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Silver Ring",
-                                    MinItems = 3,
-                                    MaxItems = 3,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Silver Ring",
-                                    MinItems = 5,
-                                    MaxItems = 5,
-                                    Percentage = 100,
-                                },
-                            },
-                            MinItems = 4,
-                            MaxItems = 5,
-                            ViolatingCrimeID = "JewelRobbery",
-                            Name = "vngOuter7",
-                            Position = new Vector3( - 619.2208f, -233.6226f, 38.05702f),
-                            Heading = 216.0172f,
-                            ButtonPromptText = "Rob",
-                            UseNavmesh = false,
-                        },
-                        new ItemTheftInteract() {
-                            PossibleItems = new List < TheftInteractItem > () {
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Gold Ring",
-                                    MinItems = 6,
-                                    MaxItems = 6,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Gold Ring",
-                                    MinItems = 8,
-                                    MaxItems = 8,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Fake Silver Ring",
-                                    MinItems = 3,
-                                    MaxItems = 3,
-                                    Percentage = 100,
-                                },
-                                new TheftInteractItem() {
-                                    ModItemName = "Silver Ring",
-                                    MinItems = 5,
-                                    MaxItems = 5,
-                                    Percentage = 100,
-                                },
-                            },
-                            MinItems = 4,
-                            MaxItems = 5,
-                            ViolatingCrimeID = "JewelRobbery",
-                            Name = "vngOuter8",
-                            Position = new Vector3( - 620.0914f, -234.3648f, 38.05702f),
-                            Heading = 213.1084f,
-                            ButtonPromptText = "Rob",
-                            UseNavmesh = false,
-                        },
+                    new TryOnInteract("ponsonbys1TryOn1",new Vector3(-708.5226f, -160.4232f, 37.41514f), 28.45096f,"Try On Clothes")
+                },
             },
+            new ClothingShopInterior(6914,"Ponsonby Burton")
+            {
+                IsTrespassingWhenClosed = true,
+                IsWeaponRestricted = true,
+                Doors = new List<InteriorDoor>() {
+                    new InteriorDoor(2372686273,new Vector3(-157.1293f, -306.4341f, 39.99308f)) { InteractPostion = new Vector3(-156.4969f, -305.4415f, 39.7325f), InteractHeader = 68.95364f, CanBeForcedOpenByPlayer = true },
+                    new InteriorDoor(2372686273,new Vector3(-156.439f, -304.4294f, 39.99308f)) { InteractPostion = new Vector3(-156.4969f, -305.4415f, 39.7325f), InteractHeader = 68.95364f, CanBeForcedOpenByPlayer = true }, },
+                TryOnInteracts = new List<TryOnInteract>()
+                {
+                    new TryOnInteract("ponsonbys2TryOn1",new Vector3(-158.8961f, -297.3741f, 39.73328f), 159.3769f,"Try On Clothes")
+                },
+            },
+            new ClothingShopInterior(1282,"Ponsonby Morningwood")
+            {
+                IsTrespassingWhenClosed = true,
+                IsWeaponRestricted = true,
+                Doors = new List<InteriorDoor>() {
+                    new InteriorDoor(2372686273,new Vector3(-1456.201f, -233.3682f, 50.05648f)) { InteractPostion = new Vector3(-1455.84f, -232.4067f, 49.7874f), InteractHeader = 225.6414f, CanBeForcedOpenByPlayer = true },
+                    new InteriorDoor(2372686273,new Vector3(-1454.782f, -231.7927f, 50.05649f)) { InteractPostion = new Vector3(-1455.84f, -232.4067f, 49.7874f), InteractHeader = 225.6414f, CanBeForcedOpenByPlayer = true }, },
+                TryOnInteracts = new List<TryOnInteract>()
+                {
+                    new TryOnInteract("ponsonbys3TryOn1",new Vector3(-1456.604f, -241.297f, 49.80648f), 309.7452f,"Try On Clothes")
+                },
+            },
+
+            new ClothingShopInterior(74754,"Discount Store Paleto Bay") 
+            {
+                IsTrespassingWhenClosed = true, 
+                IsWeaponRestricted = true,
+                Doors = new List<InteriorDoor>()
+                {
+                    new InteriorDoor(3146141106,new Vector3(-1.725257f, 6515.914f, 32.02779f)) { InteractPostion = new Vector3(-1.122339f, 6517.009f, 31.86892f), InteractHeader = 222.1187f, CanBeForcedOpenByPlayer = true, NeedsDefaultUnlock = true },
+                    new InteriorDoor(868499217,new Vector3(-0.05637074f, 6517.461f, 32.02779f)) { InteractPostion = new Vector3(-1.122339f, 6517.009f, 31.86892f), InteractHeader = 222.1187f, CanBeForcedOpenByPlayer = true, NeedsDefaultUnlock = true },
+                },
+                TryOnInteracts = new List<TryOnInteract>()
+                {
+                    new TryOnInteract("discountStorePaletoTryOn1",new Vector3(12.02322f, 6513.735f, 31.87785f), 79.29751f,"Try On Clothes")
+                }
+            },
+            new ClothingShopInterior(88066,"Discount Store Strawberry")
+            {
+                IsTrespassingWhenClosed = true,
+                IsWeaponRestricted = true,
+                Doors = new List<InteriorDoor>()
+                {
+                    new InteriorDoor(868499217,new Vector3(82.38156f, -1392.752f, 29.52609f)) { InteractPostion = new Vector3(82.79227f, -1391.628f, 29.40493f), InteractHeader = 88.64867f, CanBeForcedOpenByPlayer = true, NeedsDefaultUnlock = true },
+                    new InteriorDoor(3146141106,new Vector3(82.38156f, -1390.476f, 29.52609f)) { InteractPostion = new Vector3(82.79227f, -1391.628f, 29.40493f), InteractHeader = 88.64867f, CanBeForcedOpenByPlayer = true, NeedsDefaultUnlock = true },
+                },
+                TryOnInteracts = new List<TryOnInteract>()
+                {
+                    new TryOnInteract("discountStoreStrawTryOn1",new Vector3(72.11845f, -1398.747f, 29.37615f), 303.7002f,"Try On Clothes")
+                }
+            },
+            new ClothingShopInterior(66562,"Discount Store Great Chaparral")
+            {
+                IsTrespassingWhenClosed = true,
+                IsWeaponRestricted = true,
+                Doors = new List<InteriorDoor>()
+                {
+                    new InteriorDoor(3146141106,new Vector3(-1094.965f, 2706.964f, 19.25781f)) { InteractPostion = new Vector3(-1095.473f, 2705.865f, 19.08511f), InteractHeader = 43.60182f, CanBeForcedOpenByPlayer = true, NeedsDefaultUnlock = true },
+                    new InteriorDoor(868499217,new Vector3(-1096.661f, 2705.446f, 19.25781f)) { InteractPostion = new Vector3(-1095.473f, 2705.865f, 19.08511f), InteractHeader = 43.60182f, CanBeForcedOpenByPlayer = true, NeedsDefaultUnlock = true },
+                },
+                TryOnInteracts = new List<TryOnInteract>()
+                {
+                    new TryOnInteract("discountStoreGCTryOn1",new Vector3(-1108.125f, 2709.05f, 19.10787f), 252.9805f,"Try On Clothes")
+                }
+            },
+            new ClothingShopInterior(118274,"Discount Store Harmony")
+            {
+                IsTrespassingWhenClosed = true,
+                IsWeaponRestricted = true,
+                Doors = new List<InteriorDoor>()
+                {
+                    new InteriorDoor(868499217,new Vector3(1196.825f, 2703.221f, 38.37257f)) { InteractPostion = new Vector3(1198.058f, 2702.745f, 38.15594f), InteractHeader = 357.7278f, CanBeForcedOpenByPlayer = true, NeedsDefaultUnlock = true },
+                    new InteriorDoor(3146141106,new Vector3(1199.101f, 2703.221f, 38.37257f)) { InteractPostion = new Vector3(1198.058f, 2702.745f, 38.15594f), InteractHeader = 357.7278f, CanBeForcedOpenByPlayer = true, NeedsDefaultUnlock = true },
+                },
+                TryOnInteracts = new List<TryOnInteract>()
+                {
+                    new TryOnInteract("discountStoreHarmonyTryOn1",new Vector3(1190.782f, 2713.385f, 38.22264f), 211.2059f,"Try On Clothes")
+                }
+            },
+            new ClothingShopInterior(60930,"Discount Store Grapeseed")
+            {
+                IsTrespassingWhenClosed = true,
+                IsWeaponRestricted = true,
+                Doors = new List<InteriorDoor>()
+                {
+                    new InteriorDoor(868499217,new Vector3(1686.983f, 4821.741f, 42.21305f)) { InteractPostion = new Vector3(1686.615f, 4820.476f, 41.97727f), InteractHeader = 278.0056f, CanBeForcedOpenByPlayer = true, NeedsDefaultUnlock = true },
+                    new InteriorDoor(3146141106,new Vector3(1687.282f, 4819.485f, 42.21305f)) { InteractPostion = new Vector3(1686.615f, 4820.476f, 41.97727f), InteractHeader = 278.0056f, CanBeForcedOpenByPlayer = true, NeedsDefaultUnlock = true },
+                },
+                TryOnInteracts = new List<TryOnInteract>()
+                {
+                    new TryOnInteract("discountStoreGrapeseedTryOn1",new Vector3(1696.029f, 4828.994f, 42.06308f), 122.3131f,"Try On Clothes")
+                }
+            },
+
+            new ClothingShopInterior(22786, "BINCO Textile City")
+            {
+                IsTrespassingWhenClosed = true,
+                IsWeaponRestricted = true,
+                Doors = new List<InteriorDoor>() {
+                    new InteriorDoor(3146141106, new Vector3(418.5713f,-808.674f,29.64108f)) { InteractPostion = new Vector3(417.3003f, -807.5683f, 29.39348f), InteractHeader = 265.3372f, CanBeForcedOpenByPlayer = true },
+                    new InteriorDoor(868499217, new Vector3(418.5713f,-806.3979f,29.64108f)) { InteractPostion = new Vector3(417.3003f, -807.5683f, 29.39348f), InteractHeader = 265.3372f, CanBeForcedOpenByPlayer = true }, },
+                TryOnInteracts = new List<TryOnInteract>()
+                {
+                    new TryOnInteract("bincoTextileTryOn1",new Vector3(428.8834f, -800.1843f, 29.49114f), 117.8901f,"Try On Clothes")
+                },
+            },
+            new ClothingShopInterior(17154, "BINCO Vespucci Canals")
+            {
+                IsTrespassingWhenClosed = true,
+                IsWeaponRestricted = true,
+                Doors = new List<InteriorDoor>() {
+                    new InteriorDoor(3146141106,new Vector3(-816.7932f, -1078.406f, 11.47806f)) { InteractPostion = new Vector3(-817.2803f, -1079.706f, 11.13252f), InteractHeader = 31.24407f, CanBeForcedOpenByPlayer = true },
+                    new InteriorDoor(868499217,new Vector3(-818.7643f, -1079.544f, 11.47806f)) { InteractPostion = new Vector3(-817.2803f, -1079.706f, 11.13252f), InteractHeader = 31.24407f, CanBeForcedOpenByPlayer = true }, },
+                TryOnInteracts = new List<TryOnInteract>()
+                {
+                    new TryOnInteract("bincoTextileTryOn1",new Vector3(-829.1951f, -1073.354f, 11.32811f), 242.6806f,"Try On Clothes")
+                },
+            },
+
+            new ClothingShopInterior(96258,"Sub Urban Harmony") 
+            {
+                IsTrespassingWhenClosed = true,
+                IsWeaponRestricted = true,
+                Doors = new List<InteriorDoor>()
+                {
+                    new InteriorDoor(1780022985,new Vector3(617.2458f, 2751.022f, 42.75777f)) { InteractPostion = new Vector3(618.3388f, 2750.28f, 42.08902f), InteractHeader = 3.158015f, CanBeForcedOpenByPlayer = true, NeedsDefaultUnlock = true },
+                },
+                TryOnInteracts = new List<TryOnInteract>()
+                {
+                    new TryOnInteract("suburbanHarmonyTryOn1",new Vector3(617.6456f, 2766.707f, 42.08809f), 178.6625f,"Try On Clothes")
+                }
+            },
+            new ClothingShopInterior(19458,"Sub Urban Hawick") 
+            {
+                IsTrespassingWhenClosed = true,
+                IsWeaponRestricted = true,
+                Doors = new List<InteriorDoor>() {
+                    new InteriorDoor(1780022985,new Vector3(127.8201f, -211.8274f, 55.22751f)) { InteractPostion = new Vector3(127.2825f, -210.7146f, 54.53591f), InteractHeader = 163.3276f, CanBeForcedOpenByPlayer = true },
+                },
+                TryOnInteracts = new List<TryOnInteract>()
+                {
+                    new TryOnInteract("suburabnHawickTryon1",new Vector3(120.9149f, -226.3024f, 54.55783f), 331.6808f,"Try On Clothes")
+                }, 
+            },
+            new ClothingShopInterior(10754,"Sub Urban Del Perro") 
+            {
+                IsTrespassingWhenClosed = true,
+                IsWeaponRestricted = true,
+                Doors = new List<InteriorDoor>() {
+                    new InteriorDoor(1780022985,new Vector3(-1201.435f, -776.8566f, 17.99184f)) { InteractPostion = new Vector3(-1201.684f, -777.8245f, 17.33805f), InteractHeader = 304.0914f, CanBeForcedOpenByPlayer = true },
+                },
+                TryOnInteracts = new List<TryOnInteract>()
+                {
+                    new TryOnInteract("suburabnDelPerroTryon1",new Vector3(-1188.012f, -768.5594f, 17.32509f), 123.6756f,"Try On Clothes")
+                },
+            },
+            new ClothingShopInterior(87554,"Sub Urban Chumash") 
+            {
+                IsTrespassingWhenClosed = true,
+                IsWeaponRestricted = true,
+                Doors = new List<InteriorDoor>() {
+                    new InteriorDoor(1780022985,new Vector3(-3167.75f, 1055.536f, 21.53288f)) { InteractPostion = new Vector3(-3168.201f, 1056.333f, 20.859f), InteractHeader = 156.0671f, CanBeForcedOpenByPlayer = true },
+                },
+                TryOnInteracts = new List<TryOnInteract>()
+                {
+                    new TryOnInteract("suburabnChumashTryon1",new Vector3(-3175.308f, 1041.788f, 20.86321f), 333.3165f,"Try On Clothes")
+                },
+            },
+
+            new ClothingShopInterior(-9932,"Vespucci Movie Masks")
+            {
+                TryOnInteracts = new List<TryOnInteract>()
+                {
+                    new TryOnInteract("vespucciMasksTryOn1",new Vector3(-1336.679f, -1277.453f, 4.877134f), 100.7063f,"Try On Masks")
+                },
+            },
+            new ClothingShopInterior(-9931,"Sanders Motorcycles Clothing")
+            {
+                TryOnInteracts = new List<TryOnInteract>()
+                {
+                    new TryOnInteract("sandersHelmetTryOn1",new Vector3(268.8374f, -1155.124f, 29.29159f), 86.83341f,"Try On Helmets")
+                },
+            },
+
+            new ClothingShopInterior(82690, "Vangelico")
+            {
+                LocalID = 82690,
+                Name = "Vangelico",
+                RequestIPLs = new List<string>() {"post_hiest_unload" },
+                RemoveIPLs = new List<string>()
+                {
+                        "jewel2fake","bh1_16_refurb","bh1_16_doors_shut",
+                },
+                Doors = new List<InteriorDoor>()
+                {
+                    new InteriorDoor(1425919976,new Vector3(-631.9554f, -236.3333f, 38.20653f))
+                    {
+                        //Position = //Position = new Vector3(-631.1723f, -236.7114f, 38.06244f),
+                        DoorGroupName = "frontDoor",LockWhenClosed = true,InteractPostion = new Vector3(-632.0832f, -237.9074f, 38.07156f), InteractHeader = 305.3878f,
+                    },
+                    new InteriorDoor(9467943,new Vector3(-630.4265f, -238.4375f, 38.20653f))
+                    {
+                        //Position = new Vector3(-630.4095f, -237.7712f, 38.0971f),
+                        DoorGroupName = "frontDoor",LockWhenClosed = true,InteractPostion = new Vector3(-632.0832f, -237.9074f, 38.07156f), InteractHeader = 305.3878f,
+                    },
+                },
+                IsTrespassingWhenClosed = true,
+                IsWeaponRestricted = true,
+                TryOnInteracts = new List<TryOnInteract>()
+                {
+                    new TryOnInteract("vengelicoTryOn1",new Vector3(-624.6606f, -232.5115f, 38.05705f), 117.1027f,"Try On Clothes")
+                },
+                InteractPoints = new List<InteriorInteract>()
+                {
+                    new ItemTheftInteract() {
+
+                        PossibleItems = VangelicoPossibleItems,
+                        MinItems = 4,
+                        MaxItems = 5,
+                        ViolatingCrimeID = StaticStrings.TheftCrimeID,
+                        Name = "vngFrontR1",
+                        Position = new Vector3( - 626.624f, -238.5478f, 38.05702f),
+                        Heading = 211.9446f,
+                        ButtonPromptText = "Rob",
+                        UseNavmesh = false,
+                    },
+                    new ItemTheftInteract() {
+
+                        PossibleItems = VangelicoPossibleItems,
+                        MinItems = 4,
+                        MaxItems = 5,
+                        ViolatingCrimeID = StaticStrings.TheftCrimeID,
+                        Name = "vngFrontR2",
+                        Position = new Vector3( - 625.6374f, -237.7162f, 38.05702f),
+                        Heading = 207.4052f,
+                        ButtonPromptText = "Rob",
+                        UseNavmesh = false,
+                    },
+                    new ItemTheftInteract() {
+                        PossibleItems = VangelicoPossibleItems,
+                        MinItems = 4,
+                        MaxItems = 5,
+                        ViolatingCrimeID = StaticStrings.TheftCrimeID,
+                        Name = "vngMidL1",
+                        Position = new Vector3( - 627.9446f, -233.8257f, 38.05702f),
+                        Heading = 212.1647f,
+                        ButtonPromptText = "Rob",
+                        UseNavmesh = false,
+                    },
+                    new ItemTheftInteract() {
+                        PossibleItems = VangelicoPossibleItems,
+                        MinItems = 4,
+                        MaxItems = 5,
+                        ViolatingCrimeID = StaticStrings.TheftCrimeID,
+                        Name = "vngMidL2",
+                        Position = new Vector3( - 626.9693f, -233.037f, 38.05702f),
+                        Heading = 212.0368f,
+                        ButtonPromptText = "Rob",
+                        UseNavmesh = false,
+                    },
+                    new ItemTheftInteract() {
+                        PossibleItems = VangelicoPossibleItems,
+                        MinItems = 4,
+                        MaxItems = 5,
+                        ViolatingCrimeID = StaticStrings.TheftCrimeID,
+                        Name = "vngMidR1",
+                        Position = new Vector3( - 626.7f, -235.4685f, 38.05702f),
+                        Heading = 33.27945f,
+                        ButtonPromptText = "Rob",
+                        UseNavmesh = false,
+                    },
+                    new ItemTheftInteract() {
+                        PossibleItems = VangelicoPossibleItems,
+                        MinItems = 4,
+                        MaxItems = 5,
+                        ViolatingCrimeID = StaticStrings.TheftCrimeID,
+                        Name = "vngMidR2",
+                        Position = new Vector3( - 625.7751f, -234.5709f, 38.05702f),
+                        Heading = 32.57174f,
+                        ButtonPromptText = "Rob",
+                        UseNavmesh = false,
+                    },
+                    new ItemTheftInteract() {
+                        PossibleItems = VangelicoPossibleItems,
+                        MinItems = 4,
+                        MaxItems = 5,
+                        ViolatingCrimeID = StaticStrings.TheftCrimeID,
+                        Name = "vngCenter1",
+                        Position = new Vector3( - 623.116f, -233.0139f, 38.05702f),
+                        Heading = 306.5918f,
+                        ButtonPromptText = "Rob",
+                        UseNavmesh = false,
+                    },
+                    new ItemTheftInteract() {
+                        PossibleItems = VangelicoPossibleItems,
+                        MinItems = 4,
+                        MaxItems = 5,
+                        ViolatingCrimeID = StaticStrings.TheftCrimeID,
+                        Name = "vngCenter2",
+                        Position = new Vector3( - 620.101f, -233.5278f, 38.05702f),
+                        Heading = 37.02949f,
+                        ButtonPromptText = "Rob",
+                        UseNavmesh = false,
+                    },
+                    new ItemTheftInteract() {
+                        PossibleItems = VangelicoPossibleItems,
+                        MinItems = 4,
+                        MaxItems = 5,
+                        ViolatingCrimeID = StaticStrings.TheftCrimeID,
+                        Name = "vngCenter3",
+                        Position = new Vector3( - 619.5614f, -230.3965f, 38.05702f),
+                        Heading = 126.2357f,
+                        ButtonPromptText = "Rob",
+                        UseNavmesh = false,
+                    },
+                    new ItemTheftInteract() {
+                        PossibleItems = VangelicoPossibleItems,
+                        MinItems = 4,
+                        MaxItems = 5,
+                        ViolatingCrimeID = StaticStrings.TheftCrimeID,
+                        Name = "vngCenter4",
+                        Position = new Vector3( - 621.0455f, -228.5942f, 38.05702f),
+                        Heading = 122.6166f,
+                        ButtonPromptText = "Rob",
+                        UseNavmesh = false,
+                    },
+                    new ItemTheftInteract() {
+                        PossibleItems = VangelicoPossibleItems,
+                        MinItems = 4,
+                        MaxItems = 5,
+                        ViolatingCrimeID = StaticStrings.TheftCrimeID,
+                        Name = "vngCenter5",
+                        Position = new Vector3( - 624.0377f, -228.1052f, 38.05702f),
+                        Heading = 217.7205f,
+                        ButtonPromptText = "Rob",
+                        UseNavmesh = false,
+                    },
+                    new ItemTheftInteract() {
+                        PossibleItems = VangelicoPossibleItems,
+                        MinItems = 4,
+                        MaxItems = 5,
+                        ViolatingCrimeID = StaticStrings.TheftCrimeID,
+                        Name = "vngCenter6",
+                        Position = new Vector3( - 624.5729f, -231.036f, 38.05702f),
+                        Heading = 307.6254f,
+                        ButtonPromptText = "Rob",
+                        UseNavmesh = false,
+                    },
+                    new ItemTheftInteract() {
+                        PossibleItems = VangelicoPossibleItems,
+                        MinItems = 4,
+                        MaxItems = 5,
+                        ViolatingCrimeID = StaticStrings.TheftCrimeID,
+                        Name = "vngOuter1",
+                        Position = new Vector3( - 624.9713f, -227.9358f, 38.05702f),
+                        Heading = 35.42755f,
+                        ButtonPromptText = "Rob",
+                        UseNavmesh = false,
+                    },
+                    new ItemTheftInteract() {
+                        PossibleItems = VangelicoPossibleItems,
+                        MinItems = 4,
+                        MaxItems = 5,
+                        ViolatingCrimeID = StaticStrings.TheftCrimeID,
+                        Name = "vngOuter2",
+                        Position = new Vector3( - 623.9496f, -227.0906f, 38.05702f),
+                        Heading = 34.9143f,
+                        ButtonPromptText = "Rob",
+                        UseNavmesh = false,
+                    },
+                    new ItemTheftInteract() {
+                        PossibleItems = VangelicoPossibleItems,
+                        MinItems = 4,
+                        MaxItems = 5,
+                        ViolatingCrimeID = StaticStrings.TheftCrimeID,
+                        Name = "vngOuter3",
+                        Position = new Vector3( - 620.6199f, -226.6056f, 38.05702f),
+                        Heading = 306.7109f,
+                        ButtonPromptText = "Rob",
+                        UseNavmesh = false,
+                    },
+                    new ItemTheftInteract() {
+                        PossibleItems = VangelicoPossibleItems,
+                        MinItems = 4,
+                        MaxItems = 5,
+                        ViolatingCrimeID = StaticStrings.TheftCrimeID,
+                        Name = "vngOuter4",
+                        Position = new Vector3( - 619.5996f, -227.6832f, 38.05702f),
+                        Heading = 297.4792f,
+                        ButtonPromptText = "Rob",
+                        UseNavmesh = false,
+                    },
+                    new ItemTheftInteract() {
+                        PossibleItems = VangelicoPossibleItems,
+                        MinItems = 4,
+                        MaxItems = 5,
+                        ViolatingCrimeID = StaticStrings.TheftCrimeID,
+                        Name = "vngOuter5",
+                        Position = new Vector3( - 618.4504f, -229.4612f, 38.05702f),
+                        Heading = 296.6827f,
+                        ButtonPromptText = "Rob",
+                        UseNavmesh = false,
+                    },
+                    new ItemTheftInteract() {
+                        PossibleItems = VangelicoPossibleItems,
+                        MinItems = 4,
+                        MaxItems = 5,
+                        ViolatingCrimeID = StaticStrings.TheftCrimeID,
+                        Name = "vngOuter6",
+                        Position = new Vector3( - 617.5781f, -230.695f, 38.05702f),
+                        Heading = 296.4518f,
+                        ButtonPromptText = "Rob",
+                        UseNavmesh = false,
+                    },
+                    new ItemTheftInteract() {
+                        PossibleItems = VangelicoPossibleItems,
+                        MinItems = 4,
+                        MaxItems = 5,
+                        ViolatingCrimeID = StaticStrings.TheftCrimeID,
+                        Name = "vngOuter7",
+                        Position = new Vector3( - 619.2208f, -233.6226f, 38.05702f),
+                        Heading = 216.0172f,
+                        ButtonPromptText = "Rob",
+                        UseNavmesh = false,
+                    },
+                    new ItemTheftInteract() {
+                        PossibleItems = VangelicoPossibleItems,
+                        MinItems = 4,
+                        MaxItems = 5,
+                        ViolatingCrimeID = StaticStrings.TheftCrimeID,
+                        Name = "vngOuter8",
+                        Position = new Vector3( - 620.0914f, -234.3648f, 38.05702f),
+                        Heading = 213.1084f,
+                        ButtonPromptText = "Rob",
+                        UseNavmesh = false,
+                    },
+        },
             }
         });
+
     }
     private void Other()
     {
@@ -8763,14 +9553,14 @@ new Vector3(-1051.115f, -237.8116f, 44.02106f), } } ,
 
 
                 Doors = new List<InteriorDoor>() {
-                    new InteriorDoor(812467272,new Vector3(-589.5225f, -1621.513f, 33.16225f)),//Inside
-                    new InteriorDoor(812467272,new Vector3(-590.8179f, -1621.425f, 33.16282f)),//Inside
+                    //new InteriorDoor(812467272,new Vector3(-589.5225f, -1621.513f, 33.16225f)), //Inside Which SIDE?
+                    //new InteriorDoor(812467272,new Vector3(-590.8179f, -1621.425f, 33.16282f)),//Inside  to add Interact
 
-                    new InteriorDoor(2667367614,new Vector3(-611.32f, -1610.089f, 27.15894f)),//Front Outside R
-                    new InteriorDoor(1099436502,new Vector3(-608.7289f, -1610.315f, 27.15894f)),//Front Ouitside L
-
-                    new InteriorDoor(2667367614,new Vector3(-592.7109f, -1628.986f, 27.15931f)),//Rear Outside R
-                    new InteriorDoor(1099436502,new Vector3(-592.9376f, -1631.577f, 27.15931f)),//Rear Ouitside L
+                    new InteriorDoor(2667367614,new Vector3(-611.32f, -1610.089f, 27.15894f)){ InteractPostion = new Vector3(-610.2036f, -1609.855f, 26.89858f), InteractHeader =  173.3626f},//Front Outside R
+                    new InteriorDoor(1099436502,new Vector3(-608.7289f, -1610.315f, 27.15894f)){ InteractPostion = new Vector3(-610.2036f, -1609.855f, 26.89858f), InteractHeader =  173.3626f},//Front Ouitside L
+                    // But what do we do about inside..pick one side run through to locked other end - unable to break open 
+                    new InteriorDoor(2667367614,new Vector3(-592.7109f, -1628.986f, 27.15931f)){ InteractPostion = new Vector3(-592.5037f, -1630.089f, 26.98354f), InteractHeader =  90.08755f},//Rear Outside R
+                    new InteriorDoor(1099436502,new Vector3(-592.9376f, -1631.577f, 27.15931f)){ InteractPostion = new Vector3(-592.5037f, -1630.089f, 26.98354f), InteractHeader =  90.08755f},//Rear Ouitside L
                     //doors dont stay open
 
                 },
@@ -8781,7 +9571,7 @@ new Vector3(-1051.115f, -237.8116f, 44.02106f), } } ,
 
 
 
-
+            new Interior(19381,"Auto Shop",new List<string>() { "bkr_bi_id1_23_door" }), // Vagos Den Rear Garage door
 
             //.
 
@@ -8861,10 +9651,29 @@ new Vector3(-1051.115f, -237.8116f, 44.02106f), } } ,
                 InteriorEgressHeading =  5.70763f,
                 InteriorSets = new List<string>() { "counterfeit_upgrade_equip_no_prod", "counterfeit_upgrade_equip", "counterfeit_security", "dryera_on", "dryerb_open", "dryerc_on", "dryerd_off", "counterfeit_cashpile10a", "counterfeit_cashpile20c", "counterfeit_cashpile100d", "special_chairs", "money_cutter", "counterfeit_setup"},
                 RequestIPLs = new List<string>() { "bkr_biker_interior_placement_interior_5_biker_dlc_int_ware04_milo"},
+                AudioEmitters = new List<AudioEmitter>()
+                {
+                    new AudioEmitter($"se_dlc_biker_cash_warehouse_radio","Radio"),
+                },
+                PropSpawns = new List<PropSpawn>()
+                {
+                     new PropSpawn("m24_1_prop_m41_radio_01a", new SpawnPlace(new Vector3(1130.2f, -3193.3f, -40.59289f), 0f)),
+                },
                 InteractPoints = new List<InteriorInteract>()
                 {
                     new ExitInteriorInteract("CounterfeitExit",new Vector3(1138.092f, -3199.069f, -39.66568f), 185.5803f,"Exit"),
                     new StandardInteriorInteract("CounterfeitStandard",new Vector3(1129.54f, -3194.124f, -40.39639f), 355.4791f,"Manage"),
+                    new AudioEmitterInteract()
+                    {
+                        Name = "CounterfeitRadio1",
+                        Position = new Vector3(1130.326f, -3194.299f, -40.39745f),
+                        Heading =  358.9831f,
+                        ButtonPromptText = "Radio Control",
+                        UseNavmesh = false,
+                        CameraPosition = new Vector3(1132.12f, -3195.095f, -39.3692f),
+                        CameraDirection = new Vector3(-0.6912193f, 0.6331462f, -0.3483415f),
+                        CameraRotation = new Rotator(-20.38591f, 9.108204E-07f, 47.5108f),
+                    },
                 }
             },
             new BusinessInterior(247553, "Cocaine Lockup")
@@ -8874,6 +9683,14 @@ new Vector3(-1051.115f, -237.8116f, 44.02106f), } } ,
                 InteriorEgressHeading = 181.0876f,
                 InteriorSets = new List<string>() { "set_up", "equipment_upgrade", "coke_press_upgrade", "production_upgrade", "table_equipment_upgrade", "coke_cut_04", "coke_cut_05", "coke_cut_01", "coke_cut_02", "coke_cut_03", "security_high"},
                 RequestIPLs = new List<string>() { "bkr_biker_interior_placement_interior_4_biker_dlc_int_ware03_milo"},
+                AudioEmitters = new List<AudioEmitter>()
+                {
+                    new AudioEmitter($"se_dlc_biker_crack_warehouse_radio","Radio"),
+                },
+                PropSpawns = new List<PropSpawn>()
+                {
+                     new PropSpawn("m24_1_prop_m41_radio_01a", new SpawnPlace(new Vector3(1086.3f, -3195.56f, -39.192215f), 91.99965f)){PlaceOnGround = true },
+                },
                 InteractPoints = new List<InteriorInteract>()
                 {
                     new ExitInteriorInteract("CocaineExit",new Vector3(1088.67f, -3187.556f, -38.99346f), 1.538507f,"Exit"),
@@ -8881,7 +9698,18 @@ new Vector3(-1051.115f, -237.8116f, 44.02106f), } } ,
                     new CraftInteriorInteract ("DrugLab",new Vector3(1092.968f, -3194.928f, -38.99347f), 279.6992f, "DrugLab")
                     {
                          CraftingFlag = "DrugLab"
-                    }
+                    },
+                    new AudioEmitterInteract()
+                    {
+                        Name = "CocaineRadio1",
+                        Position = new Vector3(1087.207f, -3195.511f, -38.99347f),
+                        Heading =  90.19034f,
+                        ButtonPromptText = "Radio Control",
+                        UseNavmesh = false,
+                        CameraPosition = new Vector3(1088.283f, -3196.731f, -37.97078f),
+                        CameraDirection = new Vector3(-0.7004394f, 0.5336794f, -0.4738892f),
+                        CameraRotation = new Rotator(-28.28705f, 3.296481E-05f, 52.69547f),
+                    },
                 }
             },
             new BusinessInterior(246785, "Document forgery")
@@ -8891,10 +9719,29 @@ new Vector3(-1051.115f, -237.8116f, 44.02106f), } } ,
                 InteriorEgressHeading = 91.33833f,
                 InteriorSets = new List<string>() { "interior_upgrade", "equipment_upgrade", "security_high", "table_equipment_upgrade", "chair01", "chair02", "chair03", "chair04", "chair05", "chair06", "chair07", "production", "set_up", "clutter"},
                 RequestIPLs = new List<string>() { "bkr_biker_interior_placement_interior_6_biker_dlc_int_ware05_milo"},
+                AudioEmitters = new List<AudioEmitter>()
+                {
+                    new AudioEmitter($"se_dlc_biker_fakeid_warehouse_radio","Radio"),
+                },
+                PropSpawns = new List<PropSpawn>()
+                {
+                     new PropSpawn("v_res_fh_speakerdock", new SpawnPlace(new Vector3(1156.13f, -3196.93f, -38.04f), 91.75924f)),
+                },
                 InteractPoints = new List<InteriorInteract>()
                 {
                     new ExitInteriorInteract("DocumentForgeryExit",new Vector3(1173.632f, -3196.689f, -39.00798f), 271.3391f,"Exit"),
                     new StandardInteriorInteract("DocumentForgeryStandard",new Vector3(1160.249f, -3192.299f, -39.00798f), 186.1683f,"Manage"),
+                    new AudioEmitterInteract()
+                    {
+                        Name = "DocumentForgeryRadio1",
+                        Position = new Vector3(1156.776f, -3196.856f, -39.00798f),
+                        Heading =  91.06123f,
+                        ButtonPromptText = "Radio Control",
+                        UseNavmesh = false,
+                        CameraPosition = new Vector3(1157.675f, -3197.823f, -37.88883f),
+                        CameraDirection = new Vector3(-0.7669014f, 0.5397997f, -0.3471001f),
+                        CameraRotation = new Rotator(-20.31005f, -1.820747E-06f, 54.85939f),
+                    },
                 }
             },
             new BusinessInterior(247041, "Meth Lab")
@@ -8904,14 +9751,38 @@ new Vector3(-1051.115f, -237.8116f, 44.02106f), } } ,
                 InteriorEgressHeading = 272.8723f,
                 InteriorSets = new List<string>() { "meth_lab_upgrade", "meth_lab_setup", "meth_lab_security_high", "meth_lab_production"},
                 RequestIPLs = new List<string>() { "bkr_biker_interior_placement_interior_2_biker_dlc_int_ware01_milo"},
+                AudioEmitters = new List<AudioEmitter>()
+                {
+                    new AudioEmitter($"se_dlc_biker_meth_warehouse_radio","Radio"),
+                },
+                PropSpawns = new List<PropSpawn>()
+                {
+                     new PropSpawn("m24_1_prop_m41_radio_01a", new SpawnPlace(new Vector3(1001.65f, -3193.79f, -39.19f), 17.5f)),
+                },
                 InteractPoints = new List<InteriorInteract>()
                 {
                     new ExitInteriorInteract("MethLabExit",new Vector3(996.9594f, -3200.593f, -36.39368f), 94.21133f,"Exit"),
-                    new StandardInteriorInteract("MethLabStandard",new Vector3(1005.692f, -3200.322f, -38.51932f), 190.0661f,"Manage"),
-                    new CraftInteriorInteract ("DrugLab",new Vector3(1014.268f, -3195.008f, -38.99316f), 359.6527f, "DrugLab")
+                    new StandardInteriorInteract("MethLabStandard",new Vector3(1001.982f, -3194.954f, -38.99316f), 3.439017f ,"Manage")
+                    {
+                        CameraPosition = new Vector3(1001.73f, -3195.208f, -37.38067f),
+                        CameraDirection = new Vector3(0.8510147f, -0.5243264f, -0.02925463f),
+                        CameraRotation = new Rotator(-1.676406f, 6.384691E-05f, -121.638f)
+                    },
+                    new CraftInteriorInteract ("DrugLab",new Vector3(1005.692f, -3200.322f, -38.51932f), 190.0661f, "DrugLab")
                     {
                          CraftingFlag = "DrugLab"
-                    }
+                    },
+                    new AudioEmitterInteract()
+                    {
+                        Name = "MethLabRadio1",
+                        Position = new Vector3(1003.062f, -3194.952f, -38.99313f),
+                        Heading =  3.272231f,
+                        ButtonPromptText = "Radio Control",
+                        UseNavmesh = false,
+                        CameraPosition = new Vector3(1001.739f, -3196.129f, -38.1144f),
+                        CameraDirection = new Vector3(0.5848997f, 0.7280532f, -0.3575346f),
+                        CameraRotation = new Rotator(-20.94887f, -9.142023E-07f, -38.77752f),
+                    },
                 }
             },
             new BusinessInterior(247297, "Weed Farm")
@@ -8921,6 +9792,15 @@ new Vector3(-1051.115f, -237.8116f, 44.02106f), } } ,
                 InteriorEgressHeading = 89.46977f,
                 InteriorSets = new List<string>() { "weed_upgrade_equip", "weed_security_upgrade", "weed_growtha_stage3", "light_growtha_stage23_upgrade", "weed_hosea", "weed_growtha_stage3", "light_growthb_stage23_upgrade", "weed_hoseb", "weed_growthc_stage3", "light_growthc_stage23_upgrade", "weed_hosec", "weed_growthd_stage3", "light_growthd_stage23_upgrade", "weed_hosed", "weed_growthe_stage3", "light_growthe_stage23_upgrade", "weed_hosee", "weed_growthf_stage3", "light_growthf_stage23_upgrade", "weed_hosef", "weed_growthg_stage3", "light_growthg_stage23_upgrade", "weed_hoseg", "weed_growthh_stage3", "light_growthh_stage23_upgrade", "weed_hoseh", "weed_growthi_stage3", "light_growthi_stage23_upgrade", "weed_hosei", "weed_production", "weed_set_up", "weed_drying", "weed_chairs"},
                 RequestIPLs = new List<string>() { "bkr_biker_interior_placement_interior_3_biker_dlc_int_ware02_milo"},
+                AudioEmitters = new List<AudioEmitter>()
+                {
+                    new AudioEmitter($"se_dlc_biker_weed_warehouse_radio","Radio"),
+                },
+                PropSpawns = new List<PropSpawn>()
+                {
+                     new PropSpawn("bkr_prop_weed_table_01a", new SpawnPlace(new Vector3(1036.34f, -3202.96f, -39.12f), 0f)),
+                     new PropSpawn("prop_ghettoblast_02", new SpawnPlace(new Vector3(1030.7f, -3204.5f, -38.142086f), 89f)) {PlaceOnGround = true },
+                },
                 InteractPoints = new List<InteriorInteract>()
                 {
                     new ExitInteriorInteract("WeedFarmExit",new Vector3(1066.195f, -3183.523f, -39.16362f), 268.3729f,"Exit"),
@@ -8928,7 +9808,18 @@ new Vector3(-1051.115f, -237.8116f, 44.02106f), } } ,
                     new CraftInteriorInteract ("DrugLab",new Vector3(1036.391f, -3203.718f, -38.17331f), 356.0549f, "DrugLab")
                     {
                          CraftingFlag = "DrugLab"
-                    }
+                    },
+                    new AudioEmitterInteract()
+                    {
+                        Name = "WeedFarmRadio1",
+                        Position = new Vector3(1031.277f, -3204.524f, -38.19125f),
+                        Heading =  88.37627f,
+                        ButtonPromptText = "Radio Control",
+                        UseNavmesh = false,
+                        CameraPosition = new Vector3(1032.336f, -3206.212f, -37.1574f),
+                        CameraDirection = new Vector3(-0.5777964f, 0.7016782f, -0.4168921f),
+                        CameraRotation = new Rotator(-24.63853f, -1.127148E-05f, 39.46973f),
+                    },
                 }
             },
             new BusinessInterior(252673, "Chop Shop")
@@ -8938,12 +9829,127 @@ new Vector3(-1051.115f, -237.8116f, 44.02106f), } } ,
                 InteriorEgressHeading = 180.365f,
                 InteriorSets = new List<string>() { "basic_style_set", "door_blocker"},
                 RequestIPLs = new List<string>() { "imp_impexp_interior_placement_interior_1_impexp_intwaremedmilo"},
+                AudioEmitters = new List<AudioEmitter>()
+                {
+                    new AudioEmitter($"dlc_ie_warehouse_radio_01","Radio"),
+                },
+                PropSpawns = new List<PropSpawn>()
+                {
+                     new PropSpawn("imp_prop_covered_vehicle_01a", new SpawnPlace(new Vector3(998.444031f, -3027.13477f, -37.8815155f), 1.99999857f)),
+                     new PropSpawn("imp_prop_covered_vehicle_01a", new SpawnPlace(new Vector3(998.4199f, -2991.657f, -40.6270866f), -88.99975f)),
+                     new PropSpawn("imp_prop_covered_vehicle_01a", new SpawnPlace(new Vector3(967.7358f, -3035.998f, -37.8815155f), 3.00044513f)),
+                     new PropSpawn("imp_prop_covered_vehicle_03a", new SpawnPlace(new Vector3(993.159f, -3026.787f, -37.8815155f), 0f)),
+                     new PropSpawn("imp_prop_covered_vehicle_03a", new SpawnPlace(new Vector3(955.1808f, -3023.62524f, -37.8815155f), -87.99966f)),
+                     new PropSpawn("imp_prop_covered_vehicle_03a", new SpawnPlace(new Vector3(998.2717f, -3004.65f, -40.6469765f), -86.99776f)),
+                     new PropSpawn("imp_prop_covered_vehicle_04a", new SpawnPlace(new Vector3(1008.51489f, -3021.986f, -40.6469765f), -92.9996948f)),
+                     new PropSpawn("imp_prop_covered_vehicle_05a", new SpawnPlace(new Vector3(977.9007f, -3030.784f, -40.6469765f), -88.99962f)),
+                     new PropSpawn("imp_prop_covered_vehicle_06a", new SpawnPlace(new Vector3(997.9313f, -3013.1f, -40.6469765f), -89.99959f)),
+                     new PropSpawn("imp_prop_covered_vehicle_06a", new SpawnPlace(new Vector3(1003.8584f, -3026.89282f, -37.8815155f), 179.999252f)),
+                     new PropSpawn("imp_prop_covered_vehicle_07a", new SpawnPlace(new Vector3(998.5535f, -2995.5f, -40.6469765f), 89.00046f)),
+                     new PropSpawn("imp_prop_covered_vehicle_07a", new SpawnPlace(new Vector3(963.4733f, -3035.95459f, -37.8815155f), 179.999619f)),
+                },
                 InteractPoints = new List<InteriorInteract>()
                 {
                     new ExitInteriorInteract("ChopShopExit",new Vector3(970.9332f, -2987.278f, -39.64696f), 0.9743451f,"Exit"),
                     new StandardInteriorInteract("ChopShopStandard",new Vector3(965.5502f, -3003.387f, -39.63989f), 267.6558f,"Manage"),
-                }
+                    new AudioEmitterInteract()
+                    {
+                        Name = "ChopShopRadio1",
+                        Position = new Vector3(968.4355f, -3000.947f, -39.64696f),
+                        Heading =  91.22874f,
+                        ButtonPromptText = "Radio Control",
+                        UseNavmesh = false,
+                        CameraPosition = new Vector3(970.0283f, -3002.324f, -38.76684f),
+                        CameraDirection = new Vector3(-0.7414564f, 0.5899757f, -0.3196422f),
+                        CameraRotation = new Rotator(-18.64129f, 7.208352E-06f, 51.49079f),
+                    },
+                },
+                RestInteracts = new List<RestInteract>()
+                {
+                    new RestInteract("ChopShopRest1", new Vector3(959.6868f, -3000.77f, -39.63989f), 86.98959f,"Rest") //used couch,bed has clipping issues
+                    {
+                        CameraPosition = new Vector3(961.5975f, -3001.641f, -38.34194f),
+                        CameraDirection = new Vector3(-0.8738775f, 0.3507931f, -0.3365744f),
+                        CameraRotation = new Rotator(-19.6683f, 1.360008E-06f, 68.12842f),
+                        StartAnimations = new List<AnimationBundle>()
+                        {
+                            new AnimationBundle("savecouch@", "t_getin_couch", (int)(eAnimationFlags.AF_HOLD_LAST_FRAME | eAnimationFlags.AF_TURN_OFF_COLLISION), 4.0f, -4.0f) { Gender = "U" }
+                        },
+                        LoopAnimations = new List<AnimationBundle>()
+                        {
+                            new AnimationBundle("savecouch@", "t_sleep_loop_couch", (int)(eAnimationFlags.AF_LOOPING | eAnimationFlags.AF_TURN_OFF_COLLISION), 4.0f, -4.0f) { Gender = "U" }
+                        },
+                        EndAnimations = new List<AnimationBundle>()
+                        {
+                            new AnimationBundle("savecouch@", "t_getout_couch", (int)(eAnimationFlags.AF_HOLD_LAST_FRAME | eAnimationFlags.AF_TURN_OFF_COLLISION), 4.0f, -4.0f) { Gender = "U" }
+                        },
+                        UseDefaultAnimations = false,
+                    },
+                },
+                OutfitInteracts = new List<OutfitInteract>()
+                {
+                    new OutfitInteract("ChopShopOutfit",new Vector3(958.7991f, -3005.179f, -39.63989f), 268.0839f,"Change Outfit")
+                    {
+                        CameraPosition = new Vector3(961.2792f, -3005.627f, -38.95876f),
+                        CameraDirection = new Vector3(-0.9396999f, 0.196931f, -0.2796109f),
+                        CameraRotation = new Rotator(-16.23699f, -1.556174E-05f, 78.16393f)
+                    }
+                },
             },
+            new BusinessInterior(298497, "Car Wash")
+            {
+                IsTeleportEntry = true,
+                InteriorEgressPosition = new Vector3(26.00592f, -1402.265f, -73.99987f),
+                InteriorEgressHeading = 2.192509f,
+                InteriorSets = new List<string>() { "set_carwash_tints"},
+                RequestIPLs = new List<string>() { "m25_1_carwash"},
+                InteriorTintColor = 6,
+                AudioEmitters = new List<AudioEmitter>()
+                {
+                    new AudioEmitter($"se_m25_1_int_tycoon_car_wash_gtamloroom003","Radio"),
+                },
+                PropSpawns = new List<PropSpawn>()
+                {
+                     new PropSpawn("p_clb_officechair_s", new SpawnPlace(new Vector3(24.0621262f, -1400.7699f, -74.9999f), -148.739349f)),
+                     new PropSpawn("p_clb_officechair_s", new SpawnPlace(new Vector3(22.9341831f, -1396.99707f, -74.99724f), 36.6240578f)),
+                     new PropSpawn("imp_prop_covered_vehicle_07a", new SpawnPlace(new Vector3(15.0238409f, -1399.77136f, -72.99987f), -88.05887f)) {PlaceOnGround = true },
+                     new PropSpawn("prop_ghettoblast_02", new SpawnPlace(new Vector3(19.56f, -1400f, -73.93f), -90.9999542f)),
+                },
+                InteractPoints = new List<InteriorInteract>()
+                {
+                    new ExitInteriorInteract("CarWashExit",new Vector3(26.00592f, -1402.265f, -73.99987f), 170.6572f,"Exit"),
+                    new StandardInteriorInteract("CarWashStandard",new Vector3(23.45037f, -1397.562f, -73.99987f), 185.7595f,"Manage"){AutoCamera = false},
+                    new AudioEmitterInteract()
+                    {
+                        Name = "CarWashRadio1",
+                        Position = new Vector3(18.86604f, -1400.047f, -73.98971f),
+                        Heading =  271.4521f,
+                        ButtonPromptText = "Radio Control",
+                        UseNavmesh = false,
+                        CameraPosition = new Vector3(17.99178f, -1398.559f, -73.0472f),
+                        CameraDirection = new Vector3(0.5267783f, -0.7415139f, -0.4155259f),
+                        CameraRotation = new Rotator(-24.55244f, -3.097527E-05f, -144.6097f),
+                    },
+                },
+                RestInteracts = new List<RestInteract>()
+                {
+                    new RestInteract("CarWashRest",new Vector3(24.65681f, -1390.613f, -73.99987f), 5.275957f,"Rest")
+                    {
+                        CameraPosition = new Vector3(26.512f, -1391.165f, -72.32277f),
+                        CameraDirection = new Vector3(-0.5051419f, 0.7012861f, -0.5030203f),
+                        CameraRotation = new Rotator(-30.20003f, 1.9757E-06f, 35.76551f)
+                    }
+                },
+                OutfitInteracts = new List<OutfitInteract>()
+                {
+                    new OutfitInteract("CarWashOutfit",new Vector3(26.62634f, -1389.169f, -73.99987f), 173.1986f,"Change Outfit")
+                    {
+                        CameraPosition = new Vector3(25.94946f, -1391.412f, -73.18571f),
+                        CameraDirection = new Vector3(0.3517275f, 0.8755532f, -0.3312014f),
+                        CameraRotation = new Rotator(-19.34171f, -4.524213E-07f, -21.88633f)
+                    }
+                },
+            }
         });
     }
 

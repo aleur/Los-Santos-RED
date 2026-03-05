@@ -60,7 +60,6 @@ public class LocationDispatcher
         DispatchablePeople = dispatchablePeople;
         DispatchableVehicles = dispatchableVehicles;
     }
-
     public void Dispatch()
     {
         foreach (GameLocation ps in World.Places.ActiveLocations.ToList().Where(x => x.IsEnabled && x.DistanceToPlayer <= x.ActivateDistance && x.IsNearby && !x.IsDispatchFilled && (x.PossibleGroupSpawns != null || x.PossiblePedSpawns != null || x.PossibleVehicleSpawns != null)).ToList())
@@ -89,11 +88,11 @@ public class LocationDispatcher
                     GameFiber.Yield();
                 }
             }
-            if (Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
-            {
-                GameFiber.Yield();
-            }
-            if (ps.PossiblePedSpawns != null && ps.PossiblePedSpawns.Any())
+            //if (Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
+            //{
+            //    GameFiber.Yield();
+            //}
+            if (ps.PossiblePedSpawns?.Any() != null)
             {
                 foreach (ConditionalLocation cl in ps.PossiblePedSpawns)
                 {
@@ -103,11 +102,11 @@ public class LocationDispatcher
                     GameFiber.Yield();
                 }
             }
-            if (Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
-            {
-                GameFiber.Yield();
-            }
-            if (ps.PossibleVehicleSpawns != null)
+            //if (Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
+            //{
+            //    GameFiber.Yield();
+            //}
+            if (ps.PossibleVehicleSpawns?.Any() != null)
             {
                 foreach (ConditionalLocation cl in ps.PossibleVehicleSpawns)
                 {
@@ -120,22 +119,21 @@ public class LocationDispatcher
             ps.IsDispatchFilled = true;
             GameFiber.Yield();
         }
-        if (Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
-        {
-            GameFiber.Yield();
-        }
+        //if (Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
+        //{
+        //    GameFiber.Yield();
+        //}
         foreach (GameLocation ps in PlacesOfInterest.InteractableLocations().Where(x => x.IsEnabled && !x.IsNearby && x.IsDispatchFilled).ToList())
         {
             //EntryPoint.WriteToConsole($"Location Dispatcher, CLEARED AT {ps.Name}");
             ps.IsDispatchFilled = false;
         }
-        if (Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
-        {
-            GameFiber.Yield();
-        }
+        //if (Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
+        //{
+        //    GameFiber.Yield();
+        //}
         HandleServiceWorkerSpawns();
     }
-
     public void Reset()
     {
         foreach (GameLocation ps in PlacesOfInterest.InteractableLocations().Where(x => x.IsDispatchFilled).ToList())
@@ -149,17 +147,18 @@ public class LocationDispatcher
     }
     private void HandleServiceWorkerSpawns()
     {
-        foreach (GameLocation ps in World.Places.ActiveLocations.ToList().Where(x => x.IsEnabled && x.DistanceToPlayer <= x.ActivateDistance && x.IsNearby && !x.IsServiceFilled).ToList())
+        foreach (GameLocation ps in World.Places.ActiveLocations.ToList().Where(x => x.IsEnabled && x.DistanceToPlayer <= x.ActivateDistance && x.IsNearby && x.IsOpen(Time.CurrentHour) && !x.IsServiceFilled).ToList())
         {
             ps.AttemptVendorSpawn(ps.IsOpen(Time.CurrentHour),Interiors,Settings,Crimes,Weapons,Time,World, false);
             ps.IsServiceFilled = true;
+            EntryPoint.WriteToConsole($"VENDOR SPAWN AT {ps.Name} ");
             GameFiber.Yield();
         }
         GameFiber.Yield();
-        foreach (GameLocation ps in PlacesOfInterest.InteractableLocations().Where(x => x.IsEnabled && !x.IsNearby && x.IsServiceFilled).ToList())
+        foreach (GameLocation ps in PlacesOfInterest.InteractableLocations().Where(x => x.IsEnabled && (!x.IsNearby || !x.IsOpen(Time.CurrentHour)) && x.IsServiceFilled).ToList())
         {
             ps.AttemptVendorDespawn();
-            //EntryPoint.WriteToConsole($"VENDOR DESPAWN AT {ps.Name} ");
+            EntryPoint.WriteToConsole($"VENDOR DESPAWN AT {ps.Name} ");
             ps.IsServiceFilled = false;
         }
     }
@@ -197,7 +196,6 @@ public class LocationDispatcher
             priorityList.Remove(selected);
         }
     }
-
     public void ForceSpawnAllVehicles(List<ConditionalLocation> conditionalLocations, Agency agency)
     {
         if (conditionalLocations == null || agency== null)

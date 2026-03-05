@@ -49,9 +49,9 @@ public class GameSaves : IGameSaves
         PlayingSave = mySave;
     }
     public void Load(GameSave gameSave, IWeapons weapons, IPedSwap pedSwap, IInventoryable player, ISettingsProvideable settings, IEntityProvideable world, IGangs gangs, ITimeControllable time, IPlacesOfInterest placesOfInterest,
-        IModItems modItems, IAgencies agencies, IContacts contacts, IInteractionable interactionable)
+        IModItems modItems, IAgencies agencies, IContacts contacts, IInteractionable interactionable, IShopMenus shopMenus)
     {
-        gameSave.Load(weapons, pedSwap, player, settings, world, gangs, agencies, time, placesOfInterest, modItems, contacts, interactionable);
+        gameSave.Load(weapons, pedSwap, player, settings, world, gangs, agencies, time, placesOfInterest, modItems, contacts, interactionable, shopMenus);
         PlayingSave = gameSave;
     }
     public void DeleteSave(GameSave toDelete)
@@ -200,6 +200,9 @@ public class GameSaves : IGameSaves
             InventoryItems = new List<InventorySave>() { new InventorySave("Marijuana",5.0f) }, 
             WeaponInventory = new List<StoredWeapon>() { new StoredWeapon(3219281620, Vector3.Zero, new WeaponVariation(), 50), }
         });
+
+        AlexisGameSave.SavedGameLocations.Add(new SavedResidence("The Vinewood Residence", true, false) { TrophyPlacements = new List<DisplayPlacement>() { new DisplayPlacement(1, "10 Year Anniversary") } });
+
         AlexisGameSave.GangReputationsSave = new List<GangRepSave>() { new GangRepSave("Gambetti", 4000, 0, 0, 0, 0, 0, 0, 0, false, false,0) };
         AlexisGameSave.SaveNumber = 1;
         AlexisGameSave.VoiceName = "A_F_M_BEVHILLS_01_WHITE_FULL_01";

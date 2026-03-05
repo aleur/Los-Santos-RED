@@ -25,13 +25,13 @@ public class SavedResidence : SavedGameLocation
     public DateTime DateOfLastRentalPayment { get; set; }
     public List<StoredWeapon> WeaponInventory { get; set; } = new List<StoredWeapon>();
     public List<InventorySave> InventoryItems { get; set; } = new List<InventorySave>();
-
+    public List<DisplayPlacement> TrophyPlacements { get; set; } = new List<DisplayPlacement>();
     public int StoredCash { get; set; }
-    public override void LoadSavedData(IInventoryable player, IPlacesOfInterest placesOfInterest, IModItems modItems, ISettingsProvideable settings)
+    public override void LoadSavedData(IInventoryable player, IPlacesOfInterest placesOfInterest, IModItems modItems, ISettingsProvideable settings, IEntityProvideable world)
     {
         if (IsOwnedByPlayer || IsRentedByPlayer)
         {
-            Residence savedPlace = placesOfInterest.PossibleLocations.Residences.Where(x => x.Name == Name).FirstOrDefault();
+            Residence savedPlace = placesOfInterest.PossibleLocations.Residences.Where(x => x.Name == Name && x.IsCorrectMap(world.IsMPMapLoaded)).FirstOrDefault();
             if (savedPlace != null)
             {
                 player.Properties.AddOwnedLocation(savedPlace);
@@ -56,6 +56,15 @@ public class SavedResidence : SavedGameLocation
                     savedPlace.SimpleInventory.Add(modItems.Get(stest.ModItemName), stest.RemainingPercent);
                 }
                 savedPlace.CashStorage.StoredCash = StoredCash;
+                savedPlace.DisplayPlacements = new List<DisplayPlacement>();
+                if (TrophyPlacements != null)
+                {
+                    foreach (DisplayPlacement trophyPlacement in TrophyPlacements)
+                    {
+                        savedPlace.DisplayPlacements.Add(new DisplayPlacement(trophyPlacement.SlotID, trophyPlacement.ModItemName));
+                    }
+                }
+                savedPlace.OnPlayerLoadedSave();
                 savedPlace.RefreshUI();
             }
         }

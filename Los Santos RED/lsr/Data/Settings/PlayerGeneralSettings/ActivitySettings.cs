@@ -104,6 +104,19 @@ public class ActivitySettings : ISettingsDefaultable
     public float BashDoorUnlockPercentage { get; set; }
     public bool UseOldLockPick { get; set; }
 
+
+
+    [Description("Allow the player to pickpocket peds.")]
+    public bool AllowPedPickPockets { get; set; }
+    [Description("Success rate for pickpocketing a ped.")]
+    public float PickPocketSuccessRate { get; set; }
+    [Description("Base chance of being detected when pickpocketing.")]
+    public float PickPocketBaseDetectionChance { get; set; }
+    [Description("Maximum distance (in meters) to pickpocket a ped.")]
+    public float PickPocketDistance { get; set; }
+    public float AlarmPercentageBash { get; set; }
+    public bool AllowSkippingCrafting { get; set; }
+
     [OnDeserialized()]
     private void SetValuesOnDeserialized(StreamingContext context)
     {
@@ -186,6 +199,14 @@ public class ActivitySettings : ISettingsDefaultable
         UseCameraForTheftInteracts = false;
 
         BashDoorUnlockPercentage = 0.1f;
+        AllowPedPickPockets = true;
+        PickPocketSuccessRate = 60f;
+        PickPocketBaseDetectionChance = 40f;
+        PickPocketDistance = 4.0f;
+
+
+        AlarmPercentageBash = 50f;
+        AllowSkippingCrafting = false;
 
     }
 }

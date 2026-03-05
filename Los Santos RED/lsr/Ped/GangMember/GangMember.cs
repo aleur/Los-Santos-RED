@@ -42,6 +42,7 @@ public class GangMember : PedExt, IWeaponIssuable
     public override int InsultLimit => 2;
     public override int CollideWithPlayerLimit => 0;
     public override int PlayerStandTooCloseLimit => 1;
+    public override float PickpocketDetectionMultiplier { get; set; } = 1.2f;
     public bool IsUsingMountedWeapon { get; set; } = false;
     public WeaponInventory WeaponInventory { get; private set; }
     public GangVoice Voice { get; private set; }
@@ -178,6 +179,8 @@ public class GangMember : PedExt, IWeaponIssuable
         WillHaveLongGuns = RandomItems.RandomPercent(gt == null ? Gang.PercentageWithLongGuns : gt.PercentageWithLongGuns);
         WillHaveSidearms = RandomItems.RandomPercent(gt == null ? Gang.PercentageWithSidearms : gt.PercentageWithSidearms);
         WillHaveMelee = RandomItems.RandomPercent(gt == null ? Gang.PercentageWithMelee : gt.PercentageWithMelee);
+        WillRacePlayer = RandomItems.RandomPercent(Gang.PercentageWillRacePlayer);
+
 
         WillFlyThroughWindshield = RandomItems.RandomPercent(Settings.SettingsManager.GangSettings.FlyThroughWindshieldPercent);
 
@@ -424,5 +427,21 @@ public class GangMember : PedExt, IWeaponIssuable
         }
         return ExtraItems;
     }
-
+    public override void OnPlayerFailedPickpocketing(IInteractionable player)
+    {
+        if (!Pedestrian.Exists())
+        {
+            EntryPoint.WriteToConsole($"Pickpocket: GangMember {Pedestrian?.Handle:X8 ?? 0} failed to react, invalid state");
+            return;
+        }
+        if (Gang == null || player.RelationshipManager == null || IsPlayerMember(player))
+        {
+            return;
+        }
+        player.RelationshipManager.GangRelationships.ChangeReputation(Gang, -350, true);
+        player.RelationshipManager.GangRelationships.AddAttacked(Gang);
+        PlayerPerception.SetFakeSeen();
+        TimesInsultedByPlayer += 10;
+        EntryPoint.WriteToConsole($"PED EVENT: GangMember {Pedestrian.Handle:X8} decreased gang reputation for {Gang.ID}, Amount=-350, marked as attacked", 3);
+    }
 }

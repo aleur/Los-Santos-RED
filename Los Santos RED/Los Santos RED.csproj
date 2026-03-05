@@ -94,6 +94,27 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug Enhanced|AnyCPU'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\Debug Enhanced\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug Enhanced|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>..\..\..\..\..\..\..\Program Files %28x86%29\Steam\steamapps\common\Grand Theft Auto V Enhanced\plugins\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <LangVersion>7.3</LangVersion>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="Microsoft.VisualBasic" />
     <Reference Include="NAudio">
@@ -106,7 +127,9 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="RagePluginHookSDK">
-      <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Grand Theft Auto V\SDK\RagePluginHookSDK.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\Grand Theft Auto V\SDK\RagePluginHookSDK.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
@@ -141,8 +164,12 @@
     <Compile Include="lsr\Data\Interface\ISpawnBlocks.cs" />
     <Compile Include="lsr\Data\Interface\IVehicleRaces.cs" />
     <Compile Include="lsr\Data\Items\CraftableItems.cs" />
+    <Compile Include="lsr\Data\Items\ShopMenus_Clothing.cs" />
     <Compile Include="lsr\Data\Location\Custom Locations\BlankLocationsData_Liberty.cs" />
+    <Compile Include="lsr\Data\Location\Custom Locations\BlankLocationsData_LibertyPP.cs" />
+    <Compile Include="lsr\Data\Location\Custom Locations\PlacesOfInterest_LibertyPP.cs" />
     <Compile Include="lsr\Data\Location\Interiors_Liberty.cs" />
+    <Compile Include="lsr\Data\Location\Interiors_LibertyPP.cs" />
     <Compile Include="lsr\Data\Location\PedCustomizerLocation.cs" />
     <Compile Include="lsr\Data\Location\PossibleInteriors.cs" />
     <Compile Include="lsr\Data\Other\CarGeneratorBlock.cs" />
@@ -157,7 +184,10 @@
     <Compile Include="lsr\Data\Peds\Dispatchable People\Gangs\DispatchablePeople_LostMC.cs" />
     <Compile Include="lsr\Data\Peds\Dispatchable People\Gangs\DispatchablePeople_Mafia.cs" />
     <Compile Include="lsr\Data\Peds\Dispatchable People\Gangs\DispatchablePeople_NorthHolland.cs" />
+    <Compile Include="lsr\Data\Peds\Dispatchable People\Gangs\DispatchablePeople_NorthHolland_LPP.cs" />
     <Compile Include="lsr\Data\Peds\Dispatchable People\Gangs\DispatchablePeople_Petrovic.cs" />
+    <Compile Include="lsr\Data\Peds\Dispatchable People\Gangs\DispatchablePeople_Petrovic_LPP.cs" />
+    <Compile Include="lsr\Data\Peds\Dispatchable People\Gangs\DispatchablePeople_SpanishLords_LPP.cs" />
     <Compile Include="lsr\Data\Peds\Dispatchable People\Gangs\DispatchablePeople_UptownRiders.cs" />
     <Compile Include="lsr\Data\Peds\Dispatchable People\Gangs\DispatchablePeople_Varrios.cs" />
     <Compile Include="lsr\Data\Peds\Dispatchable People\OptionalAppliedOverlay.cs" />
@@ -169,6 +199,7 @@
     <Compile Include="lsr\Data\Settings\PlayerGeneralSettings\GroupSettings.cs" />
     <Compile Include="lsr\Data\Settings\PlayerGeneralSettings\RadarDetectorSettings.cs" />
     <Compile Include="lsr\Data\Vehicles\DispatchableVehicles_FEJ.cs" />
+    <Compile Include="lsr\Data\Vehicles\eGangVehicleType.cs" />
     <Compile Include="lsr\Data\Vehicles\ePoliceServiceType.cs" />
     <Compile Include="lsr\Data\Vehicles\MilitaryVehicleType.cs" />
     <Compile Include="lsr\Data\Vehicles\Variations\DispatchableVehicleGroupType.cs" />
@@ -194,6 +225,7 @@
     <Compile Include="lsr\Data\Vehicles\Variations\DispatchableVehicles_RaceCars.cs" />
     <Compile Include="lsr\Data\Vehicles\VehicleRaces.cs" />
     <Compile Include="lsr\Data\Vehicles\VehicleRaces_Liberty.cs" />
+    <Compile Include="lsr\Data\Vehicles\VehicleRaces_LibertyPP.cs" />
     <Compile Include="lsr\Data\Vehicles\VehicleRaceTypeManager.cs" />
     <Compile Include="lsr\Dispatcher\Items\eSpawnAdjustment.cs" />
     <Compile Include="lsr\Dispatcher\Items\SpawnAdjustmentAmount.cs" />
@@ -201,6 +233,7 @@
     <Compile Include="lsr\Dispatcher\Civilian\TaxiDispatcher.cs" />
     <Compile Include="lsr\Helper\CraftableItemLookupModel.cs" />
     <Compile Include="lsr\Inventory\CashStorage.cs" />
+    <Compile Include="lsr\Locations\Interiors\AudioEmitter.cs" />
     <Compile Include="lsr\Locations\Interiors\BankDrawerInteract.cs" />
     <Compile Include="lsr\Locations\Interiors\BankInterior.cs" />
     <Compile Include="lsr\Locations\Interiors\Barber\BarberShopInterior.cs" />
@@ -211,16 +244,32 @@
     <Compile Include="lsr\Locations\Interiors\Barber\FakeCustomizeInterior.cs" />
     <Compile Include="lsr\Locations\Interiors\Barber\SalonInteract.cs" />
     <Compile Include="lsr\Locations\Interiors\BusinessInterior.cs" />
+    <Compile Include="lsr\Locations\Interiors\Clothing Store\ClothingPurchaseMenu.cs" />
+    <Compile Include="lsr\Locations\Interiors\Clothing Store\ClothingShopInterior.cs" />
+    <Compile Include="lsr\Locations\Interiors\Clothing Store\PedClothingComponent.cs" />
+    <Compile Include="lsr\Locations\Interiors\Clothing Store\PedClothingShopMenu.cs" />
+    <Compile Include="lsr\Locations\Interiors\Clothing Store\PedClothingShopMenuItem.cs" />
+    <Compile Include="lsr\Locations\Interiors\Clothing Store\TryOnInteract.cs" />
     <Compile Include="lsr\Locations\Interiors\CraftInteriorInteract.cs" />
+    <Compile Include="lsr\Locations\Interiors\AudioEmitterInteract.cs" />
     <Compile Include="lsr\Locations\Interiors\ExitInteriorInteract.cs" />
     <Compile Include="lsr\Locations\Interiors\Gambling\Blackjack\BlackJackInteract.cs" />
+    <Compile Include="lsr\Locations\Interiors\Residence\MoneyEntitySet.cs" />
+    <Compile Include="lsr\Locations\Interiors\Residence\Trophy\CabinetData.cs" />
+    <Compile Include="lsr\Locations\Interiors\Residence\MansionInterior.cs" />
+    <Compile Include="lsr\Locations\Interiors\Residence\Trophy\DisplayPlacement.cs" />
+    <Compile Include="lsr\Locations\Interiors\Residence\Trophy\DisplaySlot.cs" />
+    <Compile Include="lsr\Locations\Interiors\Theft\AnimationPreInteract.cs" />
+    <Compile Include="lsr\Locations\Interiors\Residence\Trophy\DisplayInteract.cs" />
     <Compile Include="lsr\Data\Location\TargetType.cs" />
     <Compile Include="lsr\Locations\Other\GangTerritory.cs" />
     <Compile Include="lsr\Locations\Places\ConditionalLocations\Civilian\CivilianConditionalLocation.cs" />
     <Compile Include="lsr\Locations\Places\GameLocations\BodyExport.cs" />
     <Compile Include="lsr\Locations\Places\GameLocations\Business.cs" />
+    <Compile Include="lsr\Locations\Places\GameLocations\ePedFocusZone.cs" />
     <Compile Include="lsr\Locations\Places\GameLocations\MoveInteraction.cs" />
     <Compile Include="lsr\Locations\Places\GameLocations\OrbitCamera.cs" />
+    <Compile Include="lsr\Locations\Places\GameLocations\PlayerPoser.cs" />
     <Compile Include="lsr\Locations\Places\GameLocations\Racing\RaceMeetup.cs" />
     <Compile Include="lsr\Locations\Places\GameLocations\VehicleLocations\ModShopMenu.cs" />
     <Compile Include="lsr\Locations\Places\GameLocations\VehicleLocations\PerformanceVehicleModKitType.cs" />
@@ -232,7 +281,10 @@
     <Compile Include="lsr\Locations\Places\GameLocations\VehicleLocations\VehicleModKitType.cs" />
     <Compile Include="lsr\Locations\Places\GameLocations\VehicleLocations\VehicleModKitWheelTypeShopMenuItem.cs" />
     <Compile Include="lsr\Locations\Places\GameLocations\VehicleLocations\VehicleModShop.cs" />
+    <Compile Include="lsr\Locations\Places\GameLocations\VehicleLocations\VehicleModToggleMenu.cs" />
+    <Compile Include="lsr\Locations\Places\GameLocations\VehicleLocations\VehicleNeonMenu.cs" />
     <Compile Include="lsr\Locations\Places\GameLocations\VehicleLocations\VehicleVariationShopMenu.cs" />
+    <Compile Include="lsr\Locations\Places\GameLocations\VehicleLocations\VehicleWindowTintMenu.cs" />
     <Compile Include="lsr\Locations\Places\GameLocations\VehicleLocations\WheelVehicleClassModKitType.cs" />
     <Compile Include="lsr\Locations\Places\GameLocations\VehicleLocations\WheelVehicleModKitType.cs" />
     <Compile Include="lsr\Locations\Places\Interface\IPayoutDisbursable.cs" />
@@ -247,6 +299,7 @@
     <Compile Include="lsr\Player\Activity\HideableObject.cs" />
     <Compile Include="lsr\Player\Activity\HidingActivity.cs" />
     <Compile Include="lsr\Player\Activity\Items\IngestActivityNew.cs" />
+    <Compile Include="lsr\Player\Activity\Pickpocket.cs" />
     <Compile Include="lsr\Player\Crafting\Craft.cs" />
     <Compile Include="lsr\Player\Gambling\Blackjack Games\BlackJackGame.cs" />
     <Compile Include="lsr\Player\Gambling\Blackjack Games\BlackjackGameUI.cs" />
@@ -264,7 +317,7 @@
     <Compile Include="lsr\Locations\Interiors\Theft\ItemUsePreInteract.cs" />
     <Compile Include="lsr\Locations\Interiors\Theft\MoneyTheftInteract.cs" />
     <Compile Include="lsr\Locations\Interiors\OutfitInteract.cs" />
-    <Compile Include="lsr\Locations\Interiors\ResidenceInterior.cs" />
+    <Compile Include="lsr\Locations\Interiors\Residence\ResidenceInterior.cs" />
     <Compile Include="lsr\Locations\Interiors\RestInteract.cs" />
     <Compile Include="lsr\Locations\Interiors\SinkInteract.cs" />
     <Compile Include="lsr\Locations\Interiors\StandardInteriorInteract.cs" />
@@ -557,6 +610,7 @@
     <Compile Include="lsr\Player\Inventory\Items\PipeItem.cs" />
     <Compile Include="lsr\Player\Inventory\Items\RadarDetectorItem.cs" />
     <Compile Include="lsr\Player\Inventory\Items\RollingPapersItem.cs" />
+    <Compile Include="lsr\Player\Inventory\Items\TrophyItem.cs" />
     <Compile Include="lsr\Player\Inventory\Items\ValuableItem.cs" />
     <Compile Include="lsr\Player\Inventory\Items\VariablePriceMenuItem.cs" />
     <Compile Include="lsr\Player\Managers\CuffManager.cs" />
@@ -625,6 +679,7 @@
     <Compile Include="lsr\Tasker\Generic\GeneralLocate\GoToPositionVehicleRaceTaskState.cs" />
     <Compile Include="lsr\Tasker\Generic\GeneralLocate\MarshalGeneralLocate.cs" />
     <Compile Include="lsr\Tasker\Generic\GeneralLocate\RegularGoToInVehicleTaskState.cs" />
+    <Compile Include="lsr\Tasker\PlayerChaseable\NewChase.cs" />
     <Compile Include="lsr\Tasker\PlayerChaseable\SubTasks\HeliEngage.cs" />
     <Compile Include="lsr\Tasker\Racing\GeneralRace.cs" />
     <Compile Include="lsr\Tasker\Taxi\TaxiDriverBrain.cs" />
@@ -840,7 +895,7 @@
     <Compile Include="lsr\Locations\Places\GameLocations\SubwayStation.cs" />
     <Compile Include="lsr\Locations\Places\ILocationDispatchable.cs" />
     <Compile Include="lsr\Locations\Places\GameLocations\BusStop.cs" />
-    <Compile Include="lsr\Locations\Places\GameLocations\ClothingShop.cs" />
+    <Compile Include="lsr\Locations\Places\GameLocations\CustomizeShops\ClothingShop.cs" />
     <Compile Include="lsr\Locations\Places\ConditionalLocations\ConditionalLocation.cs" />
     <Compile Include="lsr\Locations\Places\ILocationRespawnable.cs" />
     <Compile Include="lsr\Locations\Places\GameLocations\Hotel\HotelRoom.cs" />
@@ -1291,6 +1346,7 @@
     <Compile Include="lsr\Ped\Health\BodyLocation.cs" />
     <Compile Include="lsr\Ped\Health\Bone.cs" />
     <Compile Include="lsr\World\NativeMemory.cs" />
+    <Compile Include="lsr\World\NativeMemoryEnhanced.cs" />
     <Compile Include="lsr\World\Places\DynamicPlaces.cs" />
     <Compile Include="lsr\World\Places\Places.cs" />
     <Compile Include="lsr\World\Places\StaticPlaces.cs" />

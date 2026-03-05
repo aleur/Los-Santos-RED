@@ -18,6 +18,7 @@ public class BlankLocationsData
     public List<BlankLocation> BlankLocationPlaces { get; set; } = new List<BlankLocation>();
     public void DefaultConfig()
     {
+        RailroadPolice();
         SpeedTraps();
         Checkpoints();
         RooftopSnipers();
@@ -38,6 +39,62 @@ public class BlankLocationsData
         RedneckGang();
         VarriosGang();
         RandomPeds();
+    }
+
+    private void RailroadPolice()
+    {
+        BlankLocation railroad1 = new BlankLocation(new Vector3(1508.027f, 3373.598f, 35.9004f), 116.1617f, "railroad1", "")
+        {
+            OpenTime = 0,
+            CloseTime = 24,
+            AssignedAssociationID = "GLRP",
+            
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+                {
+                    new LEConditionalLocation(new Vector3(1508.027f, 3373.598f, 35.9004f), 116.1617f, 35f){ IsEmpty = false, },
+                },
+        };
+        BlankLocationPlaces.Add(railroad1);
+        BlankLocation railroad2 = new BlankLocation(new Vector3(262.6646f, 3315.036f, 39.55537f), 231.6474f, "railroad2", "")
+        {
+            OpenTime = 0,
+            CloseTime = 24,
+            AssignedAssociationID = "GLRP",
+
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+                {
+                    new LEConditionalLocation(new Vector3(262.6646f, 3315.036f, 39.55537f), 231.6474f, 35f){ IsEmpty = false, },
+                },
+        };
+        BlankLocationPlaces.Add(railroad2);
+
+
+        BlankLocation railroad3 = new BlankLocation(new Vector3(1196.498f, 3266.45f, 38.64182f), 25.32101f, "railroad3", "")
+        {
+            OpenTime = 0,
+            CloseTime = 24,
+            AssignedAssociationID = "GLRP",
+
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+                {
+                    new LEConditionalLocation(new Vector3(1196.498f, 3266.45f, 38.64182f), 25.32101f, 35f){ IsEmpty = false, TaskRequirements = TaskRequirements.Guard },
+                },
+        };
+        BlankLocationPlaces.Add(railroad3);
+
+        BlankLocation railroad4 = new BlankLocation(new Vector3(562.358f, 3194.734f, 39.82635f), 330.7249f, "railroad4", "")
+        {
+            OpenTime = 0,
+            CloseTime = 24,
+            AssignedAssociationID = "GLRP",
+
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+                {
+                    new LEConditionalLocation(new Vector3(562.358f, 3194.734f, 39.82635f), 330.7249f, 35f){ IsEmpty = false, TaskRequirements = TaskRequirements.Guard },
+                },
+        };
+        BlankLocationPlaces.Add(railroad4);
+
     }
 
     private void RandomPeds()
@@ -103,6 +160,25 @@ public class BlankLocationsData
                 },
         };
         BlankLocationPlaces.Add(civSpawn5);
+
+        BlankLocation ChopShopSpawn = new BlankLocation(new Vector3(970.872f, -2987.221f, -39.64696f), 0f, "ChopShoptest", "")
+        {
+            OpenTime = 0,
+            CloseTime = 24,
+            IsOnSPMap = false,
+            InteriorID = 252673,
+            ActivateDistance = 75f,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+                {
+                    new CivilianConditionalLocation(new Vector3(998.5114f, -3000.00562f, -39.9687233f), -87.88121f, defaultCarSpawnPercentage + 60){ OverrideDispatchableVehicleGroupID = "ImportExportVehicles", },
+                    new CivilianConditionalLocation(new Vector3(978.865356f, -3001.82935f, -39.9684448f), -92.09672f, defaultCarSpawnPercentage + 60){ OverrideDispatchableVehicleGroupID = "ImportExportVehicles", },
+                    new CivilianConditionalLocation(new Vector3(961.840942f, -3025.47559f, -39.96845f), 89.4656754f, defaultCarSpawnPercentage + 60){ OverrideDispatchableVehicleGroupID = "ImportExportVehicles", },
+                    new CivilianConditionalLocation(new Vector3(961.8632f, -3021.789f, -39.9684677f), 89.15911f, defaultCarSpawnPercentage + 60){ OverrideDispatchableVehicleGroupID = "ImportExportVehicles", },
+                    new CivilianConditionalLocation(new Vector3(955.0f, -3028.615f, -37.2079735f), -89.31444f, defaultCarSpawnPercentage + 60){ OverrideDispatchableVehicleGroupID = "ImportExportVehicles", },
+                    new CivilianConditionalLocation(new Vector3(998.2715f, -3008.85f, -39.9684525f), -90.70057f, defaultCarSpawnPercentage + 60){ OverrideDispatchableVehicleGroupID = "ImportExportVehicles", },
+                },
+        };
+        BlankLocationPlaces.Add(ChopShopSpawn);
     }
 
     private void RooftopSnipers()
@@ -3783,7 +3859,7 @@ new List<ConditionalGroup>() {
             
             Name = "GambettiPower",
             Description = "3 Gambetti in a alley off Power Street",
-            EntrancePosition = new Vector3(443.7656f, 121.4294f, 98.95059f),
+            EntrancePosition = new Vector3(403.1715f, 58.50986f, 97.97793f),
             EntranceHeading = 69.60268f,
             OpenTime = 0,
             CloseTime = 24,
@@ -6589,8 +6665,8 @@ new List<ConditionalGroup>() {
             EntranceHeading = -141.6932f,
             OpenTime = 0,
             CloseTime = 24,
-            
-            
+            IsOnSPMap = false,//spawns in rubbish area
+
             AssignedAssociationID = "AMBIENT_GANG_MARABUNTE",
             MenuID = "",
 
@@ -7532,7 +7608,7 @@ new List<ConditionalGroup>() {
             
             Name = "PavanoFarmEggs",
             FullName = "",
-            Description = "5 Pavano outside derelict Farm Eggs building",
+            Description = "4 Pavano outside derelict Farm Eggs building",
             MapIcon = 267,
             EntrancePosition = new Vector3(2552.402f, 4673.885f, 33.6469f),
             EntranceHeading = 19.66658f,
@@ -7599,17 +7675,6 @@ new List<ConditionalGroup>() {
                             RequiredVehicleGroup = "",
                             TaskRequirements = TaskRequirements.Guard,
                             ForcedScenarios = new List<String>() { "WORLD_HUMAN_STAND_MOBILE", },
-                            MaxWantedLevelSpawn = 6,
-                        },
-                        new GangConditionalLocation()
-                        {
-                            Location = new Vector3(2550.346f, 4668.052f, 34.07679f),
-                            Heading = -125.7162f,
-                            AssociationID = "",
-                            RequiredPedGroup = "",
-                            RequiredVehicleGroup = "",
-                            TaskRequirements = TaskRequirements.Guard,
-                            ForcedScenarios = new List<String>() { "WORLD_HUMAN_SMOKING", },
                             MaxWantedLevelSpawn = 6,
                         },
                     },

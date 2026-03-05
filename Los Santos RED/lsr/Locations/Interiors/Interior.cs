@@ -6,19 +6,23 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Windows.Interop;
 using System.Xml.Serialization;
 
 [Serializable()]
 public class Interior
 {
-    private bool IsInside;
+    protected bool IsInside;
     protected IInteractionable Player;
     protected ILocationInteractable LocationInteractable;
     protected GameLocation InteractableLocation;
     protected ISettingsProvideable Settings;
-    private bool IsActive = false;
-    private bool IsRunningInteriorUpdate = false;
+    protected bool IsActive = false;
+    protected bool IsRunningInteriorUpdate = false;
     protected List<Rage.Object> SpawnedProps = new List<Rage.Object>();
+    protected int alarmSoundID;
+    protected bool isAlarmActive;
+    protected bool isOpen;
 
     public Interior()
     {
@@ -59,9 +63,9 @@ public class Interior
         Name = name;
     }
     [XmlIgnore]
-    public int InternalID { get; private set; }
+    public int InternalID { get; protected set; }
     [XmlIgnore]
-    public int DisabledInteriorID { get; private set; }
+    public int DisabledInteriorID { get; protected set; }
     [XmlIgnore]
     public bool IsMenuInteracting { get; set; }
     public int LocalID { get; set; }
@@ -73,8 +77,10 @@ public class Interior
     public List<string> RequestIPLs { get; set; } = new List<string>();
     public List<string> RemoveIPLs { get; set; } = new List<string>();
     public List<string> InteriorSets { get; set; } = new List<string>();
+    public List<Vector3> LinkedInteriorCoords { get; set; } = new List<Vector3>();
     public int InteriorTintColor { get; set; } = -1;
     public int InteriorSetStyleID { get; set; } = -1;
+    public int InteriorWallpaperColor { get; set; } = -1;
     public Vector3 InteriorEgressPosition { get; set; }
     public float InteriorEgressHeading { get; set; }
     public bool NeedsActivation { get; set; } = false;
@@ -98,8 +104,13 @@ public class Interior
     public InteriorInteract ClosestInteract => AllInteractPoints.Where(x => x.CanAddPrompt).OrderBy(x => x.DistanceTo).FirstOrDefault();
 
     public GameLocation GameLocation { get; set; }
+    public bool IsAlarmActive => isAlarmActive;
+    public bool IsNotAlarmed { get; set; }
 
-    public virtual void Setup(IInteractionable player, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, ILocationInteractable locationInteractable, IModItems modItems, IClothesNames clothesNames)
+
+    public List<AudioEmitter> AudioEmitters { get; set; } = new List<AudioEmitter>();
+
+    public virtual void Setup(IInteractionable player, IPlacesOfInterest placesOfInterest, ISettingsProvideable settings, ILocationInteractable locationInteractable, IModItems modItems, IClothesNames clothesNames, IRadioStations radioStations)
     {
         Settings = settings;
         Player = player;
@@ -110,26 +121,16 @@ public class Interior
         }
         foreach (InteriorInteract interiorInteract in AllInteractPoints)//InteractPoints)
         {
-            interiorInteract.Setup(modItems, clothesNames);
+            interiorInteract.Setup(modItems, clothesNames, radioStations);
         }
-    }
-    public void DebugLockDoors()
-    {
-        foreach (InteriorDoor door in Doors)
+        foreach(InteriorDoor interiorDoor in Doors)
         {
-            door.LockDoor();
-            EntryPoint.WriteToConsole($"INTERIOR: {Name} {door.ModelHash} {door.Position} LOCKED");
+            interiorDoor.AddPairedDoors(Doors.Where(x => x.DoorGroupName == interiorDoor.DoorGroupName && x.Position != interiorDoor.Position).ToList());
         }
     }
-    public void DebugOpenDoors()
-    {
-        foreach (InteriorDoor door in Doors)
-        {
-            door.UnLockDoor();
-            EntryPoint.WriteToConsole($"INTERIOR: {Name} {door.ModelHash} {door.Position} UNLOCKED");
-        }
-    }
-    public void Load(bool isOpen)
+
+
+    public virtual void Load(bool isOpen)
     {
         GameFiber.StartNew(delegate
         {
@@ -143,15 +144,15 @@ public class Interior
                 {
                     InternalID = LocalID;
                 }
-                if(NeedsSetDisabled)
+                if (NeedsSetDisabled)
                 {
                     NativeFunction.Natives.DISABLE_INTERIOR(InternalID, false);
                 }
-                if(NeedsActivation)
+                if (NeedsActivation)
                 {
                     NativeFunction.Natives.PIN_INTERIOR_IN_MEMORY(InternalID);
                     NativeFunction.Natives.SET_INTERIOR_ACTIVE(InternalID, true);
-                    if(NativeFunction.Natives.IS_INTERIOR_CAPPED<bool>(InternalID))
+                    if (NativeFunction.Natives.IS_INTERIOR_CAPPED<bool>(InternalID))
                     {
                         NativeFunction.Natives.CAP_INTERIOR(InternalID, false);
                     }
@@ -197,7 +198,7 @@ public class Interior
                     NativeFunction.Natives.ACTIVATE_INTERIOR_ENTITY_SET(InternalID, newEntitySetStyle);
                     GameFiber.Yield();
                 }
-                LoadDoors(isOpen);
+                LoadDoors(isOpen, true);
                 if (DisabledInteriorCoords != Vector3.Zero)
                 {
                     DisabledInteriorID = NativeFunction.Natives.GET_INTERIOR_AT_COORDS<int>(DisabledInteriorCoords.X, DisabledInteriorCoords.Y, DisabledInteriorCoords.Z);
@@ -215,7 +216,7 @@ public class Interior
                     }
                 }
 
-                
+
 
                 IsActive = true;
                 GameFiber.Yield();
@@ -224,7 +225,7 @@ public class Interior
 
 
                 //GameFiber.Sleep(250);
-               // LoadDoors(isOpen);
+                // LoadDoors(isOpen);
 
             }
             catch (Exception ex)
@@ -233,111 +234,129 @@ public class Interior
             }
         }, "Load Interior");
     }
-    protected virtual void LoadDoors(bool isOpen)
-    {
-        EntryPoint.WriteToConsole($"LOAD DOORS RAN {isOpen}");
-        if (isOpen)
-        {
-            foreach (InteriorDoor door in Doors)
-            {
-                door.UnLockDoor();
-            }
-        }
-        else
-        {
-            EntryPoint.WriteToConsole($"LOAD DOORS RAN LOCKING STUFF {isOpen}");
-            foreach (InteriorDoor door in Doors.Where(x => x.LockWhenClosed))
-            {
-                door.LockDoor();
-            }
-        }
-    }
-    public void Unload()
+
+    public virtual void Unload()
     {
         GameFiber.StartNew(delegate
+        {
+            try
             {
-                try
+                if (NeedsSetDisabled)
                 {
-                    if (NeedsSetDisabled)
+                    NativeFunction.Natives.DISABLE_INTERIOR(InternalID, true);
+                }
+                if (NeedsActivation)
+                {
+                    NativeFunction.Natives.UNPIN_INTERIOR(InternalID);
+                    NativeFunction.Natives.SET_INTERIOR_ACTIVE(InternalID, false);
+                    if (NativeFunction.Natives.IS_INTERIOR_CAPPED<bool>(InternalID))
                     {
-                        NativeFunction.Natives.DISABLE_INTERIOR(InternalID, true);
+                        NativeFunction.Natives.CAP_INTERIOR(InternalID, true);
                     }
-                    if (NeedsActivation)
-                    {
-                        NativeFunction.Natives.UNPIN_INTERIOR(InternalID);
-                        NativeFunction.Natives.SET_INTERIOR_ACTIVE(InternalID, false);
-                        if (NativeFunction.Natives.IS_INTERIOR_CAPPED<bool>(InternalID))
-                        {
-                            NativeFunction.Natives.CAP_INTERIOR(InternalID, true);
-                        }
-                    }
-                    foreach (string iplName in RequestIPLs)
-                    {
-                        NativeFunction.Natives.REMOVE_IPL(iplName);
-                        GameFiber.Yield();
-                    }
-                    foreach (string iplName in RemoveIPLs)
-                    {
-                        NativeFunction.Natives.REQUEST_IPL(iplName);
-                        GameFiber.Yield();
-                    }
-                    foreach (string interiorSet in InteriorSets)
-                    {
-                        NativeFunction.Natives.DEACTIVATE_INTERIOR_ENTITY_SET(InternalID, interiorSet);
-                        GameFiber.Yield();
-                    }
-                    // Deactivate the current entity set style if active
-                    if (InteriorSetStyleID != -1)
-                    {
-                        string entitySetStyle = $"entity_set_style_{InteriorSetStyleID}";
-                        EntryPoint.WriteToConsole($"Deactivating entity set style on unload: {entitySetStyle}");
-                        NativeFunction.Natives.DEACTIVATE_INTERIOR_ENTITY_SET(InternalID, entitySetStyle);
-                        GameFiber.Yield();
-                    }
-                    foreach (InteriorDoor door in Doors)
-                    {
-                        door.LockDoor();
-                        //NativeFunction.Natives.x9B12F9A24FABEDB0(door.ModelHash, door.Position.X, door.Position.Y, door.Position.Z, true, 0.0f, 50.0f); //NativeFunction.Natives.x9B12F9A24FABEDB0(door.ModelHash, door.Position.X, door.Position.Y, door.Position.Z, true, door.Rotation.Pitch, door.Rotation.Roll, door.Rotation.Yaw);
-                        //door.IsLocked = true;
-                        door.Deactivate();
-                        GameFiber.Yield();
-                    }
-                    if (DisabledInteriorCoords != Vector3.Zero)
-                    {
-                        DisabledInteriorID = NativeFunction.Natives.GET_INTERIOR_AT_COORDS<int>(DisabledInteriorCoords.X, DisabledInteriorCoords.Y, DisabledInteriorCoords.Z);
-                        NativeFunction.Natives.DISABLE_INTERIOR(DisabledInteriorID, true);
-                        NativeFunction.Natives.CAP_INTERIOR(DisabledInteriorID, true);
-                        NativeFunction.Natives.REFRESH_INTERIOR(DisabledInteriorID);
-                        GameFiber.Yield();
-                    }
-                    NativeFunction.Natives.REFRESH_INTERIOR(InternalID);
-                    //SetInactive();
-                    IsActive = false;
+                }
+                foreach (string iplName in RequestIPLs)
+                {
+                    NativeFunction.Natives.REMOVE_IPL(iplName);
                     GameFiber.Yield();
-
-                    EntryPoint.WriteToConsole($"Unload Interior {Name}");
-                    //new Vector3(-19.51501f, -597.6929f, 94.02557f)
                 }
-                catch (Exception ex)
+                foreach (string iplName in RemoveIPLs)
                 {
-                    EntryPoint.WriteToConsole(ex.Message + " " + ex.StackTrace, 0);
-                    EntryPoint.ModController.CrashUnload();
+                    NativeFunction.Natives.REQUEST_IPL(iplName);
+                    GameFiber.Yield();
                 }
-            }, "Unload Interiors");
+                foreach (string interiorSet in InteriorSets)
+                {
+                    NativeFunction.Natives.DEACTIVATE_INTERIOR_ENTITY_SET(InternalID, interiorSet);
+                    GameFiber.Yield();
+                }
+                // Deactivate the current entity set style if active
+                if (InteriorSetStyleID != -1)
+                {
+                    string entitySetStyle = $"entity_set_style_{InteriorSetStyleID}";
+                    EntryPoint.WriteToConsole($"Deactivating entity set style on unload: {entitySetStyle}");
+                    NativeFunction.Natives.DEACTIVATE_INTERIOR_ENTITY_SET(InternalID, entitySetStyle);
+                    GameFiber.Yield();
+                }
+                foreach (InteriorDoor door in Doors)
+                {
+                    door.LockDoor();
+                    //NativeFunction.Natives.x9B12F9A24FABEDB0(door.ModelHash, door.Position.X, door.Position.Y, door.Position.Z, true, 0.0f, 50.0f); //NativeFunction.Natives.x9B12F9A24FABEDB0(door.ModelHash, door.Position.X, door.Position.Y, door.Position.Z, true, door.Rotation.Pitch, door.Rotation.Roll, door.Rotation.Yaw);
+                    //door.IsLocked = true;
+                    door.Deactivate();
+                    GameFiber.Yield();
+                }
+                if (DisabledInteriorCoords != Vector3.Zero)
+                {
+                    DisabledInteriorID = NativeFunction.Natives.GET_INTERIOR_AT_COORDS<int>(DisabledInteriorCoords.X, DisabledInteriorCoords.Y, DisabledInteriorCoords.Z);
+                    NativeFunction.Natives.DISABLE_INTERIOR(DisabledInteriorID, true);
+                    NativeFunction.Natives.CAP_INTERIOR(DisabledInteriorID, true);
+                    NativeFunction.Natives.REFRESH_INTERIOR(DisabledInteriorID);
+                    GameFiber.Yield();
+                }
+                NativeFunction.Natives.REFRESH_INTERIOR(InternalID);
+                TurnOffAlarm();
+                //SetInactive();
+
+
+                if (AllInteractPoints != null)
+                {
+                    foreach (InteriorInteract ii in AllInteractPoints)
+                    {
+                        ii.OnInteriorUnloaded();
+                    }
+                }
+
+
+                IsActive = false;
+                GameFiber.Yield();
+
+                EntryPoint.WriteToConsole($"Unload Interior {Name}");
+                //new Vector3(-19.51501f, -597.6929f, 94.02557f)
+            }
+            catch (Exception ex)
+            {
+                EntryPoint.WriteToConsole(ex.Message + " " + ex.StackTrace, 0);
+                EntryPoint.ModController.CrashUnload();
+            }
+        }, "Unload Interiors");
     }
-    public void Update()
+    public void Update(bool IsOpen)
     {
         foreach (InteriorDoor door in Doors.Where(x=> !x.IsLocked && x.ForceRotateOpen && !x.HasBeenForceRotatedOpen))
         {
-            EntryPoint.WriteToConsole("ATTEMPTING TO FORCE ROTATE OPEN DOOR THAT WASNT THERE");
+            //EntryPoint.WriteToConsole("ATTEMPTING TO FORCE ROTATE OPEN DOOR THAT WASNT THERE");
             door.UnLockDoor();
         }
-
-
         foreach (InteriorDoor door in Doors.Where(x => x.IsLocked && x.LockWhenClosed && !x.HasRanLockWithEntity))
         {
-            EntryPoint.WriteToConsole("ATTEMPTING TO LOCK A DOOR WHERE THE ENTITY DOESNT EXISTS");
+            //EntryPoint.WriteToConsole("ATTEMPTING TO LOCK A DOOR WHERE THE ENTITY DOESNT EXISTS");
             door.LockDoor();
+        }
+        if(!IsOpen && Player.CurrentLocation != null && Player.CurrentLocation.CurrentInterior != null && Player.CurrentLocation.CurrentInterior == this)
+        {
+            return;//dont do anything until you leave
+        }
+        if(Player.CurrentLocation.TimeOutside < 10000)
+        {
+            return; //give you 10 seconds OUTSIde befoe it locks
+        }
+
+        if(isOpen != IsOpen)
+        {
+            if (IsOpen)
+            {      
+                if (GameLocation != null)
+                {
+                    GameLocation.IsServiceFilled = false;
+                }
+                EntryPoint.WriteToConsole($"Interior changed from closed to Open {Name}");
+            }
+            else
+            {
+                EntryPoint.WriteToConsole($"Interior changed from open to closed {Name}");
+            }
+            LoadDoors(IsOpen, false);
+            isOpen = IsOpen;
         }
 
         //if(IsTeleportEntry)
@@ -448,17 +467,52 @@ public class Interior
             interiorInteract.UpdateDistances(Player);
         }
     }
+    protected virtual void LoadDoors(bool isOpen, bool reLockForcedEntry)
+    {
+        EntryPoint.WriteToConsole($"LOAD DOORS RAN {isOpen}");
+        if (isOpen)
+        {
+            foreach (InteriorDoor door in Doors)
+            {
+                door.UnLockDoor();
+            }
+        }
+        else
+        {
+            EntryPoint.WriteToConsole($"LOAD DOORS RAN LOCKING STUFF {isOpen}");
+
+            if (reLockForcedEntry)
+            {
+                foreach (InteriorDoor door in Doors.Where(x => x.LockWhenClosed))
+                {
+                    door.LockDoor();
+                }
+            }
+            else
+            {
+                foreach (InteriorDoor door in Doors.Where(x => x.LockWhenClosed && !x.HasBeenForcedOpen))
+                {
+                    door.LockDoor();
+                }
+            }
+        }
+    }
     public void Exit()
     {
         IsMenuInteracting = false;
         RemoveButtonPrompts();
         TeleportOut();
     }
-
     public virtual void AddDistanceOffset(Vector3 offsetToAdd)
     {
-        InternalInteriorCoordinates += offsetToAdd;
-        DisabledInteriorCoords += offsetToAdd;
+        if (InternalInteriorCoordinates != Vector3.Zero)
+        {
+            InternalInteriorCoordinates += offsetToAdd;
+        }
+        if (DisabledInteriorCoords != Vector3.Zero)
+        {
+            DisabledInteriorCoords += offsetToAdd;
+        }
 
         foreach (InteriorDoor sl in Doors)
         {
@@ -466,13 +520,23 @@ public class Interior
             {
                 sl.Position += offsetToAdd;
             }
+            if(sl.InteractPostion != Vector3.Zero)
+            {
+                sl.InteractPostion += offsetToAdd;
+            }
         }
-        InteriorEgressPosition += offsetToAdd;
+        if (InteriorEgressPosition != Vector3.Zero)
+        {
+            InteriorEgressPosition += offsetToAdd;
+        }
         foreach(InteriorInteract test in AllInteractPoints)
         {
             test.AddDistanceOffset(offsetToAdd);
         }
-        ClearPositions.ForEach(x => x += offsetToAdd);
+        for (int i = 0; i < ClearPositions.Count; i++)
+        {
+            ClearPositions[i] += offsetToAdd;
+        }
         if (PropSpawns != null)
         {
             foreach (PropSpawn test in PropSpawns)
@@ -491,9 +555,8 @@ public class Interior
         {
             SearchLocations.ForEach(x => x += offsetToAdd);
         }
+        Doors.Clear();
     }
-
-
     private void SetInactive()
     {
         if (IsInside)
@@ -560,7 +623,7 @@ public class Interior
             player.Violations.AddViolating(StaticStrings.ArmedRobberyCrimeID);
         }
     }
-    private void RemoveSpawnedProps()
+    protected void RemoveSpawnedProps()
     {
         foreach(Rage.Object prop in SpawnedProps)
         {
@@ -571,15 +634,67 @@ public class Interior
         }
         SpawnedProps.Clear();
     }
-    [OnDeserialized()]
-    private void SetValuesOnDeserialized(StreamingContext context)
-    {
-        InteriorTintColor = -1;
-        InteriorSetStyleID = -1;
-    }
-
     public virtual void AddLocation(PossibleInteriors lppInteriors)
     {
         lppInteriors.GeneralInteriors.Add(this);
+    }
+    public virtual void SetOffAlarm()
+    {
+        if(IsNotAlarmed)
+        {
+            return;
+        }
+        if(IsAlarmActive)
+        {
+            return;
+        }
+        alarmSoundID = NativeFunction.Natives.GET_SOUND_ID<int>();
+        Vector3 Coords = Game.LocalPlayer.Character.Position;
+        uint GameTimeStarted = Game.GameTime;
+        while (!NativeFunction.Natives.REQUEST_SCRIPT_AUDIO_BANK<bool>("Alarms", false, -1) && Game.GameTime - GameTimeStarted <= 2000)
+        {
+            GameFiber.Yield();
+        }
+        isAlarmActive = true;
+        if(GameLocation != null)
+        {
+            Coords = GameLocation.EntrancePosition;
+        }
+        NativeFunction.Natives.PLAY_SOUND_FROM_COORD(alarmSoundID, "Burglar_Bell", Coords.X, Coords.Y, Coords.Z, "Generic_Alarms", false, 0, false);
+        //NativeFunction.Natives.PLAY_SOUND_FROM_COORD(alarmSoundID, "ALARMS_KLAXON_03_CLOSE", Coords.X, Coords.Y, Coords.Z, "", false,0,false);
+    }
+    public void TurnOffAlarm()
+    {
+        if(!IsAlarmActive)
+        {
+            return;
+        }
+        isAlarmActive = false;
+        NativeFunction.Natives.STOP_SOUND(alarmSoundID);
+        NativeFunction.Natives.RELEASE_SOUND_ID(alarmSoundID);
+    }
+    public virtual bool CheckMatchingIDs(int internalId)
+    {
+        return internalId == InternalID;
+    }
+    public virtual void OnStoredCashChanged(int storedCash)
+    {
+
+    }
+    public void DebugLockDoors()
+    {
+        foreach (InteriorDoor door in Doors)
+        {
+            door.LockDoor();
+            EntryPoint.WriteToConsole($"INTERIOR: {Name} {door.ModelHash} {door.Position} LOCKED");
+        }
+    }
+    public void DebugOpenDoors()
+    {
+        foreach (InteriorDoor door in Doors)
+        {
+            door.UnLockDoor();
+            EntryPoint.WriteToConsole($"INTERIOR: {Name} {door.ModelHash} {door.Position} UNLOCKED");
+        }
     }
 }

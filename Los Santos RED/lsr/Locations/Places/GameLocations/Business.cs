@@ -12,13 +12,15 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-public class Business : GameLocation, IInventoryableLocation, ILocationSetupable, IPayoutDisbursable, ICraftable
+public class Business : GameLocation, ILocationSetupable, IRestableLocation, IInventoryableLocation, IOutfitableLocation, IPayoutDisbursable, ICraftable
 {
     private UIMenu OfferSubMenu;
     private string CanPurchaseRightLabel => $"{PurchasePrice:C0}";
     private UIMenuItem PurchaseBusinessMenuItem;
     private UIMenuItem SellBusinessItem;
-
+    private UIMenu outfitsSubMenu;
+    private bool KeepInteractionGoing;
+    private UIMenuNumericScrollerItem<int> RestMenuItem;
 
     public Business() : base()
     {
@@ -194,6 +196,43 @@ public class Business : GameLocation, IInventoryableLocation, ILocationSetupable
         int payoutAmount = payout * daysSinceLastPayment / PayoutFrequency;
         return payoutAmount;
     }
+    //public void Payout(IPropertyOwnable player, ITimeReportable time)
+    //{
+    //    try
+    //    {
+    //        if (player == null)
+    //        {
+    //            return;
+    //        }
+    //        int daysSinceLastPayment = (time.CurrentDateTime - DatePayoutPaid).Days;
+    //        DatePayoutPaid = time.CurrentDateTime;
+    //        DatePayoutDue = DatePayoutPaid.AddDays(PayoutFrequency);
+
+    //        if (IsPayoutInModItems)
+    //        {
+    //            ModItem itemToAdd = ModItems.Get(ModItemToPayout);
+    //            int payoutAmount = (daysSinceLastPayment / PayoutFrequency) * ModItemPayoutAmount;
+    //            if(payoutAmount>0)
+    //            {
+    //                SimpleInventory.Add(itemToAdd, payoutAmount);
+    //                UpdateSalesPrice();
+    //            }
+    //        }
+    //        else
+    //        {
+    //            int payoutAmount = CalculatePayoutAmount(daysSinceLastPayment);
+    //            CashStorage.StoredCash = CashStorage.StoredCash + payoutAmount;
+    //            UpdateSalesPrice();
+    //        }
+    //    }
+    //    catch (Exception ex)
+    //    {
+    //        EntryPoint.WriteToConsole($"{ex.Message} {ex.StackTrace}", 0);
+    //        Game.DisplayNotification($"ERROR in Payout {ex.Message}");
+    //    }
+    //}
+
+
     public void Payout(IPropertyOwnable player, ITimeReportable time)
     {
         try
@@ -202,32 +241,39 @@ public class Business : GameLocation, IInventoryableLocation, ILocationSetupable
             {
                 return;
             }
-            int daysSinceLastPayment = (time.CurrentDateTime - DatePayoutPaid).Days;
-            DatePayoutPaid = time.CurrentDateTime;
-            DatePayoutDue = DatePayoutPaid.AddDays(PayoutFrequency);
-
+            double daysElapsed = (time.CurrentDateTime - DatePayoutPaid).TotalDays;
+            if(daysElapsed < PayoutFrequency)
+            {
+                return;
+            }
+            int completedCycles = (int)(daysElapsed / PayoutFrequency);
             if (IsPayoutInModItems)
             {
                 ModItem itemToAdd = ModItems.Get(ModItemToPayout);
-                int payoutAmount = (daysSinceLastPayment / PayoutFrequency) * ModItemPayoutAmount;
-                if(payoutAmount>0)
+                int totalItems = completedCycles * ModItemPayoutAmount;
+                if (totalItems > 0)
                 {
-                    SimpleInventory.Add(itemToAdd, payoutAmount);
+                    SimpleInventory.Add(itemToAdd, totalItems);
                 }
             }
             else
             {
-                int payoutAmount = CalculatePayoutAmount(daysSinceLastPayment);
-                CashStorage.StoredCash = CashStorage.StoredCash + payoutAmount;
+                int payoutAmount = CalculatePayoutAmount(completedCycles);
+                CashStorage.StoredCash += payoutAmount;
             }
-            int salesPriceToAdd = (int)(PurchasePrice * (GrowthPercentage / 100.0));
-            CurrentSalesPrice = Math.Min(CurrentSalesPrice + salesPriceToAdd, MaxSalesPrice == 0? (int)(PurchasePrice * 1.2f):MaxSalesPrice);
+            UpdateSalesPrice();
+            DatePayoutPaid = DatePayoutPaid.AddDays(completedCycles * PayoutFrequency);
+            DatePayoutDue = DatePayoutPaid.AddDays(PayoutFrequency);       
         }
         catch (Exception ex)
         {
             EntryPoint.WriteToConsole($"{ex.Message} {ex.StackTrace}", 0);
-            Game.DisplayNotification($"ERROR in Payout {ex.Message}");
         }
+    }
+    private void UpdateSalesPrice()
+    {
+        int salesPriceToAdd = (int)(PurchasePrice * (GrowthPercentage / 100.0));
+        CurrentSalesPrice = Math.Min(CurrentSalesPrice + salesPriceToAdd, MaxSalesPrice == 0 ? (int)(PurchasePrice * 1.2f) : MaxSalesPrice);
     }
     public override void Reset()
     {
@@ -340,6 +386,20 @@ public class Business : GameLocation, IInventoryableLocation, ILocationSetupable
         {
             Blip.Sprite = IsOwned ? BlipSprite.Business : BlipSprite.BusinessForSale;
         }
+    }
+    public override void UpdateBlip(ITimeReportable time)
+    {
+        if (Blip.Exists())
+        {
+            MapIconColorString = (IsOwned ? "Green" : "White");
+            Blip.Sprite = IsOwned ? BlipSprite.Business : BlipSprite.BusinessForSale;
+            Blip.Color = Color.FromName(IsOwned ? "Green" : "White");
+        }
+        if (IsOwned)
+        {
+            return;
+        }
+        base.UpdateBlip(time);
     }
     private string GetButtonPromptText()
     {
@@ -492,5 +552,132 @@ public class Business : GameLocation, IInventoryableLocation, ILocationSetupable
             }
         };
         landlordMenu.BusinessesTab.items.Add(BusinessItem);
+    }
+    // Added Rest/Outfit functionality to businesses
+    public void CreateRestMenu(bool removeBanner)
+    {
+        Player.ActivityManager.IsInteractingWithLocation = true;
+        Player.IsTransacting = true;
+        CreateInteractionMenu();
+        InteractionMenu.Visible = true;
+        if (removeBanner)
+        {
+            InteractionMenu.RemoveBanner();
+        }
+        else if (!HasBannerImage)
+        {
+            InteractionMenu.SetBannerType(EntryPoint.LSRedColor);
+        }
+        InteractionMenu.Clear();
+        CreateRestInteractionMenu();
+        while (IsAnyMenuVisible || Time.IsFastForwarding || KeepInteractionGoing)
+        {
+            MenuPool.ProcessMenus();
+            GameFiber.Yield();
+        }
+        DisposeInteractionMenu();
+        // StoreCamera?.StopImmediately(false);
+        Player.ActivityManager.IsInteractingWithLocation = false;
+        Player.IsTransacting = false;
+        if (Interior != null)
+        {
+            Interior.IsMenuInteracting = false;
+        }
+    }
+    public void CreateOutfitMenu(bool removeBanner, bool isInside)
+    {
+        Player.ActivityManager.IsInteractingWithLocation = true;
+        Player.IsTransacting = true;
+        CreateInteractionMenu();
+        InteractionMenu.Visible = true;
+        if (removeBanner)
+        {
+            InteractionMenu.RemoveBanner();
+        }
+        else if (!HasBannerImage)
+        {
+            InteractionMenu.SetBannerType(EntryPoint.LSRedColor);
+        }
+        InteractionMenu.Clear();
+        CreateOutfitInteractionMenu(removeBanner, isInside);
+        while (IsAnyMenuVisible || Time.IsFastForwarding || KeepInteractionGoing)
+        {
+            MenuPool.ProcessMenus();
+            GameFiber.Yield();
+        }
+        DisposeInteractionMenu();
+        //StoreCamera?.StopImmediately(true);
+        Player.ActivityManager.IsInteractingWithLocation = false;
+        Player.IsTransacting = false;
+        if (Interior != null)
+        {
+            Interior.IsMenuInteracting = false;
+        }
+    }
+    private void CreateRestInteractionMenu()
+    {
+        RestMenuItem = new UIMenuNumericScrollerItem<int>("Rest", "Rest at your business to recover health. Select up to 12 hours.", 1, 12, 1) { Formatter = v => v.ToString() + " hours" };
+        RestMenuItem.Activated += (sender, selectedItem) =>
+        {
+            Rest(RestMenuItem.Value);
+        };
+        InteractionMenu.AddItem(RestMenuItem);
+    }
+    private void CreateOutfitInteractionMenu(bool removeBanner, bool isInside)
+    {
+        outfitsSubMenu = MenuPool.AddSubMenu(InteractionMenu, "Outfits");
+        if (removeBanner)
+        {
+            outfitsSubMenu.RemoveBanner();
+        }
+        else if (!HasBannerImage)
+        {
+            outfitsSubMenu.SetBannerType(EntryPoint.LSRedColor);
+        }
+        InteractionMenu.MenuItems[InteractionMenu.MenuItems.Count() - 1].Description = "Set an outfit.";
+        Player.OutfitManager.CreateOutfitMenu(MenuPool, outfitsSubMenu, isInside, removeBanner, true, false);
+    }
+    private void Rest(int Hours)
+    {
+        Time.FastForward(Time.CurrentDateTime.AddHours(Hours));//  new DateTime(Time.CurrentYear, Time.CurrentMonth, Time.CurrentDay, 11, 0, 0));
+        InteractionMenu.Visible = false;
+        KeepInteractionGoing = true;
+        Player.IsResting = true;
+        Player.IsSleeping = true;
+        Player.ButtonPrompts.AddPrompt("BusinessRest", "Cancel Rest", "BusinessRest", Settings.SettingsManager.KeySettings.InteractCancel, 99);
+
+
+
+
+
+        GameFiber FastForwardWatcher = GameFiber.StartNew(delegate
+        {
+            try
+            {
+                while (Time.IsFastForwarding)
+                {
+                    if (!Settings.SettingsManager.NeedsSettings.ApplyNeeds)
+                    {
+                        Player.HealthManager.ChangeHealth(1);
+                    }
+                    if (Player.ButtonPrompts.IsPressed("BusinessRest"))
+                    {
+                        Time.StopFastForwarding();
+                    }
+                    GameFiber.Yield();
+                }
+                Player.ButtonPrompts.RemovePrompts("BusinessRest");
+                Player.IsResting = false;
+                Player.IsSleeping = false;
+                InteractionMenu.Visible = true;
+                KeepInteractionGoing = false;
+            }
+            catch (Exception ex)
+            {
+                EntryPoint.WriteToConsole(ex.Message + " " + ex.StackTrace, 0);
+                EntryPoint.ModController.CrashUnload();
+            }
+        }, "FastForwardWatcher");
+        //EntryPoint.WriteToConsole($"PLAYER EVENT: START REST ACTIVITY AT BUSINESS");
     }
 }

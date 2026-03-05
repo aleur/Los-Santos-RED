@@ -63,6 +63,9 @@ public class ScannerDispatchInformation
     public Dispatch RequestNOOSEUnits { get; private set; }
     public Dispatch RequestNooseUnitsAlt { get; private set; }
     public Dispatch RequestNooseUnitsAlt2 { get; private set; }
+
+    public Dispatch RequestSWATUnits { get; private set; }
+
     public Dispatch RequestSwatAirSupport { get; private set; }
     public Dispatch ShotsFiredStatus { get; private set; }
     public Dispatch ResistingArrest { get; private set; }
@@ -85,6 +88,7 @@ public class ScannerDispatchInformation
     public Dispatch ThreateningOfficerWithFirearm { get; private set; }
     public Dispatch TrespassingOnGovernmentProperty { get; private set; }
     public Dispatch TrespassingOnMilitaryBase { get; private set; }
+    public Dispatch StolenArmedMilitaryVehicle { get; private set; }
     public Dispatch Trespassing { get; private set; }
     public Dispatch VehicleCrashed { get; private set; }
     public Dispatch VehicleHitAndRun { get; private set; }
@@ -104,6 +108,7 @@ public class ScannerDispatchInformation
     public Dispatch TheftDispatch { get; private set; }
     public Dispatch Shoplifting { get; private set; }
     public Dispatch BreakingAndEntering { get; private set; }
+    public Dispatch PickPocketing { get; private set; }
 
     public Dispatch FicticiousPlates { get; private set; }
     public void Setup()
@@ -238,7 +243,19 @@ public class ScannerDispatchInformation
             LocationDescription = LocationSpecificity.Zone,
             MainAudioSet = new List<AudioSet>()
             {
-                new AudioSet(new List<string>() { crime_trespassing_on_government_property.Trespassingongovernmentproperty.FileName },"trespassing on military base"),
+                new AudioSet(new List<string>() { crime_trespassing_on_government_property.Trespassingongovernmentproperty.FileName },"trespassing on military base"),       
+            },
+        };
+        StolenArmedMilitaryVehicle = new Dispatch()
+        {
+            Name = "Stealing an Armed Military Vehicle",
+            ResultsInLethalForce = true,
+            CanBeReportedMultipleTimes = false,
+            LocationDescription = LocationSpecificity.Zone,
+            IncludeDrivingVehicle = true,
+            MainAudioSet = new List<AudioSet>()
+            {
+                new AudioSet(new List<string>() { crime_person_in_a_stolen_vehicle.Apersoninastolenvehicle.FileName },"stolen military vehicle"),
             },
         };
         Trespassing = new Dispatch()
@@ -298,6 +315,15 @@ public class ScannerDispatchInformation
             LocationDescription = LocationSpecificity.StreetAndZone,
             IncludeCarryingWeapon = true,
             CanBeReportedMultipleTimes = false,
+        };
+        PickPocketing = new Dispatch()
+        {
+            Name = "Petty Theft",
+            LocationDescription = LocationSpecificity.Street,
+            MainAudioSet = new List<AudioSet>()
+            {
+                new AudioSet(new List<string>() { crime_4_84.Apettytheft.FileName },"a petty theft"),
+            },
         };
         CivilianDown = new Dispatch()
         {
@@ -905,6 +931,67 @@ public class ScannerDispatchInformation
                 new AudioSet(new List<string>() { SWAT3.calloutpending.FileName },"dispatching NOOSE units"),
             },
         };
+
+
+
+        List<AudioSet> SWATPreambleAudioSet = new List<AudioSet>()
+            {
+                new AudioSet(new List<string>() { SWAT3.emergencytraffic.FileName, AudioBeeps.Radio_End_1.FileName, AudioBeeps.Radio_Start_1.FileName,SWAT3.tendavidgo.FileName },"emergency traffic"),
+                new AudioSet(new List<string>() { SWAT3.emergencytraffic.FileName, AudioBeeps.Radio_End_1.FileName, AudioBeeps.Radio_Start_1.FileName,SWAT3.tendavidgoahead.FileName },"emergency traffic"),
+                new AudioSet(new List<string>() { SWAT3.copyemergencytraffic.FileName, AudioBeeps.Radio_End_1.FileName, AudioBeeps.Radio_Start_1.FileName,SWAT3.tendavidgo.FileName },"emergency traffic"),
+                new AudioSet(new List<string>() { SWAT3.copyemergencytraffic.FileName, AudioBeeps.Radio_End_1.FileName, AudioBeeps.Radio_Start_1.FileName,SWAT3.tendavidgoahead.FileName },"emergency traffic"),
+                new AudioSet(new List<string>() { SWAT3.copywarrantinformation.FileName, AudioBeeps.Radio_End_1.FileName, AudioBeeps.Radio_Start_1.FileName,SWAT3.tendavidgo.FileName },"emergency traffic"),
+                new AudioSet(new List<string>() { SWAT3.copywarrantinformation.FileName, AudioBeeps.Radio_End_1.FileName, AudioBeeps.Radio_Start_1.FileName,SWAT3.tendavidgoahead.FileName },"emergency traffic"),
+                new AudioSet(new List<string>() { SWAT3.hitandrun.FileName, AudioBeeps.Radio_End_1.FileName, AudioBeeps.Radio_Start_1.FileName,SWAT3.tendavidgo.FileName },"emergency traffic"),
+                new AudioSet(new List<string>() { SWAT3.hitandrun.FileName, AudioBeeps.Radio_End_1.FileName, AudioBeeps.Radio_Start_1.FileName,SWAT3.tendavidgoahead.FileName },"emergency traffic"),
+             };
+
+        List<AudioSet> SWATEpilogueAudioSet = new List<AudioSet>()
+            {
+                new AudioSet(new List<string>() { SWAT3.tendavidrogershowusinroute.FileName },"en route"),
+                new AudioSet(new List<string>() { SWAT3.tendavidrogerrespondingcode3.FileName },"en route"),
+             };
+
+        RequestSWATUnits = new Dispatch()
+        {
+            IncludeAttentionAllUnits = false,
+            Name = "SWAT Units Requested",
+            IsPoliceStatus = true,
+            IncludeReportedBy = false,
+            LocationDescription = LocationSpecificity.Nothing,
+            CanAddExtras = false,
+
+            PreambleAudioSet = SWATPreambleAudioSet,
+            MainAudioSet = new List<AudioSet>()
+            {
+                new AudioSet(new List<string>() { SWAT3.multipleswatunitsresponding.FileName,SWAT3.suspectarmedusecaution.FileName},"dispatching SWAT units"),
+                new AudioSet(new List<string>() { SWAT3.multipleswatunitsresponding.FileName, SWAT3.suspectsarmedwithheavyweaponsandbodyarmor.FileName },"dispatching SWAT units"),
+                new AudioSet(new List<string>() { SWAT3.swat10minuteeta.FileName },"dispatching SWAT units"),
+                new AudioSet(new List<string>() { SWAT3.calloutpending.FileName },"dispatching SWAT units"),
+                new AudioSet(new List<string>() { SWAT3.respondcode3.FileName},"dispatching SWAT units"),
+                new AudioSet(new List<string>() { SWAT3.numerousshotsfired.FileName},"dispatching SWAT units"),
+                new AudioSet(new List<string>() { SWAT3.requestingcode1alphain30minutes.FileName },"dispatching SWAT units"),
+            },
+            EpilogueAudioSet = SWATEpilogueAudioSet,
+        };
+
+        RequestSwatAirSupport = new Dispatch()
+        {
+            Name = "Air Support Requested",
+            IsPoliceStatus = true,
+            IncludeReportedBy = false,
+            LocationDescription = LocationSpecificity.Nothing,
+            CanAddExtras = false,
+            PreambleAudioSet = SWATPreambleAudioSet,
+            MainAudioSet = new List<AudioSet>()
+            {
+                new AudioSet(new List<string>() { SWAT3.airsupportimmediateinsertion.FileName,SWAT3.respondcode3.FileName },"officers requesting helicopter support"),
+            },
+            EpilogueAudioSet = SWATEpilogueAudioSet,
+        };
+
+
+
         RequestFIBUnits = new Dispatch()
         {
             IncludeAttentionAllUnits = false,
@@ -918,23 +1005,7 @@ public class ScannerDispatchInformation
                 new AudioSet(new List<string>() { dispatch_units_full.FIBteamdispatchingfromstation.FileName},"dispatching FIB-HET units"),
             },
         };
-        RequestSwatAirSupport = new Dispatch()
-        {
-            Name = "Air Support Requested",
-            IsPoliceStatus = true,
-            IncludeReportedBy = false,
-            LocationDescription = LocationSpecificity.Nothing,
-            CanAddExtras = false,
-            PreambleAudioSet = new List<AudioSet>()
-            {
-                new AudioSet(new List<string>() { SWAT3.emergencytraffic.FileName, AudioBeeps.Radio_End_1.FileName, AudioBeeps.Radio_Start_1.FileName,SWAT3.tendavidgoahead.FileName },"emergency traffic"),
-               new AudioSet(new List<string>() { SWAT3.copyemergencytraffic.FileName, AudioBeeps.Radio_End_1.FileName, AudioBeeps.Radio_Start_1.FileName,SWAT3.tendavidgo.FileName },"emergency traffic"),
-             },
-            MainAudioSet = new List<AudioSet>()
-            {
-                new AudioSet(new List<string>() { SWAT3.airsupportimmediateinsertion.FileName,SWAT3.respondcode3.FileName },"officers requesting helicopter support"),
-            },
-        };
+
         ShotsFiredStatus = new Dispatch()
         {
             Name = "Shots Fired",

@@ -20,6 +20,12 @@ public class ScrewdriverItem : ModItem
     public int MinVehicleDoorPickTime { get; set; } = 4000;
     public int MaxVehicleDoorPickTime { get; set; } = 8000;
 
+
+    public float AlarmPercentageMin { get; set; } = 5f;//60f;
+    public float AlarmPercentageMax { get; set; } = 15f;//75f;
+    public uint GameTimeBetweenAlarmChecksMin { get; set; } = 4000;
+    public uint GameTimeBetweenAlarmChecksMax { get; set; } = 8000;
+
     public ScrewdriverItem()
     {
 
@@ -46,7 +52,6 @@ public class ScrewdriverItem : ModItem
     {
         possibleItems?.ScrewdriverItems.RemoveAll(x => x.Name == Name);
         possibleItems?.ScrewdriverItems.Add(this);
-        base.AddToList(possibleItems);
     }
 
 
@@ -82,9 +87,9 @@ public class ScrewdriverItem : ModItem
     }
 
 
-    public bool DoLockpickAnimation(IInteractionable Player, IBasicUseable BasicUseable, Action OnCompletedPicking, ISettingsProvideable Settings, bool showHelpText, bool isVehicle) => DoLockpickAnimation(Player, BasicUseable, OnCompletedPicking, Settings, "", "", showHelpText, isVehicle);
+    public bool DoLockpickAnimation(IInteractionable Player, IBasicUseable BasicUseable, Action OnCompletedPicking, ISettingsProvideable Settings, bool showHelpText, bool isVehicle, Interior interior) => DoLockpickAnimation(Player, BasicUseable, OnCompletedPicking, Settings, "", "", showHelpText, isVehicle, null, -1, -1, interior);
 
-    public bool DoLockpickAnimation(IInteractionable Player, IBasicUseable BasicUseable, Action OnCompletedPicking, ISettingsProvideable Settings, string dictionary, string anim, bool showHelpText, bool isVehicle)
+    public bool DoLockpickAnimation(IInteractionable Player, IBasicUseable BasicUseable, Action OnCompletedPicking, ISettingsProvideable Settings, string dictionary, string anim, bool showHelpText, bool isVehicle, Vehicle TargetVehicle, int SeatTryingToEnter, int DoorIndex, Interior interior)
     {
         float LockpickAnimStopPercentage = 0.5f;
         float LockpickAnimRestartPercentage = 0.3f;
@@ -116,6 +121,8 @@ public class ScrewdriverItem : ModItem
         ScrewDriverObject = SpawnAndAttachItem(BasicUseable, true, true);
         bool isLooping = false;
         bool hasPickedLock = false;
+        uint GameTimeLastCheckedAlarm = Game.GameTime;
+        uint GameTimeBetweenAlarmChecks = RandomItems.GetRandomNumber(GameTimeBetweenAlarmChecksMin, GameTimeBetweenAlarmChecksMax);
         while (Player.IsAliveAndFree)
         {
             float pedAnimTime = NativeFunction.CallByName<float>("GET_ENTITY_ANIM_CURRENT_TIME", Game.LocalPlayer.Character, animDictionary, animName);
@@ -133,6 +140,20 @@ public class ScrewdriverItem : ModItem
                 NativeFunction.Natives.SET_ANIM_RATE(Player.Character, LockpickAnimAnimRate, 2, false);
             }
             Player.WeaponEquipment.SetUnarmed();
+
+            if (Game.GameTime - GameTimeLastCheckedAlarm >= GameTimeBetweenAlarmChecks)
+            {
+                EntryPoint.WriteToConsole("SCREWNDRIVER, DID ALRM CHECK");
+                if (interior != null && RandomItems.RandomPercent(RandomItems.GetRandomNumber(AlarmPercentageMin, AlarmPercentageMax)))
+                {
+                    interior.SetOffAlarm();
+                    Player.HasSetOffAlarm(interior.GameLocation);
+                }
+                GameTimeBetweenAlarmChecks = RandomItems.GetRandomNumber(GameTimeBetweenAlarmChecksMin, GameTimeBetweenAlarmChecksMax);
+                GameTimeLastCheckedAlarm = Game.GameTime;
+            }
+
+
             if (Player.IsMoveControlPressed || !Player.Character.IsAlive)
             {
                 break;
@@ -147,8 +168,28 @@ public class ScrewdriverItem : ModItem
                 }
                 break;
             }
+
+            if(isVehicle && TargetVehicle.Exists())
+            {
+                Player.ButtonPrompts.AttemptAddPrompt("VehicleLockpick", "Break Window", "VehicleLockpick", GameControl.Enter, 999);
+                if(Player.ButtonPrompts.IsPressed("VehicleLockpick"))
+                {
+                    Player.SetCarBreakIn();
+                    NativeFunction.Natives.TASK_ENTER_VEHICLE(Player.Character, TargetVehicle, -1, SeatTryingToEnter, 2.0f, 1, 0);
+                    break;
+                }
+            }
+
+            if (isVehicle && TargetVehicle.Exists() && TargetVehicle.Doors[DoorIndex].IsOpen)
+            {
+                EntryPoint.WriteToConsole($"LOCK PICK ENTRY BREAK 2: {Player.IsMoveControlPressed} TargetVehicle.Doors[DoorIndex].IsOpen {TargetVehicle.Doors[DoorIndex].IsOpen}");
+                NativeFunction.Natives.TASK_ENTER_VEHICLE(Player.Character, TargetVehicle, -1, SeatTryingToEnter, 2.0f, 1, 0);
+                //Continue = false;
+                break;
+            }
             GameFiber.Yield();
         }
+        Player.ButtonPrompts.RemovePrompts("VehicleLockpick");
         if (hasPickedLock)
         {
             NativeFunction.Natives.SET_ENTITY_ANIM_CURRENT_TIME(Player.Character, animDictionary, animName, LockpickAnimStopPercentage);

@@ -19,7 +19,7 @@ public class FireConditionalLocation : ConditionalLocation
     }
     public override bool DetermineRun(bool force)
     {
-        if (!Settings.SettingsManager.FireSettings.ManageDispatching)
+        if (!Settings.SettingsManager.FireSettings.ManageDispatching || EntryPoint.IsLSPDFRIntegrationEnabled)
         {
             return false;
         }
@@ -46,7 +46,7 @@ public class FireConditionalLocation : ConditionalLocation
     {
         try
         {
-            FireFighterSpawnTask fireFighterSpawnTask = new FireFighterSpawnTask(Agency, SpawnLocation, DispatchableVehicle, DispatchablePerson, Settings.SettingsManager.FireSettings.ShowSpawnedBlips, Settings, Weapons, Names, true, World, ModItems, ShopMenus);
+            FireFighterSpawnTask fireFighterSpawnTask = new FireFighterSpawnTask(Agency, SpawnLocation, DispatchableVehicle, DispatchablePerson, Settings.SettingsManager.FireSettings.ShowSpawnedBlips, Settings, Weapons, Names, true, World, ModItems, ShopMenus, Crimes);
             fireFighterSpawnTask.AllowAnySpawn = true;
             fireFighterSpawnTask.AllowBuddySpawn = false;
             fireFighterSpawnTask.SpawnRequirement = TaskRequirements;

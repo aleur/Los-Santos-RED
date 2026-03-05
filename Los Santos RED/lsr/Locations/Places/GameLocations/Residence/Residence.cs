@@ -58,6 +58,10 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
     public CashStorage CashStorage { get; set; }
     [XmlIgnore]
     public ResidenceInterior ResidenceInterior { get; set; }
+    [XmlIgnore]
+    public List<DisplayPlacement> DisplayPlacements { get; set; } = new List<DisplayPlacement>();
+
+    public override bool AreMarkersDisabled => !IsOwnedOrRented;
     public bool CanRent => !IsOwned && !IsRented && RentalFee > 0;
     public bool CanBuy => !IsOwned && PurchasePrice > 0;
     public bool IsOwnedOrRented => IsOwned || IsRented;
@@ -313,6 +317,10 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
         SimpleInventory.Reset();
         UpdateStoredData();
         CashStorage.Reset();
+        foreach(DisplayPlacement tp in DisplayPlacements)
+        {
+            tp.DespawnDisplay();
+        }
     }
     public void ReRent(IPropertyOwnable player, ITimeReportable time)
     {
@@ -509,7 +517,7 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
             outfitsSubMenu.SetBannerType(EntryPoint.LSRedColor);
         }
         InteractionMenu.MenuItems[InteractionMenu.MenuItems.Count() - 1].Description = "Set an outfit.";
-        Player.OutfitManager.CreateOutfitMenu(MenuPool, outfitsSubMenu, isInside, removeBanner);
+        Player.OutfitManager.CreateOutfitMenu(MenuPool, outfitsSubMenu, isInside, removeBanner, true, false);
     }
     private void OnRentedOrPurchased()
     {
@@ -822,6 +830,14 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
             {
                 myRes.StoredCash = CashStorage.StoredCash;
             }
+            if(DisplayPlacements != null)
+            {
+                myRes.TrophyPlacements = new List<DisplayPlacement>();
+                foreach(DisplayPlacement trophyPlacements in DisplayPlacements)
+                {
+                    myRes.TrophyPlacements.Add(new DisplayPlacement(trophyPlacements.SlotID, trophyPlacements.ModItemName));
+                }
+            }
         }
         return myRes;
     }
@@ -851,5 +867,11 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
         }
         return residenceInformation.ToString();
     }
+
+    public void OnPlayerLoadedSave()
+    {
+        ResidenceInterior?.OnPlayerLoadedSave();
+    }
+
 }
 

@@ -20,7 +20,7 @@ public class EMSConditionalLocation : ConditionalLocation
     }
     public override bool DetermineRun(bool force)
     {
-        if (!Settings.SettingsManager.EMSSettings.ManageDispatching)
+        if (!Settings.SettingsManager.EMSSettings.ManageDispatching || EntryPoint.IsLSPDFRIntegrationEnabled)
         {
             return false;
         }
@@ -46,7 +46,7 @@ public class EMSConditionalLocation : ConditionalLocation
     {
         try
         {
-            EMTSpawnTask emtSpawnTask = new EMTSpawnTask(Agency, SpawnLocation, DispatchableVehicle, DispatchablePerson, Settings.SettingsManager.EMSSettings.ShowSpawnedBlips, Settings, Weapons, Names, true, World, ModItems, ShopMenus);
+            EMTSpawnTask emtSpawnTask = new EMTSpawnTask(Agency, SpawnLocation, DispatchableVehicle, DispatchablePerson, Settings.SettingsManager.EMSSettings.ShowSpawnedBlips, Settings, Weapons, Names, true, World, ModItems, ShopMenus, Crimes);
             emtSpawnTask.AllowAnySpawn = true;
             emtSpawnTask.AllowBuddySpawn = false;
             emtSpawnTask.SpawnRequirement = TaskRequirements;

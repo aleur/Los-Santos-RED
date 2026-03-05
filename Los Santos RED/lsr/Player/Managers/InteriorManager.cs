@@ -68,23 +68,26 @@ public class InteriorManager
             }
             return;
         }
-        foreach(GameLocation gameLocation in World.Places.ActiveLocations.ToList())
+        if (Player.IsAliveAndFree)
         {
-            if (!gameLocation.HasInterior || gameLocation.Interior == null || gameLocation.Interior.IsTeleportEntry)
+            foreach (GameLocation gameLocation in World.Places.ActiveLocations.ToList())
             {
-                continue;
-            }
-            if (gameLocation.Interior.AllInteractPoints == null || !gameLocation.Interior.AllInteractPoints.Any())
-            {
-                continue;
-            }
-            if(gameLocation.IsActivated && gameLocation.DistanceToPlayer <= gameLocation.InteriorMaxUpdateDistance)// 50f)
-            {
-                if(!InteriorUpdateLocations.Any(x=> x.Interior?.LocalID == gameLocation.Interior?.LocalID))
+                if (!gameLocation.HasInterior || gameLocation.Interior == null || gameLocation.Interior.IsTeleportEntry)
                 {
-                    InteriorUpdateLocations.Add(gameLocation);
+                    continue;
                 }
-                StartInteriorChecking();
+                if (gameLocation.Interior.AllInteractPoints == null || !gameLocation.Interior.AllInteractPoints.Any())
+                {
+                    continue;
+                }
+                if (gameLocation.IsActivated && gameLocation.DistanceToPlayer <= gameLocation.InteriorMaxUpdateDistance)// 50f)
+                {
+                    if (!InteriorUpdateLocations.Any(x => x.Interior?.LocalID == gameLocation.Interior?.LocalID))
+                    {
+                        InteriorUpdateLocations.Add(gameLocation);
+                    }
+                    StartInteriorChecking();
+                }
             }
         }
         InteriorUpdateLocations.RemoveAll(x => !x.IsActivated || !x.IsNearby || x.DistanceToPlayer >= x.InteriorMaxUpdateDistance);// 50f);
@@ -123,7 +126,10 @@ public class InteriorManager
                 while (IsActive && EntryPoint.ModController.IsRunning && InteriorUpdateLocations.Any())
                 {
                     UpdateClosestInteract();
-                    ClosestInteriorInteract?.UpdateActivated(Interactionable, Settings, ClosestLocation, ClosestInterior, LocationInteractable);
+                    if (ClosestLocation != null && !ClosestLocation.AreMarkersDisabled)
+                    {
+                        ClosestInteriorInteract?.UpdateActivated(Interactionable, Settings, ClosestLocation, ClosestInterior, LocationInteractable);
+                    }
                     HandleMarkers();
                     GameFiber.Yield();
                 }
@@ -145,15 +151,23 @@ public class InteriorManager
         {
             return;
         }
+        if(!Player.IsAliveAndFree)
+        {
+            return; 
+        }
         foreach(GameLocation location in InteriorUpdateLocations)
         {
             if(location.Interior.IsMenuInteracting)
             {
                 continue;
             }
+            if(location.AreMarkersDisabled)
+            {
+                continue;
+            }
             foreach(InteriorInteract interiorInteract in location.Interior.AllInteractPoints)
             {
-                interiorInteract.DisplayMarker(Settings.SettingsManager.WorldSettings.InteriorMarkerType, Settings.SettingsManager.WorldSettings.InteriorMarkerZOffset, Settings.SettingsManager.WorldSettings.InteriorMarkerScale);
+                interiorInteract.DisplayMarker(interiorInteract.MarkerType, Settings.SettingsManager.WorldSettings.InteriorMarkerZOffset, Settings.SettingsManager.WorldSettings.InteriorMarkerScale);
             }
         }
     }
@@ -167,6 +181,11 @@ public class InteriorManager
         ClosestInteriorInteract = null;
         ClosestInterior = null;
         ClosestLocation = null;
+
+        if(!Player.IsAliveAndFree)
+        {
+            return;
+        }
         foreach (GameLocation gameLocation in InteriorUpdateLocations.ToList())
         {
             gameLocation.Interior.UpdateInteractDistances();

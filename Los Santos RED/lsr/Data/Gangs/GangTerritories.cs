@@ -38,9 +38,10 @@ public class GangTerritories : IGangTerritories
             EntryPoint.WriteToConsole($"No Gang Territories config found, creating default", 0);
 
             DefaultConfig();
-            DefaultConfig_LosSantos2008();
-            DefaultConfig_Simple();
-            DefaultConfig_LibertyCity();
+           // DefaultConfig_LosSantos2008();
+           // DefaultConfig_Simple();
+           // DefaultConfig_LibertyCity();
+            DefaultConfig_LibertyCityLPP();
         }
         //Load Additive
         foreach (FileInfo fileInfo in LSRDirectory.GetFiles("GangTerritories+_*.xml").OrderByDescending(x => x.Name))
@@ -191,6 +192,7 @@ public class GangTerritories : IGangTerritories
             new GangTerritory("AMBIENT_GANG_ANCELOTTI","CHU", 0, 100),//Chumash
             //new GangTerritory("LSMC","CMSW", 0, 100),
             new GangTerritory("AMBIENT_GANG_MEXICAN","CYPRE", 0, 100),//Cypress Flats
+            new GangTerritory("AMBIENT_GANG_MEXICAN","CYPRE2", 0, 100),//Cypress Flats
             new GangTerritory("AMBIENT_GANG_BALLAS","DAVIS", 0, 100),
             // new GangTerritory("AMBIENT_GANG_FAMILY","DAVIS", 1, 50),
             //new GangTerritory("LSMC","DELBE", 0, 100),
@@ -251,7 +253,7 @@ public class GangTerritories : IGangTerritories
             new GangTerritory("AMBIENT_GANG_MESSINA","RICHM", 0, 100),//Richman
             //new GangTerritory("AMBIENT_GANG_MESSINA","ROCKF", 0, 100),//Rockford Hills
             //new GangTerritory("LSMC","RTRAK", 0, 100),
-            new GangTerritory("AMBIENT_GANG_MEXICAN","SANAND", 0, 100),//broken zone in east LS
+            //new GangTerritory("AMBIENT_GANG_MEXICAN","SANAND", 0, 100),//broken zone in east LS
             //new GangTerritory("LSMC","SANCHIA", 0, 100),
             new GangTerritory("AMBIENT_GANG_HILLBILLY","SANDY", 0, 100),//Sandy Shores
             new GangTerritory("AMBIENT_GANG_BALLAS","SKID", 0, 100),//Mission Row
@@ -353,15 +355,93 @@ public class GangTerritories : IGangTerritories
             new GangTerritory("AMBIENT_GANG_ANCELOTTI","PORTU", 0, 100),//port tudor
         };
         Serialization.SerializeParams(LibertyGangTerritoriesList, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LibertyConfigFolder}\\GangTerritories_{StaticStrings.LibertyConfigSuffix}.xml");
+    }
 
+    private void DefaultConfig_LibertyCityLPP()
+    {
+        List<GangTerritory> LibertyLPPGangTerritoriesList = new List<GangTerritory>()
+        {
+            //Lost (ONLY ALderney)
+            new GangTerritory("AMBIENT_GANG_LOST","ACTRR", 0, 100),//acter
+            new GangTerritory("AMBIENT_GANG_LOST","ACTIP", 0, 100),//acter indus
+            new GangTerritory("AMBIENT_GANG_LOST","ALSCF", 0, 100),//acter prison
+            new GangTerritory("AMBIENT_GANG_LOST","TUDOR", 0, 100),//tudor
+            new GangTerritory("AMBIENT_GANG_LOST","BEECW", 0, 100),//beachwood city LOST have taken over in LPP
+          
+            //Yardies (Only Alderney)
+            new GangTerritory("AMBIENT_GANG_YARDIES","SCHOL", 0, 100),//schlotter
+            new GangTerritory("AMBIENT_GANG_YARDIES","BEECW", 0, 100),//beachwood city
+            new GangTerritory("AMBIENT_GANG_YARDIES","WILLI", 0, 100),//Willis
+            new GangTerritory("AMBIENT_GANG_YARDIES","MEADH", 0, 100),//Meadow Hills
 
+            //Korean Mob (Only Alderney)
+            new GangTerritory("AMBIENT_GANG_KOREAN","ALDCI", 0, 100),//Alderny City
+            new GangTerritory("AMBIENT_GANG_KOREAN","LEFWO", 0, 100),//Leftwood
+            new GangTerritory("AMBIENT_GANG_KOREAN","WESDY", 0, 100),//Westdyke
+            new GangTerritory("AMBIENT_GANG_KOREAN","BERCH", 0, 100),//bercham
 
+            //Triads (South East Algonquin)
+            new GangTerritory("AMBIENT_GANG_WEICHENG","CHITO", 0, 100),//CHinatown   
+            new GangTerritory("AMBIENT_GANG_WEICHENG","THXCH", 0, 100),//the exchange
+            new GangTerritory("AMBIENT_GANG_WEICHENG","FISSO", 0, 100),//fishmarket south
 
+            //North Holland Hustlers (As Said)
+            new GangTerritory("AMBIENT_GANG_HOLHUST","NOHOL", 0, 100),//North Holland
 
-        List<GangTerritory> LPPZoneJurisdiction = new List<GangTerritory>();
-        LPPZoneJurisdiction.AddRange(LibertyGangTerritoriesList);
-        LPPZoneJurisdiction.AddRange(GangTerritoriesList);
-        Serialization.SerializeParams(LPPZoneJurisdiction, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LPPConfigFolder}\\GangTerritories_{StaticStrings.LPPConfigSuffix}.xml");
+            //AOD North West Algonquin
+            new GangTerritory("AMBIENT_GANG_ANGELS","VASIH", 0, 100),//Varsity Heights
+            new GangTerritory("AMBIENT_GANG_ANGELS","MIDPW", 0, 100),//Middle Park West
+            new GangTerritory("AMBIENT_GANG_ANGELS","NOHOL", 1, 100),//North Holland
+
+            //Uptown Riders (only Northwood, maybe westdyke?)
+            new GangTerritory("AMBIENT_GANG_UPTOWN","NORWO", 0, 100),//Northwood
+
+            //Spanish Lords (in West Bohan)
+            new GangTerritory("AMBIENT_GANG_SPANISH","STHBO", 0, 100),//South BOhan
+            new GangTerritory("AMBIENT_GANG_SPANISH","FORSI", 0, 100),//Fortside
+            new GangTerritory("AMBIENT_GANG_SPANISH","CHAPO", 0, 100),//Chase Point
+            new GangTerritory("AMBIENT_GANG_SPANISH","BOULE", 0, 100),//Chase Point 
+
+            //Mafia
+            //Gambetti (Southern Algonquin (With Triads))
+            new GangTerritory("AMBIENT_GANG_GAMBETTI","LITAL", 0, 100),//little italy
+            new GangTerritory("AMBIENT_GANG_GAMBETTI","CITH", 0, 100),//city hall
+            new GangTerritory("AMBIENT_GANG_GAMBETTI","SUFFO", 0, 100),//suffolk
+            new GangTerritory("AMBIENT_GANG_GAMBETTI","THTRI", 0, 100),//the triangle
+            new GangTerritory("AMBIENT_GANG_GAMBETTI","THPRES", 0, 100),//presidents city
+
+            //Lupisella (Bohan (With Spanish Lords))
+            new GangTerritory("AMBIENT_GANG_LUPISELLA","INSTI", 0, 100),//Industrial Bohan
+            new GangTerritory("AMBIENT_GANG_LUPISELLA","LTBAY", 0, 100),//Little Bay Boahn
+            new GangTerritory("AMBIENT_GANG_LUPISELLA","NRTGA", 0, 100),//Northern Gardens
+
+            //Petrovic (Broker)
+            new GangTerritory("AMBIENT_GANG_PETROVIC","HOBEH", 0, 100),//Hove Beach
+            new GangTerritory("AMBIENT_GANG_PETROVIC","FIISL", 0, 100),//Firefly Island
+            new GangTerritory("AMBIENT_GANG_PETROVIC","BEGGA", 0, 100),//Beachgate
+
+            //Pavano
+            new GangTerritory("AMBIENT_GANG_PAVANO","EAHOL", 0, 100),//East Holland
+            new GangTerritory("AMBIENT_GANG_PAVANO","LANCA", 0, 100),//Laancaster
+            new GangTerritory("AMBIENT_GANG_PAVANO","MIDPE", 0, 100),//Middle Park East
+
+            //Messian 
+            new GangTerritory("AMBIENT_GANG_MESSINA","STARJ", 0, 100),//Star Junction
+            new GangTerritory("AMBIENT_GANG_MESSINA","PUGAT", 0, 100),//Purgatory
+            new GangTerritory("AMBIENT_GANG_MESSINA","HATGA", 0, 100),//Hafton Gardens
+            new GangTerritory("AMBIENT_GANG_MESSINA","LANCE", 0, 100),//Lancet
+            new GangTerritory("AMBIENT_GANG_MESSINA","WESMI", 0, 100),//Westminster
+
+            //Ancelotti
+            new GangTerritory("AMBIENT_GANG_ANCELOTTI","NORMY", 0, 100),//Normandy
+            new GangTerritory("AMBIENT_GANG_ANCELOTTI","PORTU", 0, 100),//port tudor
+        };
+        Serialization.SerializeParams(LibertyLPPGangTerritoriesList, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LPPConfigFolder}\\GangTerritories+_{StaticStrings.LPPConfigSuffix}.xml");
+
+        //List<GangTerritory> LPPZoneJurisdiction = new List<GangTerritory>();
+        //LPPZoneJurisdiction.AddRange(LibertyGangTerritoriesList);
+        //LPPZoneJurisdiction.AddRange(GangTerritoriesList);
+        //Serialization.SerializeParams(LPPZoneJurisdiction, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LPPConfigFolder}\\GangTerritories_{StaticStrings.LPPConfigSuffix}.xml");
 
     }
 
@@ -380,8 +460,9 @@ public class GangTerritories : IGangTerritories
             new GangTerritory("AMBIENT_GANG_KKANGPAE", "KOREAT", 0, 100),//Little Seoul
 
             new GangTerritory("AMBIENT_GANG_MEXICAN", "CYPRE", 0, 100),//Cypress Flats
+            new GangTerritory("AMBIENT_GANG_MEXICAN", "CYPRE2", 0, 100),//Cypress Flats
             new GangTerritory("AMBIENT_GANG_MEXICAN", "RANCHO", 1, 50),//south rancho?
-            new GangTerritory("AMBIENT_GANG_MEXICAN", "SANAND", 0, 100),//broken zone in east LS
+            //new GangTerritory("AMBIENT_GANG_MEXICAN", "SANAND", 0, 100),//broken zone in east LS
 
             new GangTerritory("AMBIENT_GANG_ARMENIAN", "LOSPUER", 0, 100),//La Puerta
 
@@ -425,40 +506,41 @@ public class GangTerritories : IGangTerritories
     }
     private void DefaultConfig_Simple()
     {
-        List<GangTerritory> SimpleGangTerritoriesList = new List<GangTerritory>()
-        {
-            new GangTerritory("AMBIENT_GANG_HILLBILLY","ALAMO", 0, 100),//Alamo Sea
-            new GangTerritory("AMBIENT_GANG_FAMILY","CHAMH", 0, 100),//chamberlain hills
-            new GangTerritory("AMBIENT_GANG_MADRAZO","CHIL", 0, 100),//Vinewood Hills
-            new GangTerritory("AMBIENT_GANG_MEXICAN","CYPRE", 0, 100),//Cypress Flats
-            new GangTerritory("AMBIENT_GANG_BALLAS","DAVIS", 0, 100),
-            new GangTerritory("AMBIENT_GANG_LOST","DESRT", 0, 100),//grande senora desert
-            new GangTerritory("AMBIENT_GANG_LOST","EAST_V", 0, 100),//East Vinewood
-            new GangTerritory("AMBIENT_GANG_MARABUNTE","EBURO", 0, 100),//el burro heights
-            new GangTerritory("AMBIENT_GANG_KKANGPAE","KOREAT", 0, 100),//Little Seoul
-            new GangTerritory("AMBIENT_GANG_WEICHENG","LEGSQU", 0, 100),//Legion Square
-            new GangTerritory("AMBIENT_GANG_MADRAZO","LMESA", 0, 100),//La Mesa
-            new GangTerritory("AMBIENT_GANG_ARMENIAN","LOSPUER", 0, 100),//La Puerta
-            new GangTerritory("AMBIENT_GANG_LOST","MIRR", 0, 100),//mirror park
-            new GangTerritory("AMBIENT_GANG_MARABUNTE","MURRI", 0, 100),//Murrieta Heights
-            new GangTerritory("AMBIENT_GANG_LOST","PALFOR", 0, 100),//Paleto Forest
-            new GangTerritory("AMBIENT_GANG_WEICHENG","PBOX", 0, 100),//Pillbox Hill
+        //List<GangTerritory> SimpleGangTerritoriesList = new List<GangTerritory>()
+        //{
+        //    new GangTerritory("AMBIENT_GANG_HILLBILLY","ALAMO", 0, 100),//Alamo Sea
+        //    new GangTerritory("AMBIENT_GANG_FAMILY","CHAMH", 0, 100),//chamberlain hills
+        //    new GangTerritory("AMBIENT_GANG_MADRAZO","CHIL", 0, 100),//Vinewood Hills
+        //    new GangTerritory("AMBIENT_GANG_MEXICAN","CYPRE", 0, 100),//Cypress Flats
+        //    new GangTerritory("AMBIENT_GANG_MEXICAN","CYPRE2", 0, 100),//Cypress Flats
+        //    new GangTerritory("AMBIENT_GANG_BALLAS","DAVIS", 0, 100),
+        //    new GangTerritory("AMBIENT_GANG_LOST","DESRT", 0, 100),//grande senora desert
+        //    new GangTerritory("AMBIENT_GANG_LOST","EAST_V", 0, 100),//East Vinewood
+        //    new GangTerritory("AMBIENT_GANG_MARABUNTE","EBURO", 0, 100),//el burro heights
+        //    new GangTerritory("AMBIENT_GANG_KKANGPAE","KOREAT", 0, 100),//Little Seoul
+        //    new GangTerritory("AMBIENT_GANG_WEICHENG","LEGSQU", 0, 100),//Legion Square
+        //    new GangTerritory("AMBIENT_GANG_MADRAZO","LMESA", 0, 100),//La Mesa
+        //    new GangTerritory("AMBIENT_GANG_ARMENIAN","LOSPUER", 0, 100),//La Puerta
+        //    new GangTerritory("AMBIENT_GANG_LOST","MIRR", 0, 100),//mirror park
+        //    new GangTerritory("AMBIENT_GANG_MARABUNTE","MURRI", 0, 100),//Murrieta Heights
+        //    new GangTerritory("AMBIENT_GANG_LOST","PALFOR", 0, 100),//Paleto Forest
+        //    new GangTerritory("AMBIENT_GANG_WEICHENG","PBOX", 0, 100),//Pillbox Hill
 
-            //new GangTerritory("AMBIENT_GANG_SALVA","RANCHO", 0, 100),
-            new GangTerritory("AMBIENT_GANG_MEXICAN","RANCHO", 1, 50),//south rancho?
-            new GangTerritory("AMBIENT_GANG_SALVA","RANCHO", 0, 50),//north rancho?
+        //    //new GangTerritory("AMBIENT_GANG_SALVA","RANCHO", 0, 100),
+        //    new GangTerritory("AMBIENT_GANG_MEXICAN","RANCHO", 1, 50),//south rancho?
+        //    new GangTerritory("AMBIENT_GANG_SALVA","RANCHO", 0, 50),//north rancho?
 
-            new GangTerritory("AMBIENT_GANG_MESSINA","RICHM", 0, 100),//Richman
-            new GangTerritory("AMBIENT_GANG_MEXICAN","SANAND", 0, 100),//broken zone in east LS
-            new GangTerritory("AMBIENT_GANG_HILLBILLY","SANDY", 0, 100),//Sandy Shores
-            new GangTerritory("AMBIENT_GANG_BALLAS","SKID", 0, 100),//Mission Row
-            new GangTerritory("AMBIENT_GANG_LOST","SLAB", 0, 100),//stab city aka slab city
-            new GangTerritory("AMBIENT_GANG_SALVA","STAD", 0, 100),//Maze Bank
-            new GangTerritory("AMBIENT_GANG_FAMILY","STRAW", 0, 100),//Strawberry
-            new GangTerritory("AMBIENT_GANG_BALLAS","TEXTI", 0, 100),//Textile City
-            new GangTerritory("AMBIENT_GANG_KKANGPAE","VCANA", 0, 100),//Vespucci Canals
-        };
-        Serialization.SerializeParams(SimpleGangTerritoriesList, "Plugins\\LosSantosRED\\AlternateConfigs\\Simple\\GangTerritories_Simple.xml");
+        //    new GangTerritory("AMBIENT_GANG_MESSINA","RICHM", 0, 100),//Richman
+        //    //new GangTerritory("AMBIENT_GANG_MEXICAN","SANAND", 0, 100),//broken zone in east LS
+        //    new GangTerritory("AMBIENT_GANG_HILLBILLY","SANDY", 0, 100),//Sandy Shores
+        //    new GangTerritory("AMBIENT_GANG_BALLAS","SKID", 0, 100),//Mission Row
+        //    new GangTerritory("AMBIENT_GANG_LOST","SLAB", 0, 100),//stab city aka slab city
+        //    new GangTerritory("AMBIENT_GANG_SALVA","STAD", 0, 100),//Maze Bank
+        //    new GangTerritory("AMBIENT_GANG_FAMILY","STRAW", 0, 100),//Strawberry
+        //    new GangTerritory("AMBIENT_GANG_BALLAS","TEXTI", 0, 100),//Textile City
+        //    new GangTerritory("AMBIENT_GANG_KKANGPAE","VCANA", 0, 100),//Vespucci Canals
+        //};
+        //Serialization.SerializeParams(SimpleGangTerritoriesList, "Plugins\\LosSantosRED\\AlternateConfigs\\Simple\\GangTerritories_Simple.xml");
     }
 }
 

@@ -485,6 +485,7 @@ public class WeaponInventory
         HasVehicleWeapon = NativeFunction.Natives.GET_CURRENT_PED_VEHICLE_WEAPON<bool>(WeaponOwner.Pedestrian, out CurrentVehicleWeapon);//3450622333 searchlight
         WeaponOwner.IsUsingMountedWeapon = HasVehicleWeapon;
         HasSearchlight = WeaponOwner.Pedestrian.CurrentVehicle.Exists() && NativeFunction.Natives.DOES_VEHICLE_HAVE_SEARCHLIGHT<bool>(WeaponOwner.Pedestrian.CurrentVehicle);
+        //EntryPoint.WriteToConsole($"{WeaponOwner.Handle} HasVehicleWeapon {HasVehicleWeapon} HasSearchlight {HasSearchlight} CurrentVehicleWeapon {CurrentVehicleWeapon}");
     }
     public void UpdateSettings()
     {
@@ -496,11 +497,13 @@ public class WeaponInventory
                 {
                     WeaponOwner.Pedestrian.Accuracy = WeaponOwner.TurretAccuracy;
                     NativeFunction.Natives.SET_PED_SHOOT_RATE(WeaponOwner.Pedestrian, WeaponOwner.TurretShootRate);
+                   // EntryPoint.WriteToConsole("PED HAS VEHICLE WEAPON SETTINGS SHOOT RATE TO WeaponOwner.TurretShootRate");
                 }
                 else
                 {
                     WeaponOwner.Pedestrian.Accuracy = WeaponOwner.VehicleAccuracy;
                     NativeFunction.Natives.SET_PED_SHOOT_RATE(WeaponOwner.Pedestrian, WeaponOwner.VehicleShootRate);
+                   // EntryPoint.WriteToConsole("PED DOES NOT HAVE VEHICLE WEAPON SETTINGS SHOOT RATE TO 500");
                 }
                 NativeFunction.Natives.SET_PED_COMBAT_ABILITY(WeaponOwner.Pedestrian, WeaponOwner.CombatAbility);
             }

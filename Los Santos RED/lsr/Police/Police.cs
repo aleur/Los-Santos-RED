@@ -45,10 +45,15 @@ namespace LosSantosRED.lsr
         public List<Cop> CloseVehicleChasingCops { get; private set; } = new List<Cop>();
         public void Update()
         {
+            if (EntryPoint.IsLSPDFRIntegrationEnabled)
+            {
+                return; 
+            }
+
             UpdateCops();
             GameFiber.Yield();
             UpdateRecognition();
-            if (Player.IsBustable && (Player.IsIncapacitated || Player.WantedLevel == 1 || (Player.WantedLevel > 1 && Player.IsDangerouslyArmed && Player.IsStill)) && Player.IsInWantedActiveMode && Player.AnyPoliceCanSeePlayer && World.Pedestrians.PoliceList.Any(x => x.ShouldBustPlayer))
+            if (Player.IsBustable && (Player.IsIncapacitated || Player.WantedLevel == 1 || (Player.WantedLevel > 1 && Player.IsDangerouslyArmed && Player.IsMovingSlowly)) && Player.IsInWantedActiveMode && Player.AnyPoliceCanSeePlayer && World.Pedestrians.PoliceList.Any(x => x.ShouldBustPlayer))
             {
                 GameFiber.Yield();
                 Player.Arrest();
@@ -104,6 +109,10 @@ namespace LosSantosRED.lsr
                             if (Settings.SettingsManager.PoliceTaskSettings.AllowPowerAssist)
                             {
                                 Cop.AssistManager.PowerAssist(Player.WantedLevel, Player.VehicleSpeedMPH);
+                            }
+                            if (Settings.SettingsManager.PoliceTaskSettings.AllowForceAssist)
+                            {
+                                Cop.AssistManager.ForceApplier(Player.IsWanted, Settings);
                             }
                         }
                         if (Cop.DistanceToPlayer <= closestDistanceToPlayer && Cop.Pedestrian.Exists() && Cop.Pedestrian.IsAlive)

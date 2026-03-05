@@ -65,6 +65,7 @@ public class DispatchablePeople : IDispatchablePeople
     private List<DispatchablePerson> SpanishLordsPeds;
     public List<DispatchablePerson> OtherPeds { get; private set; }
     public List<DispatchablePerson> TaxiDrivers { get; private set; }
+    public List<DispatchablePerson> KnowayDrivers { get; private set; }
     public List<DispatchablePerson> VendorPeds { get; private set; }
     public List<DispatchablePerson> IllicitMarketplacePeds { get; private set; }
     public List<DispatchablePerson> TellerPeds { get; private set; }
@@ -104,8 +105,11 @@ public class DispatchablePeople : IDispatchablePeople
     private DispatchablePeople_AngelsOfDeath DispatchablePeople_AngelsOfDeath;
     private DispatchablePeople_UptownRiders DispatchablePeople_UptownRiders;
 
+    private DispatchablePeople_NorthHolland_LPP DispatchablePeople_NorthHolland_LPP;
     private DispatchablePeople_NorthHolland DispatchablePeople_NorthHolland;
     private DispatchablePeople_Petrovic DispatchablePeople_Petrovic;
+    private DispatchablePeople_Petrovic_LPP DispatchablePeople_Petrovic_LPP;
+    private DispatchablePeople_SpanishLords_LPP DispatchablePeople_SpanishLords_LPP;
     private DispatchablePeople_Cops DispatchablePeople_Cops;
     private int optionalpropschance;
     private DispatchablePeople_AngelsOfDeath DispatchablePeople_AngelsOfDeath_LS;
@@ -127,10 +131,11 @@ public class DispatchablePeople : IDispatchablePeople
     public List<DispatchablePerson> AngelsOfDeathPeds_LS { get; set; }
 
     public List<DispatchablePerson> UptownRidersPeds { get; set; }
-
-
+    public List<DispatchablePerson> SpanishLordsPeds_LPP { get; set; }
     public List<DispatchablePerson> PetrovicPeds { get; set; }
+    public List<DispatchablePerson> PetrovicPeds_LPP { get; set; }
     public List<DispatchablePerson> NorthHollandPeds { get; set; }
+    public List<DispatchablePerson> NorthHollandPeds_LPP { get; set; }
 
     public List<DispatchablePersonGroup> AllPeople => PeopleGroupLookup;
     public void Setup(IIssuableWeapons issuableWeapons)
@@ -168,11 +173,11 @@ public class DispatchablePeople : IDispatchablePeople
         {
             EntryPoint.WriteToConsole($"No Dispatchable People config found, creating default", 0);
             SetupDefault();
-            DefaultConfig_LosSantos2008();
-            DefaultConfig_Simple();
+            //DefaultConfig_LosSantos2008();
+            //DefaultConfig_Simple();
             DefaultConfig_FullExpandedJurisdiction();
             DefaultConfig();
-            DefaultConfig_LibertyCity();
+            //DefaultConfig_LibertyCity();
             DefaultConfig_LPP();
         }
         //Load Additive
@@ -1721,9 +1726,17 @@ public class DispatchablePeople : IDispatchablePeople
         DispatchablePeople_NorthHolland = new DispatchablePeople_NorthHolland(this);
         DispatchablePeople_NorthHolland.Setup();
 
+        DispatchablePeople_NorthHolland_LPP = new DispatchablePeople_NorthHolland_LPP(this);
+        DispatchablePeople_NorthHolland_LPP.Setup();
+
         DispatchablePeople_Petrovic = new DispatchablePeople_Petrovic(this);
         DispatchablePeople_Petrovic.Setup();
 
+        DispatchablePeople_Petrovic_LPP = new DispatchablePeople_Petrovic_LPP(this);
+        DispatchablePeople_Petrovic_LPP.Setup();
+
+        DispatchablePeople_SpanishLords_LPP = new DispatchablePeople_SpanishLords_LPP(this);
+        DispatchablePeople_SpanishLords_LPP.Setup();
 
 
         VagosPeds = new List<DispatchablePerson>() {
@@ -1897,6 +1910,11 @@ public class DispatchablePeople : IDispatchablePeople
         TaxiDrivers = new List<DispatchablePerson>() {
             new DispatchablePerson("a_m_m_socenlat_01",100,100),
         };
+
+        KnowayDrivers = new List<DispatchablePerson>() {
+            new DispatchablePerson("a_m_m_socenlat_01",100,100) { IsInvisibleAndInvulnerable = true },
+        };
+
         VendorPeds = new List<DispatchablePerson>() {
             new DispatchablePerson("s_m_m_strvend_01",100,100),
             new DispatchablePerson("s_m_m_linecook",100,100),
@@ -1909,8 +1927,11 @@ public class DispatchablePeople : IDispatchablePeople
         };
         BarPeds = new List<DispatchablePerson>()
         {
+            new DispatchablePerson("s_m_y_barman_01",100,100),
+            new DispatchablePerson("s_f_y_beachbarstaff_01",100,100),
             new DispatchablePerson("s_f_y_clubbar_01",100,100),
-            new DispatchablePerson("s_m_y_clubbar_01",100,100),
+            new DispatchablePerson("s_f_y_clubbar_02",100,100),
+            //new DispatchablePerson("s_m_y_clubbar_01",100,100), // Invisible Chest needs set variation.
             new DispatchablePerson("a_f_y_clubcust_01",100,100),
         };
         HaircutPeds = new List<DispatchablePerson>()
@@ -2014,14 +2035,20 @@ public class DispatchablePeople : IDispatchablePeople
 
 
         PeopleGroupLookup.Add(new DispatchablePersonGroup("NorthHollandPeds", NorthHollandPeds));
+        PeopleGroupLookup.Add(new DispatchablePersonGroup("NorthHollandPeds_LPP", NorthHollandPeds_LPP));
         PeopleGroupLookup.Add(new DispatchablePersonGroup("PetrovicPeds", PetrovicPeds));
+        PeopleGroupLookup.Add(new DispatchablePersonGroup("PetrovicPeds_LPP", PetrovicPeds_LPP));
         PeopleGroupLookup.Add(new DispatchablePersonGroup("SpanishLordsPeds", SpanishLordsPeds));
+        PeopleGroupLookup.Add(new DispatchablePersonGroup("SpanishLordsPeds_LPP", SpanishLordsPeds_LPP));
         PeopleGroupLookup.Add(new DispatchablePersonGroup("UptownRidersPeds", UptownRidersPeds));
         PeopleGroupLookup.Add(new DispatchablePersonGroup("AngelsOfDeathPeds", AngelsOfDeathPeds_LS));
 
         //Other
         PeopleGroupLookup.Add(new DispatchablePersonGroup("OtherPeds", OtherPeds));
         PeopleGroupLookup.Add(new DispatchablePersonGroup("TaxiDrivers", TaxiDrivers));
+        PeopleGroupLookup.Add(new DispatchablePersonGroup("knowaypeds", KnowayDrivers));
+
+
         PeopleGroupLookup.Add(new DispatchablePersonGroup("RegularPeds", RegularPeds));
 
 
@@ -2381,7 +2408,7 @@ public class DispatchablePeople : IDispatchablePeople
     }
     private void DefaultConfig_LPP()
     {
-        List<DispatchablePersonGroup> LPPPersonGroup = Extensions.DeepCopy(PeopleGroupLookup);
+        List<DispatchablePersonGroup> LPPPersonGroup = new List<DispatchablePersonGroup>();//Extensions.DeepCopy(PeopleGroupLookup);
         int optionalpropschance = 20;
         DispatchablePerson DetectiveMale = new DispatchablePerson("mp_m_freemode_01", 2, 2)
         {
@@ -2636,7 +2663,7 @@ public class DispatchablePeople : IDispatchablePeople
         };
         LPPPersonGroup.Add(new DispatchablePersonGroup("FDLCFirePeds", FDLC_DLC));
 
-        Serialization.SerializeParams(LPPPersonGroup, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LPPConfigFolder}\\DispatchablePeople_{StaticStrings.LPPConfigSuffix}.xml");
+        Serialization.SerializeParams(LPPPersonGroup, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LPPConfigFolder}\\DispatchablePeople+_{StaticStrings.LPPConfigSuffix}.xml");
     }
     private void DefaultConfig_LosSantos2008()
     {
@@ -2786,181 +2813,182 @@ public class DispatchablePeople : IDispatchablePeople
     }
     private void DefaultConfig_Simple()
     {
-        StandardCops_Simple = new List<DispatchablePerson>() {
-            new DispatchablePerson("s_f_y_cop_01",40,40) {
-                DebugName = "LSPDDefaultOldFemale"
-                ,MaxWantedLevelSpawn = 2
-                ,EmptyHolster = new PedComponent(9,0,0,0)
-                ,FullHolster = new PedComponent(9,1,0,0)
-                ,OptionalProps = new List<PedPropComponent>() { new PedPropComponent(0, 0, 0), new PedPropComponent(1, 0, 0), new PedPropComponent(1, 1, 0) }
-            },//new PedPropComponent(0, 0, 0)//Hat,//new PedPropComponent(1, 0, 0)//Glasses
-            new DispatchablePerson("s_m_y_cop_01",60,60) {
-                DebugName = "LSPDDefaultOldNoArmorMale"
-                ,MaxWantedLevelSpawn = 2
-                ,EmptyHolster = new PedComponent(9,0,0,0)
-                ,FullHolster = new PedComponent(9,1,0,0)
-                ,OptionalProps = new List<PedPropComponent>() { new PedPropComponent(0, 0, 0), new PedPropComponent(1, 0, 0), new PedPropComponent(1, 1, 0), new PedPropComponent(1, 2, 0), new PedPropComponent(1, 3, 0) }
-                ,AllowRandomizeBeforeVariationApplied = true
-                ,RequiredVariation = new PedVariation(new List<PedComponent>() { new PedComponent(9, 1, 0, 0) })
-            },
-            new DispatchablePerson("s_m_y_cop_01",0,60) {
-                DebugName = "LSPDDefaultOldArmorMale"
-                ,ArmorMin = 50
-                ,ArmorMax = 50
-                ,MinWantedLevelSpawn = 3
-                ,EmptyHolster = new PedComponent(9,0,0,0)
-                ,FullHolster = new PedComponent(9,1,0,0)
-                ,OptionalProps = new List<PedPropComponent>() { new PedPropComponent(1, 0, 0), new PedPropComponent(1, 1, 0), new PedPropComponent(1, 2, 0), new PedPropComponent(1, 3, 0) }//Glasses only?
-                ,OptionalPropChance = 80
-                ,AllowRandomizeBeforeVariationApplied = true
-                ,RequiredVariation = new PedVariation(new List<PedComponent>() {
-                    new PedComponent(9, 2, 0, 0) },
-                    new List<PedPropComponent>() { new PedPropComponent(0, 1, 1) })
-            },//vest, no hat
-        };
+        //StandardCops_Simple = new List<DispatchablePerson>() {
+        //    new DispatchablePerson("s_f_y_cop_01",40,40) {
+        //        DebugName = "LSPDDefaultOldFemale"
+        //        ,MaxWantedLevelSpawn = 2
+        //        ,EmptyHolster = new PedComponent(9,0,0,0)
+        //        ,FullHolster = new PedComponent(9,1,0,0)
+        //        ,OptionalProps = new List<PedPropComponent>() { new PedPropComponent(0, 0, 0), new PedPropComponent(1, 0, 0), new PedPropComponent(1, 1, 0) }
+        //    },//new PedPropComponent(0, 0, 0)//Hat,//new PedPropComponent(1, 0, 0)//Glasses
+        //    new DispatchablePerson("s_m_y_cop_01",60,60) {
+        //        DebugName = "LSPDDefaultOldNoArmorMale"
+        //        ,MaxWantedLevelSpawn = 2
+        //        ,EmptyHolster = new PedComponent(9,0,0,0)
+        //        ,FullHolster = new PedComponent(9,1,0,0)
+        //        ,OptionalProps = new List<PedPropComponent>() { new PedPropComponent(0, 0, 0), new PedPropComponent(1, 0, 0), new PedPropComponent(1, 1, 0), new PedPropComponent(1, 2, 0), new PedPropComponent(1, 3, 0) }
+        //        ,AllowRandomizeBeforeVariationApplied = true
+        //        ,RequiredVariation = new PedVariation(new List<PedComponent>() { new PedComponent(9, 1, 0, 0) })
+        //    },
+        //    new DispatchablePerson("s_m_y_cop_01",0,60) {
+        //        DebugName = "LSPDDefaultOldArmorMale"
+        //        ,ArmorMin = 50
+        //        ,ArmorMax = 50
+        //        ,MinWantedLevelSpawn = 3
+        //        ,EmptyHolster = new PedComponent(9,0,0,0)
+        //        ,FullHolster = new PedComponent(9,1,0,0)
+        //        ,OptionalProps = new List<PedPropComponent>() { new PedPropComponent(1, 0, 0), new PedPropComponent(1, 1, 0), new PedPropComponent(1, 2, 0), new PedPropComponent(1, 3, 0) }//Glasses only?
+        //        ,OptionalPropChance = 80
+        //        ,AllowRandomizeBeforeVariationApplied = true
+        //        ,RequiredVariation = new PedVariation(new List<PedComponent>() {
+        //            new PedComponent(9, 2, 0, 0) },
+        //            new List<PedPropComponent>() { new PedPropComponent(0, 1, 1) })
+        //    },//vest, no hat
+        //};
 
-        FIBPeds_Simple = new List<DispatchablePerson>() {
-            new DispatchablePerson("s_m_m_fibsec_01",55,70){ DebugName = "FIBAgentMale", MaxWantedLevelSpawn = 3 },
-            new DispatchablePerson("s_m_m_fiboffice_01",15,0){ DebugName = "FIBNormalMale1", MaxWantedLevelSpawn = 3 },
-            new DispatchablePerson("s_m_m_fiboffice_02",15,0){ DebugName = "FIBNormalMale2", MaxWantedLevelSpawn = 3 },
-            new DispatchablePerson("u_m_m_fibarchitect",10,0) { DebugName = "FIBNormalMale3", MaxWantedLevelSpawn = 3 },
-            new DispatchablePerson("s_m_y_swat_01", 0, 100) {
-                DebugName = "FIBSWATDefaultMale"
-                ,GroupName = "FIBHET"
-                ,AccuracyMin = 30
-                ,AccuracyMax = 50
-                ,ShootRateMin = 400
-                ,ShootRateMax = 500
-                ,CombatAbilityMin = 2
-                ,CombatAbilityMax = 2
-                ,HealthMin = 100
-                ,HealthMax = 100
-                ,ArmorMin = 100
-                ,ArmorMax = 100
-                ,MinWantedLevelSpawn = 5
-                ,MaxWantedLevelSpawn = 5
-                ,AllowRandomizeBeforeVariationApplied = true
-                ,RequiredVariation = new PedVariation(
-                    new List<PedComponent>() { new PedComponent(10, 0, 1, 0) },
-                    new List<PedPropComponent>() { new PedPropComponent(0, 0, 0) })
-            },
-        };
-        NOOSEPeds_Simple = new List<DispatchablePerson>() {
-            new DispatchablePerson("s_m_y_swat_01",100,100){
-                DebugName = "NOOSEDefaultMale"
-                ,AccuracyMin = 25
-                ,AccuracyMax = 40
-                ,ShootRateMin = 400
-                ,ShootRateMax = 500
-                ,CombatAbilityMin = 1
-                ,CombatAbilityMax = 2
-                ,HealthMin = 100
-                ,HealthMax = 100
-                ,ArmorMin = 100
-                ,ArmorMax = 100
-                ,AllowRandomizeBeforeVariationApplied = true
-                ,RequiredVariation = new PedVariation(
-                    new List<PedComponent>() { new PedComponent(10, 0, 0, 0) },
-                    new List<PedPropComponent>() { new PedPropComponent(0, 0, 0) })
-            },
-        };
-        MarshalsServicePeds_Simple = new List<DispatchablePerson>() {
-            new DispatchablePerson("s_m_m_ciasec_01",0, 50){ DebugName = "USMSSimple",AccuracyMin = 25
-                ,AccuracyMax = 30
-                ,ShootRateMin = 400
-                ,ShootRateMax = 500
-                ,CombatAbilityMin = 0
-                ,CombatAbilityMax = 2
-                ,HealthMin = 100
-                ,HealthMax = 100
-                ,ArmorMin = 100
-                ,ArmorMax = 100, MaxWantedLevelSpawn = 3 },
-        };
-        PrisonPeds_Simple = new List<DispatchablePerson>() {
-            new DispatchablePerson("s_m_m_prisguard_01",100,100)  { DebugName = "PrisonGuardMale" },
-        };
-        SecurityPeds_Simple = new List<DispatchablePerson>() {
-            new DispatchablePerson("s_m_m_security_01",100,100)  { DebugName = "SecurityMale" },
-        };
-        GruppeSechsPeds_Simple = new List<DispatchablePerson>() {
-            new DispatchablePerson("s_m_m_armoured_01",100,100)  { DebugName = "SecurityMale" },
-            new DispatchablePerson("s_m_m_armoured_02",100,100)  { DebugName = "SecurityMale" },
-        };
-        SecuroservPeds_Simple = new List<DispatchablePerson>() {
-            new DispatchablePerson("mp_m_securoguard_01",100,100)  { DebugName = "SecurityMale" },
-        };
-        BobcatPeds_Simple = new List<DispatchablePerson>() {
-            new DispatchablePerson("ig_prolsec_02",100,100){ DebugName = "SecurityMale" },
-        };
-        MerryweatherSecurityPeds_Simple = new List<DispatchablePerson>() {
-            new DispatchablePerson("s_m_m_security_01",100,100)  { DebugName = "SecurityMale" },
-        };
-        //
-        List<DispatchablePersonGroup> PeopleGroupLookup_Simple = new List<DispatchablePersonGroup>();
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("StandardCops", StandardCops_Simple));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("SheriffPeds", SheriffPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("NOOSEPeds", NOOSEPeds_Simple));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("FIBPeds", FIBPeds_Simple));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("ParkRangers", ParkRangers));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("DOAPeds", DOAPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("SAHPPeds", SAHPPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("ArmyPeds", ArmyPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("USMCPeds", USMCPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("USAFPeds", USAFPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("PrisonPeds", PrisonPeds_Simple));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("CoastGuardPeds", CoastGuardPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("NYSPPeds", NYSPPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("MarshalsServicePeds", MarshalsServicePeds_Simple));
+        //FIBPeds_Simple = new List<DispatchablePerson>() {
+        //    new DispatchablePerson("s_m_m_fibsec_01",55,70){ DebugName = "FIBAgentMale", MaxWantedLevelSpawn = 3 },
+        //    new DispatchablePerson("s_m_m_fiboffice_01",15,0){ DebugName = "FIBNormalMale1", MaxWantedLevelSpawn = 3 },
+        //    new DispatchablePerson("s_m_m_fiboffice_02",15,0){ DebugName = "FIBNormalMale2", MaxWantedLevelSpawn = 3 },
+        //    new DispatchablePerson("u_m_m_fibarchitect",10,0) { DebugName = "FIBNormalMale3", MaxWantedLevelSpawn = 3 },
+        //    new DispatchablePerson("s_m_y_swat_01", 0, 100) {
+        //        DebugName = "FIBSWATDefaultMale"
+        //        ,GroupName = "FIBHET"
+        //        ,AccuracyMin = 30
+        //        ,AccuracyMax = 50
+        //        ,ShootRateMin = 400
+        //        ,ShootRateMax = 500
+        //        ,CombatAbilityMin = 2
+        //        ,CombatAbilityMax = 2
+        //        ,HealthMin = 100
+        //        ,HealthMax = 100
+        //        ,ArmorMin = 100
+        //        ,ArmorMax = 100
+        //        ,MinWantedLevelSpawn = 5
+        //        ,MaxWantedLevelSpawn = 5
+        //        ,AllowRandomizeBeforeVariationApplied = true
+        //        ,RequiredVariation = new PedVariation(
+        //            new List<PedComponent>() { new PedComponent(10, 0, 1, 0) },
+        //            new List<PedPropComponent>() { new PedPropComponent(0, 0, 0) })
+        //    },
+        //};
+        //NOOSEPeds_Simple = new List<DispatchablePerson>() {
+        //    new DispatchablePerson("s_m_y_swat_01",100,100){
+        //        DebugName = "NOOSEDefaultMale"
+        //        ,AccuracyMin = 25
+        //        ,AccuracyMax = 40
+        //        ,ShootRateMin = 400
+        //        ,ShootRateMax = 500
+        //        ,CombatAbilityMin = 1
+        //        ,CombatAbilityMax = 2
+        //        ,HealthMin = 100
+        //        ,HealthMax = 100
+        //        ,ArmorMin = 100
+        //        ,ArmorMax = 100
+        //        ,AllowRandomizeBeforeVariationApplied = true
+        //        ,RequiredVariation = new PedVariation(
+        //            new List<PedComponent>() { new PedComponent(10, 0, 0, 0) },
+        //            new List<PedPropComponent>() { new PedPropComponent(0, 0, 0) })
+        //    },
+        //};
+        //MarshalsServicePeds_Simple = new List<DispatchablePerson>() {
+        //    new DispatchablePerson("s_m_m_ciasec_01",0, 50){ DebugName = "USMSSimple",AccuracyMin = 25
+        //        ,AccuracyMax = 30
+        //        ,ShootRateMin = 400
+        //        ,ShootRateMax = 500
+        //        ,CombatAbilityMin = 0
+        //        ,CombatAbilityMax = 2
+        //        ,HealthMin = 100
+        //        ,HealthMax = 100
+        //        ,ArmorMin = 100
+        //        ,ArmorMax = 100, MaxWantedLevelSpawn = 3 },
+        //};
+        //PrisonPeds_Simple = new List<DispatchablePerson>() {
+        //    new DispatchablePerson("s_m_m_prisguard_01",100,100)  { DebugName = "PrisonGuardMale" },
+        //};
+        //SecurityPeds_Simple = new List<DispatchablePerson>() {
+        //    new DispatchablePerson("s_m_m_security_01",100,100)  { DebugName = "SecurityMale" },
+        //};
+        //GruppeSechsPeds_Simple = new List<DispatchablePerson>() {
+        //    new DispatchablePerson("s_m_m_armoured_01",100,100)  { DebugName = "SecurityMale" },
+        //    new DispatchablePerson("s_m_m_armoured_02",100,100)  { DebugName = "SecurityMale" },
+        //};
+        //SecuroservPeds_Simple = new List<DispatchablePerson>() {
+        //    new DispatchablePerson("mp_m_securoguard_01",100,100)  { DebugName = "SecurityMale" },
+        //};
+        //BobcatPeds_Simple = new List<DispatchablePerson>() {
+        //    new DispatchablePerson("ig_prolsec_02",100,100){ DebugName = "SecurityMale" },
+        //};
+        //MerryweatherSecurityPeds_Simple = new List<DispatchablePerson>() {
+        //    new DispatchablePerson("s_m_m_security_01",100,100)  { DebugName = "SecurityMale" },
+        //};
+        ////
+        //List<DispatchablePersonGroup> PeopleGroupLookup_Simple = new List<DispatchablePersonGroup>();
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("StandardCops", StandardCops_Simple));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("SheriffPeds", SheriffPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("NOOSEPeds", NOOSEPeds_Simple));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("FIBPeds", FIBPeds_Simple));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("ParkRangers", ParkRangers));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("DOAPeds", DOAPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("SAHPPeds", SAHPPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("ArmyPeds", ArmyPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("USMCPeds", USMCPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("USAFPeds", USAFPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("PrisonPeds", PrisonPeds_Simple));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("CoastGuardPeds", CoastGuardPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("NYSPPeds", NYSPPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("MarshalsServicePeds", MarshalsServicePeds_Simple));
 
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("OffDutyCops", OffDutyCops));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("LSLifeguardPeds", LSLifeguardPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("OffDutyCops", OffDutyCops));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("LSLifeguardPeds", LSLifeguardPeds));
 
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("LSPDASDPeds", LSPDASDPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("LSSDASDPeds", LSSDASDPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("LCPDPeds", StandardCops_Old));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("LSPDASDPeds", LSPDASDPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("LSSDASDPeds", LSSDASDPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("LCPDPeds", StandardCops_Old));
 
-        //Fire
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("Firefighters", Firefighters));
-        //EMTs
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("BlueEMTs", BlueEMTs));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("GreenEMTs", GreenEMTs));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("EMTs", EMTs));
-        //Security
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("SecurityPeds", SecurityPeds_Simple));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("GruppeSechsPeds", GruppeSechsPeds_Simple));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("SecuroservPeds", SecuroservPeds_Simple));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("BobcatPeds", BobcatPeds_Simple));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("MerryweatherSecurityPeds", MerryweatherSecurityPeds_Simple));
-        //Gangs
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("LostMCPeds", LostMCPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("VagosPeds", VagosPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("FamiliesPeds", FamiliesPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("BallasPeds", BallasPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("MarabuntaPeds", MarabuntaPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("AltruistPeds", AltruistPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("VarriosPeds", VarriosPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("TriadsPeds", TriadsPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("KoreanPeds", KoreanPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("RedneckPeds", RedneckPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("ArmenianPeds", ArmenianPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("CartelPeds", CartelPeds));
+        ////Fire
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("Firefighters", Firefighters));
+        ////EMTs
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("BlueEMTs", BlueEMTs));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("GreenEMTs", GreenEMTs));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("EMTs", EMTs));
+        ////Security
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("SecurityPeds", SecurityPeds_Simple));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("GruppeSechsPeds", GruppeSechsPeds_Simple));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("SecuroservPeds", SecuroservPeds_Simple));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("BobcatPeds", BobcatPeds_Simple));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("MerryweatherSecurityPeds", MerryweatherSecurityPeds_Simple));
+        ////Gangs
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("LostMCPeds", LostMCPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("VagosPeds", VagosPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("FamiliesPeds", FamiliesPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("BallasPeds", BallasPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("MarabuntaPeds", MarabuntaPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("AltruistPeds", AltruistPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("VarriosPeds", VarriosPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("TriadsPeds", TriadsPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("KoreanPeds", KoreanPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("RedneckPeds", RedneckPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("ArmenianPeds", ArmenianPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("CartelPeds", CartelPeds));
 
-        //Other
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("OtherPeds", OtherPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("TaxiDrivers", TaxiDrivers));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("RegularPeds", RegularPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("VehicleRacePeds", VehicleRacePeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("VendorPeds", VendorPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("IllicitMarketplacePeds", IllicitMarketplacePeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("TellerPeds", TellerPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("BurgerShotPeds", BurgerShotPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("CluckinBellPeds", CluckinBellPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("TwatPeds", TwatPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("GunshopPeds", GunshopPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("BarPeds", BarPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("HaircutPeds", HaircutPeds));
-        PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("BobMuletPeds", BobMuletPeds));
-        Serialization.SerializeParams(PeopleGroupLookup_Simple, "Plugins\\LosSantosRED\\AlternateConfigs\\Simple\\DispatchablePeople_Simple.xml");
+        ////Other
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("OtherPeds", OtherPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("TaxiDrivers", TaxiDrivers));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("knowaypeds", KnowayDrivers));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("RegularPeds", RegularPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("VehicleRacePeds", VehicleRacePeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("VendorPeds", VendorPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("IllicitMarketplacePeds", IllicitMarketplacePeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("TellerPeds", TellerPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("BurgerShotPeds", BurgerShotPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("CluckinBellPeds", CluckinBellPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("TwatPeds", TwatPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("GunshopPeds", GunshopPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("BarPeds", BarPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("HaircutPeds", HaircutPeds));
+        //PeopleGroupLookup_Simple.Add(new DispatchablePersonGroup("BobMuletPeds", BobMuletPeds));
+        //Serialization.SerializeParams(PeopleGroupLookup_Simple, "Plugins\\LosSantosRED\\AlternateConfigs\\Simple\\DispatchablePeople_Simple.xml");
     }
 
    public OptionalAppliedOverlayLogic GenericGangTattoos(bool isMale, float headPercent, float torsoPercent, float armsPercent, float legsPercent)

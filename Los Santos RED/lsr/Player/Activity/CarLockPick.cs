@@ -187,6 +187,8 @@ public class CarLockPick
     private bool LockPickAnimation_New()
     {
         Player.IsLockPicking = true;
+
+        NativeFunction.Natives.CLEAR_PED_TASKS(Game.LocalPlayer.Character);
         bool Continue = true;
         EntryPoint.WriteToConsole($"LOCK PICK ENTRY: LockPickAnimation START NEW");
 
@@ -204,7 +206,7 @@ public class CarLockPick
             EntryPoint.WriteToConsole("SCREWDRIVER ITEM IS NULL 2");
             return false;
         }
-        Continue = ScrewdriverItem.DoLockpickAnimation(Interactionable, BasicUseable, OpenDoor, Settings, "veh@break_in@0h@p_m_one@", Animation, false, true);
+        Continue = ScrewdriverItem.DoLockpickAnimation(Interactionable, BasicUseable, OpenDoor, Settings, "veh@break_in@0h@p_m_one@", Animation, false,true, TargetVehicle, SeatTryingToEnter, DoorIndex, null);
         if (!TargetVehicle.Exists())
         {
             return false;

@@ -60,7 +60,7 @@ public class Cop : PedExt, IWeaponIssuable, IPlayerChaseable, IAIChaseable
     public override int TaserAccuracy { get; set; } = 30;
     public override int TaserShootRate { get; set; } = 100;
     public override int VehicleAccuracy { get; set; } = 10;
-    public override int VehicleShootRate { get; set; } = 20;
+    public override int VehicleShootRate { get; set; } = 80;
     public override int TurretAccuracy { get; set; } = 30;
     public override int TurretShootRate { get; set; } = 1000;
     public override bool AutoCallsInUnconsciousPeds { get; set; } = true;
@@ -68,6 +68,7 @@ public class Cop : PedExt, IWeaponIssuable, IPlayerChaseable, IAIChaseable
     public override int PlayerStandTooCloseLimit => 1;
     public override int InsultLimit => 2;
     public override string BlipName => "Police";
+    public override float PickpocketDetectionMultiplier { get; set; } = 2.0f;
     public CopAssistManager AssistManager { get; private set;}
     public CopVoice Voice { get; private set; }
     public WeaponInventory WeaponInventory { get; private set; }
@@ -86,6 +87,7 @@ public class Cop : PedExt, IWeaponIssuable, IPlayerChaseable, IAIChaseable
     public bool IsUsingMountedWeapon { get; set; } = false;
     public PedExt CurrentTarget { get; set; }
     public override bool HasWeapon => WeaponInventory.HasPistol || WeaponInventory.HasLongGun;
+    public override bool CanCurrentlyRacePlayer => false;
     public override bool NeedsFullUpdate
     {
         get
@@ -220,12 +222,16 @@ public class Cop : PedExt, IWeaponIssuable, IPlayerChaseable, IAIChaseable
         {
             return;
         }
-        dispatchablePerson.SetPedExtPermanentStats(this, Settings.SettingsManager.PoliceSettings.OverrideHealth, Settings.SettingsManager.PoliceSettings.OverrideArmor, Settings.SettingsManager.PoliceSettings.OverrideAccuracy);
+
+        if (!EntryPoint.IsLSPDFRIntegrationEnabled)
+        {
+            dispatchablePerson.SetPedExtPermanentStats(this, Settings.SettingsManager.PoliceSettings.OverrideHealth, Settings.SettingsManager.PoliceSettings.OverrideArmor, Settings.SettingsManager.PoliceSettings.OverrideAccuracy);
+        }
         if (!Pedestrian.Exists())
         {
             return;
         }
-        if (!IsAnimal)
+        if (!IsAnimal && !EntryPoint.IsLSPDFRIntegrationEnabled)
         {
             bool hasLongGuns = RandomItems.RandomPercent(AssignedAgency.PercentageWithLongGuns);
             bool percentusingLongGuns = RandomItems.RandomPercent(AssignedAgency.PercentageUsingLongGunsWheneverPossible);
@@ -266,6 +272,11 @@ public class Cop : PedExt, IWeaponIssuable, IPlayerChaseable, IAIChaseable
         {
             return;
         }
+        if(EntryPoint.IsLSPDFRIntegrationEnabled)
+        {
+            return;
+        }
+
         //return;
         if (Settings.SettingsManager.PoliceSettings.ForceDefaultWeaponAnimations)
         {
@@ -305,7 +316,7 @@ public class Cop : PedExt, IWeaponIssuable, IPlayerChaseable, IAIChaseable
             NativeFunction.Natives.SET_PED_CONFIG_FLAG(Pedestrian, (int)250, true);
             //EntryPoint.WriteToConsole("COP SET TAKE DAMAGE");
         }
-        if (Settings.SettingsManager.PoliceTaskSettings.AllowFlyThroughWindshield)
+        if (Settings.SettingsManager.PoliceTaskSettings.AllowFlyThroughWindshield && RandomItems.RandomPercent(Settings.SettingsManager.PoliceTaskSettings.FlyThroughWindshieldPercentage))
         {
             NativeFunction.Natives.SET_PED_CONFIG_FLAG(Pedestrian, (int)32, true);
             //EntryPoint.WriteToConsole("COP SET FLY THRU WINDSHIELD");

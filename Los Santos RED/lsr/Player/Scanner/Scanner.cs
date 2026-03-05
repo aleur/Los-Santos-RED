@@ -499,7 +499,7 @@ namespace LosSantosRED.lsr
         {
             if (Player.IsWanted && !ReportedRequestAirSupport && !SDI.RequestAirSupport.HasBeenPlayedThisWanted && !SDI.RequestSwatAirSupport.HasBeenPlayedThisWanted && World.Pedestrians.AnyHelicopterUnitsSpawned)
             {
-                if (World.Pedestrians.AnyNooseUnitsSpawned && Player.WantedLevel >= 4)
+                if (Player.WantedLevel >= 4)
                 {
                     AddToQueue(SDI.RequestSwatAirSupport);
                 }
@@ -559,6 +559,14 @@ namespace LosSantosRED.lsr
                 {
                     AddToQueue(SDI.RequestNooseUnitsAlt2);
                 }
+            }
+        }
+        public void OnSWATDeployed()
+        {
+            if (Player.IsWanted && Player.WantedLevel >= 4 && !SDI.RequestSWATUnits.HasBeenPlayedThisWanted )
+            {
+                AddToQueue(SDI.RequestSWATUnits);
+               
             }
         }
         public void OnPaidFine()
@@ -1672,6 +1680,10 @@ namespace LosSantosRED.lsr
 
             new CrimeDispatch(StaticStrings.TrespassingOnMilitaryBaseCrimeID,SDI.TrespassingOnMilitaryBase),
 
+
+            new CrimeDispatch(StaticStrings.StolenArmedMilitaryVehicleCrimeID,SDI.StolenArmedMilitaryVehicle),
+            new CrimeDispatch(StaticStrings.StolenArmedMilitaryVehicleCrimeID,SDI.StolenArmedMilitaryVehicle),
+
             new CrimeDispatch(StaticStrings.TrespessingCrimeID,SDI.Trespassing),
             new CrimeDispatch(StaticStrings.CivilianTrespessingCrimeID,SDI.Trespassing),
             new CrimeDispatch(StaticStrings.VehicleInvasionCrimeID,SDI.SuspiciousActivity),
@@ -1707,6 +1719,9 @@ namespace LosSantosRED.lsr
 
             new CrimeDispatch(StaticStrings.TheftCrimeID,SDI.TheftDispatch),
             new CrimeDispatch(StaticStrings.ShopliftingCrimeID,SDI.Shoplifting),
+
+            new CrimeDispatch(StaticStrings.PickPocketingCrimeID, SDI.PickPocketing),
+
         };
             DispatchList = new List<Dispatch>
         {
@@ -1714,6 +1729,7 @@ namespace LosSantosRED.lsr
             ,SDI.ShotsFiredAtAnOfficer
             ,SDI.AssaultingOfficer
             ,SDI.ThreateningOfficerWithFirearm
+            ,SDI.StolenArmedMilitaryVehicle
             ,SDI.TrespassingOnGovernmentProperty
             ,SDI.TrespassingOnMilitaryBase
             ,SDI.Trespassing
@@ -1780,6 +1796,7 @@ namespace LosSantosRED.lsr
             ,SDI.GotOnFreeway
             ,SDI.GotOffFreeway
             ,SDI.WentInTunnel
+            ,SDI.RequestSWATUnits
             ,SDI.TamperingWithVehicle
             ,SDI.VehicleCrashed
             ,SDI.VehicleStartedFire
@@ -1800,6 +1817,7 @@ namespace LosSantosRED.lsr
             ,SDI.TheftDispatch
             ,SDI.Shoplifting
             ,SDI.FicticiousPlates
+            ,SDI.PickPocketing
         };
         }
         private Dispatch DetermineDispatchFromCrime(Crime crimeAssociated)
@@ -2098,6 +2116,15 @@ namespace LosSantosRED.lsr
             SDI.Setup();
         }
 
+        public List<Dispatch> GetDispatchList()
+        {
+            return DispatchList;
+        }
 
+        internal void PlayDispatchDebug(Dispatch selectedItem)
+        {
+            BuildDispatch(selectedItem,false,false);
+        }
     }
+
 }

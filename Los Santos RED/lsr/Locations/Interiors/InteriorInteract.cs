@@ -21,6 +21,9 @@ using System.Xml.Serialization;
 [XmlInclude(typeof(ItemTheftInteract))]
 [XmlInclude(typeof(SalonInteract))]
 [XmlInclude(typeof(CraftInteriorInteract))]
+[XmlInclude(typeof(DisplayInteract))]
+[XmlInclude(typeof(AudioEmitterInteract))]
+[XmlInclude(typeof(TryOnInteract))]
 //UrinalInteract
 //ToiletInteract
 public class InteriorInteract
@@ -65,11 +68,13 @@ public class InteriorInteract
     public bool UseNavmesh { get; set; } = true;
     public bool WithWarp { get; set; } = false;
     public bool ForceIsntantCamera { get; set; } = false;
-
-
     public bool IsAutoInteract { get; set; } = false;
+    public virtual int MarkerType { get; set; } = 0;
     public virtual bool ShouldAddPrompt => !Interior.IsMenuInteracting && distanceTo <= InteractDistance && !Player.ActivityManager.IsInteracting && Player.ActivityManager.CanPerformActivitiesOnFoot;
-    public virtual void Setup(IModItems modItems, IClothesNames clothesNames)
+    
+    public virtual bool ShouldHideMarker { get; set; } = false;
+    
+    public virtual void Setup(IModItems modItems, IClothesNames clothesNames, IRadioStations radioStations)
     {
         ModItems = modItems;
         ClothesNames = clothesNames;
@@ -78,9 +83,17 @@ public class InteriorInteract
     {
 
     }
+    public virtual void OnInteriorUnloaded()
+    {
+
+    }
     public virtual void DisplayMarker(int markerType, float zOffset, float markerScale)
     {
         if(DistanceTo >= 30)
+        {
+            return;
+        }
+        if(ShouldHideMarker)
         {
             return;
         }
@@ -188,7 +201,7 @@ public class InteriorInteract
             LocationCamera.AutoInterior(Position, Heading, wait, true);
         }        
     }
-    protected virtual void WaitForAnimation(string animDict, string animName)
+    public virtual void WaitForAnimation(string animDict, string animName)
     {
         string PlayingDict = animDict;
         string PlayingAnim = animName;

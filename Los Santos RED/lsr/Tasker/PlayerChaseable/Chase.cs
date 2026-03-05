@@ -698,8 +698,11 @@ public class Chase : ComplexTask
                     else
                     {
                         IsSetFollow = false;
-                        NativeFunction.Natives.TASK_VEHICLE_CHASE(Ped.Pedestrian, Player.Character);
+                        //NativeFunction.Natives.TASK_VEHICLE_CHASE(Ped.Pedestrian, Player.Character);
                         //NativeFunction.Natives.SET_TASK_VEHICLE_CHASE_IDEAL_PURSUIT_DISTANCE(Ped.Pedestrian, 8f);
+
+                        SetChaseTask();
+
 
 
                         SetPassiveChase();
@@ -760,8 +763,8 @@ public class Chase : ComplexTask
         if (IsSetFollow && (Player.WantedLevel > 1 || Player.VehicleSpeedMPH >= 55f))
         {
             //NativeFunction.Natives.CLEAR_PED_TASKS(Ped.Pedestrian);
-            NativeFunction.Natives.TASK_VEHICLE_CHASE(Ped.Pedestrian, Player.Character);
-
+            //NativeFunction.Natives.TASK_VEHICLE_CHASE(Ped.Pedestrian, Player.Character);
+            SetChaseTask();
 
             SetPassiveChase();
 
@@ -970,7 +973,18 @@ public class Chase : ComplexTask
         VehicleChase_CheckStuck();
         
     }
+    private void SetChaseTask()
+    {
+        //if (Ped.Pedestrian.CurrentVehicle.Exists() && Game.LocalPlayer.Character.Exists() && Game.LocalPlayer.Character.CurrentVehicle.Exists())
+        //{
+        //    NativeFunction.Natives.TASK_VEHICLE_MISSION(Ped.Pedestrian, Ped.Pedestrian.CurrentVehicle,
+        //    Game.LocalPlayer.Character.CurrentVehicle, Settings.SettingsManager.DebugSettings.ChaseMissionType,
+        //    90f,
+        //    (int)eCustomDrivingStyles.Code3,1.0f, 20f, true);
+        //}
+        NativeFunction.Natives.TASK_VEHICLE_CHASE(Ped.Pedestrian, Player.Character);
 
+    }
 
     private void SetPassiveChase()
     {

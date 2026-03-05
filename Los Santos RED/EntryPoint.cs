@@ -42,6 +42,8 @@ public static class EntryPoint
     public static uint NotificationID { get; set; }
     public static GameConfig LoadedConfig { get; set; } = new GameConfig("");
     public static bool IsLoadingAltConfig { get; set; } = false;
+    public static bool IsLSPDFRIntegrationEnabled { get; set; } = false;
+    public static bool IsEnhancedVersion { get; set; } = false;
     public static void Main()
     {
 
@@ -58,11 +60,21 @@ public static class EntryPoint
     }
     private static void Startup()
     {
+        GetEnhancedGTAStatus();
         GetVersionInfo();
         CheckDependencies();
         CheckForUpdates();
         NotificationID = Game.DisplayNotification($"{PreStartMessage}");
     }
+
+    private static void GetEnhancedGTAStatus()
+    {
+        if(File.Exists("GTA5_Enhanced.exe"))
+        {
+            IsEnhancedVersion = true;
+        }
+    }
+
     private static void Loop()
     {
         while (true)

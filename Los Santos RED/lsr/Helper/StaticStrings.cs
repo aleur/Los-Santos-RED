@@ -45,6 +45,7 @@ public static class StaticStrings
     public static readonly string LSRGunDealerContactName = "LSR Gun Dealer";
     public static readonly string SchlechtContactName = "Schlecht Rideshare";
     public static readonly string RydeMeContactName = "RydeMe Rideshare";
+    public static readonly string KnowayContactName = "KnoWay";//these have gotta go, but where?
 
     public static readonly string HellCabContactName = "Hell Cab";//these have gotta go, but where?
     public static readonly string PurpleCabContactName = "Purple Cab Co.";//these have gotta go, but where?
@@ -64,6 +65,8 @@ public static class StaticStrings
 
     public static readonly string TrespassingOnMilitaryBaseCrimeID = "TrespassingOnMilitaryBase";
 
+
+    public static readonly string StolenArmedMilitaryVehicleCrimeID = "StolenArmedMilitaryVehicle";
 
     public static readonly string TrespessingCrimeID = "Trespassing";
 
@@ -93,7 +96,7 @@ public static class StaticStrings
     public static readonly string BreakingEnteringCrimeID = "BreakingEnteringCrime";
 
     public static readonly string BreakingEnteringAudibleCrimeID = "BreakingEnteringAudibleCrime";
-
+    public static readonly string PickPocketingCrimeID = "PickPocketing";
     public static readonly string ShopliftingCrimeID = "Shoplifting";
     public static readonly string DrugPossessionCrimeID = "DrugPossession";
 

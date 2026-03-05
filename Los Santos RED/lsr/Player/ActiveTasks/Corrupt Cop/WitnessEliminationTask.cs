@@ -57,13 +57,14 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         private ShopMenu WitnessShopMenu;
         private WeaponInformation WitnessWeapon;
         private CorruptCopContact Contact;
+
+        private bool IsPlayerFarFromWitness => Witness != null && Witness.Pedestrian.Exists() && !NativeHelper.IsNearby(EntryPoint.FocusCellX, EntryPoint.FocusCellY, SpawnPositionCellX, SpawnPositionCellY, 10) && Witness.Pedestrian.DistanceTo2D(Player.Character) >= 850f;
         public int PaymentAmount { get; set; }
         public int RepOnCompletion { get; set; }
         public int DebtOnFail { get; set; }
         public int RepOnFail { get; set; }
         public int DaysToComplete { get; set; }
         public string DebugName { get; set; }
-        private bool IsPlayerFarFromWitness => Witness != null && Witness.Pedestrian.Exists() && Witness.Pedestrian.DistanceTo2D(Player.Character) >= 850f;
         private bool IsPlayerNearWitnessSpawn => SpawnPositionCellX != -1 && SpawnPositionCellY != -1 && NativeHelper.IsNearby(EntryPoint.FocusCellX, EntryPoint.FocusCellY, SpawnPositionCellX, SpawnPositionCellY, 6);
         public WitnessEliminationTask(ITaskAssignable player, ITimeReportable time, IGangs gangs, PlayerTasks playerTasks, IPlacesOfInterest placesOfInterest, List<DeadDrop> activeDrops, ISettingsProvideable settings, IEntityProvideable world, 
             ICrimes crimes, INameProvideable names,IWeapons weapons, IShopMenus shopMenus, CorruptCopContact corruptCopContact)
@@ -183,21 +184,47 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                     //EntryPoint.WriteToConsoleTestLong($"Task Inactive for {Contact.Name}");
                     break;
                 }
-                if(!IsWitnessSpawned && IsPlayerNearWitnessSpawn)
+                //if(!IsWitnessSpawned && IsPlayerNearWitnessSpawn && !IsPlayerFarFromWitness)
+                //{
+                //    SpawnWitness();
+                //    EntryPoint.WriteToConsole("SHUIT THE FUCK UP");
+                //}
+                //else if(IsWitnessSpawned && IsPlayerFarFromWitness)
+                //{
+                //    DespawnWitness();
+                //    if(Witness.HasSeenPlayerCommitCrime)
+                //    {
+                //        //EntryPoint.WriteToConsoleTestLong("Witness Elimination WITNESS FLED");
+                //        Game.DisplayHelp($"{Contact.Name} The witness fled");
+                //        break;
+                //    }
+                //}
+
+
+                if(IsPlayerNearWitnessSpawn)
                 {
-                    IsWitnessSpawned = SpawnWitness();
-                }
-                if(IsWitnessSpawned && IsPlayerFarFromWitness)
-                {
-                    DespawnWitness();
-                    if(Witness.HasSeenPlayerCommitCrime)
+                    if(!IsWitnessSpawned)
                     {
-                        //EntryPoint.WriteToConsoleTestLong("Witness Elimination WITNESS FLED");
-                        Game.DisplayHelp($"{Contact.Name} The witness fled");
-                        break;
+                        SpawnWitness();
+                        EntryPoint.WriteToConsole("SHUIT THE FUCK UP");
                     }
                 }
-                else if(IsWitnessSpawned && Witness != null && Witness.Pedestrian.Exists() && Witness.Pedestrian.IsDead)
+                else
+                {
+                    if (IsWitnessSpawned && !IsPlayerNearWitnessSpawn && IsPlayerFarFromWitness)
+                    {
+                        EntryPoint.WriteToConsole("DESPAWN 1");
+                        DespawnWitness();
+                        if (Witness.HasSeenPlayerCommitCrime)
+                        {
+                            //EntryPoint.WriteToConsoleTestLong("Witness Elimination WITNESS FLED");
+                            Game.DisplayHelp($"{Contact.Name} The witness fled");
+                            break;
+                        }
+                    }
+                }
+
+                if(IsWitnessSpawned && Witness != null && Witness.Pedestrian.Exists() && Witness.Pedestrian.IsDead)
                 {
                     Witness.Pedestrian.IsPersistent = false;
                     Witness.DeleteBlip();
@@ -205,9 +232,11 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                     CurrentTask.OnReadyForPayment(true);
                     break;
                 }
-                if(IsWitnessSpawned && Witness != null && !Witness.Pedestrian.Exists())//somehow it got removed, set it as despawned
+                else if(IsWitnessSpawned && Witness != null && !Witness.Pedestrian.Exists() && IsPlayerFarFromWitness && !IsPlayerNearWitnessSpawn)//somehow it got removed, set it as despawned
                 {
+                    EntryPoint.WriteToConsole("DESPAWN 2");
                     DespawnWitness();
+                    
                 }
                 GameFiber.Sleep(1000);
             }
@@ -352,6 +381,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 NativeFunction.Natives.SET_MODEL_AS_NO_LONGER_NEEDED(Game.GetHashKey(WitnessModel));
                 if (ped.Exists())
                 {
+                    
                     string GroupName = "Man";
                     if(!WitnessIsMale)
                     {
@@ -367,7 +397,9 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                     Witness.CanBeAmbientTasked = true;
                     Witness.CanBeTasked = true;
                     Witness.WasModSpawned = true;
-                    if(WitnessVariation == null)
+                    Witness.IsManuallyDeleted = true;
+                    IsWitnessSpawned = true;
+                    if (WitnessVariation == null)
                     {
                         Witness.Pedestrian.RandomizeVariation();
                         WitnessVariation = NativeHelper.GetPedVariation(Witness.Pedestrian);
@@ -414,7 +446,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                         }
                         //they either know and flee, or know and fight     
                     }
-                    GameFiber.Sleep(1000);
+                    //GameFiber.Sleep(1000);
                     SendWitnessSpawnedMessage();
                     return true;
                 }
@@ -423,6 +455,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
         }
         private void SendWitnessSpawnedMessage()
         {
+
             List<string> Replies;
             string LookingForItem = "";
             if (WitnessIsCustomer)
@@ -502,6 +535,7 @@ namespace LosSantosRED.lsr.Player.ActiveTasks
                 //EntryPoint.WriteToConsoleTestLong("Witness Elimination DESPAWNED WITNESS");
             }
             IsWitnessSpawned = false;
+            EntryPoint.WriteToConsole("IS WITNESS DESPAWNED");
         }
         private void GetPayment()
         {

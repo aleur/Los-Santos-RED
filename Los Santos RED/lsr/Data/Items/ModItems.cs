@@ -94,7 +94,7 @@ public class ModItems : IModItems
             DefaultConfig_FullModernTraffic();
             DefaultConfig_FullExpandedJurisdiction();
             DefaultConfig_FullExpandedExperience();
-            DefaultConfig_LosSantos2008();
+            //DefaultConfig_LosSantos2008();
             DefaultConfig_FullExpandedWeapons();
         }
         //Load Additive
@@ -112,6 +112,12 @@ public class ModItems : IModItems
     private void DefaultConfig_FullExpandedWeapons()
     {
         PossibleItems newPossibleItems = new PossibleItems();
+
+
+        newPossibleItems.WeaponItems.Add(new WeaponItem("Duke Mustang .357",
+        "Show everyone you mean buisness with this classic steel piece of Americana. Built to last even through a zombie apocalypse.",
+        false, ItemType.Weapons)
+            { VanillaName = "Mustang Revolver", ModelName = "weapon_mustangrev", PoliceFindDuringPlayerSearchPercentage = 35, FindPercentage = 10 });
 
 
         newPossibleItems.WeaponItems.Add(new WeaponItem("Vom Feuer VF76",
@@ -215,13 +221,14 @@ public class ModItems : IModItems
     {
         PossibleItems newPossibleItems = new PossibleItems();//PossibleItems.Copy();
 
-        //
+        //Service
         newPossibleItems.VehicleItems.Add(new VehicleItem("Brute Headmaster", ItemType.Vehicles) { ModelName = "civsbus" });
-
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Brute Moving Van", false, ItemType.Vehicles) { OverrideMakeName = "Brute", ModelName = "civmovingvan" });
         //Motorcycles
         newPossibleItems.VehicleItems.Add(new VehicleItem("Western Sovereign Cruiser", ItemType.Vehicles) { ModelName = "civsovereign2" });
         newPossibleItems.VehicleItems.Add(new VehicleItem("Western Gargoyle Cruiser", ItemType.Vehicles) { ModelName = "civgargoylestock" });
         //Muscle
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Declasses Vigero 2nd Gen", ItemType.Vehicles) { ModelName = "civvigero2" });
         newPossibleItems.VehicleItems.Add(new VehicleItem("Bravado Gauntlet R/T", ItemType.Vehicles) { ModelName = "civgauntletstock" });
         newPossibleItems.VehicleItems.Add(new VehicleItem("Vapid Dominator 4th Gen", ItemType.Vehicles) { ModelName = "civdominator7" });
         //Sedans
@@ -232,39 +239,39 @@ public class ModItems : IModItems
         newPossibleItems.VehicleItems.Add(new VehicleItem("Maibatsu Kuruma", ItemType.Vehicles) { OverrideMakeName = "Maibatsu", OverrideClassName = "Sedan", ModelName = "kuruma", Description = "The perfect car to go with your flesh tunnel earrings, frosted spikes, and oversize jeans. Buy this and you'll never fail to be mistaken for a small town drug dealer again.", });
         newPossibleItems.VehicleItems.Add(new VehicleItem("Declasse Merit", ItemType.Vehicles) { OverrideMakeName = "Declasse", OverrideClassName = "Sedan", ModelName = "civmerit" });
         newPossibleItems.VehicleItems.Add(new VehicleItem("Cheval Purge", ItemType.Vehicles) { OverrideMakeName = "Cheval", OverrideClassName = "Sedan", ModelName = "purge", Description = "After all the yuppies in Vinewood decided they wanted Karin and Coil electric vehicles, we stuck a small underpowered gasoline engine in our floundering SURGE to minimize the losses.", });
-
-
         newPossibleItems.VehicleItems.Add(new VehicleItem("Schyster PMP 600", ItemType.Vehicles) { OverrideMakeName = "Schyster", OverrideClassName = "Sedan", ModelName = "civpmp600" });
         newPossibleItems.VehicleItems.Add(new VehicleItem("Albany Presidente", ItemType.Vehicles) { OverrideMakeName = "Albany", OverrideClassName = "Sedan", ModelName = "civpresidente" });
-
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Karin S95", ItemType.Vehicles) { OverrideMakeName = "Karin", OverrideClassName = "Sedan", ModelName = "civs95" });
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Benefactor Streiter Stock", true, ItemType.Vehicles) { ModelName = "civstreiter", Description = "Look in the mirror and what do you see? Is it a flabby, pallid investment manager with a solitary sex life and spiraling personal debts? It's OK, you don't need to answer that - you're only seeing this ad because we've datamined your Lifeinvader profile. And statistically, we know your next step is going to be the impulsive purchase of a 4x4 that you'll never take out of the city - which is where the Streiter comes in.", });
+        //Compacts
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Grotti Brioso AC", ItemType.Vehicles) { ModelName = "civbrioso" });
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Weeny Issi 2nd Gen", ItemType.Vehicles) { ModelName = "civissi8" });
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Weeny Issi Sport", ItemType.Vehicles) { ModelName = "civissi7" });
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Dinka Blista Kanjo", ItemType.Vehicles) { ModelName = "civkanjo" });
+        //Sport
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Pfister Comet Stock", ItemType.Vehicles) { ModelName = "civcomet2" });
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Pfister Comet Retro", ItemType.Vehicles) { ModelName = "civcomet4" });
         //Trucks
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Vapid Contender 4x4", ItemType.Vehicles) { ModelName = "civcontenderiv" });
         newPossibleItems.VehicleItems.Add(new VehicleItem("Vapid Firebolt Stock", ItemType.Vehicles) { ModelName = "civfireboltstock" });
         newPossibleItems.VehicleItems.Add(new VehicleItem("Vapid Sadler 4WD", ItemType.Vehicles) { ModelName = "civsadleroffroad" });
         newPossibleItems.VehicleItems.Add(new VehicleItem("Vapid Caracara Utility", ItemType.Vehicles) { ModelName = "civcaracarautil" });
         newPossibleItems.VehicleItems.Add(new VehicleItem("Vapid Caracara 2WD", ItemType.Vehicles) { ModelName = "civcaracarawork" });
         newPossibleItems.VehicleItems.Add(new VehicleItem("Vapid Caracara SX3 4WD", ItemType.Vehicles) { ModelName = "civcaracarastock" });
         newPossibleItems.VehicleItems.Add(new VehicleItem("Bravado Bison XL", ItemType.Vehicles) { ModelName = "civbisonxl", OverrideLoadBodiesInBed = true, BedLoadOffsetOverride = new Vector3(0f, -1.5f, 1.25f) });
-            
-
         newPossibleItems.VehicleItems.Add(new VehicleItem("Vapid Bobcat 4x4", ItemType.Vehicles) { OverrideMakeName = "Vapid", OverrideClassName = "Pickup", ModelName = "civbobcatoffroad" });
         newPossibleItems.VehicleItems.Add(new VehicleItem("Vapid Bobcat Regular Bed", ItemType.Vehicles) { OverrideMakeName = "Vapid", OverrideClassName = "Pickup", ModelName = "civbobcatwork" });
         newPossibleItems.VehicleItems.RemoveAll(x => x.ModelName == "contender");
         newPossibleItems.VehicleItems.Add(new VehicleItem("Karin Everon V8", true, ItemType.Vehicles) { OverrideMakeName = "Karin", ModelName = "contender" });//swapped from vaid to KARIN and renamed
-
-
         newPossibleItems.VehicleItems.Add(new VehicleItem("Karin Everon 2nd Gen", true, ItemType.Vehicles) { OverrideMakeName = "Karin", ModelName = "civeveron3" });
-        
-
-
-
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Canis Kamacho Stock", true, ItemType.Vehicles) { OverrideMakeName = "Canis", ModelName = "civkamacho" });
         newPossibleItems.VehicleItems.Add(new VehicleItem("Canis Bodhi Mod", ItemType.Vehicles) { OverrideMakeName = "Canis", ModelName = "bodhi", Description = "The Canis Bodhi has traveled the well-trodden path from military to redneck to hipster." });
-
         //SUV
         newPossibleItems.VehicleItems.Add(new VehicleItem("Vapid Scout", false, ItemType.Vehicles) { OverrideMakeName = "Vapid", ModelName = "civscoutgresk" });
-
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Annis Hellion Stock", false, ItemType.Vehicles) { ModelName = "civhellion" });
+        newPossibleItems.VehicleItems.Add(new VehicleItem("Canis Seminole Frontier Stock", false, ItemType.Vehicles) { ModelName = "civseminole2" });
         //HELIS
         newPossibleItems.VehicleItems.Add(new VehicleItem("Buckingham Maverick 2nd Gen", true, ItemType.Vehicles) { OverrideMakeName = "Buckingham", ModelName = "civmaverick2" });//civ 2nd gen mav
-
         Serialization.SerializeParam(newPossibleItems, "Plugins\\LosSantosRED\\AlternateConfigs\\FullModernTraffic\\ModItems+_FullModernTraffic.xml");
     }
     private void DefaultConfig_LosSantos2008()
@@ -377,6 +384,7 @@ public class ModItems : IModItems
         AllItems.AddRange(PossibleItems.BodyArmorItems);
         AllItems.AddRange(PossibleItems.RadarDetectorItems);
         AllItems.AddRange(PossibleItems.HardwareItems);
+        AllItems.AddRange(PossibleItems.TrophyItems);
         return AllItems;
     }
     public List<ModItem> PropItems()
@@ -552,6 +560,7 @@ public class ModItems : IModItems
         DefaultConfig_Valuables();
         DefaultConfig_FEE();
         DefaultConfig_HardwareItems();
+        DefaultConfig_TrophyItems();
         Serialization.SerializeParam(PossibleItems, ConfigFileName);
     }
     private void DefaultConfig_FEE()
@@ -582,6 +591,42 @@ public class ModItems : IModItems
              new HardwareItem("Chemicals", "For Science! Mix responsibly... or don't.", ItemType.Equipment){
                 ModelItemID = "ng_proc_paintcan02a",
                 ItemSubType = ItemSubType.Misc},
+        });
+    }
+    private void DefaultConfig_TrophyItems()
+    {
+        PossibleItems.TrophyItems.AddRange(new List<TrophyItem>
+        {
+            new TrophyItem("100 Races", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_100races", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("10 Year Anniversary", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_10yo", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("Three Comma Club", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_3commaclub", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("$500 Million Earned", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_500mil", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("Adversary Champion", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_adversary", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("Arcade Master", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_arcademaster", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("Arena War Legend", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_arenawarlegend", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("Car Collector", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_carcollector", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("Career Criminal", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_careercriminal", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("Cayo Perico Heist", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_cayoperico", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("Collector", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_collector", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("Completionist", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_completionist", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("Diamond Casino Heist", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_diamondcasino", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("Doomsday Heist", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_doomsday", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("Entrepreneur", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_entrepreneur", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("Flight School", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_flightschool", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("GTA V Veteran", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_gtav", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("Heist Professional", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_heistpro", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("LS Car Meet", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_lscm", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("Criminal Mastermind", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_mastermind", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("Nine Figure Earner", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_ninefig", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("Platinum Award", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_platinum", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("Rank 100", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_rank100", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("Rank 500", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_rank500", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("Rank 1000", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_rank1000", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("Spotlight Award", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_spotlight", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("Story Completion", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_story", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("Vault Cracker", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_vault", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("Well Liked", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_wellliked", ItemSubType = ItemSubType.Misc,},
+            new TrophyItem("World Record Holder", "", ItemType.Valuables){ ModelItemID = "m25_2_prop_m52_trpy_worldrecord", ItemSubType = ItemSubType.Misc,},      
         });
     }
     private void DefaultConfig_Armor()
@@ -2744,7 +2789,7 @@ public class ModItems : IModItems
             new VehicleItem("Dinka Jester (Racecar)", true, ItemType.Vehicles) { ModelName = "jester2", Description = "A Japanese hybrid-electric sportscar with a front-end designed to look like an angry grin might be too whimsical for some, but with a 4-liter V6 engine and 420hp, the Dinka Jester still packs a serious punchline. Race tuned special edition.", },
             new VehicleItem("Dinka Jester Classic", true, ItemType.Vehicles) { ModelName = "jester3", Description = "Dinka are famous for their hyperbikes and other suicide machines, but their legacy only has one name on it: the Jester Classic. They may have set out to make a sports GT, but they accidentally made the most iconic street racer ever to do a quarter mile with plenty of change out of ten seconds flat. It's still as beautiful as it ever was, it'll still eat you alive if you so much as flinch while you're behind the wheel, and you still wouldn't change a damn thing.", },
             new VehicleItem("Dinka Jester RR", true, ItemType.Vehicles) { ModelName = "jester4", Description = "Experts agree that the world is ending. And other experts agree that the only thing you can do about it is get online and fine tune your consumer choices. Introducing the latest Dinka Jester: the car with the killer smile is back, and this time it's so deadpan we're pretty sure it's not even joking. So stop doomscrolling. You've found it.", },
-            new VehicleItem("Dinka Blista Kanjo", true, ItemType.Vehicles) { ModelName = "kanjo", Description = "Cheap ramen noodles, Princess Robot Bubblegum, tentacle porn - if you want to express your teenage love for Japanese culture in a car purchase, look no further. Sure, the hideous straight lines and cafeteria tray bumper might cause your date to turn and run, but under that vibe-destroying exterior you'll find a vehicle ready to prove its worth, even if you and your equally deluded mates are the only ones to see it. The Dinka Blista Kanjo - it's a fapper's delight.", },
+            new VehicleItem("Dinka Blista Kanjo Custom", true, ItemType.Vehicles) { ModelName = "kanjo", Description = "Cheap ramen noodles, Princess Robot Bubblegum, tentacle porn - if you want to express your teenage love for Japanese culture in a car purchase, look no further. Sure, the hideous straight lines and cafeteria tray bumper might cause your date to turn and run, but under that vibe-destroying exterior you'll find a vehicle ready to prove its worth, even if you and your equally deluded mates are the only ones to see it. The Dinka Blista Kanjo - it's a fapper's delight.", },
             new VehicleItem("Dinka RT3000", true, ItemType.Vehicles) { ModelName = "rt3000", Description = "There's more power behind the Dinka RT3000 than the Palmer-Taylor Power Station when they break out the party dust, start the rave, and let the reactor do its thing. It's not a complicated formula, but it works.", },
             new VehicleItem("Dinka Sugoi", true, ItemType.Vehicles) { ModelName = "sugoi", Description = "How do you let people know you're interesting and exciting without engaging in conversation, or even making eye contact? The Dinka Sugoi has as much finish and flash as the elaborate mating ritual of a bird of paradise. Just paint it bright, beam the lights and powerslide your way round town to lure the admiration and friendship that you alone could not.", },
             new VehicleItem("Dinka Thrust", true, ItemType.Vehicles) { ModelName = "thrust" },
@@ -3201,7 +3246,7 @@ public class ModItems : IModItems
             new VehicleItem("Dewbauchee Champion", ItemType.Vehicles) { ModelName = "champion", RequiresDLC = true, },
             new VehicleItem("Lampadati Cinquemila", ItemType.Vehicles) { ModelName = "cinquemila", RequiresDLC = true, },
             new VehicleItem("Pfister Comet S2", ItemType.Vehicles) { ModelName = "comet7", RequiresDLC = true, },
-            
+
             new VehicleItem("Lampadati Corsita", ItemType.Vehicles) { ModelName = "corsita", RequiresDLC = true, },
             new VehicleItem("Enus Deity", ItemType.Vehicles) { ModelName = "deity", RequiresDLC = true, },
             new VehicleItem("Declasse Dragur", ItemType.Vehicles) { ModelName = "draugur", RequiresDLC = true, },
@@ -3276,13 +3321,13 @@ public class ModItems : IModItems
 
             //Bottom Dollar DLC
             new VehicleItem("Overflod Pipistrello", ItemType.Vehicles) { ModelName = "pipistrello", RequiresDLC = true, },
-            new VehicleItem("Invetero Coquette D1", ItemType.Vehicles) { ModelName = "coquette5", RequiresDLC = true, },     
+            new VehicleItem("Invetero Coquette D1", ItemType.Vehicles) { ModelName = "coquette5", RequiresDLC = true, },
             new VehicleItem("Declasse Yosemite 1500", ItemType.Vehicles) { ModelName = "yosemite1500", RequiresDLC = true, },
             new VehicleItem("Pegassi Pizza Boy", ItemType.Vehicles) { ModelName = "pizzaboy", RequiresDLC = true, },
             new VehicleItem("Bollokan Envisage", ItemType.Vehicles) { ModelName = "envisage", RequiresDLC = true, },
-            new VehicleItem("Benefactor Vorschlaghammer", ItemType.Vehicles) { ModelName = "vorschlaghammer", RequiresDLC = true, },    
+            new VehicleItem("Benefactor Vorschlaghammer", ItemType.Vehicles) { ModelName = "vorschlaghammer", RequiresDLC = true, },
             new VehicleItem("Canis Castigator", ItemType.Vehicles) { ModelName = "castigator", RequiresDLC = true, },
-            new VehicleItem("Ubermacht Niobe", ItemType.Vehicles) { ModelName = "niobe", RequiresDLC = true, },         
+            new VehicleItem("Ubermacht Niobe", ItemType.Vehicles) { ModelName = "niobe", RequiresDLC = true, },
             new VehicleItem("Enus Paragon S", ItemType.Vehicles) { ModelName = "paragon3", RequiresDLC = true, },
             new VehicleItem("Annis Euros X32", ItemType.Vehicles) { ModelName = "eurosX32", RequiresDLC = true, },
             new VehicleItem("Vapid Dominator FX", ItemType.Vehicles) { ModelName = "dominator10", RequiresDLC = true, },
@@ -3328,9 +3373,20 @@ public class ModItems : IModItems
             new VehicleItem("Brute Bobcat Security Stockade", true, ItemType.Vehicles) { ModelName = "stockade4" },
             new VehicleItem("MTL Flatbed Custom 2", true, ItemType.Vehicles) { ModelName = "flatbed2" },
 
+            //Safehouse in the Hills
+            new VehicleItem("Grotti GT750", true, ItemType.Vehicles) { ModelName = "gt750" },
+            new VehicleItem("Ubermacht Sentinel XS4", true, ItemType.Vehicles) { ModelName = "sentinel6" },
+            new VehicleItem("Pfister X-treme", true, ItemType.Vehicles) { ModelName = "xtreme" },
+            new VehicleItem("Vapid FMJ Mk V", true, ItemType.Vehicles) { ModelName = "fmj2" },
+            new VehicleItem("Pfister Astrale", true, ItemType.Vehicles) { ModelName = "astrale" },
+            new VehicleItem("Grotti Itali Classic", true, ItemType.Vehicles) { ModelName = "itali2" },
+            new VehicleItem("Shitzu Keitora", true, ItemType.Vehicles) { ModelName = "keitora" },
+            new VehicleItem("Progen Luiva", true, ItemType.Vehicles) { ModelName = "luiva" },
+
+
             //Drift
             new VehicleItem("Declasse Drift Tampa", ItemType.Vehicles) { ModelName = "drifttampa", RequiresDLC = true, },
-            new VehicleItem("Declasse Drift Yosemite", ItemType.Vehicles) { ModelName = "driftyosemite", RequiresDLC = true, },       
+            new VehicleItem("Declasse Drift Yosemite", ItemType.Vehicles) { ModelName = "driftyosemite", RequiresDLC = true, },
             new VehicleItem("Annis Drift Euros", ItemType.Vehicles) { ModelName = "drifteuros", RequiresDLC = true, },
             new VehicleItem("Fathom Drift FR36", ItemType.Vehicles) { ModelName = "driftfr36", RequiresDLC = true, },
             new VehicleItem("Karin Drift Futo", ItemType.Vehicles) { ModelName = "driftfuto", RequiresDLC = true, },
@@ -3343,6 +3399,11 @@ public class ModItems : IModItems
             new VehicleItem("Bravado Drift Gauntlet Hellfire", ItemType.Vehicles) { ModelName = "driftgauntlet4", RequiresDLC = true, },
             new VehicleItem("Annis Drift Hardy", ItemType.Vehicles) { ModelName = "drifthardy", RequiresDLC = true, },
             new VehicleItem("Declasse Dift Walton L35 2", ItemType.Vehicles) { ModelName = "driftl352", RequiresDLC = true, },
+
+            new VehicleItem("Vapid Drift Dominator GT", ItemType.Vehicles) { ModelName = "driftdominator9", RequiresDLC = true, },
+            new VehicleItem("Shitzu Drift Keitora", ItemType.Vehicles) { ModelName = "driftkeitora", RequiresDLC = true, },
+            new VehicleItem("Dinka Drift RT3000", ItemType.Vehicles) { ModelName = "driftrt3000", RequiresDLC = true, },
+            new VehicleItem("Ubermacht Drift Sentinel XS", ItemType.Vehicles) { ModelName = "driftsentinel2", RequiresDLC = true, },
 
 
             //Bikes
@@ -3456,6 +3517,203 @@ public class ModItems : IModItems
             //new VehicleItem("wolfsbane2", ItemType.Vehicles) { ModelName = "wolfsbane2" },
             //new VehicleItem("yankee2", ItemType.Vehicles) { ModelName = "yankee2" },
             //new VehicleItem("yankee", ItemType.Vehicles) { ModelName = "yankee" },
+
+            //LCPP Vehicles
+
+            // Motorcycles - Sport Bikes
+            new VehicleItem("Dinka Akuma (IV)", ItemType.Vehicles) { ModelName = "lcakuma" },
+            new VehicleItem("Dinka Double T (IV)", ItemType.Vehicles) { ModelName = "lcdouble" },
+            new VehicleItem("Dinka Double T Custom (IV)", ItemType.Vehicles) { ModelName = "lcdouble2" },
+            new VehicleItem("Pegassi Ruffian (IV)", ItemType.Vehicles) { ModelName = "lcruffian" },
+            new VehicleItem("Pegassi Bati 801 (IV)", ItemType.Vehicles) { ModelName = "lcbati" },
+            new VehicleItem("Principe Nemesis (IV)", ItemType.Vehicles) { ModelName = "lcnemesis" },
+            new VehicleItem("Shitzu Hakuchou (IV)", ItemType.Vehicles) { ModelName = "lchakuchou" },
+            new VehicleItem("Shitzu Hakuchou Custom (IV)", ItemType.Vehicles) { ModelName = "lchakuchou3" },
+            new VehicleItem("Shitzu NRG-900 (IV)", ItemType.Vehicles) { ModelName = "lcnrg900" },
+            new VehicleItem("Shitzu PCJ-600 (IV)", ItemType.Vehicles) { ModelName = "lcpcj" },
+            new VehicleItem("Shitzu Vader (IV)", ItemType.Vehicles) { ModelName = "lcvader" },
+            // Motorcycles - Choppers
+            new VehicleItem("Western Angel (IV)", ItemType.Vehicles) { ModelName = "lcangel" },
+            new VehicleItem("Western Bagger (IV)", ItemType.Vehicles) { ModelName = "lcbagger" },
+            new VehicleItem("Western Daemon (IV)", ItemType.Vehicles) { ModelName = "lcdaemon" },
+            new VehicleItem("Western Diabolus (IV)", ItemType.Vehicles) { ModelName = "lcdiabolus" },
+            new VehicleItem("Western Freeway (IV)", ItemType.Vehicles) { ModelName = "lcfreeway" },
+            new VehicleItem("Western Hellfury (IV)", ItemType.Vehicles) { ModelName = "lchellfury" },
+            new VehicleItem("Western Revenant (IV)", ItemType.Vehicles) { ModelName = "lcrevenant" },
+            new VehicleItem("Western Sovereign (IV)", ItemType.Vehicles) { ModelName = "lcsovereign2" },
+            new VehicleItem("Western Wolfsbane Classic (IV)", ItemType.Vehicles) { ModelName = "lcwolfsbane2" },
+            new VehicleItem("Western Zombie Bobber (IV)", ItemType.Vehicles) { ModelName = "lczombiea" },
+            // Motorcycles - Liberty City Chopshop
+            new VehicleItem("LCC Hexer (IV)", ItemType.Vehicles) { ModelName = "lchexer" },
+            new VehicleItem("LCC Lycan (IV)", ItemType.Vehicles) { ModelName = "lclycan" },
+            new VehicleItem("LCC Lycan Custom (IV)", ItemType.Vehicles) { ModelName = "lclycan2" },
+            new VehicleItem("LCC Nightblade Classic (IV)", ItemType.Vehicles) { ModelName = "lcnightblade2" },
+            // Motorcycles - Off-Road
+            new VehicleItem("Maibatsu Sanchez (IV)", ItemType.Vehicles) { ModelName = "lcsanchez" },
+            new VehicleItem("Maibatsu Sanchez Livery (IV)", ItemType.Vehicles) { ModelName = "lcsanchez2" },
+            // Motorcycles - Scooter
+            new VehicleItem("Pegassi Faggio Classic (IV)", ItemType.Vehicles) { ModelName = "lcfaggio3" },
+            new VehicleItem("Pegassi Faggio (IV)", ItemType.Vehicles) { ModelName = "lcfaggio" },
+
+
+            // Cars - Compacts
+            new VehicleItem("BF Club (IV)", ItemType.Vehicles) { ModelName = "lcclub" },
+            new VehicleItem("Declasse Rhapsody (IV)", ItemType.Vehicles) { ModelName = "lcrhapsody" },
+            new VehicleItem("Dinka Blista Compact (IV)", ItemType.Vehicles) { ModelName = "lcblista2" },
+            new VehicleItem("Karin Dilettante (IV)", ItemType.Vehicles) { ModelName = "lcdilettante" },
+            new VehicleItem("Karin Dilettante FMA PArking (IV)", ItemType.Vehicles) { ModelName = "lcdilettante2" },
+            new VehicleItem("Weeny Issi Classic (IV)", ItemType.Vehicles) { ModelName = "lcissi2" },
+
+            // Cars - Sedans
+            new VehicleItem("Anus Pinnacle (IV)", ItemType.Vehicles) { ModelName = "lcpinnacle" },
+            new VehicleItem("Albany Emperor (IV)", ItemType.Vehicles) { ModelName = "lcemperor" },
+            new VehicleItem("Albany Emperor Rusty (IV)", ItemType.Vehicles) { ModelName = "lcemperor2" },
+            new VehicleItem("Albany Esperanto (IV)", ItemType.Vehicles) { ModelName = "lcesperanto" },
+            new VehicleItem("Albany Esperanto Taxi (IV)", ItemType.Vehicles) { ModelName = "lcrom" },
+            new VehicleItem("Albany Presidente (IV)", ItemType.Vehicles) { ModelName = "lcpres" },
+            new VehicleItem("Albany Presidente V10S (IV)", ItemType.Vehicles) { ModelName = "lcpres2" },
+            new VehicleItem("Albany Primo (IV)", ItemType.Vehicles) { ModelName = "lcprimo" },
+            new VehicleItem("Albany Primo Custom (IV)", ItemType.Vehicles) { ModelName = "lcprimo2" },
+            new VehicleItem("Albany Washington (IV)", ItemType.Vehicles) { ModelName = "lcwashington" },
+            new VehicleItem("Benefactor Schafter LE (IV)", ItemType.Vehicles) { ModelName = "lcschafter" },
+            new VehicleItem("Benefactor Schafter V12 (IV)", ItemType.Vehicles) { ModelName = "lcschafter3" },
+            new VehicleItem("Bravado Buffalo (IV)", ItemType.Vehicles) { ModelName = "lcbuffalo" },
+            new VehicleItem("Bravado Feroci (IV)", ItemType.Vehicles) { ModelName = "lcferoci" },
+            new VehicleItem("Bravado Feroci FlyUS (IV)", ItemType.Vehicles) { ModelName = "lcferoci2" },
+            new VehicleItem("Declasse Merit (IV)", ItemType.Vehicles) { ModelName = "lcmerit" },
+            new VehicleItem("Declasse Premier (IV)", ItemType.Vehicles) { ModelName = "lcpremier" },
+            new VehicleItem("Declasse Premier Classic (IV)", ItemType.Vehicles) { ModelName = "lcpremier2" },
+            new VehicleItem("Dinka Chavos (IV)", ItemType.Vehicles) { ModelName = "lcchavos" },
+            new VehicleItem("Dinka Chavos S (IV)", ItemType.Vehicles) { ModelName = "lcchavos2" },
+            new VehicleItem("Dinka Perennial (IV)", ItemType.Vehicles) { ModelName = "lcperennial" },
+            new VehicleItem("Dinka Perennial FlyUS (IV)", ItemType.Vehicles) { ModelName = "lcperennial2" },
+            new VehicleItem("Dundreary Admiral (IV)", ItemType.Vehicles) { ModelName = "lcadmiral" },
+            new VehicleItem("Dundreary Regina (IV)", ItemType.Vehicles) { ModelName = "lcregina" },
+            new VehicleItem("Dundreary Regina 4-dr (IV)", ItemType.Vehicles) { ModelName = "lcregina3" },
+            new VehicleItem("Dundreary Regina VP (IV)", ItemType.Vehicles) { ModelName = "lcregina2" },
+            new VehicleItem("Emperor Lokus (IV)", ItemType.Vehicles) { ModelName = "lclokus" },
+            new VehicleItem("Enus Cognoscenti (IV)", ItemType.Vehicles) { ModelName = "lccognoscenti" },
+            new VehicleItem("Enus Cognoscenti 55 (IV)", ItemType.Vehicles) { ModelName = "lccog55" },
+            new VehicleItem("Enus Super Diamond (IV)", ItemType.Vehicles) { ModelName = "lcsuperd" },
+            new VehicleItem("Enus Super Drop Diamond (IV)", ItemType.Vehicles) { ModelName = "lcsuperd2" },
+            new VehicleItem("Imponte DF8-90 (IV)", ItemType.Vehicles) { ModelName = "lcdf8" },
+            new VehicleItem("Karin Intruder (IV)", ItemType.Vehicles) { ModelName = "lcintruder" },
+            new VehicleItem("Karin Sultan (IV)", ItemType.Vehicles) { ModelName = "lcsultan" },
+            new VehicleItem("Karin Sultan S (IV)", ItemType.Vehicles) { ModelName = "lcsultans" },
+            new VehicleItem("Maibatsu Vincent (IV)", ItemType.Vehicles) { ModelName = "lcvincent" },
+            new VehicleItem("Schyster PMP 600 (IV)", ItemType.Vehicles) { ModelName = "lcpmp600" },
+            new VehicleItem("Ubermacht Oracle XS (IV)", ItemType.Vehicles) { ModelName = "lcoracle" },
+            new VehicleItem("Vapid Interceptor (IV)", ItemType.Vehicles) { ModelName = "lcinterceptor" },
+            new VehicleItem("Vapid Stanier S (IV)", ItemType.Vehicles) { ModelName = "lcstanier2" },
+            new VehicleItem("Vulcar Ingot (IV)", ItemType.Vehicles) { ModelName = "lcingot" },
+            new VehicleItem("Willard Marbelle (IV)", ItemType.Vehicles) { ModelName = "lcmarbelle" },
+            new VehicleItem("Willard Solair (IV)", ItemType.Vehicles) { ModelName = "lcsolair" },
+            new VehicleItem("Willard Willard (IV)", ItemType.Vehicles) { ModelName = "lcwillard" },
+            new VehicleItem("Zirconium Stratum (IV)", ItemType.Vehicles) { ModelName = "lcstratum" },
+            new VehicleItem("Zirconium Stratum Sedan (IV)", ItemType.Vehicles) { ModelName = "lcstratum2" },
+
+            // Cars - Coupes
+            new VehicleItem("Benefactor Feltzer Coupe (IV)", ItemType.Vehicles) { ModelName = "lcfeltzer" },
+            new VehicleItem("Ocelot F620 (IV)", ItemType.Vehicles) { ModelName = "lcf620" },
+            new VehicleItem("Ubermacht Sentinel GTS (IV)", ItemType.Vehicles) { ModelName = "lcsentinel5" },
+            new VehicleItem("Vapid Fortune (IV)", ItemType.Vehicles) { ModelName = "lcfortune" },
+
+            // Cars - Muscle
+            new VehicleItem("Albany Buccaneer (IV)", ItemType.Vehicles) { ModelName = "lcbuccaneer" },
+            new VehicleItem("Albany Buccaneer Luxe (IV)", ItemType.Vehicles) { ModelName = "lcbuccaneer3" },
+            new VehicleItem("Albany Manana (IV)", ItemType.Vehicles) { ModelName = "lcmanana" },
+            new VehicleItem("Albany Virgo (IV)", ItemType.Vehicles) { ModelName = "lcvirgo" },
+            new VehicleItem("Albany Virgo Classic (IV)", ItemType.Vehicles) { ModelName = "lcvirgo3" },
+            new VehicleItem("Albany Virgo Classic Custom (IV)", ItemType.Vehicles) { ModelName = "lcvirgo2" },
+            new VehicleItem("Bravado Gauntlet (IV)", ItemType.Vehicles) { ModelName = "lcgauntlet" },
+            new VehicleItem("Classique Stalion (IV)", ItemType.Vehicles) { ModelName = "lcstalion" },
+            new VehicleItem("Declasse Sabre (IV)", ItemType.Vehicles) { ModelName = "lcsabre" },
+            new VehicleItem("Declasse Sabre Beater (IV)", ItemType.Vehicles) { ModelName = "lcsabre2" },
+            new VehicleItem("Declasse Sabre Turbo (IV)", ItemType.Vehicles) { ModelName = "lcsabregt" },
+            new VehicleItem("Declasse Tampa (IV)", ItemType.Vehicles) { ModelName = "lctampa" },
+            new VehicleItem("Declasse Vigero (IV)", ItemType.Vehicles) { ModelName = "lcvigero" },
+            new VehicleItem("Declasse Vigero Beater (IV)", ItemType.Vehicles) { ModelName = "lcvigero3" },
+            new VehicleItem("Declasse Voodoo (IV)", ItemType.Vehicles) { ModelName = "lcvoodoo3" },
+            new VehicleItem("Declasse Voodoo Custom (IV)", ItemType.Vehicles) { ModelName = "lcvoodoo" },
+            new VehicleItem("Imponte Dukes (IV)", ItemType.Vehicles) { ModelName = "lcdukes" },
+            new VehicleItem("Imponte Phoenix 455 RS (IV)", ItemType.Vehicles) { ModelName = "lcphoenix2" },
+            new VehicleItem("Imponte Ruiner (IV)", ItemType.Vehicles) { ModelName = "lcruiner" },
+            new VehicleItem("Vapid Chino (IV)", ItemType.Vehicles) { ModelName = "lcchino" },
+            new VehicleItem("Vapid Peyote (IV)", ItemType.Vehicles) { ModelName = "lcpeyote" },
+            new VehicleItem("Willard Faction (IV)", ItemType.Vehicles) { ModelName = "lcfaction" },
+
+            // Cars - Sports - Sports Classic
+            new VehicleItem("Bravado Banshee (IV)", ItemType.Vehicles) { ModelName = "lcbanshee" },
+            new VehicleItem("Cheval Surge (IV)", ItemType.Vehicles) { ModelName = "lcsurge" },
+            new VehicleItem("Coil Raiden (IV)", ItemType.Vehicles) { ModelName = "lcraiden" },
+            new VehicleItem("Dewbauchee Super GT (IV)", ItemType.Vehicles) { ModelName = "lcsupergt" },
+            new VehicleItem("Dinka Jester (IV)", ItemType.Vehicles) { ModelName = "lcjester" },
+            new VehicleItem("Dinka Sugoi (IV)", ItemType.Vehicles) { ModelName = "lcsugoi" },
+            new VehicleItem("Grotti Carbonizzare (IV)", ItemType.Vehicles) { ModelName = "lccarbonizzare" },
+            new VehicleItem("Grotti Cheetah (IV)", ItemType.Vehicles) { ModelName = "lccheetah" },
+            new VehicleItem("Grotti Cheetah Classic (IV)", ItemType.Vehicles) { ModelName = "lccheetah2" },// same as 3
+            //new VehicleItem("Grotti Cheetah Classic (IV)", ItemType.Vehicles) { ModelName = "lccheetah3" }, // same as 2 - added for completeness
+            new VehicleItem("Grotti Turismo (IV)", ItemType.Vehicles) { ModelName = "lcturismo" },
+            new VehicleItem("Invetero Coquette (IV)", ItemType.Vehicles) { ModelName = "lccoquette" },
+            new VehicleItem("Invetero Coquette Classic (IV)", ItemType.Vehicles) { ModelName = "lccoquette5" },
+            new VehicleItem("Karin Futo (IV)", ItemType.Vehicles) { ModelName = "lcfuto" },
+            new VehicleItem("Karin Futo Alt (IV)", ItemType.Vehicles) { ModelName = "lcfuto3" },
+            new VehicleItem("Karin Kuruma (IV)", ItemType.Vehicles) { ModelName = "lckuruma" },
+            new VehicleItem("Karin Sultan RS (IV)", ItemType.Vehicles) { ModelName = "lcsultanrs" },
+            new VehicleItem("Obey 9F (IV)", ItemType.Vehicles) { ModelName = "lcninef" },
+            new VehicleItem("Pfister Comet (IV)", ItemType.Vehicles) { ModelName = "lccomet2" },
+            new VehicleItem("Benefactor Schlagen GT (IV)", ItemType.Vehicles) { ModelName = "lcschlagen" },
+            new VehicleItem("Schyster Fusilade (IV)", ItemType.Vehicles) { ModelName = "lcfusilade" },
+            new VehicleItem("Vapid Uranus LozSpeed (IV)", ItemType.Vehicles) { ModelName = "lcuranus" },
+
+            // Cars - Super
+            new VehicleItem("Benefactor Schafter GTR (IV)", ItemType.Vehicles) { ModelName = "lcschaftergtr" },
+            new VehicleItem("Modena Typhoon (IV)", ItemType.Vehicles) { ModelName = "lctyphoon" },
+            new VehicleItem("Pegassi Infernus (IV)", ItemType.Vehicles) { ModelName = "lcinfernus" },
+            new VehicleItem("Vapid Bullet (IV)", ItemType.Vehicles) { ModelName = "lcbullet" },
+
+            // Cars - SUVs
+            new VehicleItem("Albany Cavalcade (IV)", ItemType.Vehicles) { ModelName = "lccavalcade" },
+            new VehicleItem("Albany Cavalcade 2nd Gen (IV)", ItemType.Vehicles) { ModelName = "lccavalcade2" },
+            new VehicleItem("Albany Cavalcade FXT (IV)", ItemType.Vehicles) { ModelName = "lcfxt" },
+            new VehicleItem("Benefactor Serrano (IV)", ItemType.Vehicles) { ModelName = "lcserrano" },
+            new VehicleItem("Canis Mesa (IV)", ItemType.Vehicles) { ModelName = "lcmesa" },
+            new VehicleItem("Declasse Granger (IV)", ItemType.Vehicles) { ModelName = "lcgranger" },
+            new VehicleItem("Dundreary Landstalker (IV)", ItemType.Vehicles) { ModelName = "lclandstalker" },
+            new VehicleItem("Emperor Habanero (IV)", ItemType.Vehicles) { ModelName = "lchabanero" },
+            new VehicleItem("Enus Jubilee (IV)", ItemType.Vehicles) { ModelName = "lcjubilee" },
+            new VehicleItem("Gallivanter Baller (IV)", ItemType.Vehicles) { ModelName = "lcballer" },
+            new VehicleItem("Lampadati Novak (IV)", ItemType.Vehicles) { ModelName = "lcnovak" },
+            new VehicleItem("Mammoth Patriot (IV)", ItemType.Vehicles) { ModelName = "lcpatriot" },
+            new VehicleItem("Ubermacht Rebla (IV)", ItemType.Vehicles) { ModelName = "lcreblaiv" },
+            new VehicleItem("Vapid Huntley Sport (IV)", ItemType.Vehicles) { ModelName = "lchuntley2" },
+            new VehicleItem("Vapid Radius (IV)", ItemType.Vehicles) { ModelName = "lcradi" },
+
+            // Cars - Off-Road
+            new VehicleItem("Bravado Bison (IV)", ItemType.Vehicles) { ModelName = "lcbison" },
+            new VehicleItem("Bravado Bison Variant (IV)", ItemType.Vehicles) { ModelName = "lcbison3" },
+            new VehicleItem("Canis Bohdi (IV)", ItemType.Vehicles) { ModelName = "lcbohdi" },
+            new VehicleItem("Declasse Rancher SWB (IV)", ItemType.Vehicles) { ModelName = "lcrancher" },
+            new VehicleItem("Vapid Bobcat (IV)", ItemType.Vehicles) { ModelName = "lcbobcat" },
+            new VehicleItem("Vapid Bobcat XL (IV)", ItemType.Vehicles) { ModelName = "lcbobcatxl" },
+            new VehicleItem("Vapid Contender (IV)", ItemType.Vehicles) { ModelName = "lccontender" },
+            new VehicleItem("Vapid Contender E109 (IV)", ItemType.Vehicles) { ModelName = "lccontender2" },
+            new VehicleItem("Vapid Sadler (IV)", ItemType.Vehicles) { ModelName = "lcsadler" },
+
+            // Cars - Vans /  Other
+            new VehicleItem("Chariot Romero Hearse (IV)", ItemType.Vehicles) { ModelName = "lcromero" },
+            new VehicleItem("Declasse Burrito (IV)", ItemType.Vehicles) { ModelName = "lcburrito3" },
+            new VehicleItem("Declasse Moonbeam (IV)", ItemType.Vehicles) { ModelName = "lcmoonbeam" },
+            new VehicleItem("Vapid Minivan (IV)", ItemType.Vehicles) { ModelName = "lcminivan" },
+            new VehicleItem("Vapid Speedo (IV)", ItemType.Vehicles) { ModelName = "lcspeedo" },
+
+            //Boats
+            new VehicleItem("Blade (IV)", ItemType.Vehicles) { ModelName = "lcblade2" },
+            new VehicleItem("Floater (IV)", ItemType.Vehicles) { ModelName = "lcfloater" },
+            new VehicleItem("Reefer (IV)", ItemType.Vehicles) { ModelName = "lcreefer" },
+            new VehicleItem("Smuggler (IV)", ItemType.Vehicles) { ModelName = "lcsmuggler" },
+            new VehicleItem("Shitzu Violator (IV)", ItemType.Vehicles) { ModelName = "lcviolator" },
+
         });
     }
     private void DefaultConfig_Weapons()

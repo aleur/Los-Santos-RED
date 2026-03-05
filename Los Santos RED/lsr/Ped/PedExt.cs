@@ -282,7 +282,7 @@ public class PedExt : IComplexTaskable, ISeatAssignable
     public bool IsDrunk { get; set; } = false;
     public bool IsFreeModePed { get; set; } = false;
     public virtual bool IsGangMember { get; set; } = false;
-    public bool IsInAPC { get; private set; }
+   // public bool IsInAPC { get; private set; }
     public bool IsInBoat { get; private set; } = false;
     public bool IsWaitingAtTrafficLight { get; set; }
     public bool IsTurningLeftAtTrafficLight { get; set; }
@@ -456,7 +456,8 @@ public class PedExt : IComplexTaskable, ISeatAssignable
     public uint GameTimeLastInjured { get; set; }
     public bool RecentlyInjured => GameTimeLastInjured != 0 && Game.GameTime - GameTimeLastInjured <= 3000;
     public bool HasBeenSeenUnconscious { get; set; } = false;
-    public bool HasBeenSeenDead { get; set; } = false;   
+    public bool HasBeenSeenDead { get; set; } = false;
+    public bool WillRacePlayer { get; set; } = false;
     public bool HasStartedEMTTreatment { get; set; } = false;
     public bool WasSeenInDistressByServicePed { get; set; } = false;
     public uint GameTimeSeenDead => Game.GameTime - GameTimeFirstSeenDead;
@@ -485,11 +486,33 @@ public class PedExt : IComplexTaskable, ISeatAssignable
     public bool CanBeBuried => IsUnconscious || IsDead;
     public bool IsLoadedInTrunk { get; set; }
     public virtual bool HasWeapon => false;
-
-    public bool CanCurrentlyRacePlayer => IsInVehicle && IsDriver && !IsWanted && !IsDead && !IsUnconscious && !IsLSRFleeing;
-
+    public virtual bool CanCurrentlyRacePlayer => IsInVehicle && IsDriver && !IsWanted && !IsDead && !IsUnconscious && !IsLSRFleeing && WillRacePlayer;
     public int CopsKilled { get; private set; }
     public int CiviliansKilled { get; private set; }
+    public virtual float PickpocketDetectionMultiplier { get; set; } = 1.0f;
+    public bool IsInArmedMilitaryVehicle { get; private set; }
+    public bool IsInRaceWorthyCar(IEntityProvideable World)
+    {
+        if(!IsInVehicle)
+        {
+            return false;
+        }
+        if(!Pedestrian.Exists())
+        {
+            return false;
+        }
+        Vehicle currentVehicle = Pedestrian.CurrentVehicle;
+        if (!currentVehicle.Exists())
+        {
+            return false;
+        }
+        VehicleExt selectedVehicle = World.Vehicles.GetVehicleExt(currentVehicle);
+        if (selectedVehicle == null)
+        {
+            return false;
+        }
+        return selectedVehicle.IsRaceWorthy();
+    }
 
     public virtual void Update(IPerceptable perceptable, IPoliceRespondable policeRespondable, IContactInteractable taskAssignable, Vector3 placeLastSeen, IEntityProvideable world)
     {
@@ -753,10 +776,10 @@ public class PedExt : IComplexTaskable, ISeatAssignable
             if (IsInVehicle)//got in
             {
                 //EntryPoint.WriteToConsole($"PedExt {Pedestrian.Handle} Got In Vehicle", 5);
-                //if(Pedestrian.CurrentVehicle.Exists())
-                //{
-                //    CurrentVehicle = Pedestrian.CurrentVehicle;
-                //}
+                if (Pedestrian.CurrentVehicle.Exists())
+                {
+                    IsInArmedMilitaryVehicle = Pedestrian.CurrentVehicle.Class == VehicleClass.Military && NativeFunction.Natives.DOES_VEHICLE_HAVE_WEAPONS<bool>(Pedestrian.CurrentVehicle);
+                }
 
 
                 GameTimeLastEnteredVehicle = Game.GameTime;
@@ -779,14 +802,18 @@ public class PedExt : IComplexTaskable, ISeatAssignable
             IsWaitingAtTrafficLight = NativeFunction.Natives.IS_VEHICLE_STOPPED_AT_TRAFFIC_LIGHTS<bool>(Pedestrian.CurrentVehicle);
             IsTurningLeftAtTrafficLight = false;
             IsTurningRightAtTrafficLight = false;
-            if (Pedestrian.CurrentVehicle.Model.Name.ToLower() == "rhino")
-            {
-                IsInAPC = true;
-            }
-            else
-            {
-                IsInAPC = false;
-            }
+            //if (Pedestrian.CurrentVehicle.Model.Name.ToLower() == "rhino")
+            //{
+            //    IsInAPC = true;
+            //}
+            //else
+            //{
+            //    IsInAPC = false;
+            //}
+
+            
+
+
             if (!IsInHelicopter && !IsInBoat)
             {
                 IsOnBike = Pedestrian.IsOnBike;
@@ -806,7 +833,8 @@ public class PedExt : IComplexTaskable, ISeatAssignable
             IsOnBike = false;
             IsDriver = false;
             IsInBoat = false;
-            IsInAPC = false;
+            //IsInAPC = false;
+            IsInArmedMilitaryVehicle = false;
             IsWaitingAtTrafficLight = false;
             IsTurningLeftAtTrafficLight = false;
             IsTurningRightAtTrafficLight = false;
@@ -1040,7 +1068,6 @@ public class PedExt : IComplexTaskable, ISeatAssignable
     //{
 
     //}
-
     public virtual void SetPersistent()
     {
         if (!WasModSpawned && Pedestrian.Exists() && !Pedestrian.IsPersistent)
@@ -1058,9 +1085,6 @@ public class PedExt : IComplexTaskable, ISeatAssignable
             EntryPoint.WriteToConsole($"RELEASING PED {Handle} MAKING NON PERSIS");
         }
     }
-
-
-
     public void SetBaseStats(DispatchablePerson dispatchablePerson, IShopMenus shopMenus, IWeapons weapons, bool addBlip)
     {
         if (!Pedestrian.Exists())
@@ -1075,6 +1099,10 @@ public class PedExt : IComplexTaskable, ISeatAssignable
         WillCallPoliceIntense = RandomItems.RandomPercent(CivilianSeriousCallPercentage());
         WillFightPolice = RandomItems.RandomPercent(CivilianFightPolicePercentage());
         WillCower = RandomItems.RandomPercent(CivilianCowerPercentage());
+
+        WillRacePlayer = RandomItems.RandomPercent(Settings.SettingsManager.CivilianSettings.PercentageWillRacePlayer);
+
+
         CanSurrender = RandomItems.RandomPercent(Settings.SettingsManager.CivilianSettings.PossibleSurrenderPercentage);
         if (addBlip)
         {
@@ -1755,7 +1783,6 @@ ENDENUM
     {
 
     }
-
     public virtual void OnStartedPersonTransactionAnimation(bool isIllicilt, bool isWeapon)
     {
         if (isIllicilt)
@@ -1771,7 +1798,6 @@ ENDENUM
             IgnorePlayerCrimes = true;
         }
     }
-
     public virtual void OnEndedPersonTransactionAnimation(bool isIllicilt, bool isWeapon)
     {
         if (isIllicilt)
@@ -1787,7 +1813,6 @@ ENDENUM
             IgnorePlayerCrimes = false;
         }
     }
-
     public void OnKilledPed(PedExt myPed)
     {
         if(myPed == null)
@@ -1805,10 +1830,22 @@ ENDENUM
             EntryPoint.WriteToConsole($"{Handle} LOGGING KILLING CIVILIAN TOTAL {CiviliansKilled}");
         }
     }
-
     public void OnVehicleHealthDecreased(int amount, bool isCollision)
     {
         EntryPoint.WriteToConsole("PED OnVehicleHealthDecreased");
+
+        if(!isCollision)
+        {
+            EntryPoint.WriteToConsole($"PED EVENT: NON COLLISION VEHICLE HEALTH DamageAmount:{amount} isCollision{isCollision}");
+
+            return;
+        }
+        if(IsInArmedMilitaryVehicle)
+        {
+            EntryPoint.WriteToConsole($"PED EVENT: ARMED MILITARY VEHICLE VEHICLE HEALTH DamageAmount:{amount} isCollision{isCollision}");
+            return;
+        }
+
         if(!Pedestrian.Exists())
         {
             return;
@@ -1825,9 +1862,23 @@ ENDENUM
         {
             return;
         }
+
+        
         float HealthToRemove = amount * Settings.SettingsManager.CivilianSettings.VehicleCrashInjureScalar * RandomItems.GetRandomNumber(1.0f - Settings.SettingsManager.CivilianSettings.VehicleCrashInjureRandomizePercentage, 1.0f + Settings.SettingsManager.CivilianSettings.VehicleCrashInjureRandomizePercentage);
         int healthToRemove = (int)Math.Ceiling(HealthToRemove);
         Pedestrian.Health = Pedestrian.Health - healthToRemove;
         EntryPoint.WriteToConsole($"PED EVENT: REMOVING HEALTH IN CRASH DamageAmount:{amount} isCollision{isCollision} healthToRemoved:{healthToRemove} CurrentHealth{Pedestrian.Health}");
+    }
+    public virtual void OnPlayerFailedPickpocketing(IInteractionable player)
+    {
+        if (!Pedestrian.Exists())
+        {
+            EntryPoint.WriteToConsole($"Pickpocket: {Pedestrian?.Handle:X8 ?? 0} failed to react, invalid state");
+            return;
+        }
+        HatesPlayer = true;
+        PlayerPerception.SetFakeSeen();
+        AddWitnessedPlayerCrime(Crimes.GetCrime(StaticStrings.PickPocketingCrimeID),player.Character.Position);
+        //EntryPoint.WriteToConsole($"Pickpocket: {Pedestrian.Handle:X8} reacted to pickpocket, IsCop={IsCop}, IsGangMember={IsGangMember}, HatesPlayer={HatesPlayer}, WillCallPolice={WillCallPolice}, WillCallPoliceIntense={WillCallPoliceIntense}, HasCellPhone={HasCellPhone}");
     }
 }

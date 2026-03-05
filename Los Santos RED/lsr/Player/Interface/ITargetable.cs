@@ -69,6 +69,7 @@ namespace LosSantosRED.lsr.Interface
         Vector3 Position { get; }
         bool IsInWantedActiveMode { get; }
         float VehicleSpeedMPH { get; }
+        bool IsMovingSlowly { get; }
         float VehicleSpeed { get; }
         //bool IsHostile(Gang gang);
     }

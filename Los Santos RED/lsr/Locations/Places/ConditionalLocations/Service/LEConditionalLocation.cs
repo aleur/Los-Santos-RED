@@ -22,7 +22,7 @@ public class LEConditionalLocation : ConditionalLocation
     }
     public override bool DetermineRun(bool force)
     {
-        if(!Settings.SettingsManager.PoliceSpawnSettings.ManageDispatching)
+        if(!Settings.SettingsManager.PoliceSpawnSettings.ManageDispatching || EntryPoint.IsLSPDFRIntegrationEnabled)
         {
             return false;
         }
@@ -48,7 +48,7 @@ public class LEConditionalLocation : ConditionalLocation
         try
         {
             EntryPoint.WriteToConsole("ATTEMPT LE SPAWN CONDITIONAL LOCATION");
-            LESpawnTask LESpawnTask = new LESpawnTask(Agency, SpawnLocation, DispatchableVehicle, DispatchablePerson, Settings.SettingsManager.PoliceSpawnSettings.ShowSpawnedBlips, Settings, Weapons, Names, RandomItems.RandomPercent(Settings.SettingsManager.PoliceSpawnSettings.AddOptionalPassengerPercentage), World, ModItems, false, ShopMenus);
+            LESpawnTask LESpawnTask = new LESpawnTask(Agency, SpawnLocation, DispatchableVehicle, DispatchablePerson, Settings.SettingsManager.PoliceSpawnSettings.ShowSpawnedBlips, Settings, Weapons, Names, RandomItems.RandomPercent(Settings.SettingsManager.PoliceSpawnSettings.AddOptionalPassengerPercentage), World, ModItems, false, ShopMenus, Crimes);
             LESpawnTask.AllowAnySpawn = true;
             LESpawnTask.AllowBuddySpawn = false;
             LESpawnTask.ClearVehicleArea = true;

@@ -19,13 +19,11 @@ namespace Mod
         private ISettingsProvideable Settings;
         private IWeapons Weapons;
 
-        private TimerBarPool TimerBarPool;
 
 
         public bool IsCrafting { get; private set; } = false;
         public CraftingMenu CraftingMenu { get; set; }
         public ICraftableItems CraftableItems;
-        private BarTimerBar ProgressBar;
         public List<(int, CraftableItem)> UnfinishedCrafts { get; set; } = new List<(int, CraftableItem)> ();
 
         public Crafting(Player player, ICraftableItems craftableItems, IModItems modItems, ISettingsProvideable settings, IWeapons weapons)
@@ -40,12 +38,6 @@ namespace Mod
         {
             SetupCraftableLookup();
             Player.Crafting = this;
-
-            TimerBarPool= new TimerBarPool();
-            ProgressBar = new BarTimerBar("Progress");
-            ProgressBar.BackgroundColor = Color.FromArgb(100, 142, 50, 50);
-            ProgressBar.ForegroundColor = Color.FromArgb(255, 181, 48, 48);//Red
-
         }
         public void Reset()
         {
@@ -149,18 +141,21 @@ namespace Mod
                 Player.Violations.SetContinuouslyViolating(craftableItem.CrimeId);
             }
 
-            TimerBarPool.Add(ProgressBar);
 
             uint GameTimeStartedCrafting = Game.GameTime;
 
-            Player.ButtonPrompts.AddPrompt("craftingStop", "Stop Crafting", "stopcraftingprompt1", Settings.SettingsManager.KeySettings.InteractCancel, 999);
-            Player.ButtonPrompts.AddPrompt("craftingPause", "Put Away", "putawayprompt1", Settings.SettingsManager.KeySettings.InteractStart, 999);
+            Player.ButtonPrompts.AttemptAddPrompt("craftingStop", "Stop Crafting", "stopcraftingprompt1", Settings.SettingsManager.KeySettings.InteractCancel, 999);
+            Player.ButtonPrompts.AttemptAddPrompt("craftingPause", "Put Away", "putawayprompt1", Settings.SettingsManager.KeySettings.InteractStart, 999);
 
+            if (Settings.SettingsManager.ActivitySettings.AllowSkippingCrafting) 
+            {
+                Player.ButtonPrompts.AttemptAddPrompt("craftingStop", "Skip Crafting", "skipcraftingprompt1", Settings.SettingsManager.KeySettings.InteractStart, 999);
+            }
             int craftedQuantity = 0;
             EntryPoint.WriteToConsole($"craftedQuantity{craftedQuantity} quantity{quantity}");
             while (craftedQuantity < quantity)//Game.GameTime - GameTimeStartedCrafting <= (craftableItem.Cooldown * quantity))
             {
-                if (!Player.IsAliveAndFree || Player.IsUnconscious || Player.ButtonPrompts.IsPressed("stopcraftingprompt1") || Player.ButtonPrompts.IsPressed("putawayprompt1"))
+                if (!Player.IsAliveAndFree || Player.IsUnconscious || Player.ButtonPrompts.IsPressed("stopcraftingprompt1") || Player.ButtonPrompts.IsPressed("putawayprompt1") || (Settings.SettingsManager.ActivitySettings.AllowSkippingCrafting && Player.ButtonPrompts.IsPressed("skipcraftingprompt1")))
                 {
                     if (!string.IsNullOrEmpty(craftableItem.CrimeId)) Player.Violations.StopContinuouslyViolating(craftableItem.CrimeId);
 
@@ -184,6 +179,13 @@ namespace Mod
                         UnfinishedCrafts.Add((quantity-craftedQuantity, craftableItem));
                         Game.DisplaySubtitle($"Crafted {productName} - {craftedQuantity} {itemToGive.MeasurementName}(s)");
                     }
+                    if(Player.ButtonPrompts.IsPressed("skipcraftingprompt1"))
+                    {
+                        Player.ButtonPrompts.RemovePrompts("craftingStop");
+                        Game.DisplayHelp("Skipped crafting.");
+                        Game.DisplaySubtitle($"Skipped crafting, crafted {productName} - {finalQuantity} {itemToGive.MeasurementName}(s)");
+                        itemToGive.AddToPlayerInventory(Player, finalQuantity - craftedQuantity);
+                    }
                     else
                     {
                         TimerBarPool.Remove(ProgressBar);
@@ -200,7 +202,6 @@ namespace Mod
                     return;
                 }
                 float currentPercentage = (float)(Game.GameTime - GameTimeStartedCrafting) / (float)craftableItem.Cooldown;
-                ProgressBar.Percentage = currentPercentage;
                 if (Game.GameTime - GameTimeStartedCrafting >= craftableItem.Cooldown)
                 {
                     GameTimeStartedCrafting = Game.GameTime;
@@ -214,11 +215,10 @@ namespace Mod
                     EntryPoint.WriteToConsole($"CRAFTED ONE craftedQuantity{craftedQuantity} quantity{quantity}");
                 }
 
-                TimerBarPool.Draw();
 
                 GameFiber.Yield();
             }
-            TimerBarPool.Remove(ProgressBar);
+
 
             Player.ButtonPrompts.RemovePrompts("craftingPause");
             Player.ButtonPrompts.RemovePrompts("craftingStop");   

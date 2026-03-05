@@ -114,7 +114,7 @@ public class AnimationInteract : InteriorInteract
         if (startBundle != null)
         {
             NativeFunction.Natives.TASK_PLAY_ANIM(Player.Character, startBundle.Dictionary, startBundle.Name, startBundle.BlendIn, startBundle.BlendOut, startBundle.Time, startBundle.Flags, 0, false, false, false);
-            WaitForAnimation(endBundle.Dictionary, startBundle.Name);
+            WaitForAnimation(startBundle.Dictionary, startBundle.Name);
         }
         if (loopBundle != null)
         {

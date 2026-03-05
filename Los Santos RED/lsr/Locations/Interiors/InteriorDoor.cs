@@ -15,6 +15,7 @@ public class InteriorDoor
     private float originalHeading = 0f;
     private bool HasOriginalHeading = false;
     private bool hasRanLockWithEntity;
+    private List<InteriorDoor> PairedDoors = new List<InteriorDoor>();
 
     //private bool WasForceRotatedOpen;
 
@@ -35,17 +36,25 @@ public class InteriorDoor
     public bool NeedsDefaultUnlock { get; set; } = false;
     public bool LockWhenClosed { get; set; } = false;
 
-
+    public bool HasCustomInteractPosition => InteractPostion != Vector3.Zero;
     public bool CanBeForcedOpenByPlayer { get; set; } = true;
 
-
+    public Vector3 InteractPostion { get; set; } = Vector3.Zero;
+    public float InteractHeader { get; set; } = 0f;
 
     public Rage.Object DoorObject => doorEntity;
+
+
+    public string DoorGroupName { get; set; }
 
     [XmlIgnore]
     public bool HasBeenForceRotatedOpen { get; set; }
 
+
     public bool HasRanLockWithEntity => hasRanLockWithEntity;
+    [XmlIgnore]
+    public bool HasBeenForcedOpen { get; private set; }
+
     public void LockDoor()
     {
         //doorEntity = NativeFunction.Natives.GET_CLOSEST_OBJECT_OF_TYPE<Rage.Object>(Position.X, Position.Y, Position.Z, 3.0f, ModelHash, true, false, true);
@@ -73,6 +82,24 @@ public class InteriorDoor
         }
         isLocked = false;
         hasRanLockWithEntity = false;
+
+        if(PairedDoors == null)
+        {
+            return;
+        }
+        foreach (InteriorDoor interiorDoor in PairedDoors)
+        {
+            if (interiorDoor.IsLocked)
+            {
+                interiorDoor.UnLockDoor();
+            }
+        }
+    }
+
+    public void ForceOpenDoor()
+    {
+        HasBeenForcedOpen = true;
+        UnLockDoor();
     }
     public void Activate()
     {
@@ -89,6 +116,7 @@ public class InteriorDoor
             ForceRotateCloseDoor();
         }
         hasRanLockWithEntity = false;
+        HasBeenForcedOpen = false;
     }
     public void AddDistanceOffset(Vector3 offsetToAdd)
     {
@@ -157,6 +185,15 @@ public class InteriorDoor
             return "Force Door";
         }
         return "";
+    }
+
+    internal void AddPairedDoors(List<InteriorDoor> pairedDoors)
+    {
+        if(pairedDoors == null)
+        {
+            return;
+        }
+        PairedDoors = pairedDoors;
     }
 }
 

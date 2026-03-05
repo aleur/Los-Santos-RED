@@ -58,7 +58,6 @@ public class ModDataFileManager
     {
 
     }
-
     public void Setup()
     {
         SetupAlternateConfigs();
@@ -107,8 +106,8 @@ public class ModDataFileManager
         Heads.ReadConfig("");
         GameFiber.Yield();
         DispatchableVehicles = new DispatchableVehicles();
-        DispatchableVehicles.ReadConfig("");
-        DispatchableVehicles.Setup(PlateTypes);
+        DispatchableVehicles.ReadConfig("", ShopMenus);
+        DispatchableVehicles.Setup(PlateTypes, ShopMenus);
         GameFiber.Yield();
         IssueableWeapons = new IssueableWeapons();
         IssueableWeapons.ReadConfig("");
@@ -173,6 +172,10 @@ public class ModDataFileManager
         Seats.ReadConfig(); // no config file
         GameFiber.Yield();
         WeatherForecasts = new WeatherForecasts();
+
+        WeatherForecasts.SetupDefaultOnly();
+
+
         //WeatherForecasts.ReadConfig(configName);
 
         GameFiber.Yield();
@@ -223,12 +226,12 @@ public class ModDataFileManager
     {
         Directory.CreateDirectory("Plugins\\LosSantosRED\\AlternateConfigs");
         SetupAddonPlatesConfig();
-        SetupEUP();
+        //SetupEUP();
         SetupFullExpandedJurisdiction();
-        SetupLosSantos2008();
-        SetupLibertyCity();
+        //SetupLosSantos2008();
+        //SetupLibertyCity();
         SetupLPP();
-        SetupSimple();
+        //SetupSimple();
         SetupFullModernTraffic();
         SetupRemoveVanillaGangs();
         SetupFullExpandedWeapons();
@@ -239,7 +242,6 @@ public class ModDataFileManager
         string Description = "Will remove all vanilla gang popgroups and spawning from the world.";
         File.WriteAllText("Plugins\\LosSantosRED\\AlternateConfigs\\RemoveVanillaGangs\\readme.txt", Description);
     }
-
     private void SetupFullExpandedWeapons()
     {
         Directory.CreateDirectory($"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.FEWConfigFolder}");
@@ -251,8 +253,8 @@ public class ModDataFileManager
             "Reference/Knowledge" + Environment.NewLine +
             "HeySlickThatsMe, AllenKennedy" + Environment.NewLine + Environment.NewLine +
             "Models" + Environment.NewLine +
-            "EUP Holster Glock - Alex_Ashford and the EUP Team" + Environment.NewLine + 
-            "Other 3d Models - IVA, romunql, rwroclav" + Environment.NewLine + Environment.NewLine;
+            "EUP Holster Glock - Alex_Ashford and the EUP Team" + Environment.NewLine +
+            "Other 3d Models - IVA, romunql, rwroclav, Vesper 3D" + Environment.NewLine + Environment.NewLine;
         File.WriteAllText($"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.FEWConfigFolder}\\readme.txt", Description);
     }
     private void SetupFullModernTraffic()
@@ -270,12 +272,13 @@ public class ModDataFileManager
         string Description2 = "" +
             "Adds DLC vehicles to the vanilla traffic." +
             "Also adds some new vehicles and includes some edits to DLC vehicles to allow them to blend in better with traffic." + Environment.NewLine +
-            "Incompatible with Los Santos 2008 config." + Environment.NewLine +
+            "Incompatible with Los Santos 2008 config and the Liberty City Preservation Project." + Environment.NewLine +
             "Install the greskfullmoderntraffic_novanillagang_addon.oiv after greskfullmoderntraffic.oiv to remove all vanilla gang spawns." + Environment.NewLine +
             "Scout - Gabriele Cappellano - original sketch       Da7k - 3D model      Nacho - 3D model - porting, assets, mapping, bugfixes     Dani02 - bugfixes, glass shards     11john11 - model improvements, dlcpack, police rims, interior assets        Eddlm - custom handling" + Environment.NewLine +
             "Merit - Model by Rockstar Games, converted to GTA V by _CP_, HQ interior by _CP_, template by Lt.Caine, UV-Map, thin LED lightbar, assembly and skins by Yard1." + Environment.NewLine +
             "PMP 600 - _CP_, Vanillaworks Team, Thundersmacker, RM76, TheAdmiester, Killatomate, GTA5Korn, Yard1, Lundy, CDemapp, PhilBellic, I'm Not MentaL, sparky66, Insincere." + Environment.NewLine +
-            "Presidente - _CP_, Vanillaworks Team, Thundersmacker, RM76, TheAdmiester, Killatomate, GTA5Korn, Yard1, Lundy, CDemapp, PhilBellic, I'm Not MentaL, sparky66, Insincere.";
+            "Presidente - _CP_, Vanillaworks Team, Thundersmacker, RM76, TheAdmiester, Killatomate, GTA5Korn, Yard1, Lundy, CDemapp, PhilBellic, I'm Not MentaL, sparky66, Insincere." + Environment.NewLine +
+            "IV Contender - _CP_, Vanillaworks Team, Thundersmacker, RM76, TheAdmiester, Killatomate, GTA5Korn, Yard1, Lundy, CDemapp, PhilBellic, I'm Not MentaL, sparky66, Insincere.";
         File.WriteAllText("Plugins\\LosSantosRED\\AlternateConfigs\\FullModernTraffic\\readme.txt", Description2);
 
         //Directory.CreateDirectory("Plugins\\LosSantosRED\\AlternateConfigs\\FullModernTraffic\\Variations\\Modern Traffic Base\\");
@@ -301,22 +304,6 @@ public class ModDataFileManager
            "";
         File.WriteAllText("Plugins\\LosSantosRED\\AlternateConfigs\\FullModernLicensePlates\\readme.txt", Description);
     }
-    private void SetupEUP()
-    {
-        Directory.CreateDirectory("Plugins\\LosSantosRED\\AlternateConfigs\\EUP");
-        string Description = "PreMade config for 'Emergency uniforms pack - Law & Order 8.3'and 'Emergency uniforms pack - Serve and Rescue' by Alex_Ashford. Need some vehicles to match? The FullExpandedJurisdiction config includes the EUP uniforms along with vehicles for most lore friendly departments. If you have your own or just want to use vanilla, this is the config for you. " + Environment.NewLine + Environment.NewLine + Environment.NewLine +
-            "EUP Installation: "
-            + Environment.NewLine +
-            "LSR FEJ Requires BOTH EUP Base and EUP Serve and Rescue"
-            + Environment.NewLine +
-            "1. Install EUP Base. Follow the instructions at https://www.lcpdfr.com/downloads/gta5mods/character/8151-emergency-uniforms-pack-law-order/"
-            + Environment.NewLine +
-            "2. Install EUP Serve and Rescue. Follow the instructions at https://www.lcpdfr.com/downloads/gta5mods/character/16256-emergency-uniforms-pack-serve-rescue/"
-            + Environment.NewLine +
-            "To use, copy all of the .xml files from the AlternateConfigs\\EUP folder into the top level LosSantosRED folder and restart the mod. You can leave the vanilla configs, alternate configs will be loaded first (if they exist)" + Environment.NewLine + Environment.NewLine +
-            "";
-        File.WriteAllText("Plugins\\LosSantosRED\\AlternateConfigs\\EUP\\readme.txt", Description);
-    }
     private void SetupFullExpandedJurisdiction()
     {
         Directory.CreateDirectory("Plugins\\LosSantosRED\\AlternateConfigs\\FullExpandedJurisdiction");
@@ -329,9 +316,6 @@ public class ModDataFileManager
             "Vehicle models are from myself " +
             "The Variations subfolder contains some different options. " +
             "The default FEJ config includes only modern vehicles and is mostly DLC vehicles. (buffalo stx, granger 3600, caracara, aleutian, riata, etc.)" +
-            //"The 2015 config contains only vehicles that were in the game for the PC release. (buffalo 1st gen, stanier 2nd gen, interceptor, gresley, etc.)" +
-            "If you are looking for older vehicles, see the Los Santos 2008 alternate config folder as it includes some of the more dated ones (esperanto, patriot, stanier 1st gen, etc.)."
-            + Environment.NewLine +
             "Open the dlc.rpf file to see modelnames"
             + Environment.NewLine + Environment.NewLine +
             "EUP Installation: "
@@ -359,6 +343,43 @@ public class ModDataFileManager
         string Description2 = "Want to use the built in peds along with the FEJ vehicles? This is the config for you. Be sure to install the FEJ OIV without EUP. Copys over the xmls to the main directory.";
         Directory.CreateDirectory("Plugins\\LosSantosRED\\AlternateConfigs\\FullExpandedJurisdiction\\Variations\\Vanilla Peds");
         File.WriteAllText("Plugins\\LosSantosRED\\AlternateConfigs\\FullExpandedJurisdiction\\Variations\\Vanilla Peds\\readme.txt", Description2);
+    }
+    private void SetupLPP()
+    {
+        Directory.CreateDirectory($"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LPPConfigFolder}");
+        string Description = "For use with Liberty City Preservation Project. "
+            + Environment.NewLine + Environment.NewLine +
+            "1. Install 'Liberty City Preservation Project' according to instructions supplied in the download. Make sure you can load into the map on vanilla GTA before proceeding."
+            + Environment.NewLine +
+            "2a. OPTIONAL Install 'Full Expanded Jurisdiction Liberty'. Adds Lore-Friendly local police and service vehicles. Install the greskfejlcinstaller.oiv from the 'Optional\\Files' folder and move the xml file into the base game directory"
+            + Environment.NewLine +
+            "2b. OPTIONAL: Install 'Full Modern Traffic'. Updates traffic to be more modern and adds some lore friendly vehicles. Follow the readme in the 'AlternateConfigs\\FullModernTraffic' folder. Be sure to install the greskfullmoderntraffic_lcpp_addon.oiv after installing the base fmt oiv."
+            + Environment.NewLine +
+            $"3. Copy all of the .xml files from the AlternateConfigs\\{StaticStrings.LPPConfigFolder} folder into the top level LosSantosRED folder and restart the mod. You can leave the vanilla configs, alternate configs will be loaded first (if they exist). Be sure to get the variations for any optional installs."
+            + Environment.NewLine + Environment.NewLine + Environment.NewLine +
+            ""
+            + Environment.NewLine + Environment.NewLine + Environment.NewLine +
+            "Credits:"
+            + Environment.NewLine +
+            "Peter Badoingy";
+        File.WriteAllText($"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LPPConfigFolder}\\readme.txt", Description);
+    }
+
+    private void SetupEUP()
+    {
+        Directory.CreateDirectory("Plugins\\LosSantosRED\\AlternateConfigs\\EUP");
+        string Description = "PreMade config for 'Emergency uniforms pack - Law & Order 8.3'and 'Emergency uniforms pack - Serve and Rescue' by Alex_Ashford. Need some vehicles to match? The FullExpandedJurisdiction config includes the EUP uniforms along with vehicles for most lore friendly departments. If you have your own or just want to use vanilla, this is the config for you. " + Environment.NewLine + Environment.NewLine + Environment.NewLine +
+            "EUP Installation: "
+            + Environment.NewLine +
+            "LSR FEJ Requires BOTH EUP Base and EUP Serve and Rescue"
+            + Environment.NewLine +
+            "1. Install EUP Base. Follow the instructions at https://www.lcpdfr.com/downloads/gta5mods/character/8151-emergency-uniforms-pack-law-order/"
+            + Environment.NewLine +
+            "2. Install EUP Serve and Rescue. Follow the instructions at https://www.lcpdfr.com/downloads/gta5mods/character/16256-emergency-uniforms-pack-serve-rescue/"
+            + Environment.NewLine +
+            "To use, copy all of the .xml files from the AlternateConfigs\\EUP folder into the top level LosSantosRED folder and restart the mod. You can leave the vanilla configs, alternate configs will be loaded first (if they exist)" + Environment.NewLine + Environment.NewLine +
+            "";
+        File.WriteAllText("Plugins\\LosSantosRED\\AlternateConfigs\\EUP\\readme.txt", Description);
     }
     private void SetupLosSantos2008()
     {
@@ -398,37 +419,14 @@ public class ModDataFileManager
             + Environment.NewLine +
             "";
         File.WriteAllText("Plugins\\LosSantosRED\\AlternateConfigs\\LosSantos2008\\readme.txt", Description);
-    }
-    private void SetupLPP()
-    {
-        Directory.CreateDirectory($"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LPPConfigFolder}");
-        string Description = "For use with Liberty City Preservation Project. "
-            + Environment.NewLine + Environment.NewLine +
-            "1. Install 'Liberty City Preservation Project' according to instructions supplied in the download. Make sure you can load into the map on vanilla GTA before proceeding."
-            + Environment.NewLine +
-            //"2. Install 'Full Expanded Jurisdiction Liberty'. Adds Lore-Friendly local police and service vehicles. Install the greskfejlcinstaller.oiv from the 'Files' folder"
-            //+ Environment.NewLine +
-            //"2a. OPTIONAL: Install 'Full Modern Traffic'. Updates traffic to be more modern and adds some lore friendly vehicles. Follow the readme in the 'AlternateConfigs\\FullModernTraffic' folder"
-            //+ Environment.NewLine +
-            $"2. Copy all of the .xml files from the AlternateConfigs\\{StaticStrings.LPPConfigFolder} folder into the top level LosSantosRED folder and restart the mod. You can leave the vanilla configs, alternate configs will be loaded first (if they exist). Be sure to get the variations for any optional installs."
-            + Environment.NewLine + Environment.NewLine + Environment.NewLine +
-            ""
-            + Environment.NewLine + Environment.NewLine + Environment.NewLine +
-            "Credits:"
-            + Environment.NewLine +
-            "box"
-            + Environment.NewLine +
-            "Peter Badoingy";
-        File.WriteAllText($"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LPPConfigFolder}\\readme.txt", Description);
-    }
-
+    }  
     private void SetupLibertyCity()
     {
         Directory.CreateDirectory($"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LibertyConfigFolder}");
         //Directory.CreateDirectory("Plugins\\LosSantosRED\\AlternateConfigs\\LibertyCity\\Variations");
         //Directory.CreateDirectory("Plugins\\LosSantosRED\\AlternateConfigs\\LibertyCity\\Variations\\CenteredAbove");
         //Directory.CreateDirectory("Plugins\\LosSantosRED\\AlternateConfigs\\LibertyCity\\Variations\\East");
-        string Description = "For use with Liberty City Remix v35 Centered"
+        string Description = "For use with Liberty City Remix v35 Centered. NOT COMPATIBLE WITH LIBERTY CITY PRESERVATION PROJECT!!"
             + Environment.NewLine + Environment.NewLine +
             "1. Install 'Liberty City Remix' according to instructions supplied in the download. Choose the Centered option. Make sure you can load into the map on vanilla GTA before proceeding."
             + Environment.NewLine +
@@ -455,7 +453,6 @@ public class ModDataFileManager
             "Peter Badoingy";
         File.WriteAllText($"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LibertyConfigFolder}\\readme.txt", Description);
     }
-
     private void SetupSimple()
     {
         Directory.CreateDirectory("Plugins\\LosSantosRED\\AlternateConfigs\\Simple");

@@ -19,16 +19,31 @@ public class WheelVehicleModKitType : VehicleModKitType
     }
     public override void AddToMenu()
     {
-        if (ModdingVehicle == null || !ModdingVehicle.Vehicle.Exists())
+        if (ModdingVehicle == null || !ModdingVehicle.Vehicle.Exists() || CurrentVariation == null)
         {
             return;
         }
+
         int TotalMods = NativeFunction.Natives.GET_NUM_VEHICLE_MODS<int>(ModdingVehicle.Vehicle, TypeID);
-        if(TotalMods == 0)
+        if (TotalMods == 0)
         {
             return;
         }
+
         WheelSubMenu = MenuPool.AddSubMenu(InteractionMenu, TypeName);
+        WheelSubMenu.SetBannerType(EntryPoint.LSRedColor);
+
+        // Restore original wheels when exiting Wheels menu
+        WheelSubMenu.OnMenuClose += (sender) =>
+        {
+            NativeFunction.Natives.SET_VEHICLE_WHEEL_TYPE(ModdingVehicle.Vehicle, CurrentVariation.WheelType);
+
+            // Reset wheel mod to saved value (or -1 if none)
+            VehicleMod wheelMod = CurrentVariation.VehicleMods.FirstOrDefault(x => x.ID == TypeID);
+            int savedMod = wheelMod?.Output ?? -1;
+            NativeFunction.Natives.SET_VEHICLE_MOD(ModdingVehicle.Vehicle, TypeID, savedMod, false);
+        };
+
         AddWheelTypeSubMenus();
     }
     private void AddWheelTypeSubMenus()
@@ -43,11 +58,11 @@ public class WheelVehicleModKitType : VehicleModKitType
             new WheelVehicleClassModKitType("Tuner",5,TypeID,ModShopMenu,WheelSubMenu,MenuPool,Player),
             new WheelVehicleClassModKitType("Bike",6,TypeID, ModShopMenu,WheelSubMenu,MenuPool,Player),
             new WheelVehicleClassModKitType("High End",7,TypeID,ModShopMenu,WheelSubMenu,MenuPool,Player),
-            new WheelVehicleClassModKitType("Super Mod 1",8,TypeID,ModShopMenu,WheelSubMenu,MenuPool,Player),
-            new WheelVehicleClassModKitType("Super Mod 2",9,TypeID,ModShopMenu,WheelSubMenu,MenuPool,Player),
-            new WheelVehicleClassModKitType("Super Mod 3",10,TypeID,ModShopMenu,WheelSubMenu,MenuPool,Player),
-            new WheelVehicleClassModKitType("Super Mod 4",11,TypeID,ModShopMenu,WheelSubMenu,MenuPool,Player),
-            new WheelVehicleClassModKitType("Super Mod 5",12,TypeID,ModShopMenu,WheelSubMenu,MenuPool,Player),
+            new WheelVehicleClassModKitType("Benny's Originals",8,TypeID,ModShopMenu,WheelSubMenu,MenuPool,Player),
+            new WheelVehicleClassModKitType("Benny's Bespoke",9,TypeID,ModShopMenu,WheelSubMenu,MenuPool,Player),
+            new WheelVehicleClassModKitType("Racing",10,TypeID,ModShopMenu,WheelSubMenu,MenuPool,Player),
+            new WheelVehicleClassModKitType("Street",11,TypeID,ModShopMenu,WheelSubMenu,MenuPool,Player),
+            new WheelVehicleClassModKitType("Track",12,TypeID,ModShopMenu,WheelSubMenu,MenuPool,Player),
 
         };
         foreach (WheelVehicleClassModKitType menu in list)

@@ -102,8 +102,9 @@ public class PlacesOfInterest : IPlacesOfInterest
         {
             EntryPoint.WriteToConsole($"No Locations config found, creating default", 0);
             DefaultConfig();
-            DefaultConfig_LibertyCity();
-            DefaultConfig_2008();
+           // DefaultConfig_LibertyCity();
+            DefaultConfig_LibertyCityPP();
+            //DefaultConfig_2008();
         }
 
         //Load Additive
@@ -403,6 +404,50 @@ public class PlacesOfInterest : IPlacesOfInterest
                 InteriorID = 34306,
                 BannerImagePath = "stores\\haironhawick.png",
             },
+
+            //// Mansion Barbers
+            //new BarberShop(new Vector3(-2595.303f, 1873.661f, 163.7214f), 314.3057f,"Tongva Barber","")
+            //{
+            //    IsWalkup = true,
+            //    OpenTime = 0,
+            //    CloseTime = 24,
+            //    ShowsOnDirectory = false,
+            //    ShowsOnTaxi = false,
+            //    IsOnSPMap = false,
+            //    IsBlipEnabled = false,
+            //    DisableRegularInteract = true,
+            //    VendorPersonnelID = "HaircutPeds",
+            //    VendorLocations = new List<SpawnPlace>() { new SpawnPlace(new Vector3(-2595.303f, 1873.661f, 163.7214f), 314.3057f) },
+            //    InteriorID = -303617,
+            //},
+            //new BarberShop(new Vector3(-1628.94f, 476.6991f, 125.5676f), 36.51946f,"Richman Barber","")
+            //{
+            //    IsWalkup = true,
+            //    OpenTime = 0,
+            //    CloseTime = 24,
+            //    ShowsOnDirectory = false,
+            //    ShowsOnTaxi = false,
+            //    IsOnSPMap = false,
+            //    IsBlipEnabled = false,
+            //    DisableRegularInteract = true,
+            //    VendorPersonnelID = "HaircutPeds",
+            //    VendorLocations = new List<SpawnPlace>() { new SpawnPlace(new Vector3(-1628.94f, 476.6991f, 125.5676f), 36.51946f) },
+            //    InteriorID = -302593,
+            //},
+            //new BarberShop(new Vector3(551.2878f, 713.4327f, 198.7077f), 334.1761f,"Vinewood Barber","")
+            //{
+            //    IsWalkup = true,
+            //    OpenTime = 0,
+            //    CloseTime = 24,
+            //    ShowsOnDirectory = false,
+            //    ShowsOnTaxi = false,
+            //    IsOnSPMap = false,
+            //    IsBlipEnabled = false,
+            //    DisableRegularInteract = true,
+            //    VendorPersonnelID = "HaircutPeds",
+            //    VendorLocations = new List<SpawnPlace>() { new SpawnPlace(new Vector3(551.2878f, 713.4327f, 198.7077f), 334.1761f) },
+            //    InteriorID = -304385,
+            //},
         };
     }
     private void DefaultConfig_PlasticSurgeryClinics()
@@ -423,7 +468,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 OpenTime = 0,
                 CloseTime = 24,
                 PurchasePrice = 135000,
-                SalesPrice = 25000,
+                SalesPrice = 60000,
                 FullName = "El Burro Heights, Trap House",
                 PossibleModItemPayouts = new List<string>() { "Marijuana", "Cocaine", "Crack", "Methamphetamine", "Heroin", "SPANK" },
                 ModItemPayoutAmount = 100,
@@ -432,14 +477,17 @@ public class PlacesOfInterest : IPlacesOfInterest
                 CameraRotation = new Rotator(0f, 0f, 0f),
                 CraftingFlag = "DrugLab"
             },
-            new Business(new Vector3(2221.945f,5614.832f,54.90165f),108.9486f,"Weed Farm", "")
+            new Business(new Vector3(-699.1762f, -2412.538f, 13.94452f), 56.22367f,"Weed Farm", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
                 PurchasePrice = 150000,
-                SalesPrice = 90000,
+                SalesPrice = 70000,
                 IsOnMPMap = false,
-                FullName = "Mount Chiliad, Marijuana Farm",
+                FullName = "LSIA, Marijuana Farm",
+                CameraPosition = new Vector3(-704.1312f, -2404.948f, 20.51479f),
+                CameraDirection = new Vector3(0.3770317f, -0.8497775f, -0.3684092f),
+                CameraRotation = new Rotator(-21.61754f, -2.663267E-05f, -156.074f),
                 PossibleModItemPayouts = new List<string>() { "Marijuana" },
                 ModItemPayoutAmount = 200,
             },
@@ -448,7 +496,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 OpenTime = 0,
                 CloseTime = 24,
                 PurchasePrice = 150000,
-                SalesPrice = 90000,
+                SalesPrice = 70000,
                 IsOnMPMap = false,
                 FullName = "Mirror Park, Marijuana Lockup",
                 PossibleModItemPayouts = new List<string>() { "Marijuana" },
@@ -463,7 +511,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 OpenTime = 0,
                 CloseTime = 24,
                 PurchasePrice = 96500,
-                SalesPrice = 50000,
+                SalesPrice = 45000,
                 IsOnMPMap = false,
                 FullName = "Mission Row, Counterfeit Factory",
                 PossibleModItemPayouts = new List<string>() { "Drivers License" },
@@ -472,27 +520,27 @@ public class PlacesOfInterest : IPlacesOfInterest
                 CameraDirection = new Vector3(-0.9496481f, -0.02304305f, -0.3124701f),
                 CameraRotation = new Rotator(-18.20815f, 5.083711E-06f, 91.39f),
             },
-            new Business(new Vector3(26.24912f,-1409.279f,29.44853f),182.4005f,"Chop Shop", "")
+            new Business(new Vector3(718.3692f,-767.5186f,24.86592f),271.1747f,"Chop Shop", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
-                PurchasePrice = 146000,
-                PayoutMin = 1200,
-                PayoutMax = 3500,
+                PurchasePrice = 346000,
+                SalesPrice = 173000,
+                PayoutMin = 2000,
+                PayoutMax = 5000,
                 PayoutFrequency = 5,
-                SalesPrice = 100000,
                 IsOnMPMap = false,
-                FullName = "Strawberry, Chop Shop",
-                CameraPosition = new Vector3(-3.404628f, -1414.432f, 35.67281f),
-                CameraDirection = new Vector3(0.8998004f, 0.4036007f, -0.1657277f),
-                CameraRotation = new Rotator(-9.539512f, -1.731491E-06f, -65.84164f),
+                FullName = "La Mesa, Chop Shop",
+                CameraPosition = new Vector3(722.9553f, -772.1132f, 27.21863f),
+                CameraDirection = new Vector3(-0.7651124f, 0.5975918f, -0.2397646f),
+                CameraRotation = new Rotator(-13.87265f, -8.794256E-07f, 52.00835f)
             },
             new Business(new Vector3(2848.69f, 4450.263f, 48.51294f), 109.1559f,"Weed Farm", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
                 PurchasePrice = 150000,
-                SalesPrice = 90000,
+                SalesPrice = 70000,
                 IsOnMPMap = false,
                 FullName = "Sandy Shores, Weed Farm",
                 PossibleModItemPayouts = new List<string>() { "Marijuana" },
@@ -506,7 +554,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 OpenTime = 0,
                 CloseTime = 24,
                 PurchasePrice = 730000,
-                SalesPrice = 500000,
+                SalesPrice = 300000,
                 IsOnMPMap = false,
                 FullName = "Sandy Shores, Meth lab",
                 PossibleModItemPayouts = new List<string>() { "Methamphetamine" },
@@ -517,7 +565,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 OpenTime = 0,
                 CloseTime = 24,
                 PurchasePrice = 730000,
-                SalesPrice = 500000,
+                SalesPrice = 300000,
                 IsOnMPMap = false,
                 FullName = "Davis, meth lab",
                 PossibleModItemPayouts = new List<string>() { "Methamphetamine" },
@@ -528,7 +576,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 OpenTime = 0,
                 CloseTime = 24,
                 PurchasePrice = 96500,
-                SalesPrice = 50000,
+                SalesPrice = 45000,
                 IsOnMPMap = false,
                 FullName = "Textile City, Document Forgery",
                 PossibleModItemPayouts = new List<string>() { "Drivers License" },
@@ -542,24 +590,41 @@ public class PlacesOfInterest : IPlacesOfInterest
                 OpenTime = 0,
                 CloseTime = 24,
                 PurchasePrice = 800000,
-                SalesPrice = 500000,
+                SalesPrice = 320000,
                 IsOnMPMap = false,
                 FullName = "Paleto Bay, Cocaine Lockup",
                 PossibleModItemPayouts = new List<string>() { "Cocaine" },
                 ModItemPayoutAmount = 200,
             },
-
+            new Business(new Vector3(26.24912f,-1409.279f,29.44853f),182.4005f,"Hands On Car Wash", "")
+            {
+                OpenTime = 0,
+                CloseTime = 24,
+                PurchasePrice = 146000,
+                SalesPrice = 65000,
+                PayoutMin = 1000,
+                PayoutMax = 2500,
+                PayoutFrequency = 5,
+                IsOnMPMap = false,
+                FullName = "Strawberry, Hands On Car Wash",
+                CameraPosition = new Vector3(-3.404628f, -1414.432f, 35.67281f),
+                CameraDirection = new Vector3(0.8998004f, 0.4036007f, -0.1657277f),
+                CameraRotation = new Rotator(-9.539512f, -1.731491E-06f, -65.84164f),
+            },
 
 
             //MP Map GARBAGE , should be thrown into a fucking volcano
-            new Business(new Vector3(2221.945f,5614.832f,54.90165f),108.9486f,"Weed Farm", "")
+            new Business(new Vector3(-699.1762f, -2412.538f, 13.94452f), 56.22367f,"Weed Farm", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
                 PurchasePrice = 150000,
                 SalesPrice = 90000,
                 IsOnSPMap = false,
-                FullName = "Mount Chiliad, Marijuana Farm",
+                FullName = "LSIA, Marijuana Farm",
+                CameraPosition = new Vector3(-704.1312f, -2404.948f, 20.51479f),
+                CameraDirection = new Vector3(0.3770317f, -0.8497775f, -0.3684092f),
+                CameraRotation = new Rotator(-21.61754f, -2.663267E-05f, -156.074f),
                 PossibleModItemPayouts = new List<string>() { "Marijuana" },
                 ModItemPayoutAmount = 200,
                 InteriorID = 247297,
@@ -569,7 +634,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 OpenTime = 0,
                 CloseTime = 24,
                 PurchasePrice = 150000,
-                SalesPrice = 90000,
+                SalesPrice = 70000,
                 IsOnSPMap = false,
                 FullName = "Mirror Park, Marijuana Lockup",
                 PossibleModItemPayouts = new List<string>() { "Marijuana" },
@@ -584,7 +649,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 OpenTime = 0,
                 CloseTime = 24,
                 PurchasePrice = 96500,
-                SalesPrice = 50000,
+                SalesPrice = 45000,
                 IsOnSPMap = false,
                 FullName = "Mission Row, Counterfeit Factory",
                 PossibleModItemPayouts = new List<string>() { "Drivers License" },
@@ -594,20 +659,20 @@ public class PlacesOfInterest : IPlacesOfInterest
                 CameraRotation = new Rotator(-18.20815f, 5.083711E-06f, 91.39f),
                 InteriorID = 246785,
             },
-            new Business(new Vector3(26.24912f,-1409.279f,29.44853f),182.4005f,"Chop Shop", "")
+            new Business(new Vector3(718.3692f,-767.5186f,24.86592f),271.1747f,"Chop Shop", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
-                PurchasePrice = 146000,
-                PayoutMin = 1200,
-                PayoutMax = 3500,
+                PurchasePrice = 346000,
+                SalesPrice = 173000,
+                PayoutMin = 2000,
+                PayoutMax = 5000,
                 PayoutFrequency = 5,
-                SalesPrice = 100000,
                 IsOnSPMap = false,
                 FullName = "Strawberry, Chop Shop",
-                CameraPosition = new Vector3(-3.404628f, -1414.432f, 35.67281f),
-                CameraDirection = new Vector3(0.8998004f, 0.4036007f, -0.1657277f),
-                CameraRotation = new Rotator(-9.539512f, -1.731491E-06f, -65.84164f),
+                CameraPosition = new Vector3(722.9553f, -772.1132f, 27.21863f),
+                CameraDirection = new Vector3(-0.7651124f, 0.5975918f, -0.2397646f),
+                CameraRotation = new Rotator(-13.87265f, -8.794256E-07f, 52.00835f),
                 InteriorID = 252673,
             },
             new Business(new Vector3(2848.69f, 4450.263f, 48.51294f), 109.1559f,"Weed Farm", "")
@@ -615,7 +680,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 OpenTime = 0,
                 CloseTime = 24,
                 PurchasePrice = 150000,
-                SalesPrice = 90000,
+                SalesPrice = 70000,
                 IsOnSPMap = false,
                 FullName = "Sandy Shores, Weed Farm",
                 PossibleModItemPayouts = new List<string>() { "Marijuana" },
@@ -630,7 +695,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 OpenTime = 0,
                 CloseTime = 24,
                 PurchasePrice = 730000,
-                SalesPrice = 500000,
+                SalesPrice = 300000,
                 IsOnSPMap = false,
                 FullName = "Sandy Shores, Meth lab",
                 PossibleModItemPayouts = new List<string>() { "Methamphetamine" },
@@ -642,7 +707,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 OpenTime = 0,
                 CloseTime = 24,
                 PurchasePrice = 730000,
-                SalesPrice = 500000,
+                SalesPrice = 300000,
                 IsOnSPMap = false,
                 FullName = "Davis, meth lab",
                 PossibleModItemPayouts = new List<string>() { "Methamphetamine" },
@@ -654,7 +719,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 OpenTime = 0,
                 CloseTime = 24,
                 PurchasePrice = 96500,
-                SalesPrice = 50000,
+                SalesPrice = 45000,
                 IsOnSPMap = false,
                 FullName = "Textile City, Document Forgery",
                 PossibleModItemPayouts = new List<string>() { "Drivers License" },
@@ -669,12 +734,28 @@ public class PlacesOfInterest : IPlacesOfInterest
                 OpenTime = 0,
                 CloseTime = 24,
                 PurchasePrice = 800000,
-                SalesPrice = 500000,
+                SalesPrice = 320000,
                 IsOnSPMap = false,
                 FullName = "Paleto Bay, Cocaine Lockup",
                 PossibleModItemPayouts = new List<string>() { "Cocaine" },
                 ModItemPayoutAmount = 200,
                 InteriorID = 247553,
+            },
+            new Business(new Vector3(26.24912f,-1409.279f,29.44853f),182.4005f,"Hands On Car Wash", "")
+            {
+                OpenTime = 0,
+                CloseTime = 24,
+                PurchasePrice = 146000,
+                SalesPrice = 66000,
+                PayoutMin = 1000,
+                PayoutMax = 2500,
+                PayoutFrequency = 5,
+                IsOnSPMap = false,
+                FullName = "Strawberry, Hands On Car Wash",
+                CameraPosition = new Vector3(-3.404628f, -1414.432f, 35.67281f),
+                CameraDirection = new Vector3(0.8998004f, 0.4036007f, -0.1657277f),
+                CameraRotation = new Rotator(-9.539512f, -1.731491E-06f, -65.84164f),
+                InteriorID = 298497,
             },
         };
     }
@@ -1066,60 +1147,223 @@ public class PlacesOfInterest : IPlacesOfInterest
     {
         ClothingShops = new List<ClothingShop>()
         {
-                new ClothingShop(new Vector3(430.0404f, -804.3267f, 29.49115f), 359.4608f, "Binco Textile City","Low-quality clothing at low prices.","LiquorStoreMenu",new Vector3(430.0404f, -804.3267f, 29.49115f))
-                {
-                    IsEnabled = false,
 
-                    VendorLocations = new List<SpawnPlace>() { new SpawnPlace(new Vector3(427.1392f, -806.624f, 29.49114f), 78.23051f) },
-
-                    //VendorModels = new List<string>() { "s_f_y_shop_low" },
-                    OpenTime = 4, CloseTime = 22,
-                    InteriorID = 22786,
-                },
-                new ClothingShop(new Vector3(618.1533f, 2749.669f, 42.08868f), 181.2038f, "Suburban Harmony","Low-quality clothing at low prices.","LiquorStoreMenu",new Vector3(618.1533f, 2749.669f, 42.08868f))
+                new ClothingShop(new Vector3(618.1257f, 2750.503f, 42.08913f), 182.7492f, "Suburban Harmony","Low-quality clothing at low prices.","GenericClothesShop")
                 {
-                    IsEnabled = false,
-                    //VendorModels = new List<string>() { "s_f_y_shop_low" }, VendorPosition = new Vector3(427.1392f, -806.624f, 29.49114f), VendorHeading = 78.23051f,
                     OpenTime = 4, CloseTime = 22,
                     InteriorID = 96258,
+                    DisableRegularInteract = true,
+                    VendorLocations = new List<SpawnPlace>()
+                    {
+                        new SpawnPlace(new Vector3(612.7495f, 2762.705f, 42.08814f), 267.8017f)
+                    },
+                    VendorPersonnelID = "TellerPeds",
+                    PedClothingShopMenuID = "GenericClothesShop",
                 },
-                new ClothingShop(new Vector3(-837.588f, -161.6364f, 37.90956f), 0f, "Didier Sachs","Fashion never cost so much","",Vector3.Zero) { OpenTime = 8, CloseTime = 20, IsTemporarilyClosed = true, ScannerFilePath = "01_specific_location\\0x0092CBCB.mp3"},//rockford hills
-                new ClothingShop(new Vector3(-717.36f, -157.29f, 38.2f), 117.6851f, "Ponsonbys","Catering to the Elite","",Vector3.Zero) { OpenTime = 8, CloseTime = 20, IsTemporarilyClosed = true, ScannerFilePath = "01_specific_location\\0x0289F802.mp3"},//rockford hills
-        
-                new ClothingShop(new Vector3(-622.108f, -230.744f, 38.05705f), 359.4608f, "Vangelico", "Retailer of high-end jewelry and blood diamonds", "", Vector3.Zero) {
+                new ClothingShop(new Vector3(127.2656f, -210.8601f, 54.53394f), 343.5752f, "Suburban Hawick","Low-quality clothing at low prices.","GenericClothesShop")
+                {
+                    OpenTime = 8,
+                    CloseTime = 20,
+                    InteriorID = 19458,
+                    DisableRegularInteract = true,
+                    VendorLocations = new List<SpawnPlace>()
+                    {
+                        new SpawnPlace(new Vector3(127.1751f, -224.4369f, 54.55785f),67.74451f)
+                    },
+                    VendorPersonnelID = "TellerPeds",
+                    PedClothingShopMenuID = "GenericClothesShop",
+                },
+                new ClothingShop(new Vector3(-1201.583f, -777.7266f, 17.33841f), 124.1612f, "Suburban Del Perro","Low-quality clothing at low prices.","GenericClothesShop")
+                {
+                    OpenTime = 8,
+                    CloseTime = 20,
+                    InteriorID = 10754,
+                    DisableRegularInteract = true,
+                    VendorLocations = new List<SpawnPlace>()
+                    {
+                        new SpawnPlace(new Vector3(-1194.017f, -766.9352f, 17.31606f),218.3366f)
+                    },
+                    VendorPersonnelID = "TellerPeds",
+                    PedClothingShopMenuID = "GenericClothesShop",
+                },
+                new ClothingShop(new Vector3(-3168.233f, 1056.191f, 20.85903f), 336.1733f, "Suburban Chumash","Low-quality clothing at low prices.","GenericClothesShop")
+                {
+                    OpenTime = 8,
+                    CloseTime = 20,
+                    InteriorID = 87554,
+                    DisableRegularInteract = true,
+                    VendorLocations = new List<SpawnPlace>()
+                    {
+                        new SpawnPlace(new Vector3(-3168.979f, 1043.077f, 20.86323f),65.11476f)
+                    },
+                    VendorPersonnelID = "TellerPeds",
+                    PedClothingShopMenuID = "GenericClothesShop",
+                },
+
+
+
+
+
+
+
+
+
+
+
+                new ClothingShop(new Vector3(-1.203748f, 6516.808f, 31.86886f), 43.96292f,"Discount Store Paleto Bay","A fresh fashion look every day.","GenericClothesShop")
+                {
+                    OpenTime = 8,
+                    CloseTime = 20,
+                    InteriorID = 74754,
+                    VendorLocations = new List<SpawnPlace>() { new SpawnPlace(new Vector3(5.844515f, 6511.208f, 31.87785f), 38.01704f) },
+                    DisableRegularInteract = true,
+                    VendorPersonnelID = "TellerPeds",
+                    PedClothingShopMenuID = "GenericClothesShop",
+                },
+                new ClothingShop(new Vector3(82.68394f, -1391.648f, 29.40018f), 268.6164f,"Discount Store Strawberry","A fresh fashion look every day.","GenericClothesShop")
+                {
+                    OpenTime = 8,
+                    CloseTime = 20,
+                    InteriorID = 88066,
+                    VendorLocations = new List<SpawnPlace>() { new SpawnPlace(new Vector3(73.78729f, -1392.828f, 29.37615f), 270.9362f) },
+                    DisableRegularInteract = true,
+                    VendorPersonnelID = "TellerPeds",
+                    PedClothingShopMenuID = "GenericClothesShop",
+                },
+                new ClothingShop(new Vector3(-1095.588f, 2705.948f, 19.08581f), 225.1095f,"Discount Store Great Chaparral","A fresh fashion look every day.","GenericClothesShop")
+                {
+                    OpenTime = 8,
+                    CloseTime = 20,
+                    InteriorID = 66562,
+                    VendorLocations = new List<SpawnPlace>() { new SpawnPlace(new Vector3(-1102.408f, 2711.86f, 19.10787f), 219.3048f) },
+                    DisableRegularInteract = true,
+                    VendorPersonnelID = "TellerPeds",
+                    PedClothingShopMenuID = "GenericClothesShop",
+                },
+                new ClothingShop(new Vector3(1198.071f, 2702.92f, 38.15594f), 177.9302f,"Discount Store Harmony","A fresh fashion look every day.","GenericClothesShop")
+                {
+                    OpenTime = 8,
+                    CloseTime = 20,
+                    InteriorID = 118274,
+                    VendorLocations = new List<SpawnPlace>() { new SpawnPlace(new Vector3(1196.921f, 2711.813f, 38.22264f), 173.7284f) },
+                    DisableRegularInteract = true,
+                    VendorPersonnelID = "TellerPeds",
+                    PedClothingShopMenuID = "GenericClothesShop",
+                },
+                new ClothingShop(new Vector3(1686.742f, 4820.526f, 41.97639f), 98.08424f,"Discount Store Grapeseed","A fresh fashion look every day.","GenericClothesShop")
+                {
+                    OpenTime = 8,
+                    CloseTime = 20,
+                    InteriorID = 60930,
+                    VendorLocations = new List<SpawnPlace>() { new SpawnPlace(new Vector3(1695.507f, 4822.706f, 42.06309f), 97.81013f) },
+                    DisableRegularInteract = true,
+                    VendorPersonnelID = "TellerPeds",
+                    PedClothingShopMenuID = "GenericClothesShop",
+                },
+
+
+                new ClothingShop(new Vector3(417.8476f, -807.7466f, 29.39305f), 92.20033f, "Binco Textile City","Low-quality clothing at low prices.","GenericClothesShop")
+                {
+                    VendorLocations = new List<SpawnPlace>() { new SpawnPlace(new Vector3(427.1392f, -806.624f, 29.49114f), 78.23051f) },
+                    OpenTime = 8, 
+                    CloseTime = 20,
+                    InteriorID = 22786,
+                    DisableRegularInteract = true,
+                    VendorPersonnelID = "TellerPeds",
+                    PedClothingShopMenuID = "GenericClothesShop",
+                },
+                new ClothingShop(new Vector3(-817.3553f, -1079.649f, 11.13252f), 211.1177f, "Binco Vespucci Canals","Low-quality clothing at low prices.","GenericClothesShop")
+                {
+                    VendorLocations = new List<SpawnPlace>() { new SpawnPlace(new Vector3(-822.8264f, -1071.879f, 11.32811f), 204.7833f) },
+                    OpenTime = 8,
+                    CloseTime = 20,
+                    InteriorID = 17154,
+                    DisableRegularInteract = true,
+                    VendorPersonnelID = "TellerPeds",
+                    PedClothingShopMenuID = "GenericClothesShop",
+                },
+
+
+                new ClothingShop(new Vector3(-717.36f, -157.29f, 38.2f), 117.6851f, "Ponsonbys Rockford Hills","Catering to the Elite","GenericClothesShop") { 
+                    OpenTime = 8, 
+                    CloseTime = 20, 
+                    InteriorID = 14338,
+                    DisableRegularInteract = true,
+                    ScannerFilePath = "01_specific_location\\0x0289F802.mp3",
+                    VendorPersonnelID = "TellerPeds",
+                    PedClothingShopMenuID = "GenericClothesShop",
+                    VendorLocations = new List<SpawnPlace>() { new SpawnPlace(new Vector3(-708.7365f, -151.7497f, 37.41513f), 113.7162f) },
+                },
+                new ClothingShop(new Vector3(-156.4988f, -305.4473f, 39.73074f), 242.0752f, "Ponsonbys Burton","Catering to the Elite","GenericClothesShop") {
+                    OpenTime = 8,
+                    CloseTime = 20,
+                    InteriorID = 6914,
+                    DisableRegularInteract = true,
+                    VendorPersonnelID = "TellerPeds",
+                    PedClothingShopMenuID = "GenericClothesShop",
+                    VendorLocations = new List<SpawnPlace>() { new SpawnPlace(new Vector3(-165.118f, -302.685f, 39.73328f), 241.0345f) },
+                },
+                new ClothingShop(new Vector3(-1455.754f, -232.4616f, 49.7874f), 45.15975f, "Ponsonbys Morningwood","Catering to the Elite","GenericClothesShop") {
+                    OpenTime = 8,
+                    CloseTime = 20,
+                    InteriorID = 1282,
+                    DisableRegularInteract = true,
+                    VendorPersonnelID = "TellerPeds",
+                    PedClothingShopMenuID = "GenericClothesShop",
+                    VendorLocations = new List<SpawnPlace>() { new SpawnPlace(new Vector3(-1449.349f, -238.932f, 49.81394f), 43.07481f) },
+                },
+
+                new ClothingShop(new Vector3(-1336.679f, -1277.453f, 4.877134f), 100.7063f, "Vespucci Movie Masks","Space Monkey 3D Masks IN STOCK NOW","MaskShopMenu") {
+                    OpenTime = 8,
+                    CloseTime = 20,
+                    InteriorID = -9932,
+                    DisableRegularInteract = true,
+                    PedClothingShopMenuID = "MaskShopMenu",
+                },
+                new ClothingShop(new Vector3(268.8374f, -1155.124f, 29.29159f), 86.83341f, "Sanders Motorcycles Clothing","Dress for the slide, not ride","HelmetShopMenu") {
+                    OpenTime = 8,
+                    CloseTime = 20,
+                    InteriorID = -9931,
+                    DisableRegularInteract = true,
+                    PedClothingShopMenuID = "HelmetShopMenu",
+                },
+                //Doesnt Have actual CLothes yet!
+                new ClothingShop(new Vector3(-631.9899f, -237.9124f, 38.07326f),122.9966f, 
+                "Vangelico", "Retailer of high-end jewelry and blood diamonds", "") {
                     Name = "Vangelico",
                     FullName = "Vangelico",
                     Description = "Retailer of high-end jewelry and blood diamonds",
-                    EntrancePosition = new Vector3( - 622.108f, -230.744f, 38.05705f),
-                    EntranceHeading = 359.4608f,
-                    OpenTime = 4,
-                    CloseTime = 22,
+                   // EntrancePosition = new Vector3( - 622.108f, -230.744f, 38.05705f),
+                   // EntranceHeading = 359.4608f,
+                    OpenTime = 8,
+                    CloseTime = 21,
                     InteriorID = 82690,
-                    IsOnSPMap = false,
-	                //MenuID = "VangelicoMenu",
-	                PossiblePedSpawns = new List < ConditionalLocation > () {
+                    //IsOnSPMap = false,
+	                MenuID = "VangelicoMenu",
+                    PedClothingShopMenuID = "GenericClothesShop",
+                    PossiblePedSpawns = new List < ConditionalLocation > () {
                         new SecurityConditionalLocation() {
-                            Location = new Vector3( - 623.1132f, -225.5436f, 38.05704f),
-                            Heading = 166.1438f,
+                            Location = new Vector3(-624.932f, -237.095f, 38.05706f),//new Vector3( - 623.1132f, -225.5436f, 38.05704f),
+                            Heading = 36.79928f,//166.1438f,
                             Percentage = 95f,
                             AssociationID = "SECURO",
                             TaskRequirements = TaskRequirements.Guard,
                             ForcedScenarios = new List<string>() {"WORLD_HUMAN_GUARD_STAND",},
-                            MinHourSpawn = 6,
-                            MaxHourSpawn = 20,
+                            MinHourSpawn = 8,
+                            MaxHourSpawn = 21,
                             ForceSidearm = true,
                             ForceLongGun = true,
                         },
                         new SecurityConditionalLocation() {
-                            Location = new Vector3( - 617.5581f, -233.1718f, 38.05704f),
-                            Heading = 94.85792f,
+                            Location = new Vector3(-629.7134f, -231.9692f, 38.05706f),//new Vector3( - 617.5581f, -233.1718f, 38.05704f),
+                            Heading = 207.0785f,//94.85792f,
                             Percentage = 95f,
                             AssociationID = "SECURO",
                             TaskRequirements = TaskRequirements.Guard,
                             ForcedScenarios = new List<string>() {"WORLD_HUMAN_GUARD_STAND",
                             },
-                            MinHourSpawn = 6,
-                            MaxHourSpawn = 20,
+                            MinHourSpawn = 8,
+                            MaxHourSpawn = 21,
                             LongGunAlwaysEquipped = true,
                             ForceSidearm = true,
                             ForceLongGun = true,
@@ -1131,6 +1375,17 @@ public class PlacesOfInterest : IPlacesOfInterest
                     },
                     VendorPersonnelID = "TellerPeds",
                 },
+
+
+                //NO DEFUALT INTERIOR
+                new ClothingShop(new Vector3(-837.588f, -161.6364f, 37.90956f), 0f, "Didier Sachs","Fashion never cost so much","GenericClothesShop") {
+                    OpenTime = 8,
+                    CloseTime = 20,
+                    DisableRegularInteract = true,
+                    IsTemporarilyClosed = true,
+                    ScannerFilePath = "01_specific_location\\0x0092CBCB.mp3",
+                    VendorPersonnelID = "TellerPeds",
+                },//rockford hills THIS DOES NOT HAVE AN INTERIOR!
 
         };
     }
@@ -1743,7 +1998,39 @@ public class PlacesOfInterest : IPlacesOfInterest
                 HasNoGarageDoors = true,
                 VehiclePreviewLocation = new SpawnPlace(new Vector3(228.374f, -992.5745f, -98.99996f), 178.1117f),
             },
-
+            new VehicleModShop(new Vector3(519.7184f, 760.2784f, 201.7066f), 308.3585f,"Garage","Vinewood Residence.")
+            {
+                OpenTime = 0,
+                CloseTime = 24,
+                ShowsOnDirectory = false,
+                ShowsOnTaxi = false,
+                IsOnSPMap = false,
+                IsBlipEnabled = false,
+                HasNoGarageDoors = true,
+                VehiclePreviewLocation = new SpawnPlace(new Vector3(560.7867f, 723.4037f, 186.4097f), 344.5037f),
+            },
+            new VehicleModShop(new Vector3(-1683.727f, 464.6574f, 128.7632f), 18.17992f,"Garage","Richman Residence.")
+            {
+                OpenTime = 0,
+                CloseTime = 24,
+                ShowsOnDirectory = false,
+                ShowsOnTaxi = false,
+                IsOnSPMap = false,
+                IsBlipEnabled = false,
+                HasNoGarageDoors = true,
+                VehiclePreviewLocation = new SpawnPlace(new Vector3(-1635.179f, 489.82f, 113.5566f), 52.1517f),
+            },
+            new VehicleModShop(new Vector3(-2596.229f, 1929.979f, 166.9171f), 276.0984f,"Garage","Tongva Residence.")
+            {
+                OpenTime = 0,
+                CloseTime = 24,
+                ShowsOnDirectory = false,
+                ShowsOnTaxi = false,
+                IsOnSPMap = false,
+                IsBlipEnabled = false,
+                HasNoGarageDoors = true,
+                VehiclePreviewLocation = new SpawnPlace(new Vector3(-2581.754f, 1877.22f, 151.7105f), 312.1215f),
+            },
         };
 
     }
@@ -1963,8 +2250,8 @@ public class PlacesOfInterest : IPlacesOfInterest
 
             //new FoodStand(new Vector3(821.7623f, -2973.566f, 6.020659f), 269.9576f, "Chihuahua Hot Dogs", "Vegan? No. Meat? Yes.","ChihuahuaHotDogMenu"){ VendorLocations = new List<SpawnPlace>() { new SpawnPlace(new Vector3(821.7623f, -2973.566f, 6.020659f), VendorHeading = 269.9576f, BannerImagePath = "stores\\chihuahuahotdogs.png" },
             new FoodStand(new Vector3(2106.954f, 4947.911f, 40.95187f), 319.9109f, "Attack-A-Taco", "Heavy Shelling!","TacoFarmerMenu") { BannerImagePath = "stores\\attackataco.png",VendorLocations = new List<SpawnPlace>() { new SpawnPlace(new Vector3(2106.954f, 4947.911f, 40.95187f), 319.9109f) }, },
-            new FoodStand(new Vector3(-1148.969f, -1601.963f, 4.390241f), 35.73399f, "Gyro Day", "Gyro Day","GenericMenu") { BannerImagePath = "stores\\gyroday.png", VendorLocations = new List<SpawnPlace>() { 
-                //new SpawnPlace(new Vector3(-1145.969f, -1602.963f, 4.390241f), 35.73399f),
+            new FoodStand(new Vector3(-1148.969f, -1601.963f, 4.390241f), 35.73399f, "Gyro Day", "Gyro Day","GenericMenu") { BannerImagePath = "stores\\gyroday.png", CloseTime = 19, VendorLocations = new List<SpawnPlace>() { 
+                //new SpawnPlace(new Vector3(-1145.969f, -1602.963f, 4.390241f), 35.73399f),  (Gyro Day clears stall at 7pm, closes shutters down at 8pm)
             new SpawnPlace(new Vector3(-1143.96021f, -1600.45581f, 4.091243f), 35.73399f),
             new SpawnPlace(new Vector3(-1149.36f, -1604.32f, 4.091243f), 46.0f),
             },
@@ -2031,7 +2318,11 @@ public class PlacesOfInterest : IPlacesOfInterest
             new Bar(new Vector3(-1388.5f, -586.6741f, 30.21859f), 31.53231f, "Bahama Mama's", "","BarMenu") { OpenTime = 0, CloseTime = 24,VendorLocations = new List<SpawnPlace>() { new SpawnPlace(new Vector3(-1391.372f, -605.995f, 30.31955f), 116.404f) }, InteriorID = 107778, VendorPersonnelID = "BarPeds", },//TeleportEnterPosition = new Vector3(-1387.984f, -587.4419f, 30.31951f), TeleportEnterHeading = 210.6985f,
             new Bar(new Vector3(-564.6519f, 276.2436f, 83.12064f), 175.5771f,"Tequila-La", "","BarMenu") { VendorFightPercentage =  25f,VendorFightPolicePercentage = 10f, OpenTime = 0, CloseTime = 24,VendorLocations = new List<SpawnPlace>() { new SpawnPlace(new Vector3(-561.9947f, 284.9062f, 82.17636f), 262.2369f) }, InteriorID = 72706, VendorPersonnelID = "BarPeds", },//need better coordinates
             new Bar(new Vector3(-2193.238f, 4290.112f, 49.17442f), 37.55579f, "Hookies", "","BarMenu") { OpenTime = 0, CloseTime = 24 } ,
-            new Bar(new Vector3(-1486.966f,-909.6642f, 10.02359f), 321.7487f, "Cocaine Lockup","","BarMenu"){OpenTime = 0, CloseTime = 24, InteriorID = 247553,IsWalkup = false, IsOnMPMap = true, IsOnSPMap = false, TypeName = "Cocaine Lockup", ActivateCells = 4, ActivateDistance = 225, IgnoreEntranceInteract = false },
+
+            //// Mansion Bar
+            //new Bar(new Vector3(-2586.541f, 1880.23f, 156.5184f), 219.217f, "Tongva Bar", "","BarMenu") { OpenTime = 0, CloseTime = 24,VendorLocations = new List<SpawnPlace>() { new SpawnPlace(new Vector3(-2586.541f, 1880.23f, 156.3184f), 219.217f) }, InteriorID = 303617, VendorPersonnelID = "BarPeds", ShowsOnDirectory = false, ShowsOnTaxi = false, IsOnSPMap = false, IsBlipEnabled = false},
+            //new Bar(new Vector3(-1637.092f, 484.3326f, 118.3645f), 321.4084f, "Richman Bar", "","BarMenu") { OpenTime = 0, CloseTime = 24,VendorLocations = new List<SpawnPlace>() { new SpawnPlace(new Vector3(-1637.092f, 484.3326f, 118.1645f), 321.4084f) }, InteriorID = 302593, VendorPersonnelID = "BarPeds", ShowsOnDirectory = false, ShowsOnTaxi = false, IsOnSPMap = false, IsBlipEnabled = false},
+            //new Bar(new Vector3(555.3027f, 724.0519f, 191.5045f), 251.9232f, "Vinewood Bar", "","BarMenu") { OpenTime = 0, CloseTime = 24,VendorLocations = new List<SpawnPlace>() { new SpawnPlace(new Vector3(555.3027f, 724.0519f, 191.3045f), 251.9232f) }, InteriorID = 304385, VendorPersonnelID = "BarPeds", ShowsOnDirectory = false, ShowsOnTaxi = false, IsOnSPMap = false, IsBlipEnabled = false},
         };
     }
     private void DefaultConfig_GasStations()//VendorLocations = new List<SpawnPlace>() { new SpawnPlace() },
@@ -2342,7 +2633,47 @@ public class PlacesOfInterest : IPlacesOfInterest
             new Bank(new Vector3(1175.215f, 2702.15f, 38.17273f), 176.9885f, "Fleeca Bank", "Everything, at a price","Fleeca")
             {
                 BannerImagePath = "stores\\fleeca.png",
+                IsOnMPMap = false,
                 InteriorID = 90626,
+                VendorLocations = new List<SpawnPlace>() {
+                    new SpawnPlace(new Vector3(1175.087f, 2708.431f, 38.08793f), 177.2366f),
+                },
+                ActivateCells = 3,
+                ActivateDistance = 75f,
+                RestrictedAreas = new RestrictedAreas()
+                {
+                    RestrictedAreasList = new List<RestrictedArea>()
+                    {
+                        new RestrictedArea("Fleeca Front Room",new Vector2[]
+                                                                {
+                                                                    new Vector2(1178.291f, 2708.304f),
+                                                                    new Vector2(1172.311f, 2708.387f),
+                                                                    new Vector2(1172.286f, 2709.354f),
+                                                                    new Vector2(1177.512f, 2709.322f),
+                                                                },
+                                                                null,RestrictedAreaType.Bank) { IsCivilianReactableRestricted = true, },
+                        new RestrictedArea("Fleeca Vault Room",new Vector2[]
+                                                                {
+                                                                    new Vector2(1178.821f, 2710.764f),
+                                                                    new Vector2(1171.883f, 2711.214f),
+                                                                    new Vector2(1171.645f, 2716.751f),
+                                                                    new Vector2(1175.179f, 2716.31f),
+                                                                    new Vector2(1178.877f, 2712.224f),
+                                                                },
+                                                                null,RestrictedAreaType.Bank) { IsCivilianReactableRestricted = true, },
+                    }
+                },
+                PossiblePedSpawns = new List<ConditionalLocation>()
+                {
+                    new SecurityConditionalLocation(new Vector3(1177.713f,2704.353f,38.08786f),0.2107314f,95f) { AssociationID = "GRP6",RequiredPedGroup = "ArmedSecurity", MinHourSpawn = 6, MaxHourSpawn = 20, TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<string>() { "WORLD_HUMAN_GUARD_STAND" }, },
+                    new SecurityConditionalLocation(new Vector3(1172.005f,2711.791f,38.06627f), 270.1688f,95f) { AssociationID = "GRP6",RequiredPedGroup = "ArmedSecurity", LongGunAlwaysEquipped = true, ForceSidearm = true,ForceLongGun = true, MinHourSpawn = 6, MaxHourSpawn = 20, TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<string>() { "WORLD_HUMAN_GUARD_STAND" }, },
+                },
+            },
+            new Bank(new Vector3(1175.215f, 2702.15f, 38.17273f), 176.9885f, "Fleeca Bank", "Everything, at a price","Fleeca") 
+            {
+                BannerImagePath = "stores\\fleeca.png",
+                IsOnSPMap = false,
+                InteriorID = 906262,
                 VendorLocations = new List<SpawnPlace>() {
                     new SpawnPlace(new Vector3(1175.087f, 2708.431f, 38.08793f), 177.2366f),
                 },
@@ -2664,7 +2995,7 @@ public class PlacesOfInterest : IPlacesOfInterest
             new Landmark(new Vector3(-200.26f, -1380.72f, 32.83f), 0f,"Glass Heroes Auto Repairs","We never crack under pressure") { IsTemporarilyClosed = true, OpenTime = 8,CloseTime = 17,ScannerFilePath = "01_specific_location\\0x105B95C3.mp3" },
             new Landmark(new Vector3(-2.34f, -1400.51f, 30.22f), 0f,"South LS Hand Car Wash","Let us give you a hand") { OpenTime = 0,CloseTime = 24,ScannerFilePath = "01_specific_location\\0x0CC361AF.mp3" },
             new Landmark(new Vector3(-698.5507f, 46.47984f, 44.03382f), 204.1632f, "The Epsilon Program", "Kifflom!"){ OpenTime = 0,CloseTime = 24 },
-
+            new Landmark(new Vector3(967.7619f, -1830.047f, 31.23835f), 352.7595f,"Auto Shop","") {OpenTime = 0,CloseTime = 24, InteriorID = 19381,IsBlipEnabled = false, IsOnSPMap = false }, // Vagos Rear Garage
 
             new Landmark(new Vector3(-1465.816f, -1393.664f, 2.514868f), 116.3505f,"Vespucci Lifeguard Tower 1","")
             {
@@ -3538,7 +3869,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 PossibleVehicleSpawns = new List<ConditionalLocation>() {
                     new LEConditionalLocation(new Vector3(1831.629f, 3662.91f, 33.92607f), 32f,55f),
                     new LEConditionalLocation(new Vector3(1835.127f, 3664.892f, 33.92607f), 32f,55f),
-                    new LEConditionalLocation(new Vector3(1847.131f, 3672.587f, 33.92607f), 32f,55f),
+                    new LEConditionalLocation(new Vector3(1847.443f, 3672.036f, 33.41676f), 32f,55f),
                 } },
             new PoliceStation(new Vector3(-443.3767f, 6016.792f, 31.71221f), 310.4416f, "Paleto Bay Sheriff's Office","A Tradition of Suppression") {
                 BannerImagePath = "agencies\\lssdmain.png",
@@ -4500,6 +4831,69 @@ public class PlacesOfInterest : IPlacesOfInterest
                 IsOnSPMap = false,
             },
 
+            // Mansions Update - Safe House In The Hills
+
+            new Residence()
+            {
+                RentalDays = 28,
+                RentalFee = 75000,
+                PurchasePrice = 12000000,
+                SalesPrice = 4800000,
+                Name = "The Vinewood Residence",
+                FullName = "The Vinewood Residence",
+                EntrancePosition = new Vector3(540.7787f, 780.194f, 202.2567f),//540.7787f, 780.194f, 202.2567f), 303.1488f
+                EntranceHeading = 303.1488f,
+                CameraPosition = new Vector3(536.8636f, 784.0091f, 210.6874f),
+                CameraDirection = new Vector3(-0.1185752f, -0.9612161f, -0.2490051f),
+                CameraRotation = new Rotator(-14.41865f, -1.112945E-05f, 172.9675f),
+                OpenTime = 0,
+                CloseTime = 24,
+                InteriorID = 304385,
+                IsOnSPMap = false,
+                IsWalkup = true,
+                DisableInteractAfterPurchase = true,
+            },
+            new Residence()
+            {
+                RentalDays = 28,
+                RentalFee = 75000,
+                PurchasePrice = 12000000,
+                SalesPrice = 4800000,
+                Name = "The Richman Villa",
+                FullName = "The Richman Villa",
+                EntrancePosition = new Vector3(-1695.184f, 490.6279f, 129.0772f),
+                EntranceHeading = 284.000f,
+                CameraPosition = new Vector3(-1700.671f, 495.3455f, 138.0742f),
+                CameraDirection = new Vector3(0.7919388f, -0.543322f, -0.2786289f),
+                CameraRotation = new Rotator(-16.17839f, -1.333467E-06f, -124.4527f),
+                OpenTime = 0,
+                CloseTime = 24,
+                InteriorID = 302593,
+                IsOnSPMap = false,
+                IsWalkup = true,
+                
+                DisableInteractAfterPurchase = true,
+            },
+            new Residence()
+            {
+                RentalDays = 28,
+                RentalFee = 75000,
+                PurchasePrice = 12000000,
+                SalesPrice = 4800000,
+                Name = "The Tongva Estate",
+                FullName = "The Tongva Estate",
+                EntrancePosition = new Vector3(-2552.234f, 1914.009f, 169.0935f),
+                EntranceHeading = 158.1219f,
+                CameraPosition = new Vector3(-2548.953f, 1923.06f, 181.9508f),
+                CameraDirection = new Vector3(-0.8709613f, -0.4103091f, -0.2703199f),
+                CameraRotation = new Rotator(-15.68331f, 2.438667E-05f, 115.2251f),
+                OpenTime = 0,
+                CloseTime = 24,
+                InteriorID = 303617,
+                IsOnSPMap = false,
+                IsWalkup = true,
+                DisableInteractAfterPurchase = true,
+            },
         };
 
         ApartmentBuildings = new List<ApartmentBuilding>()
@@ -6230,7 +6624,11 @@ public class PlacesOfInterest : IPlacesOfInterest
         PlacesOfInterest_Liberty placesOfInterest_Liberty = new PlacesOfInterest_Liberty(this);
         placesOfInterest_Liberty.DefaultConfig();
     }
-
+    private void DefaultConfig_LibertyCityPP()
+    {
+        PlacesOfInterest_LibertyPP placesOfInterest_Liberty = new PlacesOfInterest_LibertyPP(this);
+        placesOfInterest_Liberty.DefaultConfig();
+    }
     public void Setup()
     {
         foreach (GameLocation bl in AllLocations())

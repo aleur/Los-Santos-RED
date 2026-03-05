@@ -86,6 +86,9 @@ namespace LosSantosRED.lsr.Data
         public List<GangLoanSave> GangLoanSaves { get; set; } = new List<GangLoanSave>();
 
 
+        public List<PedClothingShopMenuItem> SavedPurchasedClothingItems { get; set; } = new List<PedClothingShopMenuItem>();
+
+
         //LEGACY TO BE REMOVED
         public List<SavedResidence> SavedResidences { get; set; } = new List<SavedResidence>();//LEGACY TO BE REMOVED
         public List<SavedBusiness> SavedBusinesses { get; set; } = new List<SavedBusiness>();//LEGACY TO BE REMOVED
@@ -117,7 +120,18 @@ namespace LosSantosRED.lsr.Data
             SaveAgencies(player);
             SaveCellPhone(player); 
             SaveOwnedProperties(player);
+            SavePurchasedClothingItem(player);
         }
+
+        private void SavePurchasedClothingItem(ISaveable player)
+        {
+            SavedPurchasedClothingItems.Clear();
+            foreach(PedClothingShopMenuItem pedClothingShopMenuItem in player.OutfitManager.PurchasedPedClothingShopMenuItems)
+            {
+                SavedPurchasedClothingItems.Add(pedClothingShopMenuItem);
+            }
+        }
+
         private void SaveOwnedProperties(ISaveable player)
         {
             SavedGameLocations.Clear();
@@ -276,15 +290,30 @@ namespace LosSantosRED.lsr.Data
         {
             if (player.Licenses.HasDriversLicense)
             {
-                DriversLicense = new DriversLicense() { ExpirationDate = player.Licenses.DriversLicense.ExpirationDate, IssueDate = player.Licenses.DriversLicense.IssueDate, IssueStateID = player.Licenses.DriversLicense.IssueStateID };
+                DriversLicense = new DriversLicense() { 
+                    ExpirationDate = player.Licenses.DriversLicense.ExpirationDate, 
+                    IssueDate = player.Licenses.DriversLicense.IssueDate, 
+                    IssueStateID = player.Licenses.DriversLicense.IssueStateID 
+                };
             }
             if (player.Licenses.HasCCWLicense)
             {
-                CCWLicense = new CCWLicense() { ExpirationDate = player.Licenses.CCWLicense.ExpirationDate, IssueDate = player.Licenses.CCWLicense.IssueDate, IssueStateID = player.Licenses.DriversLicense.IssueStateID };
+                CCWLicense = new CCWLicense() { 
+                    ExpirationDate = player.Licenses.CCWLicense.ExpirationDate, 
+                    IssueDate = player.Licenses.CCWLicense.IssueDate,
+                    IssueStateID = player.Licenses.DriversLicense.IssueStateID 
+                };
             }
             if (player.Licenses.HasPilotsLicense)
             {
-                PilotsLicense = new PilotsLicense() { ExpirationDate = player.Licenses.PilotsLicense.ExpirationDate, IssueDate = player.Licenses.PilotsLicense.IssueDate, IssueStateID = player.Licenses.DriversLicense.IssueStateID, IsFixedWingEndorsed = player.Licenses.PilotsLicense.IsFixedWingEndorsed, IsRotaryEndorsed = player.Licenses.PilotsLicense.IsRotaryEndorsed, IsLighterThanAirEndorsed = player.Licenses.PilotsLicense.IsLighterThanAirEndorsed };
+                PilotsLicense = new PilotsLicense() { 
+                    ExpirationDate = player.Licenses.PilotsLicense.ExpirationDate, 
+                    IssueDate = player.Licenses.PilotsLicense.IssueDate, 
+                    IssueStateID = player.Licenses.DriversLicense.IssueStateID, 
+                    IsFixedWingEndorsed = player.Licenses.PilotsLicense.IsFixedWingEndorsed, 
+                    IsRotaryEndorsed = player.Licenses.PilotsLicense.IsRotaryEndorsed, 
+                    IsLighterThanAirEndorsed = player.Licenses.PilotsLicense.IsLighterThanAirEndorsed 
+                };
             }
         }
         private void SaveAgencies(ISaveable player)
@@ -300,7 +329,8 @@ namespace LosSantosRED.lsr.Data
             CellPhoneSave = new CellPhoneSave(player.CellPhone.CustomRingtone, player.CellPhone.CustomTextTone, player.CellPhone.CustomTheme, player.CellPhone.CustomBackground, player.CellPhone.CustomVolume, player.CellPhone.SleepMode, player.CellPhone.CustomPhoneType, player.CellPhone.CustomPhoneOS);
         }
         //Load
-        public void Load(IWeapons weapons,IPedSwap pedSwap, IInventoryable player, ISettingsProvideable settings, IEntityProvideable world, IGangs gangs, IAgencies agencies, ITimeControllable time, IPlacesOfInterest placesOfInterest, IModItems modItems, IContacts contacts, IInteractionable interactionable)
+        public void Load(IWeapons weapons,IPedSwap pedSwap, IInventoryable player, ISettingsProvideable settings, IEntityProvideable world, IGangs gangs, 
+            IAgencies agencies, ITimeControllable time, IPlacesOfInterest placesOfInterest, IModItems modItems, IContacts contacts, IInteractionable interactionable, IShopMenus shopMenus)
         {
             try
             {
@@ -324,11 +354,12 @@ namespace LosSantosRED.lsr.Data
                 LoadAgencies(agencies, player);
                 LoadHealth(player);
 
-                //LEGACY TO BE REMOVED
-                LoadResidences(player, placesOfInterest, modItems, settings);//LEGACY TO BE REMOVED
-                LoadBusinesses(player, placesOfInterest, modItems, settings);//LEGACY TO BE REMOVED
+                ////LEGACY TO BE REMOVED
+                //LoadResidences(player, placesOfInterest, modItems, settings);//LEGACY TO BE REMOVED
+                //LoadBusinesses(player, placesOfInterest, modItems, settings);//LEGACY TO BE REMOVED
 
-                LoadOwnedProperties(player, placesOfInterest, modItems, settings);
+                LoadOwnedProperties(player, placesOfInterest, modItems, settings, world);
+                LoadSavedClothingItems(player, shopMenus);
                 GameFiber.Sleep(1000);
                 Game.FadeScreenIn(1500, true);
                 player.DisplayPlayerNotification();
@@ -341,6 +372,15 @@ namespace LosSantosRED.lsr.Data
             }
         }
 
+        private void LoadSavedClothingItems(IInventoryable player, IShopMenus shopMenus)
+        {
+            //do we really wnat to save the whole xml again each time? would make it easier
+            player.OutfitManager.PurchasedPedClothingShopMenuItems.Clear();
+            foreach (PedClothingShopMenuItem pedClothingShopMenuItem in SavedPurchasedClothingItems)
+            {
+                    player.OutfitManager.PurchasedPedClothingShopMenuItems.Add(pedClothingShopMenuItem);         
+            }
+        }
 
         private void LoadMoney(IInventoryable player)
         {
@@ -605,11 +645,11 @@ namespace LosSantosRED.lsr.Data
                 player.Licenses.PilotsLicense = new PilotsLicense() { ExpirationDate = PilotsLicense.ExpirationDate, IssueDate = PilotsLicense.IssueDate, IssueStateID = DriversLicense.IssueStateID, IsFixedWingEndorsed = PilotsLicense.IsFixedWingEndorsed, IsRotaryEndorsed = PilotsLicense.IsRotaryEndorsed, IsLighterThanAirEndorsed = PilotsLicense.IsLighterThanAirEndorsed };
             }
         }
-        private void LoadOwnedProperties(IInventoryable player, IPlacesOfInterest placesOfInterest, IModItems modItems, ISettingsProvideable settings)
+        private void LoadOwnedProperties(IInventoryable player, IPlacesOfInterest placesOfInterest, IModItems modItems, ISettingsProvideable settings, IEntityProvideable world)
         {
             foreach (SavedGameLocation savedLocation in SavedGameLocations)
             {
-                savedLocation.LoadSavedData(player, placesOfInterest, modItems, settings);
+                savedLocation.LoadSavedData(player, placesOfInterest, modItems, settings, world);
             }
         }
         private void LoadDebt (IInventoryable player)

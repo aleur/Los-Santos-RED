@@ -43,6 +43,7 @@ using Microsoft.VisualBasic;
 [XmlInclude(typeof(WeaponItem))]
 [XmlInclude(typeof(EquipmentItem))]
 [XmlInclude(typeof(BodyArmorItem))]
+[XmlInclude(typeof(TrophyItem))]
 public class ModItem
 {
     private UIMenuNumericScrollerItem<int> sellScroller;
@@ -824,7 +825,19 @@ public class ModItem
 
     public virtual void AddToList(PossibleItems possibleItems)
     {
+        possibleItems?.ModItems.RemoveAll(x => x.Name == Name);
+        possibleItems?.ModItems.Add(this);
+    }
 
+
+
+    public virtual Rage.Object SpawnObject(Vector3 position, float heading)
+    {
+        if(ModelItem == null)
+        {
+            return null;
+        }
+        return new Rage.Object(ModelItem.ModelName, position, heading);
     }
 }
 

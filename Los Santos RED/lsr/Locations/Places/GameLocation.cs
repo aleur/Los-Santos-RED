@@ -232,12 +232,6 @@ public class GameLocation : ILocationDispatchable
     [XmlIgnore]
     public List<Merchant> Vendors { get; set; } = new List<Merchant>();
 
-
-
-
-
-
-
     public Vector3 VehiclePreviewCameraPosition { get; set; } = Vector3.Zero;
     public Vector3 VehiclePreviewCameraDirection { get; set; } = Vector3.Zero;
     public Rotator VehiclePreviewCameraRotation { get; set; }
@@ -253,7 +247,7 @@ public class GameLocation : ILocationDispatchable
     public virtual int MaxRestockHours { get; set; }
 
     //public int MaxAssaultSpawns { get; set; } = 15;
-
+    public virtual bool AreMarkersDisabled => false;
     public float CloseRange { get; set; } = 10f;
 
 
@@ -360,6 +354,7 @@ public class GameLocation : ILocationDispatchable
     public DateTime DatePayoutPaid { get; set; }
     [XmlIgnore]
     public virtual bool IsOwned { get; set; } = false;
+
     #endregion
 
     [OnDeserialized()]
@@ -538,7 +533,7 @@ public class GameLocation : ILocationDispatchable
                 AssignedOrganization = Associations.GetOrganization(AssignedAssociationID);
             }
         }
-        Menu = shopMenus.GetSpecificMenu(MenuID);
+        Menu = shopMenus.GetSpecificInstancedMenu(MenuID);
         if (HasInterior)
         {
             interior = interiors?.GetInteriorByLocalID(InteriorID);
@@ -644,6 +639,10 @@ public class GameLocation : ILocationDispatchable
         {
             return;
         }
+        if(Menu == null)
+        {
+            return;
+        }
         if (DateTime.Compare(Time.CurrentDateTime, NextPriceRefreshTime) == 1)
         {
             foreach (MenuItem menuItem in Menu.Items)
@@ -661,6 +660,10 @@ public class GameLocation : ILocationDispatchable
     protected virtual void HandleSupplyRefreshes()
     {
         if (MinRestockHours <= 0 && MaxRestockHours <= 0)
+        {
+            return;
+        }
+        if (Menu == null)
         {
             return;
         }
@@ -772,11 +775,68 @@ public class GameLocation : ILocationDispatchable
         {
             AllLocation.AddRange(PossibleVehicleSpawns);
         }
+
+        if (PossibleGroupSpawns != null)
+        {
+
+            foreach (ConditionalGroup cd in PossibleGroupSpawns)
+            {
+                if (cd.PossiblePedSpawns != null)
+                {
+                    AllLocation.AddRange(cd.PossiblePedSpawns);
+                }
+                if (cd.PossibleVehicleSpawns != null)
+                {
+                    AllLocation.AddRange(cd.PossibleVehicleSpawns);
+                }
+            }
+
+        }
+
         foreach (ConditionalLocation cl in AllLocation)
         {
             cl.AddDistanceOffset(offsetToAdd);
         }
-        RestrictedAreas?.AddDistanceOffset(offsetToAdd);
+        if (RestrictedAreas != null)
+        {
+        foreach (var ra in RestrictedAreas.RestrictedAreasList)
+            {
+                // Offset the main boundary points (Vector2)
+                if (ra.Boundaries != null)
+                {
+                    for (int i = 0; i < ra.Boundaries.Length; i++)
+                    {
+                        ra.Boundaries[i] = new Vector2(
+                            ra.Boundaries[i].X + offsetToAdd.X,
+                            ra.Boundaries[i].Y + offsetToAdd.Y
+                        );
+                    }
+                }
+                // Offset all cameras in this restricted area
+                if (ra.SecurityCameras != null)
+                {
+                foreach (var cam in ra.SecurityCameras)
+                {
+                     cam.Position += offsetToAdd; 
+                }
+             }
+          }
+        }
+
+        //moved into base class since its base class items
+        VehiclePreviewLocation?.AddDistanceOffset(offsetToAdd);
+        foreach(SpawnPlace spawnPlace in VehicleDeliveryLocations)
+        {
+            spawnPlace.AddDistanceOffset(offsetToAdd);
+        }
+
+        if (VehiclePreviewCameraPosition != Vector3.Zero)
+        {
+            VehiclePreviewCameraPosition += offsetToAdd;
+        }
+
+        
+
     }
     public virtual void RemoveMessage()
     {
@@ -927,7 +987,7 @@ public class GameLocation : ILocationDispatchable
                /// UpdatePrompts();
                 if (IsActivated && HasInterior)
                 {
-                    Interior?.Update();
+                    Interior?.Update(IsOpen(time.CurrentHour));
                 }
                 if(DistanceToPlayer <= CloseRange)
                 {
@@ -1186,7 +1246,7 @@ public class GameLocation : ILocationDispatchable
         
         HandleVariableItems();
        // EntryPoint.WriteToConsole($"ATTEMPTING VENDOR AT {Name} {VendorPersonType.ModelName}");
-        Vendors = new List<Merchant>();
+       // Vendors = new List<Merchant>();
         SpawnLocation sl = new SpawnLocation(spawnPlace.Position) { Heading = spawnPlace.Heading };
         MerchantSpawnTask merchantSpawnTask = new MerchantSpawnTask(sl, null,VendorPersonType,false,false,true,Settings,Crimes,Weapons,Names,World,ModItems,ShopMenus,this);
 
@@ -1273,9 +1333,22 @@ public class GameLocation : ILocationDispatchable
                 pedExt.DeleteBlip();
                 pedExt.Pedestrian.IsPersistent = false;
                 EntryPoint.WriteToConsole($"AttemptVendorDespawn MADE NON PERSIST");
+                pedExt.Pedestrian.Dismiss();
             }
+            SpawnedVendors.Clear();
         }
-        SpawnedVendors.Clear();
+
+        //foreach (PedExt pedExt in SpawnedMerchants.ToList()) 
+        //{
+        //    if (pedExt.Pedestrian.Exists())
+        //    {
+        //        pedExt.DeleteBlip();
+        //        pedExt.Pedestrian.IsPersistent = false;
+        //        EntryPoint.WriteToConsole($"AttemptMerchantDespawn MADE NON PERSIST MERCHANT");
+        //        pedExt.Pedestrian.Dismiss();
+        //    }
+        //    SpawnedMerchants.Clear();
+        //}
     }
 
     public IssuableWeapon GetRandomWeapon(bool isSidearm, IWeapons weapons)
@@ -1436,6 +1509,11 @@ public class GameLocation : ILocationDispatchable
     public virtual void AddToLandLordMenu(LandlordMenu landlordMenu)
     {
 
+    }
+
+    public virtual void OnStoredCashChanged(int storedCash)
+    {
+        Interior?.OnStoredCashChanged(storedCash);
     }
     //public virtual void UpdatePrompts()
     //{

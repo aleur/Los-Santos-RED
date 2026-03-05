@@ -6,6 +6,7 @@ using Rage;
 using Rage.Native;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Text;
 using System.Linq;
 
 public class LEDispatcher
@@ -22,6 +23,7 @@ public class LEDispatcher
     private readonly IPlacesOfInterest PlacesOfInterest;
     private readonly IModItems ModItems;
     private readonly IShopMenus ShopMenus;
+    private readonly ICrimes Crimes;
 
     private readonly float MinimumDeleteDistance = 150f;//200f
     private readonly uint MinimumExistingTime = 20000;
@@ -162,7 +164,7 @@ public class LEDispatcher
     private bool HasNeedToSpawnBoat => (Player.CurrentVehicle?.IsBoat == true || Player.IsSwimming) && World.Vehicles.PoliceBoatsCount < SpawnedBoatLimit;
     private bool TotalIsWanted => World.TotalWantedLevel > 0;
     public LEDispatcher(IEntityProvideable world, IDispatchable player, IAgencies agencies, ISettingsProvideable settings, IStreets streets, IZones zones, IJurisdictions jurisdictions, IWeapons weapons,
-        INameProvideable names, IPlacesOfInterest placesOfInterest, IModItems modItems, IShopMenus shopMenus)
+        INameProvideable names, IPlacesOfInterest placesOfInterest, IModItems modItems, IShopMenus shopMenus, ICrimes crimes)
     {
         Player = player;
         World = world;
@@ -176,7 +178,8 @@ public class LEDispatcher
         PlacesOfInterest = placesOfInterest;
         ModItems = modItems;
         ShopMenus = shopMenus;
-        MarshalDispatcher = new MarshalDispatcher(Player, this, Settings, World, Weapons, Names, PlacesOfInterest, ModItems, Agencies, ShopMenus);
+        Crimes = crimes;
+        MarshalDispatcher = new MarshalDispatcher(Player, this, Settings, World, Weapons, Names, PlacesOfInterest, ModItems, Agencies, ShopMenus, Crimes);
     }
     private float LikelyHoodOfAnySpawn
     {
@@ -900,7 +903,7 @@ public class LEDispatcher
     {
         //EntryPoint.WriteToConsole("LE DISPATCHER HAS DISPATCHED RAN1");
         HasDispatchedThisTick = false;
-        if (!Settings.SettingsManager.PoliceSpawnSettings.ManageDispatching)
+        if (!Settings.SettingsManager.PoliceSpawnSettings.ManageDispatching || EntryPoint.IsLSPDFRIntegrationEnabled)
         {
             return HasDispatchedThisTick;
         }
@@ -971,7 +974,7 @@ public class LEDispatcher
         {
             return;
         }
-        LESpawnTask spawnTask = new LESpawnTask(Agency, SpawnLocation, vehicleExt.DispatchableVehicle, null, Settings.SettingsManager.PoliceSpawnSettings.ShowSpawnedBlips, Settings, Weapons, Names, false, World, ModItems, false, ShopMenus);
+        LESpawnTask spawnTask = new LESpawnTask(Agency, SpawnLocation, vehicleExt.DispatchableVehicle, null, Settings.SettingsManager.PoliceSpawnSettings.ShowSpawnedBlips, Settings, Weapons, Names, false, World, ModItems, false, ShopMenus, Crimes);
         spawnTask.SpawnWithAllWeapons = true;
         EntryPoint.WriteToConsole($"DEBUG LE DISPATCH RESPAWNING RAPPELLED PED VehicleType:{vehicleExt?.DispatchableVehicle} PersonType:{null} RequiredPedGroup:{vehicleExt?.DispatchableVehicle?.RequiredPedGroup} GroupName:{null}");
         spawnTask.SpawnAsPassenger(vehicleExt, seatIndex);
@@ -1399,7 +1402,7 @@ public class LEDispatcher
 
             }
 
-            LESpawnTask spawnTask = new LESpawnTask(Agency, SpawnLocation, VehicleType, PersonType, Settings.SettingsManager.PoliceSpawnSettings.ShowSpawnedBlips, Settings, Weapons, Names, addOptionalPassengers, World, ModItems, addCanine, ShopMenus);
+            LESpawnTask spawnTask = new LESpawnTask(Agency, SpawnLocation, VehicleType, PersonType, Settings.SettingsManager.PoliceSpawnSettings.ShowSpawnedBlips, Settings, Weapons, Names, addOptionalPassengers, World, ModItems, addCanine, ShopMenus, Crimes);
             spawnTask.AllowAnySpawn = allowAny;
             spawnTask.AllowBuddySpawn = allowBuddy && !isOffDuty;
             spawnTask.ClearVehicleArea = clearArea;
@@ -1576,6 +1579,12 @@ public class LEDispatcher
                         addedSpawnAdjustments |= eSpawnAdjustment.InAirVehicle;
                         addedAdjustment = true;
                         EntryPoint.WriteToConsole("LE DISPATCHER ADDED AIR VEHICLE ADJUSTMENT");
+                    }
+                    if(Player.IsInArmedMilitaryVehicle)
+                    {
+                        addedSpawnAdjustments |= eSpawnAdjustment.InArmedMilitaryVehicle;
+                        addedAdjustment = true;
+                        EntryPoint.WriteToConsole("LE DISPATCHER ADDED ARMED MILITARY VEHICLE ADJUSTMENT");
                     }
 
                     if (HasNeedToAmbientCanineDispatch)
@@ -1893,7 +1902,7 @@ public class LEDispatcher
             Roadblock.Dispose();
             GameFiber.Yield();
         }
-        Roadblock = new Roadblock(Player, World, ToSpawn, VehicleToUse, OfficerType, RoadblockFinalPosition, RoadblockFinalHeading, Settings, Weapons, Names, force, ModItems, enableCarBlocks,enableSpikeStrips,enableOtherBarriers, ShopMenus);
+        Roadblock = new Roadblock(Player, World, ToSpawn, VehicleToUse, OfficerType, RoadblockFinalPosition, RoadblockFinalHeading, Settings, Weapons, Names, force, ModItems, enableCarBlocks,enableSpikeStrips,enableOtherBarriers, ShopMenus, Crimes);
         Roadblock.SpawnRoadblock();
         GameFiber.Yield();
         GameTimeLastSpawnedRoadblock = Game.GameTime;    

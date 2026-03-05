@@ -218,6 +218,16 @@ public class Zones : IZones
             new Zone("TATAMO", "Tataviam Mountains", StaticStrings.LosSantosCountyID, StaticStrings.SanAndreasStateID, true, eLocationEconomy.Poor, eLocationType.Wilderness),
             new Zone("WINDF", "Ron Alternates Wind Farm", StaticStrings.LosSantosCountyID, StaticStrings.SanAndreasStateID, true, eLocationEconomy.Poor, eLocationType.Wilderness),
 
+            new Zone("CYPRE2", "Cypress Industrial", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Poor, eLocationType.Industrial)
+            {
+                DealerMenuContainerID = StaticStrings.MarijuanaAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.MarijuanaAreaDrugCustomerMenuGroupID,Boundaries =
+                new Vector2[] {
+                    new Vector2(935.9811f, -1902.274f),
+                    new Vector2(1120.571f, -1891.891f),
+                    new Vector2(1063.934f, -1708.617f),
+                    new Vector2(917.0331f, -1723.506f),
+                },
+            },
 
 
             //UNKNWON 
@@ -342,14 +352,14 @@ public class Zones : IZones
             //LEAPE
             //Other
             new Zone("OCEANA", "Atlantic Ocean", StaticStrings.LibertyCityCountyID, StaticStrings.LibertyStateID, false, eLocationEconomy.Middle, eLocationType.Rural),
-            new Zone("SANAND", "Outskirts", StaticStrings.LibertyCityCountyID, StaticStrings.LibertyStateID, false, eLocationEconomy.Middle, eLocationType.Rural),
+            new Zone("SANAND", "Outskirts", StaticStrings.LibertyCityCountyID, StaticStrings.LibertyStateID, false, eLocationEconomy.Middle, eLocationType.Rural), // Disables LS zone around Vagos den 
             };
-        Serialization.SerializeParams(LibertyCityZones, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LibertyConfigFolder}\\Zones_{StaticStrings.LibertyConfigSuffix}.xml");
+        //Serialization.SerializeParams(LibertyCityZones, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LibertyConfigFolder}\\Zones_{StaticStrings.LibertyConfigSuffix}.xml");
 
         List<Zone> LPPZones = new List<Zone>();
         LPPZones.AddRange(LibertyCityZones);
-        LPPZones.AddRange(ZoneList);
-        Serialization.SerializeParams(LPPZones, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LPPConfigFolder}\\Zones_{StaticStrings.LPPConfigSuffix}.xml");
+        //LPPZones.AddRange(ZoneList);
+        Serialization.SerializeParams(LPPZones, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LPPConfigFolder}\\Zones+_{StaticStrings.LPPConfigSuffix}.xml");
     }
 
    

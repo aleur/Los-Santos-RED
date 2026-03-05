@@ -217,7 +217,7 @@ public class Debug
         }
         if (Settings.SettingsManager.DebugSettings.ShowCivilianPerceptionArrows)
         {
-            EntryPoint.WriteToConsole("DRAW DEBUG ARROWS");
+           // EntryPoint.WriteToConsole("DRAW DEBUG ARROWS");
             List<PedExt> AllPeds = World.Pedestrians.CivilianList;
             AllPeds.AddRange(World.Pedestrians.GangMemberList);
             AllPeds.AddRange(World.Pedestrians.MerchantList);
@@ -530,9 +530,110 @@ public class Debug
     }
     private void DebugNumpad4()
     {
+
+
+        GameFiber.StartNew(delegate
+        {
+            float prevSpeed = 0.0f;
+            string CurrentSubtitle = "";
+            bool isAccelerating = false;
+            bool isBraking = false;
+            bool isTurning = false;
+            Vehicle coolVeh = Player.Character.CurrentVehicle;
+            float CurrentSpeed = 0.0f;
+            float speedThreshold = Settings.SettingsManager.PoliceTaskSettings.ForceAssistSpeedChangeThreshold;
+            float turningRadius = Settings.SettingsManager.PoliceTaskSettings.ForceAssistTurningRadiusLimit;
+            while (!Game.IsKeyDown(Keys.O))
+            {
+
+
+                if(Player.Character.CurrentVehicle.Exists())
+                {
+                    
+                    CurrentSpeed = coolVeh.Speed;
+
+                    if (CurrentSpeed > prevSpeed)
+                    {
+                        isAccelerating = true;
+                    }
+                    else
+                    {
+                        isAccelerating = false;
+                    }
+
+                    float speedDiff = CurrentSpeed - prevSpeed;
+                    if (speedDiff < speedThreshold)
+                    {
+                        isBraking = true;
+                    }
+                    else
+                    {
+                        isBraking = false;
+                    }
+
+                    
+
+                    prevSpeed = CurrentSpeed;
+                    if(coolVeh.SteeringAngle > turningRadius)
+                    {
+                        isTurning = true;
+                    }
+                    else
+                    {
+                        isTurning = false;
+                    }
+                    
+                    bool isApplyingForce = false;
+
+                    if (!isTurning)
+                    {
+                        if (isAccelerating)
+                        {
+                            isApplyingForce = true;
+                            coolVeh.ApplyForce(new Vector3(0.0f,1.0f,0.0f) * Settings.SettingsManager.PoliceTaskSettings.ForceAssistAmount, Vector3.Zero, true, true);
+                        }
+                        else if (isBraking)
+                        {
+                            isApplyingForce = true;
+                            coolVeh.ApplyForce(new Vector3(0.0f, -1.0f* Settings.SettingsManager.PoliceTaskSettings.ForceAssistAmount, 0.0f) , Vector3.Zero, true, true);
+                        }
+                        
+                    }
+                    CurrentSubtitle = $"isAccelerating{isAccelerating} isBraking{isBraking} CurrentSpeed:{Math.Round(CurrentSpeed,2)} PrevSpeed:{Math.Round(prevSpeed,2)} Diff:{Math.Round(speedDiff, 2)} isTurning {isTurning}  isApplyingForce{isApplyingForce}";
+
+                }
+
+
+
+
+
+
+                Game.DisplaySubtitle(CurrentSubtitle);
+                GameFiber.Yield();
+            }
+
+        }, "Run Debug Logic");
+        GameFiber.Sleep(500);
+
+
+
+
+
+        //Cop found = World.Pedestrians.PoliceList.OrderBy(x => x.DistanceToPlayer).FirstOrDefault();
+        //if(found == null || !found.Pedestrian.Exists())
+        //{
+        //    return;
+        //}
+        //EntryPoint.WriteToConsole($"TASK_COMBAT_PED {found.Handle} DefaultCombatFlag:{found.DefaultCombatFlag}");
+
+        //found.Pedestrian.RelationshipGroup.SetRelationshipWith(Game.LocalPlayer.Character.RelationshipGroup, Relationship.Hate);
+
+        //NativeFunction.Natives.TASK_COMBAT_PED(found.Pedestrian, Player.Character, found.DefaultCombatFlag, 16);
+
+
         //NativeFunction.Natives.SET_RADIO_TO_STATION_NAME("RADIO_23_INTEGRITY");
 
-       // NativeFunction.Natives.x477D9DB48F889591("RADIO_01_CLASS_ROCK", true);
+        // NativeFunction.Natives.x477D9DB48F889591("RADIO_01_CLASS_ROCK", true);
 
         //NativeFunction.CallByHash<bool>(0x477D9DB48F889591, "RADIO_01_CLASS_ROCK", true);
 
@@ -5417,7 +5518,7 @@ private void contacttest()
             uint currentWeapon;
             NativeFunction.Natives.GET_CURRENT_PED_WEAPON<bool>(ped.Pedestrian, out currentWeapon, true);
             uint RG = NativeFunction.Natives.GET_PED_RELATIONSHIP_GROUP_HASH<uint>(ped.Pedestrian);
-            EntryPoint.WriteToConsole($"Handle {ped.Pedestrian.Handle}-{ped.DistanceToPlayer}-Cells:{NativeHelper.MaxCellsAway(EntryPoint.FocusCellX, EntryPoint.FocusCellY, ped.CellX, ped.CellY)} {ped.Pedestrian.Model.Name} {ped.Name} ${ped.Money} CanSeePlayer{ped.CanSeePlayer} MENU? {ped.HasMenu} IsUnconscious:{ped.IsUnconscious} Alive:{ped.Pedestrian.IsAlive} Task: {ped.CurrentTask?.Name}-{ped.CurrentTask?.SubTaskName} OtherCrimes {ped.OtherCrimesWitnessed.Count()}  PlayerCrimes {ped.PlayerCrimesWitnessed.Count()} WantedLevel = {ped.WantedLevel} IsDeadlyChase = {ped.IsDeadlyChase} IsBusted {ped.IsBusted} IsArrested {ped.IsArrested} IsInVehicle {ped.IsInVehicle} ViolationWantedLevel = {ped.CurrentlyViolatingWantedLevel} Weapon {currentWeapon} Reason {ped.PedViolations.CurrentlyViolatingWantedLevelReason} Stunned {ped.Pedestrian.IsStunned} Task {ped.CurrentTask?.Name}-{ped.CurrentTask?.SubTaskName} WasEverSetPersistent:{ped.WasEverSetPersistent} Call:{ped.WillCallPolice} Fight:{ped.WillFight} WillFightPolice {ped.WillFightPolice} NewGroup:{ped.Pedestrian.RelationshipGroup.Name} NativeGroup:{RG} IsMovingAway:{ped.DistanceChecker.IsMovingAway} WasModSpawned:{ped.WasModSpawned} IsPersistent{ped.Pedestrian.IsPersistent}", 5);
+            EntryPoint.WriteToConsole($"Handle {ped.Pedestrian.Handle}-{ped.DistanceToPlayer}-Cells:{NativeHelper.MaxCellsAway(EntryPoint.FocusCellX, EntryPoint.FocusCellY, ped.CellX, ped.CellY)} {ped.Pedestrian.Model.Name} {ped.Name} ${ped.Money} CanSeePlayer{ped.CanSeePlayer} {ped.Handle} PPS:{ped.PlayerPerception.PlayerPerceptionString} MENU? {ped.HasMenu} IsUnconscious:{ped.IsUnconscious} Alive:{ped.Pedestrian.IsAlive} Task: {ped.CurrentTask?.Name}-{ped.CurrentTask?.SubTaskName} OtherCrimes {ped.OtherCrimesWitnessed.Count()}  PlayerCrimes {ped.PlayerCrimesWitnessed.Count()} WantedLevel = {ped.WantedLevel} IsDeadlyChase = {ped.IsDeadlyChase} IsBusted {ped.IsBusted} IsArrested {ped.IsArrested} IsInVehicle {ped.IsInVehicle} ViolationWantedLevel = {ped.CurrentlyViolatingWantedLevel} Weapon {currentWeapon} Reason {ped.PedViolations.CurrentlyViolatingWantedLevelReason} Stunned {ped.Pedestrian.IsStunned} Task {ped.CurrentTask?.Name}-{ped.CurrentTask?.SubTaskName} WasEverSetPersistent:{ped.WasEverSetPersistent} Call:{ped.WillCallPolice} Fight:{ped.WillFight} WillFightPolice {ped.WillFightPolice} NewGroup:{ped.Pedestrian.RelationshipGroup.Name} NativeGroup:{RG} IsMovingAway:{ped.DistanceChecker.IsMovingAway} WasModSpawned:{ped.WasModSpawned} IsPersistent{ped.Pedestrian.IsPersistent}", 5);
         }
         EntryPoint.WriteToConsole($"============================================ CIVIES END", 5);
         EntryPoint.WriteToConsole($"============================================ SECURITY START", 5);
@@ -5667,8 +5768,9 @@ private void contacttest()
 
             bool canSeePlayer = cop.CanSeePlayer;
 
-            string retardedcops = $"IsDriver:{cop.IsDriver}";
+            string retardedcops = $"IsDriver:{cop.IsDriver} RelationshipGroup:{cop.Pedestrian.RelationshipGroup.Name}";
 
+            
 
             if (cop.CurrentTask?.OtherTarget?.Pedestrian.Exists() == true)
             {
@@ -5747,7 +5849,7 @@ private void contacttest()
             {
                 EntryPoint.WriteToConsole($"Num6: Cop {cop.Pedestrian.Handle}-Cells:{NativeHelper.MaxCellsAway(EntryPoint.FocusCellX, EntryPoint.FocusCellY, cop.CellX, cop.CellY)}-{cop.DistanceToPlayer} {cop.Pedestrian.Model.Name} Name:{cop.Name} {cop.GroupName} weaponhash {currentWeapon} IsUnconscious:{cop.IsUnconscious} IsMale:{cop.Pedestrian.IsMale} " +
                     $"TaskStatus:{cop.Pedestrian.Tasks.CurrentTaskStatus} Weapons: {cop.CopDebugString} Task: {cop.CurrentTask?.Name}-{cop.CurrentTask?.SubTaskName} Target:{cop.CurrentTask.OtherTarget.Pedestrian.Handle} IsRespondingToInvestigation {cop.IsRespondingToInvestigation} IsRespondingToCitizenWanted {cop.IsRespondingToCitizenWanted} IsInVehicle {cop.IsInVehicle} Vehicle  {VehString} {combat} WEapon: {Weapon} {VehicleWeapon} " +
-                    $"HasLoggedDeath {cop.HasLoggedDeath} WasModSpawned {cop.WasModSpawned} RGotIn:{cop.RecentlyGotInVehicle} RGotOut:{cop.RecentlyGotOutOfVehicle} WeaponSet {weaponinventorystring} DebugWeaponState {cop.WeaponInventory.DebugWeaponState}", 5);
+                    $"HasLoggedDeath {cop.HasLoggedDeath} WasModSpawned {cop.WasModSpawned} RelationshipGroup:{cop.Pedestrian.RelationshipGroup} RGotIn:{cop.RecentlyGotInVehicle} RGotOut:{cop.RecentlyGotOutOfVehicle} WeaponSet {weaponinventorystring} DebugWeaponState {cop.WeaponInventory.DebugWeaponState}", 5);
 
             }
 
@@ -5755,7 +5857,7 @@ private void contacttest()
             {
                 EntryPoint.WriteToConsole($"Num6: Cop {cop.Pedestrian.Handle}-Cells:{NativeHelper.MaxCellsAway(EntryPoint.FocusCellX, EntryPoint.FocusCellY, cop.CellX, cop.CellY)}-{cop.DistanceToPlayer} {cop.Pedestrian.Model.Name} Name:{cop.Name} {cop.GroupName} weaponhash {currentWeapon} IsUnconscious:{cop.IsUnconscious} IsMale:{cop.Pedestrian.IsMale} " +
                     $"TaskStatus:{cop.Pedestrian.Tasks.CurrentTaskStatus} Weapons: {cop.CopDebugString} Task: {cop.CurrentTask?.Name}-{cop.CurrentTask?.SubTaskName} Target:{0} IsRespondingToInvestigation {cop.IsRespondingToInvestigation} IsRespondingToCitizenWanted {cop.IsRespondingToCitizenWanted} IsInVehicle {cop.IsInVehicle} Vehicle  {VehString} {combat} weapon: {Weapon} {VehicleWeapon} " +
-                    $"HasLoggedDeath {cop.HasLoggedDeath} WasModSpawned {cop.WasModSpawned} RGotIn:{cop.RecentlyGotInVehicle} RGotOut:{cop.RecentlyGotOutOfVehicle} WeaponSet {weaponinventorystring} DebugWeaponState {cop.WeaponInventory.DebugWeaponState}", 5);
+                    $"HasLoggedDeath {cop.HasLoggedDeath} WasModSpawned {cop.WasModSpawned} RelationshipGroup:{cop.Pedestrian.RelationshipGroup} RGotIn:{cop.RecentlyGotInVehicle} RGotOut:{cop.RecentlyGotOutOfVehicle} WeaponSet {weaponinventorystring} DebugWeaponState {cop.WeaponInventory.DebugWeaponState}", 5);
             }
 
         }
