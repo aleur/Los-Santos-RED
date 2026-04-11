@@ -52,8 +52,8 @@ public class PurchaseMenu : ModUIMenu
         if (purchaseMenu != null)
         {
             purchaseMenu.Visible = false;
+            Player.ButtonPrompts.Clear();
         }
-        Player.ButtonPrompts.Clear();
     }
     public void Setup()
     {
@@ -90,7 +90,7 @@ public class PurchaseMenu : ModUIMenu
             {
                 purchaseMenu.RemoveBanner();
             }
-            purchaseMenu.OnItemSelect += (selnder, selectedItem, index) =>
+            purchaseMenu.OnItemSelect += (sender, selectedItem, index) =>
             {
                 Transaction?.SellMenu?.Dispose();
                 Transaction?.PurchaseMenu?.Show();             

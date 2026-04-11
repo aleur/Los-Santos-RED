@@ -81,6 +81,7 @@ public class CityHall : GameLocation
     public override void StandardInteract(LocationCamera locationCamera, bool isInside)
     {
         Player.ActivityManager.IsInteractingWithLocation = true;
+        Player.CurrentInteractedLocation = this;
         CanInteract = false;
         Player.IsTransacting = true;
         GameFiber.StartNew(delegate
@@ -94,11 +95,9 @@ public class CityHall : GameLocation
                 GenerateCityHallMenu();
                 ProcessInteractionMenu();
                 DisposeInteractionMenu();
+                ResetInteractBools();
                 DisposeCamera(isInside);
                 DisposeInterior();
-                Player.ActivityManager.IsInteractingWithLocation = false;
-                CanInteract = true;
-                Player.IsTransacting = false;
             }
             catch (Exception ex)
             {

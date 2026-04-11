@@ -22,7 +22,6 @@ namespace Mod
         private ISettingsProvideable Settings;
         private ICrimes Crimes;
         private IWeapons Weapons;     
-        private ITimeControllable Time;
         private IInteriors Interiors;
         private IShopMenus ShopMenus;
         private IGangs Gangs;
@@ -56,6 +55,7 @@ namespace Mod
             Events = new Events(this, zones, jurisdictions, settings, placesOfInterest, weapons, crimes, time, shopMenus, interiors, gangs, gangTerritories, streets, agencies, names, pedGroups, locationTypes, plateTypes, associations, contacts, ModDataFileManager.ModItems, modDataFileManager.IssueableWeapons, modDataFileManager.Heads, modDataFileManager.DispatchablePeople, modDataFileManager.ClothesNames);
             SpawnErrors = new List<SpawnError>();
         }
+        public ITimeControllable Time { get; private set; }
         public bool IsMPMapLoaded { get; private set; }
         public bool IsZombieApocalypse { get; set; } = false;
         public Vehicles Vehicles { get; private set; }

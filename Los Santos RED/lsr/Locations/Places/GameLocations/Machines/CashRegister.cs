@@ -67,6 +67,7 @@ public class CashRegister : GameLocation
         if (CanInteract)
         {
             Player.ActivityManager.IsInteractingWithLocation = true;
+            Player.CurrentInteractedLocation = this;
             CanInteract = false;
             Player.IsTransacting = true;
             GameFiber.StartNew(delegate
@@ -111,9 +112,7 @@ public class CashRegister : GameLocation
                         }
                     }
                     FullDispose();
-                    Player.ActivityManager.IsInteractingWithLocation = false;
-                    Player.IsTransacting = false;
-                    CanInteract = true;
+                    ResetInteractBools();
                 }
                 catch (Exception ex)
                 {

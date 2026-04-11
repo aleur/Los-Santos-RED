@@ -37,6 +37,7 @@ namespace LosSantosRED.lsr.Interface
         VehicleExt CurrentVehicle { get; }
         bool IsResting { get; set; }
         bool IsSleeping { get; set; }
+        bool IsWorking { get; set; }
         //bool IsDealingDrugs { get; set; }
         //bool IsDealingIllegalGuns { get; set; }
         bool IsNotWanted { get; }
@@ -71,5 +72,6 @@ namespace LosSantosRED.lsr.Interface
 
         bool IsInWantedActiveMode { get; }
         bool IsSetDisabledControls { get; set; }
+        GameLocation CurrentInteractedLocation { get; set; }
     }
 }

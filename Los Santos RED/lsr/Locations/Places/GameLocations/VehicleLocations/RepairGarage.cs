@@ -62,6 +62,7 @@ public class RepairGarage : GameLocation
             return;
         }
         Player.ActivityManager.IsInteractingWithLocation = true;
+        Player.CurrentInteractedLocation = this;
         CanInteract = false;
         Player.IsTransacting = true;
         GameFiber.StartNew(delegate
@@ -77,11 +78,9 @@ public class RepairGarage : GameLocation
                 GeneratePayNSprayMenu();
                 ProcessInteractionMenu();
                 DisposeInteractionMenu();
+                ResetInteractBools();
                 DisposeDoor();
                 StoreCamera.Dispose();
-                Player.ActivityManager.IsInteractingWithLocation = false;
-                CanInteract = true;
-                Player.IsTransacting = false;
             }
             catch (Exception ex)
             {

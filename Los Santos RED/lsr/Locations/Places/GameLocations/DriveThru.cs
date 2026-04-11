@@ -43,6 +43,7 @@ public class DriveThru : GameLocation
         if (CanInteract)
         {
             Player.ActivityManager.IsInteractingWithLocation = true;
+            Player.CurrentInteractedLocation = this;
             CanInteract = false;
             Player.IsTransacting = true;
             GameFiber.StartNew(delegate
@@ -59,10 +60,8 @@ public class DriveThru : GameLocation
                     Transaction.ProcessTransactionMenu();
                     Transaction.DisposeTransactionMenu();
                     DisposeInteractionMenu();
+                    ResetInteractBools();
                     NativeFunction.Natives.STOP_GAMEPLAY_HINT(false);
-                    Player.ActivityManager.IsInteractingWithLocation = false;
-                    Player.IsTransacting = false;
-                    CanInteract = true;
                 }
                 catch (Exception ex)
                 {

@@ -232,6 +232,7 @@ public class SellMenu : ModUIMenu
         {
             Transaction.Store?.HighlightVehicle();
             GeneratePreview(categoryMenu, categoryMenu.CurrentSelection);
+            EntryPoint.WriteToConsole("SELL MENU ON MENU OPEN VEHICLE CATEGORY");
         };
         categoryMenu.OnMenuClose += (sender) =>
         {

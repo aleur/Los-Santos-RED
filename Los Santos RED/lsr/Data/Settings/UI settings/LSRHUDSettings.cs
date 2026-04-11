@@ -48,6 +48,7 @@ public class LSRHUDSettings : ISettingsDefaultable
     public bool PlayerStatusSimpleTime { get; set; }
 
     public bool PlayerStatusShowWhenSleeping { get; set; }
+    public bool PlayerStatusShowWhenWorking { get; set; }
 
 
     public bool PlayerStatusIncludePoliceCount { get; set; }
@@ -202,6 +203,7 @@ public class LSRHUDSettings : ISettingsDefaultable
         PlayerStatusIncludeTime = false;
         PlayerStatusSimpleTime = true;
         PlayerStatusShowWhenSleeping = true;
+        PlayerStatusShowWhenWorking = true;
         PlayerStatusIncludePoliceCount = false;
         ShowStreetDisplay = true;
         FadeStreetDisplay = true;

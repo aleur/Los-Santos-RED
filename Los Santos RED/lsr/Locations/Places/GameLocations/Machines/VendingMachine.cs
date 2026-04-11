@@ -64,6 +64,7 @@ public class VendingMachine : GameLocation
         if (CanInteract)
         {
             Player.ActivityManager.IsInteractingWithLocation = true;
+            Player.CurrentInteractedLocation = this;
             CanInteract = false;
             Player.IsTransacting = true;
             GameFiber.StartNew(delegate
@@ -101,9 +102,7 @@ public class VendingMachine : GameLocation
                         DisposeInteractionMenu();
                     }
                     FullDispose();
-                    Player.ActivityManager.IsInteractingWithLocation = false;
-                    Player.IsTransacting = false;
-                    CanInteract = true;
+                    ResetInteractBools();
                 }
                 catch (Exception ex)
                 {

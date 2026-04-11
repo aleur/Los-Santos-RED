@@ -161,9 +161,11 @@
     <Compile Include="lsr\Data\Interface\ICraftable.cs" />
     <Compile Include="lsr\Data\Interface\IGameConfigs.cs" />
     <Compile Include="lsr\Data\Interface\ICraftableItems.cs" />
+    <Compile Include="lsr\Data\Interface\IBusinessMenus.cs" />
     <Compile Include="lsr\Data\Interface\ISpawnBlocks.cs" />
     <Compile Include="lsr\Data\Interface\IVehicleRaces.cs" />
     <Compile Include="lsr\Data\Items\CraftableItems.cs" />
+    <Compile Include="lsr\Data\Items\BusinessMenus.cs" />
     <Compile Include="lsr\Data\Items\ShopMenus_Clothing.cs" />
     <Compile Include="lsr\Data\Location\Custom Locations\BlankLocationsData_Liberty.cs" />
     <Compile Include="lsr\Data\Location\Custom Locations\BlankLocationsData_LibertyPP.cs" />
@@ -262,6 +264,8 @@
     <Compile Include="lsr\Locations\Interiors\Theft\AnimationPreInteract.cs" />
     <Compile Include="lsr\Locations\Interiors\Residence\Trophy\DisplayInteract.cs" />
     <Compile Include="lsr\Data\Location\TargetType.cs" />
+    <Compile Include="lsr\Locations\Menus\BusinessMenu.cs" />
+    <Compile Include="lsr\Locations\Menus\BusinessMenuTypes.cs" />
     <Compile Include="lsr\Locations\Other\GangTerritory.cs" />
     <Compile Include="lsr\Locations\Places\ConditionalLocations\Civilian\CivilianConditionalLocation.cs" />
     <Compile Include="lsr\Locations\Places\GameLocations\BodyExport.cs" />
@@ -288,6 +292,7 @@
     <Compile Include="lsr\Locations\Places\GameLocations\VehicleLocations\WheelVehicleClassModKitType.cs" />
     <Compile Include="lsr\Locations\Places\GameLocations\VehicleLocations\WheelVehicleModKitType.cs" />
     <Compile Include="lsr\Locations\Places\Interface\IPayoutDisbursable.cs" />
+    <Compile Include="lsr\Locations\Places\Property.cs" />
     <Compile Include="lsr\Player\ActiveTasks\Gang\GangArsonTask.cs" />
     <Compile Include="lsr\Player\ActiveTasks\Gang\GangRacketeeringTask.cs" />
     <Compile Include="lsr\Player\ActiveTasks\Gang\RivalGangAmbushTask.cs" />

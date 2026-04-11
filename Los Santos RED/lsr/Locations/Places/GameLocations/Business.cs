@@ -351,7 +351,7 @@ public class Business : GameLocation, ILocationSetupable, IRestableLocation, IIn
         PlaySuccessSound();
         DisplayMessage("~g~Sold", $"You have sold {Name} for {CurrentSalesPrice.ToString("C0")}");
     }
-    protected override bool Purchase()
+    public override bool Purchase()
     {
         if (CanBuy && Player.BankAccounts.GetMoney(true) >= PurchasePrice)
         {

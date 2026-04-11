@@ -124,6 +124,7 @@ public class GangDen : GameLocation, IRestableLocation, IAssaultSpawnable
             return;
         }
         Player.ActivityManager.IsInteractingWithLocation = true;
+        Player.CurrentInteractedLocation = this;
         CanInteract = false;
         GameFiber.StartNew(delegate
         {
@@ -152,10 +153,9 @@ public class GangDen : GameLocation, IRestableLocation, IAssaultSpawnable
                     Player.IsTransacting = false;
                 }
                 DisposeInteractionMenu();
+                ResetInteractBools();
                 DisposeCamera(isInside);
                 DisposeInterior();
-                Player.ActivityManager.IsInteractingWithLocation = false;
-                CanInteract = true;
             }
             catch (Exception ex)
             {
@@ -395,6 +395,7 @@ public class GangDen : GameLocation, IRestableLocation, IAssaultSpawnable
     public void CreateRestMenu(bool removeBanner)
     {
         Player.ActivityManager.IsInteractingWithLocation = true;
+        Player.CurrentInteractedLocation = this;
         Player.IsTransacting = true;
         CreateInteractionMenu();
         InteractionMenu.Visible = true;
@@ -414,8 +415,7 @@ public class GangDen : GameLocation, IRestableLocation, IAssaultSpawnable
             GameFiber.Yield();
         }
         DisposeInteractionMenu();
-        Player.ActivityManager.IsInteractingWithLocation = false;
-        Player.IsTransacting = false;
+        ResetInteractBools();
         if (Interior != null)
         {
             Interior.IsMenuInteracting = false;

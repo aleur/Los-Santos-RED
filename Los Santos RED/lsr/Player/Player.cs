@@ -268,6 +268,7 @@ namespace Mod
         public Cop ClosestCopDriverToPlayer { get; set; }
         public Agency AssignedAgency { get; set; }
         public GameLocation ClosestInteractableLocation { get; private set; }
+        public GameLocation CurrentInteractedLocation { get; set; }
         public float ClosestPoliceDistanceToPlayer { get; set; }
         public Scenario ClosestScenario { get; private set; }
         public GangMember CurrentLookedAtGangMember { get; private set; }
@@ -435,6 +436,7 @@ namespace Mod
         public bool IsMovingSlowly { get; private set; }
         public bool IsStunned { get; private set; }
         public bool IsTransacting { get; set; }
+        public bool IsWorking { get; set; } = false;
         public bool IsVisiblyArmed { get; set; }
         public VehicleExt InterestedVehicle => IsInVehicle ? CurrentVehicle : CurrentLookedAtVehicle;
         public bool IsWanted => wantedLevel > 0;

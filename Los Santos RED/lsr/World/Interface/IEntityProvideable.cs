@@ -29,6 +29,7 @@ namespace LosSantosRED.lsr.Interface
         IStreets Streets { get; }
         bool IsFEJInstalled { get; }
         bool IsTrafficDisabled { get; }
+        ITimeControllable Time { get; }
 
         void LoadMPMap();
         void LoadSPMap();

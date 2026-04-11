@@ -72,5 +72,6 @@ namespace LosSantosRED.lsr.Interface
         //   void StartSimpleCellphoneActivity();
         //  void StartTransaction();
         //    void StartSittingDown(bool v1, bool v2);
+        GameLocation CurrentInteractedLocation { get; }
     }
 }

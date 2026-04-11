@@ -63,6 +63,7 @@ public class Hotel : GameLocation
     public override void StandardInteract(LocationCamera locationCamera, bool isInside)
     {
         Player.ActivityManager.IsInteractingWithLocation = true;
+        Player.CurrentInteractedLocation = this;
         CanInteract = false;
         GameFiber.StartNew(delegate
         {
@@ -79,10 +80,9 @@ public class Hotel : GameLocation
                     GameFiber.Yield();
                 }
                 DisposeInteractionMenu();
+                ResetInteractBools();
                 DisposeCamera(isInside);
                 DisposeInterior();
-                Player.ActivityManager.IsInteractingWithLocation = false;
-                CanInteract = true;
             }
             catch (Exception ex)
             {

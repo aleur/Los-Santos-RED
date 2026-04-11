@@ -65,6 +65,7 @@ public class Dealership : GameLocation, ILicensePlatePreviewable
     public override void StandardInteract(LocationCamera locationCamera, bool isInside)
     {
         Player.ActivityManager.IsInteractingWithLocation = true;
+        Player.CurrentInteractedLocation = this;
         CanInteract = false;
         Player.IsTransacting = true;
         GameFiber.StartNew(delegate
@@ -73,22 +74,38 @@ public class Dealership : GameLocation, ILicensePlatePreviewable
             {
                 SetupLocationCamera(locationCamera, isInside, true);
                 CreateInteractionMenu();
-                HandleVariableItems();
-                Transaction = new Transaction(MenuPool, InteractionMenu, Menu, this);
-                Transaction.LicensePlatePreviewable = this;
-                Transaction.LocationCamera = StoreCamera;
-                Transaction.VehicleDeliveryLocations = VehicleDeliveryLocations;
-                Transaction.VehiclePreviewPosition = VehiclePreviewLocation;
-                Transaction.CreateTransactionMenu(Player, ModItems, World, Settings, Weapons, Time);
-                InteractionMenu.Visible = true;
-                Transaction.ProcessTransactionMenu();
-                Transaction.DisposeTransactionMenu();
+                if (Menu != null)
+                {
+                    HandleVariableItems();
+                    Transaction = new Transaction(MenuPool, InteractionMenu, Menu, this);
+                    Transaction.LicensePlatePreviewable = this;
+                    Transaction.VehicleDeliveryLocations = VehicleDeliveryLocations;
+                    Transaction.VehiclePreviewPosition = VehiclePreviewLocation;
+                }
+                if (BusinessMenu != null)
+                {
+                    Property = new Property(MenuPool, InteractionMenu, BusinessMenu, Player, Time, Settings, this);
+                }
+                if (Menu != null)
+                {
+                    Transaction.CreateTransactionMenu(Player, ModItems, World, Settings, Weapons, Time);
+                    UIMenuCategory = "ShopMenu";
+                    InteractionMenu.Visible = true;
+                    Transaction.ProcessTransactionMenu();
+                    Transaction.DisposeTransactionMenu();
+                }
+                else if (BusinessMenu != null)
+                {
+                    Property.CreateBusinessMenu(ModItems, World, Weapons);
+                    UIMenuCategory = "BusinessMenu";
+                    InteractionMenu.Visible = true;
+                    Property.ProcessBusinessMenu();
+                    Property.DisposeBusinessMenu();
+                }
                 DisposeInteractionMenu();
+                ResetInteractBools();
                 DisposeCamera(isInside);
                 DisposeInterior();
-                Player.ActivityManager.IsInteractingWithLocation = false;
-                Player.IsTransacting = false;
-                CanInteract = true;
             }
             catch (Exception ex)
             {

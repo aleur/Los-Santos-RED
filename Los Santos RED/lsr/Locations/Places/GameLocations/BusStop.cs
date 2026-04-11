@@ -42,6 +42,7 @@ public class BusStop : GameLocation
         if (CanInteract)
         {
             Player.ActivityManager.IsInteractingWithLocation = true;
+            Player.CurrentInteractedLocation = this;
             CanInteract = false;
 
             GameFiber.StartNew(delegate
@@ -56,11 +57,17 @@ public class BusStop : GameLocation
 
                 ProcessInteractionMenu();
                 DisposeInteractionMenu();
+                ResetInteractBools();
                 StoreCamera.Dispose();
-                Player.ActivityManager.IsInteractingWithLocation = false;
-                CanInteract = true;
             }, "HotelInteract");
         }
+    }
+    protected override void ResetInteractBools()
+    {
+        Player.ActivityManager.IsInteractingWithLocation = false;
+        Player.CurrentInteractedLocation = null;
+        UIMenuCategory = string.Empty;
+        CanInteract = true;
     }
     public override List<Tuple<string, string>> DirectoryInfo(int currentHour, float distanceTo)
     {

@@ -101,6 +101,7 @@ public class Bank : GameLocation
     public override void StandardInteract(LocationCamera locationCamera, bool isInside)
     {
         Player.ActivityManager.IsInteractingWithLocation = true;
+        Player.CurrentInteractedLocation = this;
         CanInteract = false;
         Player.IsTransacting = true;
         GameFiber.StartNew(delegate
@@ -118,12 +119,10 @@ public class Bank : GameLocation
                 }
                 BankInteraction.Dispose();
                 DisposeInteractionMenu();
+                ResetInteractBools();
                 DisposeCamera(isInside);
                 DisposeInterior();
                 //StoreCamera.Dispose();
-                Player.IsTransacting = false;
-                Player.ActivityManager.IsInteractingWithLocation = false;
-                CanInteract = true;
             }
             catch (Exception ex)
             {

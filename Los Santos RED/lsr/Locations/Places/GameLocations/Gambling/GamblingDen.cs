@@ -101,6 +101,7 @@ ILocationInteractable player, IModItems modItems, IWeapons weapons, ITimeControl
     public override void StandardInteract(LocationCamera locationCamera, bool isInside)
     {
         Player.ActivityManager.IsInteractingWithLocation = true;
+        Player.CurrentInteractedLocation = this;
         CanInteract = false;
         Player.IsTransacting = true;
         GameFiber.StartNew(delegate
@@ -114,11 +115,9 @@ ILocationInteractable player, IModItems modItems, IWeapons weapons, ITimeControl
                 Interact();
                 ProcessInteractionMenu();
                 DisposeInteractionMenu();
+                ResetInteractBools();
                 DisposeCamera(isInside);
                 DisposeInterior();
-                Player.IsTransacting = false;
-                Player.ActivityManager.IsInteractingWithLocation = false;
-                CanInteract = true;
             }
             catch (Exception ex)
             {

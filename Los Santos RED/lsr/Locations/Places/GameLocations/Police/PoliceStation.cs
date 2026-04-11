@@ -100,6 +100,7 @@ public class PoliceStation : GameLocation, ILocationRespawnable, ILicensePlatePr
     public override void StandardInteract(LocationCamera locationCamera, bool isInside)
     {
         Player.ActivityManager.IsInteractingWithLocation = true;
+        Player.CurrentInteractedLocation = this;
         CanInteract = false;
         Player.IsTransacting = true;
         GameFiber.StartNew(delegate
@@ -117,11 +118,9 @@ public class PoliceStation : GameLocation, ILocationRespawnable, ILicensePlatePr
                     InteractAsOther();
                 }
                 DisposeInteractionMenu();
+                ResetInteractBools();
                 DisposeCamera(isInside);
                 DisposeInterior();
-                Player.ActivityManager.IsInteractingWithLocation = false;
-                Player.IsTransacting = false;
-                CanInteract = true;
             }
             catch (Exception ex)
             {

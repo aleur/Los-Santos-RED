@@ -75,7 +75,7 @@ public class GunStore : GameLocation
         }
     }
     protected override bool ShouldSpawnVendor() => PhoneContact == null || !Player.RelationshipManager.GetOrCreate(PhoneContact).IsHostile;
-    protected override bool IsLocationClosed()
+    public override bool IsLocationClosed()
     {
         if (PhoneContact != null && Player.RelationshipManager.GetOrCreate(PhoneContact).IsHostile)
         {
@@ -87,6 +87,7 @@ public class GunStore : GameLocation
     public override void StandardInteract(LocationCamera locationCamera, bool isInside)
     {
         Player.ActivityManager.IsInteractingWithLocation = true;
+        Player.CurrentInteractedLocation = this;
         CanInteract = false;
         Player.IsTransacting = true;
         GameFiber.StartNew(delegate
@@ -104,11 +105,9 @@ public class GunStore : GameLocation
                 Player.RelationshipManager.OnInteracted(PhoneContact, Transaction.MoneySpent, (Transaction.MoneySpent) / 5);
                 Transaction.DisposeTransactionMenu();
                 DisposeInteractionMenu();
+                ResetInteractBools();
                 DisposeCamera(isInside);
                 DisposeInterior();
-                Player.ActivityManager.IsInteractingWithLocation = false;
-                Player.IsTransacting = false;
-                CanInteract = true;
             }
             catch (Exception ex)
             {

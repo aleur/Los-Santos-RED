@@ -42,6 +42,7 @@ namespace LosSantosRED.lsr.Interface
      //   bool IsPerformingActivity { get; }
         bool IsSleeping { get; }
         bool IsTransacting { get; }
+        bool IsWorking { get; }
         bool IsWanted { get; }
         float VehicleSpeedKMH { get; }
         float VehicleSpeedMPH { get; }

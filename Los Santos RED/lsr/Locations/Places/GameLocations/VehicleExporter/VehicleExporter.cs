@@ -89,7 +89,7 @@ public class VehicleExporter : GameLocation
         }
     }
     protected override bool ShouldSpawnVendor() => PhoneContact == null || !Player.RelationshipManager.GetOrCreate(PhoneContact).IsHostile;
-    protected override bool IsLocationClosed()
+    public override bool IsLocationClosed()
     {
         if (PhoneContact != null && Player.RelationshipManager.GetOrCreate(PhoneContact).IsHostile)
         {
@@ -102,6 +102,7 @@ public class VehicleExporter : GameLocation
     public override void StandardInteract(LocationCamera locationCamera, bool isInside)
     {
         Player.ActivityManager.IsInteractingWithLocation = true;
+        Player.CurrentInteractedLocation = this;
         CanInteract = false;
         Player.IsTransacting = true;
         GameFiber.StartNew(delegate
@@ -125,11 +126,9 @@ public class VehicleExporter : GameLocation
                     //Player.CellPhone.AddContact(new VehicleExporterContact(ContactName), true);
                 }
                 DisposeInteractionMenu();
+                ResetInteractBools();
                 DisposeCamera(isInside);
                 DisposeInterior();
-                Player.ActivityManager.IsInteractingWithLocation = false;
-                CanInteract = true;
-                Player.IsTransacting = false;
             }
             catch (Exception ex)
             {

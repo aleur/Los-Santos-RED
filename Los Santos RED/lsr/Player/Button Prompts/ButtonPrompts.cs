@@ -2,6 +2,7 @@
 using LSR.Vehicles;
 using Rage;
 using Rage.Native;
+using RAGENativeUI;
 using RAGENativeUI.Elements;
 using System;
 using System.Collections.Generic;
@@ -287,6 +288,34 @@ public class ButtonPrompts
             AddPrompt("InteractableLocation", $"{Player.ClosestInteractableLocation.ButtonPromptText}", $"{Player.ClosestInteractableLocation.ButtonPromptText}", Settings.SettingsManager.KeySettings.InteractPositiveOrYes, 1);
         }
     }
+    private void LocationMenuPrompts()
+    {
+        RemovePrompts("StartConversation");
+        RemovePrompts("StartTransaction");
+        RemovePrompts("InteractableLocation");
+        RemovePrompts("StartScenario");
+        RemovePrompts("Search");
+        RemovePrompts("Drag");//new
+        RemovePrompts("Grab");//new
+        RemovePrompts("Treat");//new
+
+        if (Player.CurrentInteractedLocation.InteractionMenu == null || Player.CurrentInteractedLocation.Menu == null || Player.CurrentInteractedLocation.BusinessMenu == null) return;
+
+        if (!HasPrompt($"BusinessMenu") && Player.CurrentInteractedLocation.UIMenuCategory == "ShopMenu")
+        {
+            RemovePrompts("BusinessMenu");
+            RemovePrompts("ShopMenu");
+            AddPrompt("BusinessMenu", $"Property", $"BusinessMenu", Settings.SettingsManager.KeySettings.InteractPositiveOrYes, 1);
+            EntryPoint.WriteToConsole("prop prompt added");
+        }
+        else if (!HasPrompt($"ShopMenu") && Player.CurrentInteractedLocation.UIMenuCategory == "BusinessMenu" && Player.CurrentInteractedLocation.IsOpen(World.Time.CurrentHour))
+        {
+            RemovePrompts("BusinessMenu");
+            RemovePrompts("ShopMenu");
+            AddPrompt("ShopMenu", $"Shop", $"ShopMenu", Settings.SettingsManager.KeySettings.InteractPositiveOrYes, 1);
+            EntryPoint.WriteToConsole("shop prompt added");
+        }
+    }
     private void ScenarioPrompts()
     {
         RemovePrompts("StartConversation");
@@ -505,7 +534,17 @@ public class ButtonPrompts
         {
             Prompts.RemoveAll(x => x.Group == "InteractableLocation");
         }
-
+        //EntryPoint.WriteToConsole($"{!addedPromptGroup} && {Player.IsShowingFrontEndMenus} && {Player.ActivityManager.IsInteractingWithLocation} && {Player.CurrentInteractedLocation != null}");
+        if (!addedPromptGroup && Player.ActivityManager.IsInteractingWithLocation && Player.CurrentInteractedLocation != null && !World.Time.IsFastForwarding)
+        {
+            LocationMenuPrompts();
+            addedPromptGroup = true;
+        }
+        else
+        {
+            Prompts.RemoveAll(x => x.Group == "ShopMenu");
+            Prompts.RemoveAll(x => x.Group == "BusinessMenu");
+        }
 
         if (!Player.ActivityManager.IsInteractingWithLocation && !Player.IsShowingFrontEndMenus && !addedPromptGroup && !Player.ActivityManager.IsInteracting && Player.ActivityManager.CanPerformActivitiesExtended && Player.IsNearScenario && Settings.SettingsManager.ActivitySettings.AllowStartingScenarios)//currently isnearscenario is turned off
         {

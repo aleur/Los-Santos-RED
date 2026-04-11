@@ -55,6 +55,7 @@ public class ApartmentBuilding : GameLocation
     public override void StandardInteract(LocationCamera locationCamera, bool isInside)
     {
         Player.ActivityManager.IsInteractingWithLocation = true;
+        Player.CurrentInteractedLocation = this;
         CanInteract = false;
         Player.IsTransacting = true;
         HasTransitionedToResidence = false;
@@ -78,16 +79,14 @@ public class ApartmentBuilding : GameLocation
                 if (!HasTransitionedToResidence)
                 {
                     DisposeInteractionMenu();
-
+                    ResetInteractBools();
                     DisposeCamera(isInside);
                     DisposeInterior();
 
                     //StoreCamera.Dispose();
-                    Player.ActivityManager.IsInteractingWithLocation = false;
-                    //CanInteract = true;
-                    Player.IsTransacting = false;
                 }
                 Player.ActivityManager.IsInteractingWithLocation = false;
+                Player.CurrentInteractedLocation = null;
 
                 Player.IsTransacting = false;
                 CanInteract = true;
@@ -99,7 +98,13 @@ public class ApartmentBuilding : GameLocation
             }
         }, "ApartmentInteract");
     }
-
+    protected override void ResetInteractBools()
+    {
+        Player.IsTransacting = false;
+        Player.ActivityManager.IsInteractingWithLocation = false;
+        Player.CurrentInteractedLocation = null;
+        UIMenuCategory = string.Empty;
+    }
     private void GenerateResidenceMenu()
     {
         foreach(int residenceID in ResidenceIDs)

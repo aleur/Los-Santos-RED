@@ -76,6 +76,7 @@ public class GasPump : GameLocation
         if (CanInteract)
         {
             Player.ActivityManager.IsInteractingWithLocation = true;
+            Player.CurrentInteractedLocation = this;
             CanInteract = false;
             Player.IsTransacting = true;
             IsFueling = false;
@@ -113,9 +114,7 @@ public class GasPump : GameLocation
                         DisposeInteractionMenu();
                     }
                     FullDispose();
-                    Player.ActivityManager.IsInteractingWithLocation = false;
-                    Player.IsTransacting = false;
-                    CanInteract = true;
+                    ResetInteractBools();
                 }
                 catch (Exception ex)
                 {

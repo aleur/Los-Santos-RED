@@ -318,7 +318,7 @@ public class LowerRightDisplay
             PlayerDisplay += $" {UI.CurrentDefaultTextColor}{stealthText}";
         }
 
-        if ((DisplayablePlayer.IsNotWanted && Settings.SettingsManager.LSRHUDSettings.PlayerStatusIncludeTime) || (Settings.SettingsManager.LSRHUDSettings.PlayerStatusShowWhenSleeping && DisplayablePlayer.IsSleeping) || Time.ForceShowClock)
+        if ((DisplayablePlayer.IsNotWanted && Settings.SettingsManager.LSRHUDSettings.PlayerStatusIncludeTime) || (Settings.SettingsManager.LSRHUDSettings.PlayerStatusShowWhenSleeping && DisplayablePlayer.IsSleeping) || (Settings.SettingsManager.LSRHUDSettings.PlayerStatusShowWhenWorking && DisplayablePlayer.IsWorking) || Time.ForceShowClock)
         {
             if (PlayerDisplay == "")
             {

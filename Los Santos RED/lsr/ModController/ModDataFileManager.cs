@@ -27,6 +27,7 @@ public class ModDataFileManager
     public Scenarios Scenarios;
     public Settings Settings;
     public ShopMenus ShopMenus;
+    public BusinessMenus BusinessMenus;
     public Streets Streets;
     public Weapons Weapons;
     public Zones Zones;
@@ -85,6 +86,10 @@ public class ModDataFileManager
         ShopMenus = new ShopMenus();
         ShopMenus.ReadConfig("");
         ShopMenus.Setup(ModItems);
+        GameFiber.Yield();
+        BusinessMenus = new BusinessMenus();
+        BusinessMenus.ReadConfig("");
+        BusinessMenus.Setup(ModItems);
         GameFiber.Yield();
         LocationTypes = new LocationTypes();
         LocationTypes.ReadConfig("");

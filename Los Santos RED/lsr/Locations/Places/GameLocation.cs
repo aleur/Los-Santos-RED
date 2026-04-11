@@ -35,6 +35,7 @@ public class GameLocation : ILocationDispatchable
     protected IOrganizations Associations;
     protected ModDataFileManager ModDataFileManager;
     protected Transaction Transaction;
+    protected Property Property;
     protected uint NotificationHandle;
     protected readonly List<string> FallBackVendorModels = new List<string>() { "s_m_m_strvend_01", "s_m_m_linecook" };
     protected float currentblipAlpha = 0.25f;
@@ -146,6 +147,7 @@ public class GameLocation : ILocationDispatchable
     public string AssignedAssociationID { get; set; }
     public bool DisableRegularInteract { get; set; } = false;
     public string MenuID { get; set; }
+    public string BusinessMenuID { get; set; }
 
     public Vector3 CameraPosition { get; set; } = Vector3.Zero;
     public Vector3 CameraDirection { get; set; } = Vector3.Zero;
@@ -290,7 +292,11 @@ public class GameLocation : ILocationDispatchable
     [XmlIgnore]
     public bool HasVendor => VendorLocations != null && VendorLocations.Any();// VendorPosition != Vector3.Zero;
     [XmlIgnore]
+    public string UIMenuCategory { get; set; }
+    [XmlIgnore]
     public ShopMenu Menu { get; set; }
+    [XmlIgnore]
+    public BusinessMenu BusinessMenu { get; set; }
     [XmlIgnore]
     public bool CanInteract { get; set; } = true;
     [XmlIgnore]
@@ -534,6 +540,7 @@ public class GameLocation : ILocationDispatchable
             }
         }
         Menu = shopMenus.GetSpecificInstancedMenu(MenuID);
+        BusinessMenu = new BusinessMenu();//modDataFileManager.BusinessMenus.GetSpecificInstancedMenu(BusinessMenuID);
         if (HasInterior)
         {
             interior = interiors?.GetInteriorByLocalID(InteriorID);
@@ -566,6 +573,7 @@ public class GameLocation : ILocationDispatchable
     public virtual void StandardInteract(LocationCamera locationCamera, bool isInside)
     {
         Player.ActivityManager.IsInteractingWithLocation = true;
+        Player.CurrentInteractedLocation = this;
         CanInteract = false;
         Player.IsTransacting = true;
         GameFiber.StartNew(delegate
@@ -574,20 +582,37 @@ public class GameLocation : ILocationDispatchable
             {
                 SetupLocationCamera(locationCamera, isInside, true);
                 CreateInteractionMenu();
-                HandleVariableItems();
-                Transaction = new Transaction(MenuPool, InteractionMenu, Menu, this);
-                Transaction.VehicleDeliveryLocations = VehicleDeliveryLocations;
-                Transaction.VehiclePreviewPosition = VehiclePreviewLocation;
-                Transaction.CreateTransactionMenu(Player, ModItems, World, Settings, Weapons, Time);
-                InteractionMenu.Visible = true;
-                Transaction.ProcessTransactionMenu();
-                Transaction.DisposeTransactionMenu();
+                if (Menu != null)
+                {
+                    HandleVariableItems();
+                    Transaction = new Transaction(MenuPool, InteractionMenu, Menu, this);
+                    Transaction.VehicleDeliveryLocations = VehicleDeliveryLocations;
+                    Transaction.VehiclePreviewPosition = VehiclePreviewLocation;
+                }
+                if (BusinessMenu != null)
+                {
+                    Property = new Property(MenuPool, InteractionMenu, BusinessMenu, Player, Time, Settings, this);
+                }
+                if (Menu != null)
+                {
+                    Transaction.CreateTransactionMenu(Player, ModItems, World, Settings, Weapons, Time);
+                    UIMenuCategory = "ShopMenu";
+                    InteractionMenu.Visible = true;
+                    Transaction.ProcessTransactionMenu();
+                    Transaction.DisposeTransactionMenu();
+                }
+                else if (BusinessMenu != null)
+                {
+                    Property.CreateBusinessMenu(ModItems, World, Weapons);
+                    UIMenuCategory = "BusinessMenu";
+                    InteractionMenu.Visible = true;
+                    Property.ProcessBusinessMenu();
+                    Property.DisposeBusinessMenu();
+                }
                 DisposeInteractionMenu();
+                ResetInteractBools();
                 DisposeCamera(isInside);
                 DisposeInterior();
-                Player.IsTransacting = false;
-                Player.ActivityManager.IsInteractingWithLocation = false;
-                CanInteract = true;
             }
             catch (Exception ex)
             {
@@ -596,7 +621,32 @@ public class GameLocation : ILocationDispatchable
             }
         }, "StandardInteract");
     }
-    protected virtual bool Purchase()
+    protected virtual void ResetInteractBools()
+    {
+        Player.IsTransacting = false;
+        Player.ActivityManager.IsInteractingWithLocation = false;
+        Player.CurrentInteractedLocation = null;
+        UIMenuCategory = string.Empty;
+        CanInteract = true;
+    }
+    public void SwitchMenus()
+    {
+        if (UIMenuCategory == "ShopMenu")
+        {
+            Transaction.CreateTransactionMenu(Player, ModItems, World, Settings, Weapons, Time);
+            InteractionMenu.Visible = true;
+            Transaction.ProcessTransactionMenu();
+            Transaction.DisposeTransactionMenu();
+        }
+        else if (UIMenuCategory == "BusinessMenu")
+        {
+            Property.CreateBusinessMenu(ModItems, World, Weapons);
+            InteractionMenu.Visible = true;
+            Property.ProcessBusinessMenu();
+            Property.DisposeBusinessMenu();
+        }
+    }
+    public virtual bool Purchase()
     {
         bool hasEnoughMoney = CashPurchaseOnly ? Player.BankAccounts.GetMoney(false) >= PurchasePrice : Player.BankAccounts.GetMoney(true) >= PurchasePrice;
         if (hasEnoughMoney)
@@ -607,6 +657,11 @@ public class GameLocation : ILocationDispatchable
         }
         DisplayMessage("~r~Purchase Failed", "We are sorry, we are unable to complete this purchase. Please make sure you have the funds.");
         return false;
+    }
+    public virtual void Sell()
+    {
+        OnSold();
+        DisplayMessage("~g~Sold", $"You have sold {Name} for {CurrentSalesPrice.ToString("C0")}");
     }
     protected virtual void OnPurchased()
     {
@@ -626,7 +681,6 @@ public class GameLocation : ILocationDispatchable
         MenuPool.CloseAllMenus();
         Interior?.ForceExitPlayer(Player, this);
         IsOwned = false;
-        DisplayMessage("~g~Sold", $"You have sold {Name} for {CurrentSalesPrice.ToString("C0")}");
     }
     public virtual void HandleVariableItems()
     {
@@ -954,7 +1008,7 @@ public class GameLocation : ILocationDispatchable
         //8 & 20, OLD GOOD
         if(OpenTime < CloseTime)
         {
-            return (currentHour >= OpenTime && currentHour <= CloseTime);
+            return (currentHour >= OpenTime && currentHour < CloseTime);
         }
         else
         {
@@ -1267,7 +1321,7 @@ public class GameLocation : ILocationDispatchable
         return merchantSpawnTask.CreatedPeople.Any();
     }
 
-    protected virtual bool IsLocationClosed()
+    public virtual bool IsLocationClosed()
     {
         if (IsTemporarilyClosed)
         {

@@ -95,6 +95,7 @@ public class Airport : GameLocation, ILocationSetupable
             return;
         }
         Player.ActivityManager.IsInteractingWithLocation = true;
+        Player.CurrentInteractedLocation = this;
         CanInteract = false;
         Player.IsTransacting = true;
         GameFiber.StartNew(delegate
@@ -108,10 +109,8 @@ public class Airport : GameLocation, ILocationSetupable
                 SetupMenu();
                 ProcessInteractionMenu();
                 DisposeInteractionMenu();
+                ResetInteractBools();
                 DisposeCamera(isInside);
-                Player.ActivityManager.IsInteractingWithLocation = false;
-                CanInteract = true;
-                Player.IsTransacting = false;
                 DisposeInterior();
             }
             catch (Exception ex)

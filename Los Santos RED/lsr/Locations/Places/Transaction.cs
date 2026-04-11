@@ -308,11 +308,25 @@ public class Transaction
     }
     public void ProcessTransactionMenu()
     {
-        while (MenuPool.IsAnyMenuOpen() || IsShowingConfirmDialog)
+        while ((MenuPool.IsAnyMenuOpen() || IsShowingConfirmDialog) && Store.UIMenuCategory == "ShopMenu")
         {
             MenuPool.ProcessMenus();
             Update();
             GameFiber.Yield();
+        }
+        if (Store.UIMenuCategory == "BusinessMenu")
+        {
+            MenuPool.Where(x => x.ParentMenu != null && x.ParentMenu != ParentMenu).ToList().ForEach(x => // To deal with those not attached to ParentMenu. Otherwise, causes multiple layers of UI.
+            {
+                EntryPoint.WriteToConsole($"{x.CurrentItem.Text}");
+                /* Not really needed + clashes with interior handling kinda
+                x.Clear();
+                x.Close();*/
+                MenuPool.Remove(x); // Instead of x.ParentMenu.Clear(); x.ParentMenu.Close(); which also works. Removes duplicates of UIMenu as well.
+            });
+            DisposeTransactionMenu();
+            ParentMenu.Clear();
+            Store.SwitchMenus();
         }
     }
     public void Update()

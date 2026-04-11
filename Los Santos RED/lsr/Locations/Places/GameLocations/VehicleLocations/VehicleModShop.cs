@@ -72,6 +72,7 @@ public class VehicleModShop : GameLocation
             return;
         }
         Player.ActivityManager.IsInteractingWithLocation = true;
+        Player.CurrentInteractedLocation = this;
         CanInteract = false;
         Player.IsTransacting = true;
         Player.IsSetDisabledControls = true;
@@ -101,6 +102,7 @@ public class VehicleModShop : GameLocation
                 GenerateModMenu();
                 ProcessMenu();
                 DisposeInteractionMenu();
+                ResetInteractBools();
                 DisposeDoor();
 
 
@@ -117,16 +119,6 @@ public class VehicleModShop : GameLocation
                     OrbitCamera.Dispose();
                 }
 
-                
-
-
-
-
-
-                Player.ActivityManager.IsInteractingWithLocation = false;
-                CanInteract = true;
-                Player.IsTransacting = false;
-                Player.IsSetDisabledControls = false;
             }
             catch (Exception ex)
             {

@@ -68,6 +68,7 @@ public class ATMMachine : GameLocation// i know m stand for machine, makes it ne
         if (CanInteract)
         {
             Player.ActivityManager.IsInteractingWithLocation = true;
+            Player.CurrentInteractedLocation = this;
             CanInteract = false;
             Player.IsTransacting = true;
             GameFiber.StartNew(delegate
@@ -109,9 +110,7 @@ public class ATMMachine : GameLocation// i know m stand for machine, makes it ne
                         DisposeInteractionMenu();
                     }                  
                     FullDispose();
-                    Player.ActivityManager.IsInteractingWithLocation = false;
-                    Player.IsTransacting = false;
-                    CanInteract = true;
+                    ResetInteractBools();
                 }
                 catch (Exception ex)
                 {

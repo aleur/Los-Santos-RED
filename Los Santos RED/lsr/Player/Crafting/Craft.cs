@@ -149,7 +149,7 @@ namespace Mod
 
             if (Settings.SettingsManager.ActivitySettings.AllowSkippingCrafting) 
             {
-                Player.ButtonPrompts.AttemptAddPrompt("craftingStop", "Skip Crafting", "skipcraftingprompt1", Settings.SettingsManager.KeySettings.InteractStart, 999);
+                Player.ButtonPrompts.AttemptAddPrompt("craftingSkip", "Skip Crafting", "skipcraftingprompt1", Settings.SettingsManager.KeySettings.InteractStart, 999);
             }
             int craftedQuantity = 0;
             EntryPoint.WriteToConsole($"craftedQuantity{craftedQuantity} quantity{quantity}");
@@ -157,15 +157,14 @@ namespace Mod
             {
                 if (!Player.IsAliveAndFree || Player.IsUnconscious || Player.ButtonPrompts.IsPressed("stopcraftingprompt1") || Player.ButtonPrompts.IsPressed("putawayprompt1") || (Settings.SettingsManager.ActivitySettings.AllowSkippingCrafting && Player.ButtonPrompts.IsPressed("skipcraftingprompt1")))
                 {
+                    IsCrafting = false;
                     if (!string.IsNullOrEmpty(craftableItem.CrimeId)) Player.Violations.StopContinuouslyViolating(craftableItem.CrimeId);
 
                     Player.IsSetDisabledControlsWithCamera = false;
 
-                    string Message;
                     if (Player.ButtonPrompts.IsPressed("stopcraftingprompt1"))
                     {
-                        TimerBarPool.Remove(ProgressBar);
-                        Message = "Crafting cancelled.";
+                        Game.DisplayHelp("Crafting cancelled.");
                         // Give back ingredients if none crafted
                         if (craftedQuantity == 0)
                         {
@@ -174,30 +173,26 @@ namespace Mod
                     }
                     else if (Player.ButtonPrompts.IsPressed("putawayprompt1"))
                     {
-                        TimerBarPool.Remove(ProgressBar);
-                        Message = "Crafting paused: item put away.";
+                        Game.DisplayHelp("Crafting paused: item put away.");
                         UnfinishedCrafts.Add((quantity-craftedQuantity, craftableItem));
                         Game.DisplaySubtitle($"Crafted {productName} - {craftedQuantity} {itemToGive.MeasurementName}(s)");
                     }
                     if(Player.ButtonPrompts.IsPressed("skipcraftingprompt1"))
                     {
-                        Player.ButtonPrompts.RemovePrompts("craftingStop");
+                        Player.ButtonPrompts.RemovePrompts("craftingSkip");
                         Game.DisplayHelp("Skipped crafting.");
-                        Game.DisplaySubtitle($"Skipped crafting, crafted {productName} - {finalQuantity} {itemToGive.MeasurementName}(s)");
-                        itemToGive.AddToPlayerInventory(Player, finalQuantity - craftedQuantity);
+                        Game.DisplaySubtitle($"Skipped crafting, crafted {productName} - {quantity} {itemToGive.MeasurementName}(s)");
+                        itemToGive.AddToPlayerInventory(Player, quantity - craftedQuantity);
                     }
                     else
                     {
-                        TimerBarPool.Remove(ProgressBar);
-                        Message = "Crafting failed.";
+                        Game.DisplayHelp("Crafting failed.");
                     }
-                    Game.DisplayHelp(Message);
-
 
                     Player.ButtonPrompts.RemovePrompts("craftingPause");
                     Player.ButtonPrompts.RemovePrompts("craftingStop");
+                    Player.ButtonPrompts.RemovePrompts("craftingSkip");
                     NativeFunction.Natives.CLEAR_PED_TASKS(Player.Character);
-                    IsCrafting = false;
 
                     return;
                 }

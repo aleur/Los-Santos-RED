@@ -18,8 +18,9 @@ namespace LosSantosRED.lsr.Interface
        // bool IsInteracting { get; }
      //   bool IsInteractingWithLocation { get; }
         GameLocation ClosestInteractableLocation { get; }
-      //  bool CanExitCurrentInterior { get; }
-      //  bool CanPerformActivities { get; }
+        GameLocation CurrentInteractedLocation { get; }
+        //  bool CanExitCurrentInterior { get; }
+        //  bool CanPerformActivities { get; }
         bool IsNearScenario { get; }
         Scenario ClosestScenario { get; }
         bool IsInVehicle { get; }

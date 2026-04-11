@@ -157,6 +157,7 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
     public override void StandardInteract(LocationCamera locationCamera, bool isInside)
     {
         Player.ActivityManager.IsInteractingWithLocation = true;
+        Player.CurrentInteractedLocation = this;
         CanInteract = false;
         Player.IsTransacting = true;
         HasTeleported = false;
@@ -179,11 +180,9 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
                     GameFiber.Yield();
                 }
                 DisposeInteractionMenu();
+                ResetInteractBools();
                 DisposeCamera(isInside);
                 DisposeInterior();
-                Player.ActivityManager.IsInteractingWithLocation = false;
-                CanInteract = true;
-                Player.IsTransacting = false;
             }
             catch (Exception ex)
             {
@@ -207,6 +206,7 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
     public void CreateRestMenu(bool removeBanner)
     {
         Player.ActivityManager.IsInteractingWithLocation = true;
+        Player.CurrentInteractedLocation = this;
         Player.IsTransacting = true;
         CreateInteractionMenu();
         InteractionMenu.Visible = true;
@@ -226,9 +226,8 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
             GameFiber.Yield();
         }
         DisposeInteractionMenu();
-       // StoreCamera?.StopImmediately(false);
-        Player.ActivityManager.IsInteractingWithLocation = false;
-        Player.IsTransacting = false;
+        ResetInteractBools();
+        // StoreCamera?.StopImmediately(false);
         if (Interior != null)
         {
             Interior.IsMenuInteracting = false;
@@ -549,7 +548,7 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
         DisplayMessage("~r~Rental Failed", "We are sorry, we are unable to complete this rental. Please make sure you have the funds.");
         return false;
     }
-    protected override bool Purchase()
+    public override bool Purchase()
     {
         if (CanBuy && Player.BankAccounts.GetMoney(true) >= PurchasePrice)
         {
