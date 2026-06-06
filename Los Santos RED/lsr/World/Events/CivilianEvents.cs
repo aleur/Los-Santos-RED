@@ -65,8 +65,19 @@ public class CivilianEvents
     public void Setup(IContactInteractable contactInteractable, ITargetable targetable)
     {
         CriminalsRG = new RelationshipGroup("CRIMINALS");
+
+        RelationshipGroup CIVMALERG = new RelationshipGroup("CIVMALE");
+        RelationshipGroup CIVFEMALERG = new RelationshipGroup("CIVFEMALE");
+
         RelationshipGroup.Cop.SetRelationshipWith(CriminalsRG, Relationship.Hate);
         CriminalsRG.SetRelationshipWith(RelationshipGroup.Cop, Relationship.Hate);
+
+        Game.SetRelationshipBetweenRelationshipGroups(CIVMALERG, CriminalsRG, Relationship.Hate);
+        Game.SetRelationshipBetweenRelationshipGroups(CriminalsRG, CIVMALERG, Relationship.Hate);
+        Game.SetRelationshipBetweenRelationshipGroups(CIVFEMALERG, CriminalsRG, Relationship.Hate);
+        Game.SetRelationshipBetweenRelationshipGroups(CriminalsRG, CIVFEMALERG, Relationship.Hate);
+        Game.SetRelationshipBetweenRelationshipGroups(CriminalsRG, RelationshipGroup.Player, Relationship.Hate);
+
         Targetable = targetable;
 
         foreach (Zone zone in PedProvider.Zones.ZoneList)
@@ -110,10 +121,12 @@ public class CivilianEvents
     }
     public void CreateCrime(bool isTrafficOnly)
     {
-        PedExt Criminal = PedProvider.Pedestrians.GangMemberList.Where(x => x.Pedestrian.Exists() && x.Pedestrian.IsAlive && x.DistanceToPlayer <= 200f && x.CanBeTasked && x.CanBeAmbientTasked && ((isTrafficOnly && x.IsDriver && x.IsInVehicle) || (!isTrafficOnly && !x.IsInVehicle))).FirstOrDefault();//85f//150f
+        PedExt Criminal = null; // = PedProvider.Pedestrians.GangMemberList.Where(x => x.Pedestrian.Exists() && x.Pedestrian.IsAlive && x.DistanceToPlayer <= 200f && x.CanBeTasked && x.CanBeAmbientTasked && ((isTrafficOnly && x.IsDriver && x.IsInVehicle) || (!isTrafficOnly && !x.IsInVehicle))).FirstOrDefault();//85f//150f
         if (Criminal == null)
         {
-            Criminal = PedProvider.Pedestrians.CivilianList.Where(x => x.Pedestrian.Exists() && x.Pedestrian.IsAlive && x.DistanceToPlayer <= 200f && x.CanBeTasked && x.CanBeAmbientTasked && ((isTrafficOnly && x.IsDriver && x.IsInVehicle) || (!isTrafficOnly && !x.IsInVehicle))).FirstOrDefault();//85f//150f
+            Criminal = PedProvider.Pedestrians.CivilianList.Where(x => x.Pedestrian.Exists() && x.Pedestrian.IsAlive && 
+                                                                 (x.DistanceToPlayer >= Settings.SettingsManager.CivilianSettings.MinimumDistancePedSelectRandomCrime && x.DistanceToPlayer <= Settings.SettingsManager.CivilianSettings.MaximumDistancePedSelectRandomCrime) && 
+                                                                  x.CanBeTasked && x.CanBeAmbientTasked && ((isTrafficOnly && x.IsDriver && x.IsInVehicle) || (!isTrafficOnly && !x.IsInVehicle))).FirstOrDefault();//85f//150f
         }
         if (Criminal != null && Criminal.Pedestrian.Exists())
         {

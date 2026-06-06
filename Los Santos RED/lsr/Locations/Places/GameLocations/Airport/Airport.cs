@@ -109,9 +109,9 @@ public class Airport : GameLocation, ILocationSetupable
                 SetupMenu();
                 ProcessInteractionMenu();
                 DisposeInteractionMenu();
-                ResetInteractBools();
                 DisposeCamera(isInside);
                 DisposeInterior();
+                ResetInteractBools();
             }
             catch (Exception ex)
             {

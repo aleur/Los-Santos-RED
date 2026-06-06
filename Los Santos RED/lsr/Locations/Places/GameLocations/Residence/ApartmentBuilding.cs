@@ -79,9 +79,9 @@ public class ApartmentBuilding : GameLocation
                 if (!HasTransitionedToResidence)
                 {
                     DisposeInteractionMenu();
-                    ResetInteractBools();
                     DisposeCamera(isInside);
                     DisposeInterior();
+                    ResetInteractBools();
 
                     //StoreCamera.Dispose();
                 }

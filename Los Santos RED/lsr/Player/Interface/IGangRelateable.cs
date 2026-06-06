@@ -11,6 +11,7 @@ namespace LosSantosRED.lsr.Interface
 {
     public interface IGangRelateable
     {
+        Properties Properties { get; }
         VehicleOwnership VehicleOwnership { get; }
         PoliceResponse PoliceResponse { get; }
         CellPhone CellPhone { get; }

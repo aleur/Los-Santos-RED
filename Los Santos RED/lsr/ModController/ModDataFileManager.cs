@@ -89,7 +89,7 @@ public class ModDataFileManager
         GameFiber.Yield();
         BusinessMenus = new BusinessMenus();
         BusinessMenus.ReadConfig("");
-        BusinessMenus.Setup(ModItems);
+        BusinessMenus.Setup();
         GameFiber.Yield();
         LocationTypes = new LocationTypes();
         LocationTypes.ReadConfig("");

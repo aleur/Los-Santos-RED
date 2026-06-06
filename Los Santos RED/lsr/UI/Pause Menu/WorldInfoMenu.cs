@@ -11,7 +11,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 
-public class PlayerInfoMenu
+public class WorldInfoMenu
 {
     private IGangs Gangs;
     private IGangTerritories GangTerritories;
@@ -33,13 +33,11 @@ public class PlayerInfoMenu
     private CrimesTab CrimesTab;
     private GangTab GangTab;
     private ZonesTab ZonesTab;
-    public ResidencesTab ResidencesTab;
-    public BusinessesTab BusinessesTab;
 
     private ISettingsProvideable Settings;
     private ILocationTypes LocationTypes;
 
-    public PlayerInfoMenu(IGangRelateable player, ITimeReportable time, IPlacesOfInterest placesOfInterest, IGangs gangs, IGangTerritories gangTerritories, IZones zones, 
+    public WorldInfoMenu(IGangRelateable player, ITimeReportable time, IPlacesOfInterest placesOfInterest, IGangs gangs, IGangTerritories gangTerritories, IZones zones, 
         IStreets streets, IInteriors interiors, IEntityProvideable world, IShopMenus shopMenus, IModItems modItems, IWeapons weapons, ISettingsProvideable settings, ILocationTypes locationTypes)
     {
         Player = player;
@@ -59,7 +57,7 @@ public class PlayerInfoMenu
     }
     public void Setup()
     {
-        tabView = new TabView("Los Santos ~r~RED~s~ Player Information");
+        tabView = new TabView("Los Santos ~r~RED~s~ World Information");
         tabView.Tabs.Clear();
         tabView.ScrollTabs = true;
         tabView.OnMenuClose += (s, e) =>
@@ -70,14 +68,12 @@ public class PlayerInfoMenu
         Game.RawFrameRender += (s, e) => tabView.DrawTextures(e.Graphics);
 
 
-        //LocationsTab = new LocationsTab(Player, PlacesOfInterest, Time, Settings, tabView, World);
-        VehiclesTab = new VehiclesTab(Player, Streets, Zones, Interiors, tabView, Settings);
-        LicensesTab = new LicensesTab(Player, Time, tabView, LocationTypes);
-        CrimesTab = new CrimesTab(Player, tabView);
-        //GangTab = new GangTab(Player,PlacesOfInterest,ShopMenus,ModItems,Weapons,GangTerritories,Zones, tabView, Time, Settings, World);
-        //ZonesTab = new ZonesTab(Player, PlacesOfInterest, ShopMenus, ModItems, Zones, tabView, GangTerritories, Settings, World);
-        BusinessesTab = new BusinessesTab(Player, tabView);
-        ResidencesTab = new ResidencesTab(Player, tabView);
+        LocationsTab = new LocationsTab(Player, PlacesOfInterest, Time, Settings, tabView, World);
+        //VehiclesTab = new VehiclesTab(Player, Streets, Zones, Interiors, tabView, Settings);
+        //LicensesTab = new LicensesTab(Player, Time, tabView, LocationTypes);
+        //CrimesTab = new CrimesTab(Player, tabView);
+        GangTab = new GangTab(Player,PlacesOfInterest,ShopMenus,ModItems,Weapons,GangTerritories,Zones, tabView, Time, Settings, World);
+        ZonesTab = new ZonesTab(Player, PlacesOfInterest, ShopMenus, ModItems, Zones, tabView, GangTerritories, Settings, World);
     }
     public void Toggle()
     {
@@ -119,14 +115,12 @@ public class PlayerInfoMenu
         tabView.Money = Time.CurrentTime;
         tabView.Tabs.Clear();
 
-        VehiclesTab.AddItems();
-        LicensesTab.AddItems();
-        CrimesTab.AddItems();
-        //GangTab.AddItems();
-        //ZonesTab.AddItems();
-        //LocationsTab.AddItems();
-        BusinessesTab.AddItems();
-        ResidencesTab.AddItems();
+        //VehiclesTab.AddItems();
+        //LicensesTab.AddItems();
+        //CrimesTab.AddItems();
+        GangTab.AddItems();
+        ZonesTab.AddItems();
+        LocationsTab.AddItems();
 
         tabView.RefreshIndex();
         tabView.ShowInstructionalButtons();

@@ -20,24 +20,32 @@ public class TurfStatus
     private Gang Gang;
     private IGangs Gangs;
     public string GangName { get; private set; }
-    public string ZoneName { get; private set; } 
-    // Location Checks
+    public string ZoneName { get; private set; }
+    #region Location Checks
     public bool HasRacketStores { get; set; }
     public bool HasRobberyStores { get; set; }
     public bool IsMainTurf { get; set; }
+    #endregion
+
+    #region Filtered GangLists
     public List<Gang> EnemyGangsWithScenarios { get; set; } = new List<Gang>(); // ass variable name
     public List<Gang> AmbientEnemyGangs { get; set; } = new List<Gang>();
-    // Scenarios
+    #endregion
+
+    #region Scenarios
     public List<BlankLocation> EnemyGangScenarios { get; set; } = new List<BlankLocation>();
     public List<BlankLocation> PoliceTargetScenarios { get; set; } = new List<BlankLocation>();
     public List<BlankLocation> OrganizationTargetScenarios { get; set; } = new List<BlankLocation>();
     public List<BlankLocation> CivilianTargetScenarios { get; set; } = new List<BlankLocation>();
     public List<BlankLocation> DignitaryTargetScenarios { get; set; } = new List<BlankLocation>();
     public List<BlankLocation> WitnessTargetScenarios { get; set; } = new List<BlankLocation>();
-    // Turf Needs
+    #endregion
+
+    #region Turf Values
     public bool HasZoneTasks => AmbientEnemyGangs.Any() || EnemyGangsWithScenarios.Any() || HasRacketStores || HasRobberyStores;
     public bool NeedsReinforcements { get; set; }
     public bool NeedsSupplies { get; set; }
+    #endregion
     public TurfStatus(IEntityProvideable world, IZones zones, IPlacesOfInterest placesOfInterest, IGangTerritories gangTerritories, IGangs gangs, GangTerritory gangTerritory, Gang gang)
     {
         World = world;
@@ -66,6 +74,7 @@ public class TurfStatus
         // No need to update Witness locations.
         RefreshEnemyGangScenarios();
     }
+    #region EnemyScenario Targeting
     private void EstablishScenarios()
     {
         // Not checking pedspawns or vehiclespawns anymore. If players fuck it up thats on them, but still checking ConditionalGroups for target availability.
@@ -189,6 +198,7 @@ public class TurfStatus
             }
         }
     }
+    #endregion
     private void CheckAmbientEnemyGangs()
     {
         foreach (GangTerritory gt in GangTerritories.GangTerritoriesList.Where(x => x.ZoneInternalGameName == GangTerritory.ZoneInternalGameName && x.GangID != GangTerritory.GangID && Gang.EnemyGangs.Contains(x.GangID)))
@@ -196,12 +206,12 @@ public class TurfStatus
             AmbientEnemyGangs.Add(Gangs.GetGang(gt.GangID));
         }
         //Gang.EnemyGangs.Where(g => GangTerritories.GangTerritoriesList.Any(x => x.ZoneInternalGameName == GangTerritory.ZoneInternalGameName && GangTerritory.GangID == g)).ToList().ForEach(g => { AmbientEnemyGangs.Add(Gangs.GetGang(g)); EntryPoint.WriteToConsole($"{Gang.ID} Territory: {GangTerritory.ZoneInternalGameName}, ENEMY AMBIENT GANG {g} ADDED"); });
-    }
+    }/*
     private int CalculateTerritoryValue()
     {
         // Defaulted to Min values, but soon will work with the updated values
         return PlacesOfInterest.PossibleLocations.RacketeeringTaskLocations().Where(x => Zones.GetZone(x.EntrancePosition) == Zones.GetZone(GangTerritory.ZoneInternalGameName) && x.IsEnabled).ToList().Sum(x => x.RacketeeringAmountMin);
-    }
+    }*/
     public bool IsRobberyTypeAvailable(string LocationType)
     {
         return PlacesOfInterest.PossibleLocations.RobberyTaskLocations().Any(x => (string.IsNullOrEmpty(LocationType) || LocationType == "Random" || x.TypeName == LocationType) && x.IsCorrectMap(World.IsMPMapLoaded) && Zones.GetZone(x.EntrancePosition) == Zones.GetZone(GangTerritory.ZoneInternalGameName));

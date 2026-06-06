@@ -118,9 +118,9 @@ public class PoliceStation : GameLocation, ILocationRespawnable, ILicensePlatePr
                     InteractAsOther();
                 }
                 DisposeInteractionMenu();
-                ResetInteractBools();
                 DisposeCamera(isInside);
                 DisposeInterior();
+                ResetInteractBools();
             }
             catch (Exception ex)
             {

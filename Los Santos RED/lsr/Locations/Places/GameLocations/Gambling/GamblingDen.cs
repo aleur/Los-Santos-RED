@@ -115,9 +115,9 @@ ILocationInteractable player, IModItems modItems, IWeapons weapons, ITimeControl
                 Interact();
                 ProcessInteractionMenu();
                 DisposeInteractionMenu();
-                ResetInteractBools();
                 DisposeCamera(isInside);
                 DisposeInterior();
+                ResetInteractBools();
             }
             catch (Exception ex)
             {

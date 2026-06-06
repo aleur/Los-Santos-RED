@@ -161,6 +161,10 @@ public class PlayerOtherSettings : ISettingsDefaultable
     public bool AllowCameraControlWhenEntering { get; set; }
     [Description("If enabled, you can move your camera when exiting locations.")]
     public bool AllowCameraControlWhenExiting { get; set; }
+    [Description("Set Maps app name. If empty, will default to \"Maps\"")]
+    public string BurnerPhoneMapsAppName { get; set; }
+    [Description("Sets Maps app banner. If empty, there'll be no banner")]
+    public string BurnerPhoneMapsAppBannerLocation { get; set; }
 
     [OnDeserialized()]
     private void SetValuesOnDeserialized(StreamingContext context)
@@ -291,6 +295,9 @@ public class PlayerOtherSettings : ISettingsDefaultable
         OrbitCameraInitialHorizontalOffset = 65f;
         AllowCameraControlWhenEntering = false;
         AllowCameraControlWhenExiting = false;
+
+        BurnerPhoneMapsAppName = "Nudle Maps";
+        BurnerPhoneMapsAppBannerLocation = "stores\\nudlemaps.png";
     }
 
 }

@@ -50,11 +50,12 @@ public class BusinessMenus : IBusinessMenus
                 PossibleBusinessMenus.BusinessMenuList.RemoveAll(x => x.ID == BusinessMenu.ID);
                 PossibleBusinessMenus.BusinessMenuList.Add(BusinessMenu);
             }
+            foreach (PropertyMenu PropertyMenu in additivePossibleItems.PropertyMenuList)
+            {
+                PossibleBusinessMenus.PropertyMenuList.RemoveAll(x => x.ID == PropertyMenu.ID);
+                PossibleBusinessMenus.PropertyMenuList.Add(PropertyMenu);
+            }
         }
-    }
-    public BusinessMenu GetSpecificMenu(string menuID)
-    {
-        return PossibleBusinessMenus.BusinessMenuList.Where(x => x.ID == menuID).FirstOrDefault();// BusinessMenuList.Where(x => x.ID == menuID).FirstOrDefault()?.Copy();
     }
     private List<BusinessMenu> AllMenus()
     {
@@ -64,10 +65,39 @@ public class BusinessMenus : IBusinessMenus
     }
     private void DefaultConfig()
     {
-        // make hella methods
+        SetupBusinessMenus();
+        SetupPropertyMenus();
         Serialization.SerializeParam(PossibleBusinessMenus, ConfigFileName);
     }
-    public void Setup(IModItems modItems)
+    private void SetupBusinessMenus()
+    {
+        PossibleBusinessMenus.BusinessMenuList.AddRange(
+            new List<BusinessMenu>()
+            {
+                new BusinessMenu("ConvenienceStore", "ConvenienceStore", "ConvenienceStore")
+            }
+        );
+    }
+    private void SetupPropertyMenus()
+    {
+        PossibleBusinessMenus.PropertyMenuList.AddRange(
+            new List<PropertyMenu>()
+            {
+                new PropertyMenu("ConvenienceStore", "ConvenienceStore", 200000, 100000) { MaxSalesPrice = 0, CashPurchaseOnly = false, PayoutFrequency = 7, PayoutMin = 1000, PayoutMax = 5000, GrowthPercentage = 20, 
+                                                                                           RacketeeringAmountMin = 500, MinPriceRefreshHours = 0, MaxPriceRefreshHours = 0, MinRestockHours = 0, MaxRestockHours = 0, 
+                                                                                           RacketeeringAmountMax = 1000, RegisterCashMax = 1550, RegisterCashMin = 250 }
+            }
+        );
+    }
+    public BusinessMenu GetSpecificBusinessMenu(string menuID)
+    {
+        return PossibleBusinessMenus.BusinessMenuList.Where(x => x.ID == menuID).FirstOrDefault();
+    }
+    public PropertyMenu GetSpecificPropertyMenu(string menuID)
+    {
+        return PossibleBusinessMenus.PropertyMenuList.Where(x => x.ID == menuID).FirstOrDefault();
+    }
+    public void Setup()
     {
         /*
         foreach (BusinessMenu sm in AllMenus())

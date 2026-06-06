@@ -1231,18 +1231,18 @@ public class PopUpMenu
                 IconNameDefault = "info_white.png",
                 IconNameSelected = "info_red.png",
                 IconNameInvalid = "info_black.png" },
-            new PopUpBox(1, "Messages", UI.MessagesMenu.Toggle,"Display the Messages and Contacts Menu") {
+            new PopUpBox(1, "World Info", UI.WorldInfoMenu.Toggle,"Display the World Info Menu") {
+                IconNameDefault = "info_white.png",
+                IconNameSelected = "info_red.png",
+                IconNameInvalid = "info_black.png" },
+            new PopUpBox(2, "Messages", UI.MessagesMenu.Toggle,"Display the Messages and Contacts Menu") {
                 IconNameDefault = "message_white.png",
                 IconNameSelected = "message_red.png",
                 IconNameInvalid = "message_black.png" },
-            new PopUpBox(2, "Burner Cell", Player.CellPhone.OpenBurner,"Open the burner phone") {
+            new PopUpBox(3, "Burner Cell", Player.CellPhone.OpenBurner,"Open the burner phone") {
                 IconNameDefault = "burnerphone_white.png",
                 IconNameSelected = "burnerphone_red.png",
-                IconNameInvalid = "burnerphone_black.png" },
-            new PopUpBox(3, "Property Manager", UI.LandlordMenu.Toggle,"Display information about owned businesses.") {
-                IconNameDefault = "message_white.png",
-                IconNameSelected = "message_red.png",
-                IconNameInvalid = "message_black.png" },
+                IconNameInvalid = "burnerphone_black.png" }
 
     };
         List<PopUpBox> ActionsSubMenu = new List<PopUpBox>()

@@ -239,14 +239,14 @@ public class GameLocation : ILocationDispatchable
     public Rotator VehiclePreviewCameraRotation { get; set; }
     public SpawnPlace VehiclePreviewLocation { get; set; }
     public List<SpawnPlace> VehicleDeliveryLocations { get; set; } = new List<SpawnPlace>();
-    public virtual int RegisterCashMin { get; set; } = 250;
-    public virtual int RegisterCashMax { get; set; } = 1550;
+    public virtual int? RegisterCashMin { get; set; }
+    public virtual int? RegisterCashMax { get; set; }
     public bool NoEntryCam { get; set; } = false;
 
-    public virtual int MinPriceRefreshHours { get; set; }
-    public virtual int MaxPriceRefreshHours { get; set; }
-    public virtual int MinRestockHours { get; set; }
-    public virtual int MaxRestockHours { get; set; }
+    public virtual int? MinPriceRefreshHours { get; set; }
+    public virtual int? MaxPriceRefreshHours { get; set; }
+    public virtual int? MinRestockHours { get; set; }
+    public virtual int? MaxRestockHours { get; set; }
 
     //public int MaxAssaultSpawns { get; set; } = 15;
     public virtual bool AreMarkersDisabled => false;
@@ -254,8 +254,8 @@ public class GameLocation : ILocationDispatchable
 
 
 
-    public virtual int RacketeeringAmountMin { get; set; } = 500;
-    public virtual int RacketeeringAmountMax { get; set; } = 1000;
+    public virtual int? RacketeeringAmountMin { get; set; }
+    public virtual int? RacketeeringAmountMax { get; set; }
 
 
     [XmlIgnore]
@@ -293,6 +293,8 @@ public class GameLocation : ILocationDispatchable
     public bool HasVendor => VendorLocations != null && VendorLocations.Any();// VendorPosition != Vector3.Zero;
     [XmlIgnore]
     public string UIMenuCategory { get; set; }
+    [XmlIgnore]
+    public bool MenuSwitchAvailable => Transaction != null && Property != null;
     [XmlIgnore]
     public ShopMenu Menu { get; set; }
     [XmlIgnore]
@@ -344,14 +346,14 @@ public class GameLocation : ILocationDispatchable
     public string MapTeleportString => IsOnSPMap && !IsOnMPMap ? "(SP)" : IsOnMPMap && !IsOnSPMap ? "(MP)" : "";
 
     #region Business Ownership
-    public virtual int PurchasePrice { get; set; }
-    public virtual int PayoutFrequency { get; set; } = 7;
-    public virtual int PayoutMin { get; set; }
-    public virtual int PayoutMax { get; set; }
-    public virtual int SalesPrice { get; set; }
-    public virtual int MaxSalesPrice { get; set; }
-    public int GrowthPercentage { get; set; } = 20;
-    public bool CashPurchaseOnly { get; set; }
+    public virtual int? PurchasePrice { get; set; }
+    public virtual int? PayoutFrequency { get; set; }
+    public virtual int? PayoutMin { get; set; }
+    public virtual int? PayoutMax { get; set; }
+    public virtual int? SalesPrice { get; set; }
+    public virtual int? MaxSalesPrice { get; set; }
+    public int? GrowthPercentage { get; set; }
+    public bool? CashPurchaseOnly { get; set; }
     [XmlIgnore]
     public int CurrentSalesPrice { get; set; }
     [XmlIgnore]
@@ -483,6 +485,17 @@ public class GameLocation : ILocationDispatchable
         toreturn.Add(Tuple.Create("Location:", "~p~" + ZoneName + "~s~"));
         toreturn.Add(Tuple.Create("Distance:", Math.Round(distanceTo * 0.000621371, 2).ToString() + " Miles away"));
         return toreturn;
+    }
+    public virtual string MapsInfo(int currentHour, float distanceTo)
+    {
+        string toReturn = Description;
+        toReturn += "~n~Currently: " + (IsTemporarilyClosed ? "~r~Temporarily Closed~s~" : IsOpen(currentHour) ? "~s~Open~s~" : "~m~Closed~s~");
+        toReturn += "~n~Hours: " + (Is247 ? "~g~24/7~s~" : $"{OpenTime}{(OpenTime <= 11 ? " am" : " pm")}-{CloseTime - 12}{(CloseTime <= 11 ? " am" : " pm")}");
+        toReturn += "~n~Address: " + StreetAddress;
+        toReturn += "~n~Location: " + "~p~" + ZoneName + "~s~";
+        toReturn += "~n~Distance: " + Math.Round(distanceTo * 0.000621371f, 2).ToString() + " Miles away";
+
+        return toReturn;
 
     }
     public virtual string TaxiInfo(int currentHour, float distanceTo, TaxiFirm taxiFirm)
@@ -540,7 +553,9 @@ public class GameLocation : ILocationDispatchable
             }
         }
         Menu = shopMenus.GetSpecificInstancedMenu(MenuID);
-        BusinessMenu = new BusinessMenu();//modDataFileManager.BusinessMenus.GetSpecificInstancedMenu(BusinessMenuID);
+        if (Menu != null) UIMenuCategory = "ShopMenu";
+        BusinessMenu = modDataFileManager.BusinessMenus.GetSpecificBusinessMenu(BusinessMenuID);
+        if (BusinessMenu != null) BusinessMenu.SetupBusiness(this, modDataFileManager.BusinessMenus.GetSpecificPropertyMenu(BusinessMenu.PropertyMenuID));
         if (HasInterior)
         {
             interior = interiors?.GetInteriorByLocalID(InteriorID);
@@ -610,9 +625,9 @@ public class GameLocation : ILocationDispatchable
                     Property.DisposeBusinessMenu();
                 }
                 DisposeInteractionMenu();
-                ResetInteractBools();
                 DisposeCamera(isInside);
                 DisposeInterior();
+                ResetInteractBools();
             }
             catch (Exception ex)
             {
@@ -648,7 +663,7 @@ public class GameLocation : ILocationDispatchable
     }
     public virtual bool Purchase()
     {
-        bool hasEnoughMoney = CashPurchaseOnly ? Player.BankAccounts.GetMoney(false) >= PurchasePrice : Player.BankAccounts.GetMoney(true) >= PurchasePrice;
+        bool hasEnoughMoney = (bool) CashPurchaseOnly ? Player.BankAccounts.GetMoney(false) >= PurchasePrice : Player.BankAccounts.GetMoney(true) >= PurchasePrice;
         if (hasEnoughMoney)
         {
             OnPurchased();
@@ -667,11 +682,11 @@ public class GameLocation : ILocationDispatchable
     {
         //Player.Properties.AddPayoutProperty(this);
         AddOwnership();
-        Player.BankAccounts.GiveMoney(-1 * PurchasePrice, !CashPurchaseOnly);
+        Player.BankAccounts.GiveMoney(-1 * PurchasePrice ?? 0, (bool) !CashPurchaseOnly);
         IsOwned = true;
         DatePayoutPaid = Time.CurrentDateTime;
-        DatePayoutDue = DatePayoutPaid.AddDays(PayoutFrequency);
-        CurrentSalesPrice = SalesPrice;
+        DatePayoutDue = DatePayoutPaid.AddDays(PayoutFrequency ?? 0);
+        CurrentSalesPrice = SalesPrice ?? 0;
     }
     protected virtual void OnSold()
     {
@@ -689,6 +704,10 @@ public class GameLocation : ILocationDispatchable
     }
     protected virtual void HandlePriceRefreshes()
     {
+        if (MinPriceRefreshHours == null && MaxPriceRefreshHours == null)
+        {
+            return;
+        }
         if (MinPriceRefreshHours <= 0 && MaxPriceRefreshHours <= 0)
         {
             return;
@@ -703,7 +722,7 @@ public class GameLocation : ILocationDispatchable
             {
                 menuItem.UpdatePrices();
             }
-            NextPriceRefreshTime = Time.CurrentDateTime.AddHours(RandomItems.GetRandomNumberInt(MinPriceRefreshHours, MaxPriceRefreshHours));
+            NextPriceRefreshTime = Time.CurrentDateTime.AddHours(RandomItems.GetRandomNumberInt((int) MinPriceRefreshHours, (int) MaxPriceRefreshHours));
             EntryPoint.WriteToConsole($"{Name} AND THE CURRENT TIME IS LATER THAN THE PRICE REFRESHTIME Current:{Time.CurrentDateTime} RefreshTime:{NextPriceRefreshTime} bPRICES HAVE BEEN REFRESHED");
         }
         else
@@ -713,6 +732,10 @@ public class GameLocation : ILocationDispatchable
     }
     protected virtual void HandleSupplyRefreshes()
     {
+        if (MinRestockHours == null && MaxRestockHours == null)
+        {
+            return;
+        }
         if (MinRestockHours <= 0 && MaxRestockHours <= 0)
         {
             return;
@@ -727,7 +750,7 @@ public class GameLocation : ILocationDispatchable
             {
                 menuItem.UpdateStock();
             }
-            NextRestockTime = Time.CurrentDateTime.AddHours(RandomItems.GetRandomNumberInt(MinRestockHours, MaxRestockHours));
+            NextRestockTime = Time.CurrentDateTime.AddHours(RandomItems.GetRandomNumberInt((int) MinRestockHours, (int) MaxRestockHours));
             EntryPoint.WriteToConsole($"{Name} AND THE CURRENT TIME IS LATER THAN THE NextRestockTime Current:{Time.CurrentDateTime} RefreshTime:{NextRestockTime} STOCK HAS BEEN UPDATED");
         }
         else
@@ -1247,6 +1270,15 @@ public class GameLocation : ILocationDispatchable
             Game.RawFrameRender += (s, e) => MenuPool.DrawBanners(e.Graphics);
             //EntryPoint.WriteToConsoleTestLong($"BANNER OVERRIDE {BannerImagePath} {HasBannerImage}");
         }
+        else if (BusinessMenu != null && !string.IsNullOrEmpty(BusinessMenu.BannerOverride))
+        {
+            BannerImagePath = $"Plugins\\LosSantosRED\\images\\{BusinessMenu.BannerOverride}";// = true;
+            BannerImage = Game.CreateTextureFromFile($"Plugins\\LosSantosRED\\images\\{BusinessMenu.BannerOverride}");
+            InteractionMenu.SetBannerType(BannerImage);
+            RemoveBanner = false;
+            Game.RawFrameRender += (s, e) => MenuPool.DrawBanners(e.Graphics);
+            //EntryPoint.WriteToConsoleTestLong($"BANNER OVERRIDE {BannerImagePath} {HasBannerImage}");
+        }
         //InteractionMenu.OnItemSelect += OnItemSelect;
         MenuPool.Add(InteractionMenu);
         CanInteract = false;
@@ -1562,7 +1594,20 @@ public class GameLocation : ILocationDispatchable
     }
     public virtual void AddToLandLordMenu(LandlordMenu landlordMenu)
     {
-
+        /*
+        if (landlordMenu.BusinessesTab.items == null)
+        {
+            landlordMenu.BusinessesTab.items = new List<TabItem>();
+        }
+        TabMissionSelectItem BusinessItem = GetUIInformation();
+        BusinessItem.OnItemSelect += (selectedItem) =>
+        {
+            if (selectedItem != null && selectedItem.Name == "GPS")
+            {
+                Player.GPSManager.AddGPSRoute(Name, EntrancePosition, true);
+            }
+        };
+        landlordMenu.BusinessesTab.items.Add(BusinessItem);*/
     }
 
     public virtual void OnStoredCashChanged(int storedCash)

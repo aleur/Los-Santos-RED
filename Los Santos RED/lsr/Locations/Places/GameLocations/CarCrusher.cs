@@ -79,9 +79,9 @@ public class CarCrusher : GameLocation
                 GenerateCrusherMenu();
                 ProcessInteractionMenu();
                 DisposeInteractionMenu();
-                ResetInteractBools();
                 DisposeCamera(isInside);
                 DisposeInterior();
+                ResetInteractBools();
             }
             catch (Exception ex)
             {

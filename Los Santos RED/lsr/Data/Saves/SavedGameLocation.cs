@@ -24,6 +24,7 @@ public class SavedGameLocation
         if (savedPlace != null)
         {
             player.Properties.AddOwnedLocation(savedPlace);
+            savedPlace.IsOwned = true;
             savedPlace.CurrentSalesPrice = CurrentSalesPrice;
         }
     }

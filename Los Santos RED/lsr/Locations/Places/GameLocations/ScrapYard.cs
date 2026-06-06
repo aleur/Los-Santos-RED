@@ -79,9 +79,9 @@ public class ScrapYard : GameLocation
                 GenerateScrapYardMenu();
                 ProcessInteractionMenu();
                 DisposeInteractionMenu();
-                ResetInteractBools();
                 DisposeCamera(isInside);
                 DisposeInterior();
+                ResetInteractBools();
             }
             catch (Exception ex)
             {

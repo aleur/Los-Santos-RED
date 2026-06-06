@@ -23,17 +23,18 @@ public class SavedBusiness : SavedGameLocation
     public override void LoadSavedData(IInventoryable player, IPlacesOfInterest placesOfInterest, IModItems modItems, ISettingsProvideable settings, IEntityProvideable world)
     {
 
-        Business savedPlace = placesOfInterest.PossibleLocations.Businesses.Where(x => x.Name == Name && x.EntrancePosition == EntrancePosition && x.IsCorrectMap(world.IsMPMapLoaded)).FirstOrDefault();
+        GameLocation savedPlace = placesOfInterest.AllLocations().Where(x => x.Name == Name && x.EntrancePosition == EntrancePosition && x.IsCorrectMap(world.IsMPMapLoaded)).FirstOrDefault();
         if (savedPlace != null)
         {
             player.Properties.AddOwnedLocation(savedPlace);
             savedPlace.IsOwned = true;
             savedPlace.DatePayoutDue = PayoutDate;
             savedPlace.DatePayoutPaid = DateOfLastPayout;
+            savedPlace.CurrentSalesPrice = CurrentSalesPrice;
+            /*
             //savedPlace.IsPayoutInModItems = biz.IsPayoutInModItems;
             savedPlace.ModItemToPayout = ModItemToPayout;
             //savedPlace.IsPayoutDepositedToBank = biz.IsPayoutDepositedToBank;
-            savedPlace.CurrentSalesPrice = CurrentSalesPrice;
             if (savedPlace.WeaponStorage == null)
             {
                 savedPlace.WeaponStorage = new WeaponStorage(settings);
@@ -51,7 +52,7 @@ public class SavedBusiness : SavedGameLocation
                 savedPlace.SimpleInventory.Add(modItems.Get(stest.ModItemName), stest.RemainingPercent);
             }
             savedPlace.CashStorage.StoredCash = StoredCash;
-            savedPlace.RefreshUI();
+            savedPlace.RefreshUI();*/
         }
     }
 }

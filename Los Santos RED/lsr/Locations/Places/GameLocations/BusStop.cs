@@ -57,8 +57,8 @@ public class BusStop : GameLocation
 
                 ProcessInteractionMenu();
                 DisposeInteractionMenu();
-                ResetInteractBools();
                 StoreCamera.Dispose();
+                ResetInteractBools();
             }, "HotelInteract");
         }
     }

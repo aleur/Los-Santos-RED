@@ -95,9 +95,9 @@ public class CityHall : GameLocation
                 GenerateCityHallMenu();
                 ProcessInteractionMenu();
                 DisposeInteractionMenu();
-                ResetInteractBools();
                 DisposeCamera(isInside);
                 DisposeInterior();
+                ResetInteractBools();
             }
             catch (Exception ex)
             {

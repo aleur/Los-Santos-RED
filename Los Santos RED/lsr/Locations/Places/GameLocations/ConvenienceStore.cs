@@ -20,10 +20,10 @@ public class ConvenienceStore : GameLocation, IGasPumpable
     public override int MapIcon { get; set; } = (int)BlipSprite.CriminalHoldups;
     public override string ButtonPromptText { get; set; }
     public int PricePerGallon { get; set; } = 3;
-    public override int PurchasePrice { get; set; } = 200000;
-    public override int SalesPrice { get; set; } = 100000;
-    public override int PayoutMin { get; set; } = 1000;
-    public override int PayoutMax { get; set; } = 5000;
+    public override int? PurchasePrice { get; set; }
+    public override int? SalesPrice { get; set; }
+    public override int? PayoutMin { get; set; }
+    public override int? PayoutMax { get; set; }
     public ConvenienceStore(Vector3 _EntrancePosition, float _EntranceHeading, string _Name, string _Description, string menuID) : base(_EntrancePosition, _EntranceHeading, _Name, _Description)
     {
         MenuID = menuID;
@@ -37,6 +37,17 @@ public class ConvenienceStore : GameLocation, IGasPumpable
     {
         possibleLocations.ConvenienceStores.Add(this);
         base.AddLocation(possibleLocations);
+    }
+    protected override void OnPurchased()
+    {
+        Player.BankAccounts.GiveMoney(-1 * PurchasePrice ?? 0, true);
+        IsOwned = true;
+        Player.Properties.AddOwnedLocation(this);
+        PlaySuccessSound();
+        DisplayMessage("~g~Purchased", $"Thank you for purchasing {Name}");
+        DatePayoutPaid = Time.CurrentDateTime;
+        DatePayoutDue = DatePayoutPaid.AddDays(PayoutFrequency ?? 0);
+        CurrentSalesPrice = SalesPrice ?? 0;
     }
 }
 

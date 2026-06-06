@@ -106,6 +106,38 @@ public class CommitCrime : ComplexTask
             GameTimeLastRan = Game.GameTime;
         }
     }
+    private void AttackEveryone()
+    {
+        if (Ped.Pedestrian.Exists())
+        {
+            NativeFunction.Natives.SET_PED_COMBAT_ATTRIBUTES(Ped.Pedestrian, (int)eCombatAttributes.BF_AlwaysEquipBestWeapon, true);
+            NativeFunction.Natives.SET_PED_COMBAT_ATTRIBUTES(Ped.Pedestrian, (int)eCombatAttributes.BF_DisableFleeFromCombat, true);
+            NativeFunction.Natives.SET_PED_INFINITE_AMMO(Ped.Pedestrian, true, ToIssue.Hash);
+            if (ToIssue.Category == WeaponCategory.LMG || ToIssue.Category == WeaponCategory.Heavy)
+            {
+                NativeFunction.Natives.SET_PED_SHOOT_RATE(Ped.Pedestrian, 800);
+            }
+            else if (ToIssue.Category == WeaponCategory.AR || ToIssue.Category == WeaponCategory.SMG)
+            {
+                NativeFunction.Natives.SET_PED_SHOOT_RATE(Ped.Pedestrian, 400);
+            }
+            else
+            {
+                NativeFunction.Natives.SET_PED_SHOOT_RATE(Ped.Pedestrian, 200);
+            }
+            unsafe
+            {
+                int lol = 0;
+                NativeFunction.CallByName<bool>("OPEN_SEQUENCE_TASK", &lol);
+                NativeFunction.CallByName<bool>("TASK_COMBAT_HATED_TARGETS_AROUND_PED", Ped.Pedestrian, 3000f, 0);
+                NativeFunction.CallByName<bool>("SET_SEQUENCE_TO_REPEAT", lol, true);
+                NativeFunction.CallByName<bool>("CLOSE_SEQUENCE_TASK", lol);
+                NativeFunction.CallByName<bool>("TASK_PERFORM_SEQUENCE", Ped.Pedestrian, lol);
+                NativeFunction.CallByName<bool>("CLEAR_SEQUENCE_TASK", &lol);
+            }
+            GameTimeLastRan = Game.GameTime;
+        }
+    }
     private void DealDrugsToTarget()
     {
         if (Ped.Pedestrian.Exists() && Target.Exists())
@@ -131,6 +163,7 @@ public class CommitCrime : ComplexTask
     {
         List<string> PossibleCrimes = new List<string>();
         PossibleCrimes.AddRange(new List<string>() { "AssaultingCivilians", "BrandishingWeapon", "FiringWeapon", "AssaultingWithDeadlyWeapon", "PublicIntoxication", "GrandTheftAuto", "Harassment", "AttemptingSuicide", "KillingCivilians", "TerroristActivity", "DealingDrugs" });
+        //PossibleCrimes.AddRange(new List<string>() {"TerroristActivity"});
         if (Ped != null)
         {
             if (Ped.IsInVehicle || IsTrafficOnly)
@@ -263,11 +296,20 @@ public class CommitCrime : ComplexTask
     private void IssueWeapon()
     {
         if (Ped == null) return;
-        List<string> WeaponCrimes = new List<string>() { "FiringWeapon", "AssaultingWithDeadlyWeapon", "KillingCivilians", "TerroristActivity", "AttemptingSuicide" };
-        bool equipNow = false;
-        if (WeaponCrimes.Contains(SelectedCrime))
+        Dictionary<string, List<WeaponCategory>> IssuingWeapons = new Dictionary<string, List<WeaponCategory>>()
         {
-            ToIssue = Weapons.GetRandomRegularWeapon(WeaponCategory.Pistol);
+            { "FiringWeapon", new List<WeaponCategory> { WeaponCategory.Pistol } },
+            { "AttemptingSuicide", new List<WeaponCategory> { WeaponCategory.Pistol } },
+            { "AssaultingWithDeadlyWeapon", new List<WeaponCategory> { WeaponCategory.SMG, WeaponCategory.Shotgun, WeaponCategory.Pistol } },
+            { "KillingCivilians", new List<WeaponCategory> { WeaponCategory.AR, WeaponCategory.Shotgun, WeaponCategory.Sniper } },
+            { "TerroristActivity", new List<WeaponCategory> { WeaponCategory.AR, WeaponCategory.LMG, WeaponCategory.Heavy } }
+        };
+        bool equipNow = false;
+        if(IssuingWeapons.Keys.Contains(SelectedCrime))
+        {
+            List<WeaponCategory> weapons;
+            IssuingWeapons.TryGetValue(SelectedCrime, out weapons);
+            ToIssue = Weapons.GetRandomRegularWeapon(weapons.PickRandom());
             equipNow = true;
         }
         else
@@ -316,14 +358,14 @@ public class CommitCrime : ComplexTask
             NativeFunction.Natives.SET_PED_COMBAT_ATTRIBUTES(Ped.Pedestrian, (int)eCombatAttributes.BF_CanFightArmedPedsWhenNotArmed, true);
             NativeFunction.Natives.SET_PED_FLEE_ATTRIBUTES(Ped.Pedestrian, 0, false);
         }
-        List<string> VictimCrimes = new List<string>() { "AssaultingCivilians", "FiringWeapon", "AssaultingWithDeadlyWeapon", "GrandTheftAuto", "Harassment", "KillingCivilians", "TerroristActivity", "DealingDrugs" };
+        List<string> VictimCrimes = new List<string>() { "AssaultingCivilians", "FiringWeapon", "AssaultingWithDeadlyWeapon", "GrandTheftAuto", "Harassment", "KillingCivilians", "DealingDrugs" };
         if (VictimCrimes.Contains(SelectedCrime))
         {
             NeedsVictim = true;
             GetNewVictim();
             if (Target.Exists())
             {
-                List<string> AttackCrimes = new List<string>() { "AssaultingCivilians", "FiringWeapon", "AssaultingWithDeadlyWeapon", "GrandTheftAuto", "KillingCivilians", "TerroristActivity" };
+                List<string> AttackCrimes = new List<string>() { "AssaultingCivilians", "FiringWeapon", "AssaultingWithDeadlyWeapon", "GrandTheftAuto", "KillingCivilians" };
                 if (AttackCrimes.Contains(SelectedCrime))
                 {
                     EntryPoint.WriteToConsole($"CommitCrime: {Ped.Pedestrian} Crime Picked {SelectedCrime} AttackTarget Ran", 5);
@@ -372,6 +414,11 @@ public class CommitCrime : ComplexTask
             {
                 EntryPoint.WriteToConsole($"CommitCrime: {Ped.Pedestrian} Crime Picked {SelectedCrime} WalkAroundWithGun Ran", 5);
                 WalkAroundWithGun();
+            }
+            else if (SelectedCrime == "TerroristActivity")
+            {
+                EntryPoint.WriteToConsole($"CommitCrime: {Ped.Pedestrian} Crime Picked {SelectedCrime} TerroristActivity Ran", 5);
+                AttackEveryone();
             }
         }
     }

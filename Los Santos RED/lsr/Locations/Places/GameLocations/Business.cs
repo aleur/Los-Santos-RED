@@ -192,8 +192,8 @@ public class Business : GameLocation, ILocationSetupable, IRestableLocation, IIn
     }
     public virtual int CalculatePayoutAmount(int daysSinceLastPayment)
     {
-        int payout = RandomItems.GetRandomNumberInt(PayoutMin, PayoutMax);
-        int payoutAmount = payout * daysSinceLastPayment / PayoutFrequency;
+        int payout = RandomItems.GetRandomNumberInt((int)PayoutMin, (int)PayoutMax);
+        int payoutAmount = payout * daysSinceLastPayment / (int) PayoutFrequency;
         return payoutAmount;
     }
     //public void Payout(IPropertyOwnable player, ITimeReportable time)
@@ -262,8 +262,8 @@ public class Business : GameLocation, ILocationSetupable, IRestableLocation, IIn
                 CashStorage.StoredCash += payoutAmount;
             }
             UpdateSalesPrice();
-            DatePayoutPaid = DatePayoutPaid.AddDays(completedCycles * PayoutFrequency);
-            DatePayoutDue = DatePayoutPaid.AddDays(PayoutFrequency);       
+            DatePayoutPaid = DatePayoutPaid.AddDays(completedCycles * PayoutFrequency ?? 0);
+            DatePayoutDue = DatePayoutPaid.AddDays(PayoutFrequency ?? 0);       
         }
         catch (Exception ex)
         {
@@ -273,7 +273,7 @@ public class Business : GameLocation, ILocationSetupable, IRestableLocation, IIn
     private void UpdateSalesPrice()
     {
         int salesPriceToAdd = (int)(PurchasePrice * (GrowthPercentage / 100.0));
-        CurrentSalesPrice = Math.Min(CurrentSalesPrice + salesPriceToAdd, MaxSalesPrice == 0 ? (int)(PurchasePrice * 1.2f) : MaxSalesPrice);
+        CurrentSalesPrice = Math.Min(CurrentSalesPrice + salesPriceToAdd, MaxSalesPrice == 0 ? (int)(PurchasePrice * 1.2f) : (int) MaxSalesPrice);
     }
     public override void Reset()
     {
@@ -364,7 +364,7 @@ public class Business : GameLocation, ILocationSetupable, IRestableLocation, IIn
     }
     protected override void OnPurchased()
     {
-        Player.BankAccounts.GiveMoney(-1 * PurchasePrice, true);
+        Player.BankAccounts.GiveMoney(-1 * PurchasePrice ?? 0, true);
         IsOwned = true;
         if(IsPayoutInModItems)
         {
@@ -376,8 +376,8 @@ public class Business : GameLocation, ILocationSetupable, IRestableLocation, IIn
         PlaySuccessSound();
         DisplayMessage("~g~Purchased", $"Thank you for purchasing {Name}");
         DatePayoutPaid = Time.CurrentDateTime;
-        DatePayoutDue = DatePayoutPaid.AddDays(PayoutFrequency);
-        CurrentSalesPrice = SalesPrice;
+        DatePayoutDue = DatePayoutPaid.AddDays(PayoutFrequency ?? 0);
+        CurrentSalesPrice = SalesPrice ?? 0;
     }
     private void UpdateStoredData()
     {
@@ -539,6 +539,7 @@ public class Business : GameLocation, ILocationSetupable, IRestableLocation, IIn
     }
     public override void AddToLandLordMenu(LandlordMenu landlordMenu)
     {
+        /*
         if (landlordMenu.BusinessesTab.items == null)
         {
             landlordMenu.BusinessesTab.items = new List<TabItem>();
@@ -551,7 +552,7 @@ public class Business : GameLocation, ILocationSetupable, IRestableLocation, IIn
                 Player.GPSManager.AddGPSRoute(Name, EntrancePosition, true);
             }
         };
-        landlordMenu.BusinessesTab.items.Add(BusinessItem);
+        landlordMenu.BusinessesTab.items.Add(BusinessItem);*/
     }
     // Added Rest/Outfit functionality to businesses
     public void CreateRestMenu(bool removeBanner)

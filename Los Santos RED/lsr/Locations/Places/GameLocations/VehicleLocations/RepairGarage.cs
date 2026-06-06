@@ -78,9 +78,9 @@ public class RepairGarage : GameLocation
                 GeneratePayNSprayMenu();
                 ProcessInteractionMenu();
                 DisposeInteractionMenu();
-                ResetInteractBools();
                 DisposeDoor();
                 StoreCamera.Dispose();
+                ResetInteractBools();
             }
             catch (Exception ex)
             {

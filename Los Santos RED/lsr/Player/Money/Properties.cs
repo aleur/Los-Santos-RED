@@ -21,8 +21,8 @@ public class Properties
         World = world;
     }
     public List<GameLocation> PropertyList { get; private set; } = new List<GameLocation>();
-    //public List<Residence> Residences { get; private set; } = new List<Residence>();
-    //public List<Business> Businesses { get; private set; } = new List<Business>();
+    public List<Residence> Residences { get; private set; } = new List<Residence>();
+    public List<GameLocation> Businesses { get; private set; } = new List<GameLocation>();
     //public List<GameLocation> PayoutProperties { get; private set; } = new List<GameLocation>();
     //public List<GameLocation> CraftingLocations { get; private set; } = new List<GameLocation>();
     public void Setup()
@@ -48,6 +48,8 @@ public class Properties
             property.Reset();
         }
         PropertyList.Clear();
+        Residences.Clear();
+        Businesses.Clear();
     }
     public void AddOwnedLocation(GameLocation toAdd)
     {
@@ -55,12 +57,42 @@ public class Properties
         {
             PropertyList.Add(toAdd);
         }
+        if (!Businesses.Any(x => x.Name == toAdd.Name && x.EntrancePosition == toAdd.EntrancePosition && x.IsCorrectMap(World.IsMPMapLoaded)))
+        {
+            Businesses.Add(toAdd);
+        }
+    }
+    public void AddOwnedLocation(Residence toAdd)
+    {
+        if (!PropertyList.Any(x => x.Name == toAdd.Name && x.EntrancePosition == toAdd.EntrancePosition && x.IsCorrectMap(World.IsMPMapLoaded)))
+        {
+            PropertyList.Add(toAdd);
+        }
+        if (!Residences.Any(x => x.Name == toAdd.Name && x.EntrancePosition == toAdd.EntrancePosition && x.IsCorrectMap(World.IsMPMapLoaded)))
+        {
+            Residences.Add(toAdd);
+        }
     }
     public void RemoveOwnedLocation(GameLocation toRemove)
     {
-        if (!PropertyList.Any(x => x.Name == toRemove.Name && x.EntrancePosition == toRemove.EntrancePosition && x.IsCorrectMap(World.IsMPMapLoaded)))
+        if (PropertyList.Any(x => x.Name == toRemove.Name && x.EntrancePosition == toRemove.EntrancePosition && x.IsCorrectMap(World.IsMPMapLoaded)))
         {
             PropertyList.Remove(toRemove);
+        }
+        if (Businesses.Any(x => x.Name == toRemove.Name && x.EntrancePosition == toRemove.EntrancePosition && x.IsCorrectMap(World.IsMPMapLoaded)))
+        {
+            Businesses.Remove(toRemove);
+        }
+    }
+    public void RemoveOwnedLocation(Residence toRemove)
+    {
+        if (PropertyList.Any(x => x.Name == toRemove.Name && x.EntrancePosition == toRemove.EntrancePosition && x.IsCorrectMap(World.IsMPMapLoaded)))
+        {
+            PropertyList.Remove(toRemove);
+        }
+        if (Residences.Any(x => x.Name == toRemove.Name && x.EntrancePosition == toRemove.EntrancePosition && x.IsCorrectMap(World.IsMPMapLoaded)))
+        {
+            Residences.Remove(toRemove);
         }
     }
 }

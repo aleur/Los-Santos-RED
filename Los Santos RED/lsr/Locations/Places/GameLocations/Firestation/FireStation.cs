@@ -101,9 +101,9 @@ public class FireStation : GameLocation, ILicensePlatePreviewable
                     InteractAsOther();
                 }
                 DisposeInteractionMenu();
-                ResetInteractBools();
                 DisposeCamera(isInside);
                 DisposeInterior();
+                ResetInteractBools();
             }
             catch (Exception ex)
             {

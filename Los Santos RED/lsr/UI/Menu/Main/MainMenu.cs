@@ -115,14 +115,22 @@ public class MainMenu : ModUIMenu
             Main.Visible = false;
         };
         //Main.AddItem(AboutMenu);//gone but not forgotten
-        UIMenuItem ShowReportingMenu = new UIMenuItem("Player Information", "Show the player information menu. This pause menu has info about Owned Vehicles, Licenses, ~r~Gang Relationships~s~, and ~y~Locations~s~.");
-        ShowReportingMenu.RightBadge = UIMenuItem.BadgeStyle.Lock;
+        UIMenuItem ShowReportingMenu = new UIMenuItem("Player Information", "Show the player information menu. This pause menu has info about Owned Vehicles, Licenses, and ~r~Crimes~s~");
+        ShowReportingMenu.RightBadge = UIMenuItem.BadgeStyle.Mask;
         ShowReportingMenu.Activated += (s, e) =>
         {
             UI.PlayerInfoMenu.Toggle();
             Main.Visible = false;
         };
         Main.AddItem(ShowReportingMenu);
+        UIMenuItem ShowWorldMenu = new UIMenuItem("World Information", "Show the world information menu. This pause menu has info about ~r~Gangs~s~, ~g~Zones~s~ and ~y~Locations~s~.");
+        ShowWorldMenu.RightBadge = UIMenuItem.BadgeStyle.Ammo;
+        ShowWorldMenu.Activated += (s, e) =>
+        {
+            UI.WorldInfoMenu.Toggle();
+            Main.Visible = false;
+        };
+        Main.AddItem(ShowWorldMenu);
 
         UIMenuItem ShowSimplePhoneMenu = new UIMenuItem("Replies and Contacts", "Shows the phone replies, text messages, and contacts. Will allow you to call ~p~Contacts~s~ and lookup ~y~Locations~s~.");
         ShowSimplePhoneMenu.RightBadge = UIMenuItem.BadgeStyle.Alert;

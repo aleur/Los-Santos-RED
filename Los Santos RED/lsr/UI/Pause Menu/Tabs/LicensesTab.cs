@@ -121,7 +121,7 @@ public class LicensesTab
         }
 
 
-        dldesc += "~n~~n~Description: A legal authorization for a specific individual to operate one or more types of motorized vehicles such as motorcycles, cars, trucks, or buses—on a public road. Vehicle Operators caught without one will be fined.";
+        dldesc += "~n~~n~Description: A legal authorization for a specific individual to operate one or more types of motorized vehicles such as motorcycles, cars, trucks, or buses-on a public road. Vehicle Operators caught without one will be fined.";
         ccwdesc += "~n~~n~Description: Allows Carrying a weapon (such as a handgun) in public in a concealed manner, either on one's person or in close proximity. Legal weapons are returned to owners after medical/bail services.";
         pilotdesc += "~n~~n~Description: Allows flying of fixed wing, lighter than air, and rotary aircraft.";
         TabItem dl = new TabTextItem("Drivers License", "Drivers License", dldesc);//TabItem tabItem = new TabTextItem($"{gr.Gang.ColorPrefix}{gr.Gang.FullName}~s~ {gr.ToBlip()}~s~", $"{gr.Gang.ColorPrefix}{gr.Gang.FullName}~s~", DescriptionText);
@@ -133,7 +133,7 @@ public class LicensesTab
         TabItem pilots = new TabTextItem("Pilots License", "Pilots License", pilotdesc);//TabItem tabItem = new TabTextItem($"{gr.Gang.ColorPrefix}{gr.Gang.FullName}~s~ {gr.ToBlip()}~s~", $"{gr.Gang.ColorPrefix}{gr.Gang.FullName}~s~", DescriptionText);
         items.Add(pilots);
 
-        TabView.AddTab(new TabSubmenuItem("Info", items));
+        TabView.AddTab(new TabSubmenuItem("Licenses", items));
     }
 }
 

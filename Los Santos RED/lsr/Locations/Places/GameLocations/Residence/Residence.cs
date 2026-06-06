@@ -180,9 +180,9 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
                     GameFiber.Yield();
                 }
                 DisposeInteractionMenu();
-                ResetInteractBools();
                 DisposeCamera(isInside);
                 DisposeInterior();
+                ResetInteractBools();
             }
             catch (Exception ex)
             {
@@ -485,7 +485,7 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
         }
         if (IsOwned)
         {
-            SellHouseItem = new UIMenuItem("Sell House", "Sell the current house.") { RightLabel = SalesPrice.ToString("C0") };
+            SellHouseItem = new UIMenuItem("Sell House", "Sell the current house.") { RightLabel = SalesPrice?.ToString("C0") };
             SellHouseItem.Activated += (sender, e) =>
             {
                 OnSold();
@@ -622,7 +622,7 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
     }
     protected override void OnPurchased()
     {
-        Player.BankAccounts.GiveMoney(-1 * PurchasePrice, true);
+        Player.BankAccounts.GiveMoney(-1 * (int) PurchasePrice, true);
         IsOwned = true;
         IsRented = false;
         UpdateStoredData();
@@ -646,9 +646,9 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
     {
         Reset();
         Player.Properties.RemoveOwnedLocation(this);
-        Player.BankAccounts.GiveMoney(SalesPrice, true);
+        Player.BankAccounts.GiveMoney(SalesPrice ?? 0, true);
         PlaySuccessSound();
-        DisplayMessage("~g~Sold", $"You have sold {Name} for {SalesPrice.ToString("C0")}");
+        DisplayMessage("~g~Sold", $"You have sold {Name} for {SalesPrice?.ToString("C0")}");
     }
     private void UpdateStoredData()
     {

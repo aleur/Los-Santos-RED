@@ -153,9 +153,9 @@ public class GangDen : GameLocation, IRestableLocation, IAssaultSpawnable
                     Player.IsTransacting = false;
                 }
                 DisposeInteractionMenu();
-                ResetInteractBools();
                 DisposeCamera(isInside);
                 DisposeInterior();
+                ResetInteractBools();
             }
             catch (Exception ex)
             {

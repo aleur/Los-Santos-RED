@@ -102,8 +102,8 @@ public class VehicleModShop : GameLocation
                 GenerateModMenu();
                 ProcessMenu();
                 DisposeInteractionMenu();
-                ResetInteractBools();
                 DisposeDoor();
+                ResetInteractBools();
 
 
                 if (VehiclePreviewLocation != null && hasteleported)

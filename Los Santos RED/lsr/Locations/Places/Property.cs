@@ -114,7 +114,7 @@ public class Property
             {
                 OfferSubMenu.RemoveBanner();
             }
-            UIMenuItem PurchaseBusinessMenuItem = new UIMenuItem("Purchase", "Select to purchase this business.") { RightLabel = Location.PurchasePrice.ToString("C0") };
+            UIMenuItem PurchaseBusinessMenuItem = new UIMenuItem("Purchase", "Select to purchase this business.") { RightLabel =  Location.PurchasePrice?.ToString("C0") };
             PurchaseBusinessMenuItem.Activated += (sender, e) =>
             {
                 if (Location.Purchase())
@@ -127,7 +127,7 @@ public class Property
         }
         else if (Location.IsOwned)
         {
-            UIMenuItem SellBusinessItem = new UIMenuItem("Sell Business", "Sell the current business.") { RightLabel = Location.SalesPrice.ToString("C0") };
+            UIMenuItem SellBusinessItem = new UIMenuItem("Sell Business", "Sell the current business.") { RightLabel = Location.SalesPrice?.ToString("C0") };
             SellBusinessItem.Activated += (sender, e) =>
             {
                 Location.Sell();

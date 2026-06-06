@@ -119,7 +119,11 @@ public class CivilianSettings : ISettingsDefaultable
 
     [Description("Minimum time required between random traffic crimes..")]
     public uint MinimumTimeBetweenRandomTrafficCrimes { get; set; }
+    [Description("Maximum distance nearby civilian can be selected to become criminal..")]
+    public uint MaximumDistancePedSelectRandomCrime { get; set; }
 
+    [Description("Minimum distance nearby civilian can be selected to become criminal..")]
+    public uint MinimumDistancePedSelectRandomCrime { get; set; }
 
     [Description("Place a blip on the criminal when a random crime is generated.")]
     public bool ShowRandomCriminalBlips { get; set; }
@@ -351,9 +355,9 @@ public class CivilianSettings : ISettingsDefaultable
         EnableZoneBasedCrime = false;
         AllowRandomCrimes = true;
         MinimumTimeBetweenRandomCrimes = 1200000;
-
-
         MinimumTimeBetweenRandomTrafficCrimes = 720000;
+        MaximumDistancePedSelectRandomCrime = 200;
+        MinimumDistancePedSelectRandomCrime = 10;
 
         CheckCivilianCrimes = true;
         AllowCiviliansToCallPoliceOnOtherCivilians = true;

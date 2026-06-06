@@ -60,8 +60,8 @@ public class DriveThru : GameLocation
                     Transaction.ProcessTransactionMenu();
                     Transaction.DisposeTransactionMenu();
                     DisposeInteractionMenu();
-                    ResetInteractBools();
                     NativeFunction.Natives.STOP_GAMEPLAY_HINT(false);
+                    ResetInteractBools();
                 }
                 catch (Exception ex)
                 {

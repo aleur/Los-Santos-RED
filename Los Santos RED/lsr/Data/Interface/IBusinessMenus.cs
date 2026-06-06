@@ -10,5 +10,7 @@ namespace LosSantosRED.lsr.Interface
     public interface IBusinessMenus
     {
         BusinessMenuTypes PossibleBusinessMenus { get; }
+        BusinessMenu GetSpecificBusinessMenu(string menuID);
+        PropertyMenu GetSpecificPropertyMenu(string menuID);
     }
 }

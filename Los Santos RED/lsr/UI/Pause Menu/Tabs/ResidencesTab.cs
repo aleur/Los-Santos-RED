@@ -8,25 +8,45 @@ using System.Text;
 
 public class ResidencesTab : ITabbableMenu
 {
-    private ILocationInteractable Player;
+    private IGangRelateable Player;
     private TabView TabView;
     private TabSubmenuItem TabItem;
     public List<TabItem> items;
-    public ResidencesTab(ILocationInteractable player, TabView tabView)
+    public ResidencesTab(IGangRelateable player, TabView tabView)
     {
         Player = player;
         TabView = tabView;
     }
     public void AddItems()
     {
-        if(items == null)
+        List<TabItem> items = new List<TabItem>();
+        bool addedItems = false;
+        foreach (GameLocation residence in Player.Properties.Residences)
         {
-            items = new List<TabItem>();
-            TabTextItem ttx = new TabTextItem("Residences Owned", "", "");
-            ttx.CanBeFocused = false;
-            items.Add(ttx);
+
+            string ListEntryText = $"{residence.Name} - ~p~{residence.ZoneName}~s~";
+            string DescriptionHeaderText = $"{residence.Name}";
+            string LocationText = residence.FullStreetAddress;
+
+            string DescriptionText = $"~n~Location: {LocationText}";
+
+            DescriptionText += $"~n~Select to set ~r~GPS~s~";
+
+            TabItem tItem = new TabTextItem(ListEntryText, DescriptionHeaderText, DescriptionText);
+            tItem.Activated += (s, e) =>
+            {
+                Player.GPSManager.AddGPSRoute(residence.Name, residence.EntrancePosition, true);
+            };
+            items.Add(tItem);
+            addedItems = true;
         }
-        TabItem = new TabSubmenuItem("Residences", items);
-        TabView.AddTab(TabItem);
+        if (addedItems)
+        {
+            TabView.AddTab(new TabSubmenuItem("Residences", items));
+        }
+        else
+        {
+            TabView.AddTab(new TabItem("Residences"));
+        }
     }
 }

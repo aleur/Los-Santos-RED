@@ -119,9 +119,9 @@ public class Hospital : GameLocation, ILocationRespawnable, ILicensePlatePreview
                     InteractAsOther();
                 }
                 DisposeInteractionMenu();
-                ResetInteractBools();
                 DisposeCamera(isInside);
                 DisposeInterior();
+                ResetInteractBools();
             }
             catch (Exception ex)
             {

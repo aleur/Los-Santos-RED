@@ -264,6 +264,7 @@
     <Compile Include="lsr\Locations\Interiors\Theft\AnimationPreInteract.cs" />
     <Compile Include="lsr\Locations\Interiors\Residence\Trophy\DisplayInteract.cs" />
     <Compile Include="lsr\Data\Location\TargetType.cs" />
+    <Compile Include="lsr\Locations\Menus\PropertyMenu.cs" />
     <Compile Include="lsr\Locations\Menus\BusinessMenu.cs" />
     <Compile Include="lsr\Locations\Menus\BusinessMenuTypes.cs" />
     <Compile Include="lsr\Locations\Other\GangTerritory.cs" />
@@ -305,6 +306,7 @@
     <Compile Include="lsr\Player\Activity\HidingActivity.cs" />
     <Compile Include="lsr\Player\Activity\Items\IngestActivityNew.cs" />
     <Compile Include="lsr\Player\Activity\Pickpocket.cs" />
+    <Compile Include="lsr\Player\Cellphone\Burner\Apps\BurnerPhoneMapsApp.cs" />
     <Compile Include="lsr\Player\Crafting\Craft.cs" />
     <Compile Include="lsr\Player\Gambling\Blackjack Games\BlackJackGame.cs" />
     <Compile Include="lsr\Player\Gambling\Blackjack Games\BlackjackGameUI.cs" />
@@ -538,10 +540,10 @@
     <Compile Include="lsr\Player\Cellphone\Contacts\TaxiServiceContact.cs" />
     <Compile Include="lsr\Player\Cellphone\Contacts\VehicleExporterContact.cs" />
     <Compile Include="lsr\Player\Cellphone\Data\CellphoneIDLookup.cs" />
-    <Compile Include="lsr\Player\Cellphone\Interactions\KillerInteraction.cs" />
-    <Compile Include="lsr\Player\Cellphone\Interactions\TaxiServiceInteraction.cs" />
-    <Compile Include="lsr\Player\Cellphone\Interactions\Taxi\AmbientSpawner.cs" />
-    <Compile Include="lsr\Player\Cellphone\Interactions\VehicleExporterInteraction.cs" />
+    <Compile Include="lsr\Player\Cellphone\ContactInteractions\KillerInteraction.cs" />
+    <Compile Include="lsr\Player\Cellphone\ContactInteractions\TaxiServiceInteraction.cs" />
+    <Compile Include="lsr\Player\Cellphone\ContactInteractions\Taxi\AmbientSpawner.cs" />
+    <Compile Include="lsr\Player\Cellphone\ContactInteractions\VehicleExporterInteraction.cs" />
     <Compile Include="lsr\Player\Crime\BOLO.cs" />
     <Compile Include="lsr\Player\Crime\Crimes\TrainStopper.cs" />
     <Compile Include="lsr\Player\Crime\RestrictedAreaManager.cs" />
@@ -706,7 +708,7 @@
     <Compile Include="lsr\Player\Cellphone\Contacts\EmergencyServicesContact.cs" />
     <Compile Include="lsr\Player\Cellphone\Contacts\GangContact.cs" />
     <Compile Include="lsr\Player\Cellphone\Contacts\GunDealerContact.cs" />
-    <Compile Include="lsr\Player\Cellphone\Interactions\IContactMenuInteraction.cs" />
+    <Compile Include="lsr\Player\Cellphone\ContactInteractions\IContactMenuInteraction.cs" />
     <Compile Include="lsr\Player\GroupManager\GroupMember.cs" />
     <Compile Include="lsr\Player\Inventory\ItemSubType.cs" />
     <Compile Include="lsr\Player\Inventory\Items\ClothingItem.cs" />
@@ -822,6 +824,7 @@
     <Compile Include="lsr\UI\Other\VehicleShowcase.cs" />
     <Compile Include="lsr\UI\Pause Menu\ConfigPauseMenu.cs" />
     <Compile Include="lsr\UI\Pause Menu\LandlordMenu.cs" />
+    <Compile Include="lsr\UI\Pause Menu\WorldInfoMenu.cs" />
     <Compile Include="lsr\UI\Pause Menu\Tabs\BusinessesTab.cs" />
     <Compile Include="lsr\UI\Pause Menu\Tabs\ContactsAddTab.cs" />
     <Compile Include="lsr\UI\Pause Menu\Tabs\ITabbableMenu.cs" />
@@ -1003,10 +1006,10 @@
     <Compile Include="lsr\Player\Cellphone\Burner\SoftKey.cs" />
     <Compile Include="lsr\Player\Cellphone\Burner\SoftKeyIcon.cs" />
     <Compile Include="lsr\Player\Cellphone\Contacts\PhoneContact.cs" />
-    <Compile Include="lsr\Player\Cellphone\Interactions\CorruptCopInteraction.cs" />
-    <Compile Include="lsr\Player\Cellphone\Interactions\EmergencyServicesInteraction.cs" />
-    <Compile Include="lsr\Player\Cellphone\Interactions\GangInteraction.cs" />
-    <Compile Include="lsr\Player\Cellphone\Interactions\GunDealerInteraction.cs" />
+    <Compile Include="lsr\Player\Cellphone\ContactInteractions\CorruptCopInteraction.cs" />
+    <Compile Include="lsr\Player\Cellphone\ContactInteractions\EmergencyServicesInteraction.cs" />
+    <Compile Include="lsr\Player\Cellphone\ContactInteractions\GangInteraction.cs" />
+    <Compile Include="lsr\Player\Cellphone\ContactInteractions\GunDealerInteraction.cs" />
     <Compile Include="lsr\Player\Cellphone\PhoneText.cs" />
     <Compile Include="lsr\Player\Crime\GPSManager.cs" />
     <Compile Include="lsr\Player\Gang\GangKickUp.cs" />

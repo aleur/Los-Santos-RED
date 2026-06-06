@@ -220,7 +220,7 @@ public class DynamicPlaces
         int newRegisterCash = RandomItems.GetRandomNumberInt(200, 1200); //3500;
         if(closestLocation != null)
         {
-            newRegisterCash = RandomItems.GetRandomNumberInt(closestLocation.RegisterCashMin, closestLocation.RegisterCashMax);
+            newRegisterCash = RandomItems.GetRandomNumberInt((int) closestLocation.RegisterCashMin, (int) closestLocation.RegisterCashMax);
         }
         CashRegister newVend = new CashRegister(EntrancePos, heading, "Cash Register", "Cash Register", "", obj, newRegisterCash) { OpenTime = 0, CloseTime = 24 };
         newVend.CanInteractWhenWanted = true;

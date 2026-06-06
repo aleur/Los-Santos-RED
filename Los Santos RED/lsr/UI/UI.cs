@@ -60,10 +60,10 @@ public class UI : IMenuProvideable
 
     public AboutMenu AboutMenu { get; private set; }
     public PlayerInfoMenu PlayerInfoMenu { get; private set; }
+    public WorldInfoMenu WorldInfoMenu { get; private set; }
     public ConfigPauseMenu ConfigPauseMenu { get; private set; }
     public SavePauseMenu SavePauseMenu { get; private set; }
     public MessagesMenu MessagesMenu { get; private set; }
-    public LandlordMenu LandlordMenu { get; private set; }
 
     public bool IsDisplayingMenu => MenuPool.IsAnyMenuOpen();
     public string CurrentDefaultTextColor { get; private set; }= "~c~";
@@ -100,9 +100,9 @@ public class UI : IMenuProvideable
         CraftingMenu = new CraftingMenu(MenuPool, CraftableItems, Crafting, locationInteractableplayer, modItems, Settings);
         MenuList = new List<ModUIMenu>() { DeathMenu, BustedMenu, MainMenu, DebugMenu, CraftingMenu };
         PlayerInfoMenu = new PlayerInfoMenu(gangRelateable, Time, placesOfInterest, gangs, gangTerritories, zones, streets, interiors, World, shopMenus,modItems, weapons, Settings, LocationTypes);
+        WorldInfoMenu = new WorldInfoMenu(gangRelateable, Time, placesOfInterest, gangs, gangTerritories, zones, streets, interiors, World, shopMenus, modItems, weapons, Settings, LocationTypes);
         SavePauseMenu = new SavePauseMenu(saveablePlayer, Time, placesOfInterest, gangs, gangTerritories, zones, streets, interiors, World, shopMenus, modItems, weapons, Settings, gameSaves, pedSwap,playerinventory, saveablePlayer, agencies, modDataFileManager.Contacts, interactionable);
         MessagesMenu = new MessagesMenu(gangRelateable, Time, placesOfInterest, gangs, gangTerritories, zones, streets, interiors, World, Settings, modDataFileManager.Contacts);
-        LandlordMenu = new LandlordMenu(locationInteractableplayer, Time);
         AboutMenu = new AboutMenu(gangRelateable, Time, Settings);
         ActionPopUpMenu = new PopUpMenu(actionablePlayer, Settings, this, gestures, dances);
         TimerBarController = new TimerBarController(displayablePlayer, TimerBarPool, Settings);
@@ -117,6 +117,7 @@ public class UI : IMenuProvideable
         DeathMenu.Setup();
         MainMenu.Setup();
         PlayerInfoMenu.Setup();
+        WorldInfoMenu.Setup();
         SavePauseMenu.Setup();
         //ConfigPauseMenu.Setup();
         MessagesMenu.Setup();
@@ -127,7 +128,6 @@ public class UI : IMenuProvideable
         LowerRightDisplay.Setup();
         TopRightMenu.Setup();
         CraftingMenu.Setup();
-        LandlordMenu.Setup();
     }
     public void Dispose()
     {
@@ -269,10 +269,10 @@ public class UI : IMenuProvideable
         TimerBarPool.Draw();
         MenuPool.ProcessMenus();
         PlayerInfoMenu.Update();
+        WorldInfoMenu.Update();
         //ConfigPauseMenu.Update();
         SavePauseMenu.Update();
         MessagesMenu.Update();
-        LandlordMenu.Update();
         AboutMenu.Update();
     }
     private void RadarUpdate()

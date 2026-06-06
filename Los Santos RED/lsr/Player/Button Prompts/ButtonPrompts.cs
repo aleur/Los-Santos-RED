@@ -299,8 +299,6 @@ public class ButtonPrompts
         RemovePrompts("Grab");//new
         RemovePrompts("Treat");//new
 
-        if (Player.CurrentInteractedLocation.InteractionMenu == null || Player.CurrentInteractedLocation.Menu == null || Player.CurrentInteractedLocation.BusinessMenu == null) return;
-
         if (!HasPrompt($"BusinessMenu") && Player.CurrentInteractedLocation.UIMenuCategory == "ShopMenu")
         {
             RemovePrompts("BusinessMenu");
@@ -535,7 +533,7 @@ public class ButtonPrompts
             Prompts.RemoveAll(x => x.Group == "InteractableLocation");
         }
         //EntryPoint.WriteToConsole($"{!addedPromptGroup} && {Player.IsShowingFrontEndMenus} && {Player.ActivityManager.IsInteractingWithLocation} && {Player.CurrentInteractedLocation != null}");
-        if (!addedPromptGroup && Player.ActivityManager.IsInteractingWithLocation && Player.CurrentInteractedLocation != null && !World.Time.IsFastForwarding)
+        if (!addedPromptGroup && Player.ActivityManager.IsInteractingWithLocation && Player.CurrentInteractedLocation != null && Player.CurrentInteractedLocation.InteractionMenu != null && Player.CurrentInteractedLocation.MenuSwitchAvailable && !World.Time.IsFastForwarding)
         {
             LocationMenuPrompts();
             addedPromptGroup = true;

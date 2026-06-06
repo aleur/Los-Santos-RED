@@ -35,6 +35,14 @@ public class SavedOutfits : ISavedOutfits
             EntryPoint.WriteToConsole($"No Saved Outfits config found, creating default", 0);
             DefaultConfig();
         }
+        //Load Additive
+        foreach (FileInfo fileInfo in LSRDirectory.GetFiles("SavedOutfits+_*.xml").OrderByDescending(x => x.Name))
+        {
+            EntryPoint.WriteToConsole($"Loaded ADDITIVE Heads config  {fileInfo.FullName}", 0);
+            List<SavedOutfit> additivePossibleItems = Serialization.DeserializeParams<SavedOutfit>(fileInfo.FullName);
+            SavedOutfitList.RemoveAll(x => additivePossibleItems.Any(y => y.Name == x.Name));
+            SavedOutfitList.AddRange(additivePossibleItems);
+        }
     }
     public void AddOutfit(SavedOutfit so)
     {

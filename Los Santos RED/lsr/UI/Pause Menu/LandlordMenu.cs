@@ -12,13 +12,13 @@ using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 public class LandlordMenu
 {
-    private ILocationInteractable Player;
+    private IGangRelateable Player;
     private TabView tabView;
     public ResidencesTab ResidencesTab;
     public BusinessesTab BusinessesTab;
     private List<ITabbableMenu> Tabs = new List<ITabbableMenu>();
     private ITimeReportable Time;
-    public LandlordMenu(ILocationInteractable player, ITimeReportable time)
+    public LandlordMenu(IGangRelateable player, ITimeReportable time)
     {
         Player = player;
         Time = time;
@@ -79,8 +79,9 @@ public class LandlordMenu
     }
     private void ClearTabs()
     {
+        /*
         BusinessesTab.items = null;
-        ResidencesTab.items = null;
+        ResidencesTab.items = null;*/
     }
     private void PopulateMenus()
     {

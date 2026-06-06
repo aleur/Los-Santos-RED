@@ -126,9 +126,9 @@ public class VehicleExporter : GameLocation
                     //Player.CellPhone.AddContact(new VehicleExporterContact(ContactName), true);
                 }
                 DisposeInteractionMenu();
-                ResetInteractBools();
                 DisposeCamera(isInside);
                 DisposeInterior();
+                ResetInteractBools();
             }
             catch (Exception ex)
             {

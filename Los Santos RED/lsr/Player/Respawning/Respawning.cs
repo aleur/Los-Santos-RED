@@ -340,6 +340,27 @@ public class Respawning// : IRespawning
                 };
         Game.DisplaySubtitle("You: ~s~" + AttemptTalkOut.PickRandom());
         GameFiber.Sleep(4000);
+        if (World.TotalWantedLevel > Player.WantedLevel) // && Player.PoliceResponse.CrimesReported.Any(x => Player.PoliceResponse.crime <= x.AssociatedCrime.Priority)
+        {
+            List<string> TalkOutResponsePositive = new List<string>()
+            {
+                $"No ticket this time. Get outta my sight.",
+                $"It's your lucky day, duty calls. Beat it.",
+                $"You picked one hell of a time. Leave, don't make me regret it.",
+                $"Something bigger just came up. Move along, quickly.",
+                $"I should finish this, but I've got a real situation now. Get going.",
+                $"Consider this a warning. I've got more important things to handle.",
+                $"You're off the hook, but don't think this makes us even. Go.",
+                $"Dispatch needs me elsewhere. Count yourself lucky and leave.",
+                $"I don't have time for you anymore. Get out of here, now.",
+                $"This isn't over, but something else takes priority. Move it."
+            };
+            Game.DisplaySubtitle("~g~Cop: ~s~" + TalkOutResponsePositive.PickRandom());
+            GameFiber.Sleep(4000);
+            ResetPlayer(true, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
+            Player.Scanner.OnTalkedOutOfTicket();
+            return true;
+        }
         if (RandomItems.RandomPercent(Player.SpeechSkill))
         {
             List<string> TalkOutResponsePositive = new List<string>()
