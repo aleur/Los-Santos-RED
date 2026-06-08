@@ -27,6 +27,7 @@ public class CraftableItem
     public List<Ingredient> Ingredients { get; set; }
     public int Cooldown { get; set; } = 2000;
     public string CrimeId { get; set; }
+    public List<string> CrimeIDs { get; set; }
     public HashSet<string> CraftingFlags { get; set; }
 
 

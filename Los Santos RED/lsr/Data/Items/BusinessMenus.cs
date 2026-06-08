@@ -74,7 +74,9 @@ public class BusinessMenus : IBusinessMenus
         PossibleBusinessMenus.BusinessMenuList.AddRange(
             new List<BusinessMenu>()
             {
-                new BusinessMenu("ConvenienceStore", "ConvenienceStore", "ConvenienceStore")
+                new BusinessMenu("ConvenienceStoreMenu", "ConvenienceStoreProperty"),
+                new BusinessMenu("GenericBusinessMenu", "GenericBusinessProperty"),
+                new BusinessMenu("SmallAirstripMenu", "SmallAirstripProperty"),
             }
         );
     }
@@ -83,8 +85,14 @@ public class BusinessMenus : IBusinessMenus
         PossibleBusinessMenus.PropertyMenuList.AddRange(
             new List<PropertyMenu>()
             {
-                new PropertyMenu("ConvenienceStore", "ConvenienceStore", 200000, 100000) { MaxSalesPrice = 0, CashPurchaseOnly = false, PayoutFrequency = 7, PayoutMin = 1000, PayoutMax = 5000, GrowthPercentage = 20, 
+                new PropertyMenu("ConvenienceStoreProperty", "ConvenienceStoreProperty", 50000, 10000) { MaxSalesPrice = 0, CashPurchaseOnly = false, PayoutFrequency = 7, PayoutMin = 1000, PayoutMax = 5000, GrowthPercentage = 20, 
                                                                                            RacketeeringAmountMin = 500, MinPriceRefreshHours = 0, MaxPriceRefreshHours = 0, MinRestockHours = 0, MaxRestockHours = 0, 
+                                                                                           RacketeeringAmountMax = 1000, RegisterCashMax = 1550, RegisterCashMin = 250 },
+                new PropertyMenu("GenericBusinessProperty", "GenericBusinessProperty", 100000, 50000) { MaxSalesPrice = 0, CashPurchaseOnly = false, PayoutFrequency = 7, PayoutMin = 1000, PayoutMax = 5000, GrowthPercentage = 20,
+                                                                                           RacketeeringAmountMin = 500, MinPriceRefreshHours = 0, MaxPriceRefreshHours = 0, MinRestockHours = 0, MaxRestockHours = 0,
+                                                                                           RacketeeringAmountMax = 1000, RegisterCashMax = 1550, RegisterCashMin = 250 },
+                new PropertyMenu("SmallAirstripProperty", "SmallAirstripProperty", 200000, 100000) { MaxSalesPrice = 0, CashPurchaseOnly = false, PayoutFrequency = 7, PayoutMin = 10000, PayoutMax = 100000, GrowthPercentage = 50,
+                                                                                           RacketeeringAmountMin = 500, MinPriceRefreshHours = 0, MaxPriceRefreshHours = 0, MinRestockHours = 0, MaxRestockHours = 0,
                                                                                            RacketeeringAmountMax = 1000, RegisterCashMax = 1550, RegisterCashMin = 250 }
             }
         );

@@ -29,7 +29,7 @@ public class VariablePriceMenuItem : MenuItem
         MaxPurchasePrice = maxPurchasePrice;
     }
     public int MinSalesPrice { get; set; }
-    public int MaxSalesPrice { get; set; }
+    public int MaxSalesPrice { get; set; } = -1;
     public int MinPurchasePrice { get; set; }
     public int MaxPurchasePrice { get; set; }
     public override void UpdatePrices()

@@ -131,7 +131,7 @@ public static class StaticStrings
     public static readonly string SanFierroAirCarrierID = "SanFierroAir";
     public static readonly string LosSantosAirCarrierID = "LosSantosAir";
     public static readonly string FlyUSCarrierID = "FlyUS";
-    public static readonly string AdiosAirlinesCarrierID = "Adios Airlines";
+    public static readonly string AdiosAirlinesCarrierID = "AdiosAirlines";
 
     //Menus
     public static readonly string DrugDealerMenuID = "DrugDealerMenu";

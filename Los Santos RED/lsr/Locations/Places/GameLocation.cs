@@ -35,7 +35,7 @@ public class GameLocation : ILocationDispatchable
     protected IOrganizations Associations;
     protected ModDataFileManager ModDataFileManager;
     protected Transaction Transaction;
-    protected Property Property;
+    protected Business Business;
     protected uint NotificationHandle;
     protected readonly List<string> FallBackVendorModels = new List<string>() { "s_m_m_strvend_01", "s_m_m_linecook" };
     protected float currentblipAlpha = 0.25f;
@@ -147,7 +147,7 @@ public class GameLocation : ILocationDispatchable
     public string AssignedAssociationID { get; set; }
     public bool DisableRegularInteract { get; set; } = false;
     public string MenuID { get; set; }
-    public string BusinessMenuID { get; set; }
+    public string BusinessID { get; set; }
 
     public Vector3 CameraPosition { get; set; } = Vector3.Zero;
     public Vector3 CameraDirection { get; set; } = Vector3.Zero;
@@ -239,14 +239,14 @@ public class GameLocation : ILocationDispatchable
     public Rotator VehiclePreviewCameraRotation { get; set; }
     public SpawnPlace VehiclePreviewLocation { get; set; }
     public List<SpawnPlace> VehicleDeliveryLocations { get; set; } = new List<SpawnPlace>();
-    public virtual int? RegisterCashMin { get; set; }
-    public virtual int? RegisterCashMax { get; set; }
+    public virtual int RegisterCashMin { get; set; } = -1;
+    public virtual int RegisterCashMax { get; set; } = -1;
     public bool NoEntryCam { get; set; } = false;
 
-    public virtual int? MinPriceRefreshHours { get; set; }
-    public virtual int? MaxPriceRefreshHours { get; set; }
-    public virtual int? MinRestockHours { get; set; }
-    public virtual int? MaxRestockHours { get; set; }
+    public virtual int MinPriceRefreshHours { get; set; } = -1;
+    public virtual int MaxPriceRefreshHours { get; set; } = -1;
+    public virtual int MinRestockHours { get; set; } = -1;
+    public virtual int MaxRestockHours { get; set; } = -1;
 
     //public int MaxAssaultSpawns { get; set; } = 15;
     public virtual bool AreMarkersDisabled => false;
@@ -254,8 +254,8 @@ public class GameLocation : ILocationDispatchable
 
 
 
-    public virtual int? RacketeeringAmountMin { get; set; }
-    public virtual int? RacketeeringAmountMax { get; set; }
+    public virtual int RacketeeringAmountMin { get; set; } = -1;
+    public virtual int RacketeeringAmountMax { get; set; } = -1;
 
 
     [XmlIgnore]
@@ -294,7 +294,7 @@ public class GameLocation : ILocationDispatchable
     [XmlIgnore]
     public string UIMenuCategory { get; set; }
     [XmlIgnore]
-    public bool MenuSwitchAvailable => Transaction != null && Property != null;
+    public bool MenuSwitchAvailable { get; set; }
     [XmlIgnore]
     public ShopMenu Menu { get; set; }
     [XmlIgnore]
@@ -346,14 +346,20 @@ public class GameLocation : ILocationDispatchable
     public string MapTeleportString => IsOnSPMap && !IsOnMPMap ? "(SP)" : IsOnMPMap && !IsOnSPMap ? "(MP)" : "";
 
     #region Business Ownership
-    public virtual int? PurchasePrice { get; set; }
-    public virtual int? PayoutFrequency { get; set; }
-    public virtual int? PayoutMin { get; set; }
-    public virtual int? PayoutMax { get; set; }
-    public virtual int? SalesPrice { get; set; }
-    public virtual int? MaxSalesPrice { get; set; }
-    public int? GrowthPercentage { get; set; }
-    public bool? CashPurchaseOnly { get; set; }
+    public virtual int PurchasePrice { get; set; } = -1;
+    public virtual int PayoutFrequency { get; set; } = -1;
+    public virtual int PayoutMin { get; set; } = -1;
+    public virtual int PayoutMax { get; set; } = -1;
+    public virtual int SalesPrice { get; set; } = -1;
+    public virtual int MaxSalesPrice { get; set; } = -1;
+    public int GrowthPercentage { get; set; } = -1;
+    public string IsCashPurchaseOnly { get; set; }
+    [XmlIgnore]
+    public bool CashPurchaseOnly
+    {
+        get => bool.TryParse(IsCashPurchaseOnly, out var result) && result;
+        set { }
+    }
     [XmlIgnore]
     public int CurrentSalesPrice { get; set; }
     [XmlIgnore]
@@ -554,7 +560,7 @@ public class GameLocation : ILocationDispatchable
         }
         Menu = shopMenus.GetSpecificInstancedMenu(MenuID);
         if (Menu != null) UIMenuCategory = "ShopMenu";
-        BusinessMenu = modDataFileManager.BusinessMenus.GetSpecificBusinessMenu(BusinessMenuID);
+        BusinessMenu = modDataFileManager.BusinessMenus.GetSpecificBusinessMenu(BusinessID);
         if (BusinessMenu != null) BusinessMenu.SetupBusiness(this, modDataFileManager.BusinessMenus.GetSpecificPropertyMenu(BusinessMenu.PropertyMenuID));
         if (HasInterior)
         {
@@ -606,8 +612,9 @@ public class GameLocation : ILocationDispatchable
                 }
                 if (BusinessMenu != null)
                 {
-                    Property = new Property(MenuPool, InteractionMenu, BusinessMenu, Player, Time, Settings, this);
+                    Business = new Business(MenuPool, InteractionMenu, BusinessMenu, Player, Time, Settings, this);
                 }
+                MenuSwitchAvailable = Transaction != null && Business != null;
                 if (Menu != null)
                 {
                     Transaction.CreateTransactionMenu(Player, ModItems, World, Settings, Weapons, Time);
@@ -618,11 +625,11 @@ public class GameLocation : ILocationDispatchable
                 }
                 else if (BusinessMenu != null)
                 {
-                    Property.CreateBusinessMenu(ModItems, World, Weapons);
+                    Business.CreateBusinessMenu(ModItems, World, Weapons);
                     UIMenuCategory = "BusinessMenu";
                     InteractionMenu.Visible = true;
-                    Property.ProcessBusinessMenu();
-                    Property.DisposeBusinessMenu();
+                    Business.ProcessBusinessMenu();
+                    Business.DisposeBusinessMenu();
                 }
                 DisposeInteractionMenu();
                 DisposeCamera(isInside);
@@ -644,7 +651,7 @@ public class GameLocation : ILocationDispatchable
         UIMenuCategory = string.Empty;
         CanInteract = true;
     }
-    public void SwitchMenus()
+    public virtual void SwitchMenus()
     {
         if (UIMenuCategory == "ShopMenu")
         {
@@ -655,15 +662,15 @@ public class GameLocation : ILocationDispatchable
         }
         else if (UIMenuCategory == "BusinessMenu")
         {
-            Property.CreateBusinessMenu(ModItems, World, Weapons);
+            Business.CreateBusinessMenu(ModItems, World, Weapons);
             InteractionMenu.Visible = true;
-            Property.ProcessBusinessMenu();
-            Property.DisposeBusinessMenu();
+            Business.ProcessBusinessMenu();
+            Business.DisposeBusinessMenu();
         }
     }
     public virtual bool Purchase()
     {
-        bool hasEnoughMoney = (bool) CashPurchaseOnly ? Player.BankAccounts.GetMoney(false) >= PurchasePrice : Player.BankAccounts.GetMoney(true) >= PurchasePrice;
+        bool hasEnoughMoney = CashPurchaseOnly ? Player.BankAccounts.GetMoney(false) >= PurchasePrice : Player.BankAccounts.GetMoney(true) >= PurchasePrice;
         if (hasEnoughMoney)
         {
             OnPurchased();
@@ -680,13 +687,14 @@ public class GameLocation : ILocationDispatchable
     }
     protected virtual void OnPurchased()
     {
+        PlaySuccessSound();
         //Player.Properties.AddPayoutProperty(this);
         AddOwnership();
-        Player.BankAccounts.GiveMoney(-1 * PurchasePrice ?? 0, (bool) !CashPurchaseOnly);
+        Player.BankAccounts.GiveMoney(-1 * PurchasePrice, !CashPurchaseOnly);
         IsOwned = true;
         DatePayoutPaid = Time.CurrentDateTime;
-        DatePayoutDue = DatePayoutPaid.AddDays(PayoutFrequency ?? 0);
-        CurrentSalesPrice = SalesPrice ?? 0;
+        DatePayoutDue = DatePayoutPaid.AddDays(PayoutFrequency);
+        CurrentSalesPrice = SalesPrice;
     }
     protected virtual void OnSold()
     {
@@ -704,10 +712,6 @@ public class GameLocation : ILocationDispatchable
     }
     protected virtual void HandlePriceRefreshes()
     {
-        if (MinPriceRefreshHours == null && MaxPriceRefreshHours == null)
-        {
-            return;
-        }
         if (MinPriceRefreshHours <= 0 && MaxPriceRefreshHours <= 0)
         {
             return;
@@ -732,10 +736,6 @@ public class GameLocation : ILocationDispatchable
     }
     protected virtual void HandleSupplyRefreshes()
     {
-        if (MinRestockHours == null && MaxRestockHours == null)
-        {
-            return;
-        }
         if (MinRestockHours <= 0 && MaxRestockHours <= 0)
         {
             return;

@@ -15,6 +15,7 @@ namespace LosSantosRED.lsr.Interface
         //ButtonPrompts ButtonPrompts { get; }
         //BankAccounts BankAccounts { get; }
         //Inventory Inventory { get; }
+        HumanState HumanState { get; }
         Properties Properties { get; }
         //ActivityManager ActivityManager { get; }
         //Ped Character { get; }

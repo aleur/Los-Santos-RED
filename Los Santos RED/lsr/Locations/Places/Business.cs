@@ -14,38 +14,27 @@ using System.Threading.Tasks;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 
-public class Property
+public class Business
 {
     private UIMenu ParentMenu;
     private UIMenu ManageBusinessMenu;
     private UIMenu AccessAmenitiesMenu;
     private UIMenu WorkOptionsMenu;
-    private uint NotificationHandle;
-    private uint GameTimeLastRotatedModel;
     private ILocationInteractable Player;
     private ITimeControllable Time;
     private ISettingsProvideable Settings;
     private DateTime ClosingTime;
     private UIMenuNumericScrollerItem<int> WorkMenuScrollerItem;
     private UIMenuItem WorkMenuItem;
-    public List<VehicleColorLookup> VehicleColors { get; private set; }
     public BusinessMenu BusinessMenu { get; set; }
     public GameLocation Location { get; private set; }
     public MenuPool MenuPool { get; private set; }
     public bool HasBannerImage { get; set; } = false;
     public Texture BannerImage { get; set; }
     public bool RemoveBanner { get; set; } = false;
-    public string LocationName { get; set; } = "";
-    public bool IsStealing { get; set; }
     public bool KeepInteractionGoing { get; set; } = false;
-    public ILicensePlatePreviewable LicensePlatePreviewable { get; set; }
-    public bool IsPurchasing { get; set; } = true;
-    public bool UseAccounts { get; set; } = true;
-    public LocationCamera LocationCamera { get; set; }
-    public bool IsInteriorInteract { get; internal set; }
-    //public bool ShouldUpdateVariablePrices { get; set; } = false;
 
-    public Property(MenuPool menuPool, UIMenu parentMenu, BusinessMenu menu, ILocationInteractable player, ITimeControllable time, ISettingsProvideable settings, GameLocation location)
+    public Business(MenuPool menuPool, UIMenu parentMenu, BusinessMenu menu, ILocationInteractable player, ITimeControllable time, ISettingsProvideable settings, GameLocation location)
     {
         MenuPool = menuPool;
         ParentMenu = parentMenu;
@@ -57,7 +46,7 @@ public class Property
         ClosingTime = (Location.CloseTime == 24 && Location.OpenTime == 0) ? new DateTime(Time.CurrentYear, Time.CurrentMonth, Time.CurrentDay, 23, 59, 00) :
             new DateTime(Time.CurrentYear, Time.CurrentMonth, Time.CurrentDay, Location.CloseTime, 0, 0);
     }
-    public Property() : base()
+    public Business() : base()
     {
 
     }
@@ -114,7 +103,7 @@ public class Property
             {
                 OfferSubMenu.RemoveBanner();
             }
-            UIMenuItem PurchaseBusinessMenuItem = new UIMenuItem("Purchase", "Select to purchase this business.") { RightLabel =  Location.PurchasePrice?.ToString("C0") };
+            UIMenuItem PurchaseBusinessMenuItem = new UIMenuItem("Purchase", "Select to purchase this business.") { RightLabel =  Location.PurchasePrice.ToString("C0") };
             PurchaseBusinessMenuItem.Activated += (sender, e) =>
             {
                 if (Location.Purchase())
@@ -127,7 +116,7 @@ public class Property
         }
         else if (Location.IsOwned)
         {
-            UIMenuItem SellBusinessItem = new UIMenuItem("Sell Business", "Sell the current business.") { RightLabel = Location.SalesPrice?.ToString("C0") };
+            UIMenuItem SellBusinessItem = new UIMenuItem("Sell Business", "Sell the current business.") { RightLabel = Location.SalesPrice.ToString("C0") };
             SellBusinessItem.Activated += (sender, e) =>
             {
                 Location.Sell();

@@ -12,26 +12,22 @@ public class BusinessMenu
     {
 
     }
-    public BusinessMenu(string iD, string name)
+    public BusinessMenu(string iD)
     {
         ID = iD;
-        Name = name;
     }
-    public BusinessMenu(string iD, string name, string propertyMenuID)
+    public BusinessMenu(string iD, string propertyMenuID)
     {
         ID = iD;
-        Name = name;
         PropertyMenuID = propertyMenuID;
     }
-    public BusinessMenu(string iD, string name, string amenitiesGroupID, List<string> availableAmenities)
+    public BusinessMenu(string iD, string amenitiesGroupID, List<string> availableAmenities)
     {
         ID = iD;
-        Name = name;
         AmenitiesGroupID = amenitiesGroupID;
         AvailableAmenities = availableAmenities;
     }
     public string ID { get; set; }
-    public string Name { get; set; }
     public string BannerOverride { get; set; }
     public string PropertyMenuID { get; set; }
     public string AmenitiesGroupID { get; set; } 

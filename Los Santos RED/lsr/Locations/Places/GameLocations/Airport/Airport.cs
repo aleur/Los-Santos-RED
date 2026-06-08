@@ -25,7 +25,9 @@ public class Airport : GameLocation, ILocationSetupable
 {
     private protected List<Carrier> Carriers = new List<Carrier>();
     private protected IPlacesOfInterest PlacesOfInterest;
-    private bool IsFlyingToLocation;
+    private UIMenu CommercialMenu;
+    private List<AirportFlight> FlightOptions;
+    public bool IsFlyingToLocation;
    
     public Airport() : base()
     {
@@ -41,11 +43,12 @@ public class Airport : GameLocation, ILocationSetupable
     public float AirArrivalHeading { get; set; }
     public List<string> RequestIPLs { get; set; }
     public List<string> RemoveIPLs { get; set; }
-    public List<AirportFlight> CommercialFlights { get; set; } = new List<AirportFlight>();
+    //public List<AirportFlight> CommercialFlights { get; set; } = new List<AirportFlight>();
     public HashSet<RoadToggler> RoadToggels { get; set; } = new HashSet<RoadToggler>();
     public HashSet<string> ZonesToEnable { get; set; } = new HashSet<string>();
     public int FuelPrice { get; set; } = 6;
     public bool RequiresMPMap { get; set; } = false;
+    public string FlightOptionsID { get; set; }
     public Airport(string airportID, Vector3 _EntrancePosition, float _EntranceHeading, string _Name, string _Description) : base(_EntrancePosition, _EntranceHeading, _Name, _Description)
     {
         AirportID = airportID;
@@ -63,6 +66,17 @@ public class Airport : GameLocation, ILocationSetupable
         PlacesOfInterest = placesOfInterest;
         base.StoreData(shopMenus, agencies, gangs, zones, jurisdictions, gangTerritories, names, crimes, PedGroups, world, streets, locationTypes, settings, plateTypes, associations, 
             contacts, interiors, player, modItems, weapons, time, placesOfInterest, issuableWeapons, heads, dispatchablePeople, modDataFileManager);
+        if (!string.IsNullOrEmpty(FlightOptionsID))
+        {
+            FlightOptions = shopMenus.GetAirportFlights(FlightOptionsID);
+            UIMenuCategory = "ShopMenu";
+        }
+        if (!string.IsNullOrEmpty(BusinessID))
+        {
+            BusinessMenu = modDataFileManager.BusinessMenus.GetSpecificBusinessMenu(BusinessID);
+            if (BusinessMenu != null) 
+                BusinessMenu.SetupBusiness(this, modDataFileManager.BusinessMenus.GetSpecificPropertyMenu(BusinessMenu.PropertyMenuID));
+        }
     }
     public override void OnInteract()//ILocationInteractable player, IModItems modItems, IEntityProvideable world, ISettingsProvideable settings, IWeapons weapons, ITimeControllable time, IPlacesOfInterest placesOfInterest)
     {
@@ -106,8 +120,30 @@ public class Airport : GameLocation, ILocationSetupable
                 SetupLocationCamera(locationCamera, isInside, true);
                 CreateInteractionMenu();
                 InteractionMenu.Visible = true;
-                SetupMenu();
-                ProcessInteractionMenu();
+                if (FlightOptions != null && FlightOptions.Any())
+                {
+                    HandleVariableItems();
+                }
+                if (BusinessMenu != null)
+                {
+                    Business = new Business(MenuPool, InteractionMenu, BusinessMenu, Player, Time, Settings, this);
+                }
+                MenuSwitchAvailable = FlightOptions != null && FlightOptions.Any() && Business != null;
+                if (FlightOptions != null && FlightOptions.Any())
+                {
+                    SetupMenu();
+                    UIMenuCategory = "ShopMenu";
+                    InteractionMenu.Visible = true;
+                    ProcessFlightsMenu();
+                }
+                else if (BusinessMenu != null)
+                {
+                    Business.CreateBusinessMenu(ModItems, World, Weapons);
+                    UIMenuCategory = "BusinessMenu";
+                    InteractionMenu.Visible = true;
+                    Business.ProcessBusinessMenu();
+                    Business.DisposeBusinessMenu();
+                }
                 DisposeInteractionMenu();
                 DisposeCamera(isInside);
                 DisposeInterior();
@@ -118,7 +154,42 @@ public class Airport : GameLocation, ILocationSetupable
                 EntryPoint.WriteToConsole(ex.Message + " " + ex.StackTrace, 0);
                 EntryPoint.ModController.CrashUnload();
             }
-        }, "AirportInteract");     
+        }, "AirportInteract");
+    }
+    public override void SwitchMenus()
+    {
+        if (UIMenuCategory == "ShopMenu")
+        {
+            SetupMenu();
+            InteractionMenu.Visible = true;
+            ProcessFlightsMenu();
+        }
+        else if (UIMenuCategory == "BusinessMenu")
+        {
+            Business.CreateBusinessMenu(ModItems, World, Weapons);
+            InteractionMenu.Visible = true;
+            Business.ProcessBusinessMenu();
+            Business.DisposeBusinessMenu();
+        }
+    }
+    public void ProcessFlightsMenu()
+    {
+        while (MenuPool.IsAnyMenuOpen() && UIMenuCategory == "ShopMenu")
+        {
+            MenuPool.ProcessMenus();
+            GameFiber.Yield();
+        }
+        if (UIMenuCategory == "BusinessMenu")
+        {
+            MenuPool.Where(x => x.ParentMenu != null && x.ParentMenu != InteractionMenu).ToList().ForEach(x => // To deal with those not attached to ParentMenu. Otherwise, causes multiple layers of UI.
+            {
+                EntryPoint.WriteToConsole($"{x.CurrentItem.Text}");
+                MenuPool.Remove(x); // Instead of x.ParentMenu.Clear(); x.ParentMenu.Close(); which also works. Removes duplicates of UIMenu as well.
+            });
+            CommercialMenu.Close();
+            InteractionMenu.Clear();
+            SwitchMenus();
+        }
     }
     protected override void DisposeCamera(bool isInside)
     {
@@ -143,14 +214,25 @@ public class Airport : GameLocation, ILocationSetupable
     {
         InteractionMenu.SubtitleText = "Pick an Option";
         AddCommercialMenu();
-        AddPrivateMenu();
+        //AddPrivateMenu();
     }
     private void AddCommercialMenu()
     {
-        UIMenu commercialSubMenu = MenuPool.AddSubMenu(InteractionMenu, "Commercial Flights");
-        commercialSubMenu.SubtitleText = "Pick a Destination";
+        CommercialMenu = MenuPool.AddSubMenu(InteractionMenu, "Commercial Flights");
+        CommercialMenu.SubtitleText = "Pick a Destination";
+        CommercialMenu.SetBannerType(BannerImage);
+
         InteractionMenu.MenuItems[InteractionMenu.MenuItems.Count() - 1].Description = "Need to get away? Chose one of our fine commercial carriers to get you where you need to go";
 
+        if (FlightOptions != null && FlightOptions.Any())
+        {
+            foreach (AirportFlight flight in FlightOptions)
+            {
+                if (flight.ToAirportID == AirportID) continue;
+                flight.AddToMenu(this, PlacesOfInterest.PossibleLocations.Airports.FirstOrDefault(x => x.AirportID == flight.ToAirportID), CommercialMenu, Player, World);
+            }
+        }
+        /*
         foreach (string groupedAirportID in CommercialFlights.GroupBy(x => x.ToAirportID).Select(x => x.Key).Distinct().OrderBy(x => x))
         {
             string DestinationName = groupedAirportID;
@@ -163,15 +245,15 @@ public class Airport : GameLocation, ILocationSetupable
                 DestinationDescription = airportGroup.Description;
             }
 
-            UIMenu destinationSubMenu = MenuPool.AddSubMenu(commercialSubMenu, DestinationName);
+            UIMenu destinationSubMenu = MenuPool.AddSubMenu(CommercialMenu, DestinationName);
             destinationSubMenu.SubtitleText = "Destination: " + DestinationName;
-            commercialSubMenu.MenuItems[commercialSubMenu.MenuItems.Count() - 1].Description = DestinationDescription;
+            CommercialMenu.MenuItems[CommercialMenu.MenuItems.Count() - 1].Description = DestinationDescription;
 
 
             int? minCost = CommercialFlights.Where(x => x.ToAirportID == groupedAirportID)?.Min(x => x.Cost);
             if (minCost.HasValue)
             {
-                commercialSubMenu.MenuItems[commercialSubMenu.MenuItems.Count() - 1].RightLabel = $"From ${minCost}";
+                CommercialMenu.MenuItems[CommercialMenu.MenuItems.Count() - 1].RightLabel = $"From ${minCost}";
             }
 
 
@@ -215,8 +297,9 @@ public class Airport : GameLocation, ILocationSetupable
                 destinationSubMenu.AddItem(destinationMenu);
 
             }
-        }
+        }*/
     }
+    /*
     private void AddPrivateMenu()
     {
         UIMenu privateSubMenu = MenuPool.AddSubMenu(InteractionMenu, "Private Flights");
@@ -328,7 +411,7 @@ public class Airport : GameLocation, ILocationSetupable
                 destinationSubMenu.AddItem(noPlanesMenu);
             }
         }
-    }
+    }*/
     public virtual void OnArrive(ILocationInteractable Player, bool setPos)
     {
         if (RequestIPLs != null)
@@ -382,7 +465,7 @@ public class Airport : GameLocation, ILocationSetupable
             }
         }
     }
-    private void FlyToAirport(Airport destinationAiport, int flightTime)
+    public void FlyToAirport(Airport destinationAiport, int flightTime, int HungerGain, int ThirstGain, int SleepGain)
     {
         GameFiber.StartNew(delegate
         {
@@ -396,6 +479,9 @@ public class Airport : GameLocation, ILocationSetupable
                 Time.SetDateTime(Time.CurrentDateTime.AddHours(flightTime));
                 GameFiber.Sleep(3000);//do the whole shebang ehre
                 Game.FadeScreenIn(1500, true);
+                Player.HumanState.Hunger.Change(HungerGain, true);
+                Player.HumanState.Thirst.Change(ThirstGain, true);
+                Player.HumanState.Sleep.Change(SleepGain, true);
             }
             catch (Exception ex)
             {

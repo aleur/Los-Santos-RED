@@ -72,7 +72,7 @@ public class PlacesOfInterest : IPlacesOfInterest
     private List<TattooShop> TattooShopPlaces;
     private List<PlasticSurgeryClinic> PlasticSurgeryClinics;
     private List<BarberShop> BarberShopPlaces;
-    private List<Business> Businesses;
+    private List<GenericBusiness> Businesses;
     private PedCustomizerLocation DefaultPedCustomizerLocation;
 
     public PossibleLocations PossibleLocations { get; private set; }
@@ -459,11 +459,10 @@ public class PlacesOfInterest : IPlacesOfInterest
     }
     private void DefaultConfig_Businesses()
     {
-        Businesses = new List<Business>();
-
-        Businesses = new List<Business>()
+        /*
+        Businesses = new List<GenericBusiness>()
         {
-            new Business(new Vector3(1437.496f,-1491.862f,63.62201f),163.8885f,"Trap House", "Selling misery since the 80's")
+            new GenericBusiness(new Vector3(1437.496f,-1491.862f,63.62201f),163.8885f,"Trap House", "Selling misery since the 80's")
             {
                 OpenTime = 0,
                 CloseTime = 24,
@@ -477,7 +476,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 CameraRotation = new Rotator(0f, 0f, 0f),
                 CraftingFlag = "DrugLab"
             },
-            new Business(new Vector3(-699.1762f, -2412.538f, 13.94452f), 56.22367f,"Weed Farm", "")
+            new GenericBusiness(new Vector3(-699.1762f, -2412.538f, 13.94452f), 56.22367f,"Weed Farm", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
@@ -491,7 +490,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 PossibleModItemPayouts = new List<string>() { "Marijuana" },
                 ModItemPayoutAmount = 200,
             },
-            new Business(new Vector3(1138.891f,-322.3859f,67.14568f),10.44588f,"Weed Farm", "")
+            new GenericBusiness(new Vector3(1138.891f,-322.3859f,67.14568f),10.44588f,"Weed Farm", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
@@ -506,7 +505,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 CameraRotation = new Rotator(-15.16129f, -1.901809E-05f, -114.2649f),
             },
 
-            new Business(new Vector3(489.0005f,-921.6695f,26.37737f),272.7067f,"Document Forgery", "")
+            new GenericBusiness(new Vector3(489.0005f,-921.6695f,26.37737f),272.7067f,"Document Forgery", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
@@ -520,7 +519,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 CameraDirection = new Vector3(-0.9496481f, -0.02304305f, -0.3124701f),
                 CameraRotation = new Rotator(-18.20815f, 5.083711E-06f, 91.39f),
             },
-            new Business(new Vector3(718.3692f,-767.5186f,24.86592f),271.1747f,"Chop Shop", "")
+            new GenericBusiness(new Vector3(718.3692f,-767.5186f,24.86592f),271.1747f,"Chop Shop", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
@@ -535,7 +534,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 CameraDirection = new Vector3(-0.7651124f, 0.5975918f, -0.2397646f),
                 CameraRotation = new Rotator(-13.87265f, -8.794256E-07f, 52.00835f)
             },
-            new Business(new Vector3(2848.69f, 4450.263f, 48.51294f), 109.1559f,"Weed Farm", "")
+            new GenericBusiness(new Vector3(2848.69f, 4450.263f, 48.51294f), 109.1559f,"Weed Farm", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
@@ -549,7 +548,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 CameraDirection = new Vector3(0.8953656f, 0.292662f, -0.3356626f),
                 CameraRotation = new Rotator(-19.61284f, -4.531792E-07f, -71.89934f),
             },
-            new Business(new Vector3(201.6389f, 2462.551f, 55.90598f), 200.5553f,"Meth lab", "")
+            new GenericBusiness(new Vector3(201.6389f, 2462.551f, 55.90598f), 200.5553f,"Meth lab", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
@@ -560,7 +559,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 PossibleModItemPayouts = new List<string>() { "Methamphetamine" },
                 ModItemPayoutAmount = 200,
             },
-            new Business(new Vector3(143.224f, -1656.096f, 29.48878f), 226.5995f,"Meth Lab", "")
+            new GenericBusiness(new Vector3(143.224f, -1656.096f, 29.48878f), 226.5995f,"Meth Lab", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
@@ -571,7 +570,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 PossibleModItemPayouts = new List<string>() { "Methamphetamine" },
                 ModItemPayoutAmount = 200,
             },
-            new Business(new Vector3(298.715f, -758.941f, 29.39268f), 250.9668f,"Document Forgery", "")
+            new GenericBusiness(new Vector3(298.715f, -758.941f, 29.39268f), 250.9668f,"Document Forgery", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
@@ -585,7 +584,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 CameraDirection = new Vector3(-0.9482352f, 0.316846f, -0.02141672f),
                 CameraRotation = new Rotator(-1.227182f, 8.539695E-06f, 71.52332f),
             },
-            new Business(new Vector3(-288.3814f, 6299.165f, 31.49225f), 44.36363f,"Cocaine Lockup", "")
+            new GenericBusiness(new Vector3(-288.3814f, 6299.165f, 31.49225f), 44.36363f,"Cocaine Lockup", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
@@ -596,7 +595,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 PossibleModItemPayouts = new List<string>() { "Cocaine" },
                 ModItemPayoutAmount = 200,
             },
-            new Business(new Vector3(26.24912f,-1409.279f,29.44853f),182.4005f,"Hands On Car Wash", "")
+            new GenericBusiness(new Vector3(26.24912f,-1409.279f,29.44853f),182.4005f,"Hands On Car Wash", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
@@ -614,7 +613,7 @@ public class PlacesOfInterest : IPlacesOfInterest
 
 
             //MP Map GARBAGE , should be thrown into a fucking volcano
-            new Business(new Vector3(-699.1762f, -2412.538f, 13.94452f), 56.22367f,"Weed Farm", "")
+            new GenericBusiness(new Vector3(-699.1762f, -2412.538f, 13.94452f), 56.22367f,"Weed Farm", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
@@ -629,7 +628,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 ModItemPayoutAmount = 200,
                 InteriorID = 247297,
             },
-            new Business(new Vector3(1138.891f,-322.3859f,67.14568f),10.44588f,"Weed Farm", "")
+            new GenericBusiness(new Vector3(1138.891f,-322.3859f,67.14568f),10.44588f,"Weed Farm", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
@@ -644,7 +643,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 CameraRotation = new Rotator(-15.16129f, -1.901809E-05f, -114.2649f),
                 InteriorID = 247297,
             },
-            new Business(new Vector3(489.0005f,-921.6695f,26.37737f),272.7067f,"Document Forgery", "")
+            new GenericBusiness(new Vector3(489.0005f,-921.6695f,26.37737f),272.7067f,"Document Forgery", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
@@ -659,7 +658,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 CameraRotation = new Rotator(-18.20815f, 5.083711E-06f, 91.39f),
                 InteriorID = 246785,
             },
-            new Business(new Vector3(718.3692f,-767.5186f,24.86592f),271.1747f,"Chop Shop", "")
+            new GenericBusiness(new Vector3(718.3692f,-767.5186f,24.86592f),271.1747f,"Chop Shop", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
@@ -675,7 +674,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 CameraRotation = new Rotator(-13.87265f, -8.794256E-07f, 52.00835f),
                 InteriorID = 252673,
             },
-            new Business(new Vector3(2848.69f, 4450.263f, 48.51294f), 109.1559f,"Weed Farm", "")
+            new GenericBusiness(new Vector3(2848.69f, 4450.263f, 48.51294f), 109.1559f,"Weed Farm", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
@@ -690,7 +689,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 CameraRotation = new Rotator(-19.61284f, -4.531792E-07f, -71.89934f),
                 InteriorID = 247297,
             },
-            new Business(new Vector3(201.6389f, 2462.551f, 55.90598f), 200.5553f,"Meth lab", "")
+            new GenericBusiness(new Vector3(201.6389f, 2462.551f, 55.90598f), 200.5553f,"Meth lab", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
@@ -702,7 +701,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 ModItemPayoutAmount = 200,
                 InteriorID = 247041,
             },
-            new Business(new Vector3(143.224f, -1656.096f, 29.48878f), 226.5995f,"Meth Lab", "")
+            new GenericBusiness(new Vector3(143.224f, -1656.096f, 29.48878f), 226.5995f,"Meth Lab", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
@@ -714,7 +713,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 ModItemPayoutAmount = 200,
                 InteriorID = 247041,
             },
-            new Business(new Vector3(298.715f, -758.941f, 29.39268f), 250.9668f,"Document Forgery", "")
+            new GenericBusiness(new Vector3(298.715f, -758.941f, 29.39268f), 250.9668f,"Document Forgery", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
@@ -729,7 +728,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 CameraRotation = new Rotator(-1.227182f, 8.539695E-06f, 71.52332f),
                 InteriorID = 246785,
             },
-            new Business(new Vector3(-288.3814f, 6299.165f, 31.49225f), 44.36363f,"Cocaine Lockup", "")
+            new GenericBusiness(new Vector3(-288.3814f, 6299.165f, 31.49225f), 44.36363f,"Cocaine Lockup", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
@@ -741,7 +740,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 ModItemPayoutAmount = 200,
                 InteriorID = 247553,
             },
-            new Business(new Vector3(26.24912f,-1409.279f,29.44853f),182.4005f,"Hands On Car Wash", "")
+            new GenericBusiness(new Vector3(26.24912f,-1409.279f,29.44853f),182.4005f,"Hands On Car Wash", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
@@ -757,6 +756,13 @@ public class PlacesOfInterest : IPlacesOfInterest
                 CameraRotation = new Rotator(-9.539512f, -1.731491E-06f, -65.84164f),
                 InteriorID = 298497,
             },
+        };
+        */
+        Businesses = new List<GenericBusiness>()
+        {
+            new GenericBusiness(new Vector3(-582.2298f, -1008.865f, 22.32969f), 269.7768f, "K-Town Watches", "") { BusinessID = "GenericBusinessMenu"},
+            new GenericBusiness(new Vector3(-582.2222f, -984.9955f, 25.98572f), 272.19f, "K-Town Shoe Store", "") { BusinessID = "GenericBusinessMenu"},
+            new GenericBusiness(new Vector3(-582.2017f, -1000.755f, 25.98572f), 267.1015f, "K-Town Electrical Appliances", "") { BusinessID = "GenericBusinessMenu"},
         };
     }
     private void DefaultConfig_TattooShops()
@@ -867,20 +873,7 @@ public class PlacesOfInterest : IPlacesOfInterest
 
                 ,ScannerFilePath = "01_areas\\0x05E7E888.mp3"
                 ,CameraPosition = new Vector3(-1047.655f, -2676.447f, 44.60207f), CameraDirection = new Vector3(-0.05335984f, -0.9665251f, -0.2509621f), CameraRotation = new Rotator(-14.53445f, 6.118878E-06f, 176.84f)
-                ,CommercialFlights = new List<AirportFlight>()
-                {
-                    new AirportFlight("LDR",StaticStrings.AirHerlerCarrierID,"Relax on one of our state of the art jets and arrive in luxury. ~n~~n~Taxi service to downtown Ludendorff included.", 1500, 5),
-                    new AirportFlight("LDR",StaticStrings.CaipiraAirwaysCarrierID,"Only three connections and 12 hours for a 5 hour flight! What else could you ask for? ~n~~n~Taxi service to downtown Ludendorff included.", 550, 12),
-
-                    //new AirportFlight("SFX",StaticStrings.SanFierroAirCarrierID,"When driving just isn't an option and your company is paying.", 350, 1),
-                    //new AirportFlight("SFX",StaticStrings.LosSantosAirCarrierID,"Experience the luxury of a small regional carriers lowest end fare.", 325, 2),
-
-                    //new AirportFlight("FIA",StaticStrings.FlyUSCarrierID,"Need to get FAR away? FlyUS and see the difference deregulation made!", 450, 6),
-                    //new AirportFlight("VCIA",StaticStrings.FlyUSCarrierID,"Nonstop service to the sunniest state in the nation!", 425, 7),
-                    new AirportFlight("CPA",StaticStrings.AdiosAirlinesCarrierID,"We won't be the only ones saying 'Adios' to you!", 500, 10),
-
-                    new AirportFlight("SSA",StaticStrings.LosSantosAirCarrierID,"Just a hop skip and a jump away, LSIX is proud to provide service to our rural neighbors to the north.", 200, 1),
-                }
+                ,FlightOptionsID = "DefaultAirportFlights"
             },
             new Airport("SSA",new Vector3(1759.512f, 3298.777f, 41.95529f), 144.954f,"Sandy Shores Airstrip",
             "A beach town nowhere near the ocean where the town is a trailer park and the beach is a mixture of toxic sludge and pulverized fish bones." +
@@ -888,6 +881,7 @@ public class PlacesOfInterest : IPlacesOfInterest
             "~n~City: ~y~Sandy Shores~s~" +
             "~n~State: ~p~San Andreas~s~")
             {
+                BusinessID = "SmallAirstripMenu",
                 OpenTime = 0
                 ,CloseTime = 24
                 ,ArrivalPosition = new Vector3(1759.512f, 3298.777f, 41.95529f)
@@ -896,10 +890,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 ,AirArrivalPosition = new Vector3(759.6899f, 2999.477f, 120.8867f)
                 ,AirArrivalHeading = 290.1536f
                 ,CameraPosition = new Vector3(1783.648f, 3279.038f, 53.9618f), CameraDirection = new Vector3(-0.9425761f, 0.2726336f, -0.1929279f), CameraRotation = new Rotator(-11.1237f, 6.525906E-07f, 73.86785f)
-                ,CommercialFlights = new List<AirportFlight>()
-                {
-                    new AirportFlight("LSIX",StaticStrings.LosSantosAirCarrierID,"Need to get to the big city fast? Don't care about safety records? Feeling lucky? If you answered yes to all of these questions, welcome aboard!", 200, 1),
-                }
+                ,FlightOptionsID = "DefaultAirportFlights"
             },
             new YanktonAiport("LDR",new Vector3(3153.898f, -4840.879f, 111.8725f),354.7703f,"Ludendorff Regional",
             "The best fish boiled in lye in all of North Yankton!" +
@@ -1051,11 +1042,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                             "prologuerd_lod",
 
                         }
-                ,CommercialFlights = new List<AirportFlight>()
-                {
-                    new AirportFlight("LSIX",StaticStrings.CaipiraAirwaysCarrierID,"You'll get there when you get there", 650, 14),
-                    //new AirportFlight("SFX",StaticStrings.SanFierroAirCarrierID,"Its the San Fierro Treat!", 680, 15),
-                }
+                ,FlightOptionsID = "DefaultAirportFlights"
                 ,RoadToggels = new HashSet<RoadToggler>()
                 {
                     new RoadToggler(new Vector3(5526.24f, -5137.23f, 61.78925f),new Vector3(3679.327f, -4973.879f, 125.0828f),192.0f),
@@ -1084,10 +1071,7 @@ public class PlacesOfInterest : IPlacesOfInterest
                 CameraRotation = new Rotator(-20.99952f, -1.005964E-05f, 62.16195f),
                 AirArrivalPosition = new Vector3(3643.128f, -4779.568f, 63.15142f),
                 AirArrivalHeading =  282.1072f,
-                CommercialFlights = new List<AirportFlight>()
-                {
-                    new AirportFlight("LSIX",StaticStrings.AdiosAirlinesCarrierID,"You'll get there when you get there", 750, 10),
-                }
+                FlightOptionsID = "DefaultAirportFlights"
             },
 
 
@@ -3315,7 +3299,7 @@ public class PlacesOfInterest : IPlacesOfInterest
             new HeadShop(new Vector3(278.8327f, -1027.653f, 29.21136f), 184.1326f, "Pipe Down Cigars", "","HeadShopMenu"){ BannerImagePath = "stores\\pipedown.png" },
             new HeadShop(new Vector3(-1154.942f, -1373.176f, 5.061489f), 305.589f, "Amnesiac Smoke Shop", "","WeedAndCigMenu"),
             new HeadShop(new Vector3(-269.2553f, 243.7069f, 90.40055f), 1.693904f, "Pipe Down", "","HeadShopMenu"){ BannerImagePath = "stores\\pipedown.png" },
-
+            new HeadShop(new Vector3(-582.2315f, -1000.543f, 22.3297f), 268.6004f, "K-Town Cigs", "","HeadShopMenu"),
         };
     }
     private void DefaultConfig_Dispensaries()

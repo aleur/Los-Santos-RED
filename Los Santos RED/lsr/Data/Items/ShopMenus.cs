@@ -9,6 +9,7 @@ using System.Collections.Generic;
 
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 
 
 
@@ -817,6 +818,7 @@ public class ShopMenus : IShopMenus
         MenuGroupList();
         DealerHangouts();
         SetupTreatments();
+        SetupFlights();
         SetupPedVariationMenus();
         SetupVehicleVariationMenus();
         SetupClothingStoreMenus();
@@ -1117,9 +1119,85 @@ public class ShopMenus : IShopMenus
         };
         PossibleShopMenus.TreatmentOptionsList.Add(new TreatmentOptions("DefaultMedicalTreatments", "DefaultMedicalTreatments", DefaultMedicalTreatments));
     }
+    private void SetupFlights()
+    {
+        List<AirportFlight> DefaultAirportFlights = new List<AirportFlight>()
+        {
+            new AirportFlight("LDR",StaticStrings.AirHerlerCarrierID,"Relax on one of our state of the art jets and arrive in luxury. Free food, drinks, and reclinable seats. ~n~~n~Taxi service to downtown Ludendorff included.", 2000, 5)
+            {
+                HungerGain = 40,
+                ThirstGain = 25,
+                SleepGain = 10,
+            },
+            new AirportFlight("LDR",StaticStrings.CaipiraAirwaysCarrierID,"Only three connections and 12 hours for a 5 hour flight! What else could you ask for? ~n~~n~Taxi service to downtown Ludendorff included.", 1050, 12)
+            {
+                HungerGain = -20,
+                ThirstGain = -20,
+                SleepGain = -100
+            },
+            new AirportFlight("CPA",StaticStrings.AdiosAirlinesCarrierID,"We won't be the only ones saying 'Adios' to you!", 1000, 10)
+            {
+                HungerGain = -10,
+                ThirstGain = -10,
+                SleepGain = -80
+            },
+            new AirportFlight("SSA",StaticStrings.LosSantosAirCarrierID,"Just a hop skip and a jump away, LosSantosAir is proud to provide service to our rural neighbors to the north.", 500, 1)
+            {
+                HungerGain = -10,
+                ThirstGain = -10,
+                SleepGain = -10
+            },
+            new AirportFlight("LSIX",StaticStrings.LosSantosAirCarrierID,"Need to get to the big city fast? Don't care about safety records? Feeling lucky? If you answered yes to all of these questions, welcome aboard!", 1000, 1)
+            {
+                HungerGain = -10,
+                ThirstGain = -10,
+                SleepGain = -10
+            },
+            new AirportFlight("LSIX",StaticStrings.AdiosAirlinesCarrierID,"You'll get there when you get there", 400, 10)
+            {
+                HungerGain = -10,
+                ThirstGain = -10,
+                SleepGain = -80
+            },
+            new AirportFlight("LSIX",StaticStrings.CaipiraAirwaysCarrierID,"You'll get there when you get there", 300, 14)
+            {
+                HungerGain = -20,
+                ThirstGain = -20,
+                SleepGain = -100
+            }
+
+        };
+        List<AirportFlight> LibertyAirportFlights = new List<AirportFlight>()
+        {
+            new AirportFlight("FIA",StaticStrings.CaipiraAirwaysCarrierID,"You'll get there when you get there", 850, 14)
+            {
+                HungerGain = -20,
+                ThirstGain = -20,
+                SleepGain = -100
+            },
+            new AirportFlight("LDR", StaticStrings.AirHerlerCarrierID, "Relax on one of our state of the art jets and arrive in luxury. Free food, drinks, and reclinable seats. ~n~~n~Taxi service to downtown Ludendorff included.", 1500, 5)
+            {
+                HungerGain = 40,
+                ThirstGain = 25,
+                SleepGain = 10,
+            },
+            new AirportFlight("LDR",StaticStrings.CaipiraAirwaysCarrierID,"Only three connections and 12 hours for a 5 hour flight! What else could you ask for? ~n~~n~Taxi service to downtown Ludendorff included.", 550, 12)
+            {
+                HungerGain = -20,
+                ThirstGain = -20,
+                SleepGain = -100
+            }
+        };
+        PossibleShopMenus.AirportFlightsList.Add(new FlightOptions("DefaultAirportFlights", DefaultAirportFlights));
+        PossibleShopMenus.AirportFlightsList.Add(new FlightOptions("LibertyAirportFlights", LibertyAirportFlights));
+    }
     public List<MedicalTreatment> GetMedicalTreatments(string treatmentOptionsID)
     {
         return PossibleShopMenus.TreatmentOptionsList.Where(x => x.ID == treatmentOptionsID).FirstOrDefault()?.MedicalTreatments;
+    }
+    public List<AirportFlight> GetAirportFlights(string airportFlightsID)
+    {
+        return PossibleShopMenus.AirportFlightsList.Where(x => x.ID == airportFlightsID).FirstOrDefault()?.AirportFlights;
     }
     private void SetupPropMenus()
     {

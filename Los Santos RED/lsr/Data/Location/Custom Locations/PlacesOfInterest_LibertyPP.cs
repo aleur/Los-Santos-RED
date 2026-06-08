@@ -15,7 +15,7 @@ public class PlacesOfInterest_LibertyPP
     private PlacesOfInterest PlacesOfInterest;
     private List<Airport> Airports;
     private List<BodyExport> BodyExports;
-    private List<Business> Businesses;
+    private List<GenericBusiness> Businesses;
     private List<CarCrusher> CarCrushers;
     private List<DeadDrop> DeadDrops;
     private List<Dealership> Dealerships;
@@ -102,11 +102,7 @@ public class PlacesOfInterest_LibertyPP
                 ArrivalPosition = new Vector3(7546.63672f, -2928.6543f, 6.079805f),
                 ArrivalHeading = 73.94f,
                 BannerImagePath = "stores\\fia.png",
-                CommercialFlights = new List<AirportFlight>()
-                {
-                    new AirportFlight("LDR",StaticStrings.AirHerlerCarrierID,"Relax on one of our state of the art jets and arrive in luxury. ~n~~n~Taxi service to downtown Ludendorff included.", 1500, 5),
-                    new AirportFlight("LDR",StaticStrings.CaipiraAirwaysCarrierID,"Only three connections and 12 hours for a 5 hour flight! What else could you ask for? ~n~~n~Taxi service to downtown Ludendorff included.", 550, 12),
-                },
+                FlightOptionsID = "LibertyAirportFlights",
                 StateID = StaticStrings.LibertyStateID,
             },
         };
@@ -262,10 +258,7 @@ public class PlacesOfInterest_LibertyPP
                             "prologuerd_lod",
 
                         }
-                ,CommercialFlights = new List<AirportFlight>()
-                {
-                    new AirportFlight("FIA",StaticStrings.CaipiraAirwaysCarrierID,"You'll get there when you get there", 850, 14),
-                }
+                ,FlightOptionsID = "LibertyAirportFlights"
                 ,RoadToggels = new HashSet<RoadToggler>()
                 {
                     new RoadToggler(new Vector3(5526.24f, -5137.23f, 61.78925f),new Vector3(3679.327f, -4973.879f, 125.0828f),192.0f),
@@ -1255,9 +1248,9 @@ public class PlacesOfInterest_LibertyPP
     }
     private void DefaultConfig_Businesses()
     {
-        LibertyCityLocations.Businesses.AddRange(new List<Business>()
+        LibertyCityLocations.Businesses.AddRange(new List<GenericBusiness>()
         {
-        new Business(new Vector3(3867.972f, -2985.559f, 11.27661f), 223.659f, "Axels Chop Shop", "")
+        new GenericBusiness(new Vector3(3867.972f, -2985.559f, 11.27661f), 223.659f, "Axels Chop Shop", "")
         {
             OpenTime = 0,
             CloseTime = 24,
@@ -1269,7 +1262,7 @@ public class PlacesOfInterest_LibertyPP
             FullName = "Axels Port Tudor, Chop Shop",
             StateID = StaticStrings.LibertyStateID,
         },
-        new Business(new Vector3(6262.109f, -3546.1f, 21.35021f), 359.8495f, "Native Chop Shop", "")
+        new GenericBusiness(new Vector3(6262.109f, -3546.1f, 21.35021f), 359.8495f, "Native Chop Shop", "")
         {
             OpenTime = 0,
             CloseTime = 24,
@@ -1281,7 +1274,7 @@ public class PlacesOfInterest_LibertyPP
             FullName = "Native Engine, Chop Shop",
             StateID = StaticStrings.LibertyStateID,
         },
-        new Business(new Vector3(6271.508f, -2621.261f, 38.64142f), 180.5914f, "East Island Laundromat", "")
+        new GenericBusiness(new Vector3(6271.508f, -2621.261f, 38.64142f), 180.5914f, "East Island Laundromat", "")
         {
             IgnoreEntranceInteract = true,
             IsWalkup = true,
@@ -1296,7 +1289,7 @@ public class PlacesOfInterest_LibertyPP
             FullName = "East Island Laundromat, Money Laundering",
             StateID = StaticStrings.LibertyStateID,
         },// Laundromat interior
-        new Business(new Vector3(4146.933f, -2131.434f, 13.60034f), 181.5922f, "Alderney City Laundromat", "")
+        new GenericBusiness(new Vector3(4146.933f, -2131.434f, 13.60034f), 181.5922f, "Alderney City Laundromat", "")
         {
             IgnoreEntranceInteract = true,
             IsWalkup = true,
@@ -1311,7 +1304,7 @@ public class PlacesOfInterest_LibertyPP
             FullName = "Alderney City Laundromat, Money Laundering",
             StateID = StaticStrings.LibertyStateID,
         },// Laundromat interior
-        new Business(new Vector3(6201.06f, -3581.436f, 20.24536f), 96.40791f, "Hove Beach Laundromat", "")
+        new GenericBusiness(new Vector3(6201.06f, -3581.436f, 20.24536f), 96.40791f, "Hove Beach Laundromat", "")
         {
             IgnoreEntranceInteract = true,
             IsWalkup = true,
@@ -1326,7 +1319,7 @@ public class PlacesOfInterest_LibertyPP
             FullName = "Hove Beach Laundromat, Money Laundering",
             StateID = StaticStrings.LibertyStateID,
         },// Laundromat interior
-        new Business(new Vector3(5438.008f, -3514.112f, 5.550913f), 267.6571f,"Document Forgery", "")
+        new GenericBusiness(new Vector3(5438.008f, -3514.112f, 5.550913f), 267.6571f,"Document Forgery", "")
         {
             OpenTime = 0,
             CloseTime = 24,
@@ -1337,7 +1330,7 @@ public class PlacesOfInterest_LibertyPP
             ModItemPayoutAmount = 10,
             StateID = StaticStrings.LibertyStateID,
         },
-        new Business(new Vector3(3916.384f, -2418.1f, 20.56711f), 0.6744787f,"Document Forgery", "")
+        new GenericBusiness(new Vector3(3916.384f, -2418.1f, 20.56711f), 0.6744787f,"Document Forgery", "")
         {
             OpenTime = 0,
             CloseTime = 24,
@@ -1351,7 +1344,7 @@ public class PlacesOfInterest_LibertyPP
             CameraRotation = new Rotator(-18.5622f, 6.754691E-07f, -171.6597f),
             StateID = StaticStrings.LibertyStateID,
         },
-        new Business(new Vector3(4205.692f, -1388.405f, 22.96781f), 255.2065f,"Trap House", "Selling misery since the 80's")
+        new GenericBusiness(new Vector3(4205.692f, -1388.405f, 22.96781f), 255.2065f,"Trap House", "Selling misery since the 80's")
         {
             OpenTime = 0,
             CloseTime = 24,
@@ -1363,7 +1356,7 @@ public class PlacesOfInterest_LibertyPP
             CraftingFlag = "DrugLab",
             StateID = StaticStrings.LibertyStateID,
         },
-        new Business(new Vector3(3328.745f, -3043.681f, 16.95441f), 196.3285f,"Trap House", "Selling misery since the 80's")
+        new GenericBusiness(new Vector3(3328.745f, -3043.681f, 16.95441f), 196.3285f,"Trap House", "Selling misery since the 80's")
         {
             OpenTime = 0,
             CloseTime = 24,
@@ -1375,7 +1368,7 @@ public class PlacesOfInterest_LibertyPP
             CraftingFlag = "DrugLab",
             StateID = StaticStrings.LibertyStateID,
         },
-        new Business(new Vector3(6541.515f, -3437.749f, 22.15429f), 86.45231f,"Trap House", "Selling misery since the 80's")
+        new GenericBusiness(new Vector3(6541.515f, -3437.749f, 22.15429f), 86.45231f,"Trap House", "Selling misery since the 80's")
         {
             OpenTime = 0,
             CloseTime = 24,
@@ -1387,7 +1380,7 @@ public class PlacesOfInterest_LibertyPP
             CraftingFlag = "DrugLab",
             StateID = StaticStrings.LibertyStateID,
         },
-        new Business(new Vector3(6405.359f, -1609.939f, 18.1663f), 313.2379f,"Trap House", "Selling misery since the 80's")
+        new GenericBusiness(new Vector3(6405.359f, -1609.939f, 18.1663f), 313.2379f,"Trap House", "Selling misery since the 80's")
         {
             OpenTime = 0,
             CloseTime = 24,
@@ -1399,7 +1392,7 @@ public class PlacesOfInterest_LibertyPP
             CraftingFlag = "DrugLab",
             StateID = StaticStrings.LibertyStateID,
         },
-        new Business(new Vector3(6588.573f, -3261.12f, 25.77531f), 272.6096f,"Meth Factory", "")
+        new GenericBusiness(new Vector3(6588.573f, -3261.12f, 25.77531f), 272.6096f,"Meth Factory", "")
         {
             OpenTime = 0,
             CloseTime = 24,
@@ -1410,7 +1403,7 @@ public class PlacesOfInterest_LibertyPP
             ModItemPayoutAmount = 200,
             StateID = StaticStrings.LibertyStateID,
         },
-        new Business(new Vector3(3387.673f, -3523.928f, 2.715489f), 270.0141f,"Meth Lab", "")
+        new GenericBusiness(new Vector3(3387.673f, -3523.928f, 2.715489f), 270.0141f,"Meth Lab", "")
         {
             OpenTime = 0,
             CloseTime = 24,
@@ -1421,7 +1414,7 @@ public class PlacesOfInterest_LibertyPP
             ModItemPayoutAmount = 200,
             StateID = StaticStrings.LibertyStateID,
         },
-        new Business(new Vector3(6075.692f, -3512.467f, 18.92244f), 358.1287f,"Marijuana Grow House", "")
+        new GenericBusiness(new Vector3(6075.692f, -3512.467f, 18.92244f), 358.1287f,"Marijuana Grow House", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
@@ -1432,7 +1425,7 @@ public class PlacesOfInterest_LibertyPP
                 ModItemPayoutAmount = 100,
                 StateID = StaticStrings.LibertyStateID,
             },
-        new Business(new Vector3(3613.078f, -3053.406f, 13.06341f), 91.73339f,"Weed Farm", "")
+        new GenericBusiness(new Vector3(3613.078f, -3053.406f, 13.06341f), 91.73339f,"Weed Farm", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
@@ -1443,7 +1436,7 @@ public class PlacesOfInterest_LibertyPP
                 ModItemPayoutAmount = 200,
                 StateID = StaticStrings.LibertyStateID,
             },
-        new Business(new Vector3(4707.243f, -3375.117f, 8.982045f), 88.7366f,"Cocaine Factory", "")
+        new GenericBusiness(new Vector3(4707.243f, -3375.117f, 8.982045f), 88.7366f,"Cocaine Factory", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,
@@ -1457,7 +1450,7 @@ public class PlacesOfInterest_LibertyPP
                 CameraRotation = new Rotator(-15.70485f, -2.039829E-05f, -129.947f),
                 StateID = StaticStrings.LibertyStateID,
             },
-        new Business(new Vector3(6026.611f, -2945.404f, 5.678048f), 90.10968f,"Cocaine Lockup", "")
+        new GenericBusiness(new Vector3(6026.611f, -2945.404f, 5.678048f), 90.10968f,"Cocaine Lockup", "")
             {
                 OpenTime = 0,
                 CloseTime = 24,

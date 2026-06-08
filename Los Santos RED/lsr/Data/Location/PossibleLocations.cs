@@ -25,7 +25,8 @@ public class PossibleLocations
     public List<Hospital> Hospitals { get; private set; } = new List<Hospital>();
     public List<FireStation> FireStations { get; private set; } = new List<FireStation>();
     public List<Restaurant> Restaurants { get; private set; } = new List<Restaurant>();
-    public List<Business> Businesses { get; private set; } = new List<Business>();
+    public List<GenericBusiness> Businesses { get; private set; } = new List<GenericBusiness>();
+    public List<Property> Properties { get; private set; } = new List<Property>();
     public List<Pharmacy> Pharmacies { get; private set; } = new List<Pharmacy>();
     public List<Dispensary> Dispensaries { get; private set; } = new List<Dispensary>();
     public List<HeadShop> HeadShops { get; private set; } = new List<HeadShop>();
@@ -103,6 +104,7 @@ public class PossibleLocations
         AllLocations.AddRange(VendingMachines);
         AllLocations.AddRange(Restaurants);
         AllLocations.AddRange(Businesses);
+        AllLocations.AddRange(Properties);
         AllLocations.AddRange(Pharmacies);
         AllLocations.AddRange(Dispensaries);
         AllLocations.AddRange(HeadShops);
@@ -150,6 +152,7 @@ public class PossibleLocations
         AllLocations.AddRange(ApartmentBuildings);
         AllLocations.AddRange(Restaurants);
         AllLocations.AddRange(Businesses);
+        AllLocations.AddRange(Properties);
         AllLocations.AddRange(Pharmacies);
         AllLocations.AddRange(Dispensaries);
         AllLocations.AddRange(HeadShops);
@@ -187,6 +190,7 @@ public class PossibleLocations
         AllLocations.AddRange(Pharmacies);
         AllLocations.AddRange(Restaurants);
         AllLocations.AddRange(Businesses);
+        AllLocations.AddRange(Properties);
         AllLocations.AddRange(Landmarks);
         AllLocations.AddRange(SportingGoodsStores);
         AllLocations.AddRange(BarberShops);

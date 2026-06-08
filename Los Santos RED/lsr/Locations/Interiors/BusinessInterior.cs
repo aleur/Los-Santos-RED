@@ -5,8 +5,8 @@ using System.Xml.Serialization;
 
 public class BusinessInterior : Interior
 {
-    protected Business business;
-    public Business Business => business;
+    protected GenericBusiness business;
+    public GenericBusiness Business => business;
     public List<RestInteract> RestInteracts { get; set; } = new List<RestInteract>();
     public List<InventoryInteract> InventoryInteracts { get; set; } = new List<InventoryInteract>();
     public List<OutfitInteract> OutfitInteracts { get; set; } = new List<OutfitInteract>();
@@ -59,22 +59,22 @@ public class BusinessInterior : Interior
             }
         }
     }
-    public void SetBusiness(Business newBusiness)
-    {
-        business = newBusiness;
-        foreach (InventoryInteract test in InventoryInteracts)
-        {
-            test.InventoryableLocation = newBusiness;
-        }
-        foreach (OutfitInteract test in OutfitInteracts)
-        {
-            test.OutfitableLocation = newBusiness;
-        }
-        foreach (RestInteract test in RestInteracts)
-        {
-            test.RestableLocation = newBusiness;
-        }
-    }
+    //public void SetBusiness(Business newBusiness)
+    //{
+    //    business = newBusiness;
+    //    foreach (InventoryInteract test in InventoryInteracts)
+    //    {
+    //        test.InventoryableLocation = newBusiness;
+    //    }
+    //    foreach (OutfitInteract test in OutfitInteracts)
+    //    {
+    //        test.OutfitableLocation = newBusiness;
+    //    }
+    //    foreach (RestInteract test in RestInteracts)
+    //    {
+    //        test.RestableLocation = newBusiness;
+    //    }
+    //}
     public override void AddLocation(PossibleInteriors interiorList)
     {
         interiorList.BusinessInteriors.Add(this);

@@ -485,7 +485,7 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
         }
         if (IsOwned)
         {
-            SellHouseItem = new UIMenuItem("Sell House", "Sell the current house.") { RightLabel = SalesPrice?.ToString("C0") };
+            SellHouseItem = new UIMenuItem("Sell House", "Sell the current house.") { RightLabel = SalesPrice.ToString("C0") };
             SellHouseItem.Activated += (sender, e) =>
             {
                 OnSold();
@@ -646,9 +646,9 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
     {
         Reset();
         Player.Properties.RemoveOwnedLocation(this);
-        Player.BankAccounts.GiveMoney(SalesPrice ?? 0, true);
+        Player.BankAccounts.GiveMoney(SalesPrice, true);
         PlaySuccessSound();
-        DisplayMessage("~g~Sold", $"You have sold {Name} for {SalesPrice?.ToString("C0")}");
+        DisplayMessage("~g~Sold", $"You have sold {Name} for {SalesPrice.ToString("C0")}");
     }
     private void UpdateStoredData()
     {

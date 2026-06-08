@@ -23,10 +23,10 @@ public class Dealership : GameLocation, ILicensePlatePreviewable
     public override int MapIcon { get; set; } = 811;//810;// (int)BlipSprite.GangVehicle;
     public override string ButtonPromptText { get; set; }
     public string LicensePlatePreviewText { get; set; } = "BUYMENOW";
-    public override int? RegisterCashMin { get; set; } = 1000;
-    public override int? RegisterCashMax { get; set; } = 3050;
-    public override int? RacketeeringAmountMin { get; set; } = 5000;
-    public override int? RacketeeringAmountMax { get; set; } = 10000;
+    public override int RegisterCashMin { get; set; } = 1000;
+    public override int RegisterCashMax { get; set; } = 3050;
+    public override int RacketeeringAmountMin { get; set; } = 5000;
+    public override int RacketeeringAmountMax { get; set; } = 10000;
     public Dealership(Vector3 _EntrancePosition, float _EntranceHeading, string _Name, string _Description, string menuID) : base(_EntrancePosition, _EntranceHeading, _Name, _Description)
     {
         MenuID = menuID;
@@ -84,7 +84,7 @@ public class Dealership : GameLocation, ILicensePlatePreviewable
                 }
                 if (BusinessMenu != null)
                 {
-                    Property = new Property(MenuPool, InteractionMenu, BusinessMenu, Player, Time, Settings, this);
+                    Business = new Business(MenuPool, InteractionMenu, BusinessMenu, Player, Time, Settings, this);
                 }
                 if (Menu != null)
                 {
@@ -96,11 +96,11 @@ public class Dealership : GameLocation, ILicensePlatePreviewable
                 }
                 else if (BusinessMenu != null)
                 {
-                    Property.CreateBusinessMenu(ModItems, World, Weapons);
+                    Business.CreateBusinessMenu(ModItems, World, Weapons);
                     UIMenuCategory = "BusinessMenu";
                     InteractionMenu.Visible = true;
-                    Property.ProcessBusinessMenu();
-                    Property.DisposeBusinessMenu();
+                    Business.ProcessBusinessMenu();
+                    Business.DisposeBusinessMenu();
                 }
                 DisposeInteractionMenu();
                 DisposeCamera(isInside);

@@ -53,8 +53,8 @@ public class Bank : GameLocation
     public override float VendorCallPoliceForSeriousCrimesPercentage { get; set; } = 100f;
     public override float VendorFightPolicePercentage { get; set; } = 0f;
     public override float VendorCowerPercentage { get; set; } = 85f;
-    public override int? RacketeeringAmountMin { get; set; } = 10000;
-    public override int? RacketeeringAmountMax { get; set; } = 20000;
+    public override int RacketeeringAmountMin { get; set; } = 10000;
+    public override int RacketeeringAmountMax { get; set; } = 20000;
 
     [XmlIgnore]
     public BankInterior BankInterior { get; set; }

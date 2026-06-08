@@ -21,6 +21,7 @@ namespace LosSantosRED.lsr.Interface
         ShopMenu GetWeightedRandomMenuFromContainer(string lookingForID);
         ShopMenuGroup GetSpecificMenuGroup(string shopMenuGroupID);
         List<MedicalTreatment> GetMedicalTreatments(string treatmentOptionsID);
+        List<AirportFlight> GetAirportFlights(string airportFlightsID);
         PedVariationShopMenu GetPedVariationMenu(string pedVariationShopMenuID);
         VehicleVariationShopMenu GetVehicleVariationMenu(string vehicleVariationShopMenuID);
         int GetAverageStreetSalesPrice(ModItem modItem);

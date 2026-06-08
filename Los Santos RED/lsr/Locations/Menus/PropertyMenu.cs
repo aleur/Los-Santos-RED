@@ -28,7 +28,7 @@ public class PropertyMenu
     //
     public int PurchasePrice { get; set; }
     public int SalesPrice { get; set; }
-    public int MaxSalesPrice { get; set; }
+    public int MaxSalesPrice { get; set; } = -1;
     public bool CashPurchaseOnly { get; set; }
     public int PayoutFrequency { get; set; }
     public int PayoutMin { get; set; }
@@ -44,21 +44,21 @@ public class PropertyMenu
     public int RegisterCashMax { get; set; }
     public void OverrideData(GameLocation loc)
     {
-        if (loc.PurchasePrice == null) loc.PurchasePrice = PurchasePrice;
-        if (loc.SalesPrice == null) loc.SalesPrice = SalesPrice;
-        if (loc.CashPurchaseOnly == null) loc.CashPurchaseOnly = CashPurchaseOnly;
-        if (loc.PayoutFrequency == null) loc.PayoutFrequency = PayoutFrequency;
-        if (loc.PayoutMin == null) loc.PayoutMin = PayoutMin;
-        if (loc.PayoutMax == null) loc.PayoutMax = PayoutMax;
-        if (loc.GrowthPercentage == null) loc.GrowthPercentage = GrowthPercentage;
-        if (loc.RacketeeringAmountMin == null) loc.RacketeeringAmountMin = RacketeeringAmountMin;
-        if (loc.RacketeeringAmountMax == null) loc.RacketeeringAmountMax = RacketeeringAmountMax;
-        if (loc.MinPriceRefreshHours == null) loc.MinPriceRefreshHours = MinPriceRefreshHours;
-        if (loc.MaxPriceRefreshHours == null) loc.MaxPriceRefreshHours = MaxPriceRefreshHours;
-        if (loc.MinRestockHours == null) loc.MinRestockHours = MinRestockHours;
-        if (loc.MaxRestockHours == null) loc.MaxRestockHours = MaxRestockHours;
-        if (loc.RegisterCashMin == null) loc.RegisterCashMin = RegisterCashMin;
-        if (loc.RegisterCashMax == null) loc.RegisterCashMax = RegisterCashMax;
+        if (loc.PurchasePrice < 0) loc.PurchasePrice = PurchasePrice;
+        if (loc.SalesPrice < 0) loc.SalesPrice = SalesPrice;
+        if (loc.IsCashPurchaseOnly == null) loc.CashPurchaseOnly = CashPurchaseOnly;
+        if (loc.PayoutFrequency < 0) loc.PayoutFrequency = PayoutFrequency;
+        if (loc.PayoutMin < 0) loc.PayoutMin = PayoutMin;
+        if (loc.PayoutMax < 0) loc.PayoutMax = PayoutMax;
+        if (loc.GrowthPercentage < 0) loc.GrowthPercentage = GrowthPercentage;
+        if (loc.RacketeeringAmountMin < 0) loc.RacketeeringAmountMin = RacketeeringAmountMin;
+        if (loc.RacketeeringAmountMax < 0) loc.RacketeeringAmountMax = RacketeeringAmountMax;
+        if (loc.MinPriceRefreshHours < 0) loc.MinPriceRefreshHours = MinPriceRefreshHours;
+        if (loc.MaxPriceRefreshHours < 0) loc.MaxPriceRefreshHours = MaxPriceRefreshHours;
+        if (loc.MinRestockHours < 0) loc.MinRestockHours = MinRestockHours;
+        if (loc.MaxRestockHours < 0) loc.MaxRestockHours = MaxRestockHours;
+        if (loc.RegisterCashMin < 0) loc.RegisterCashMin = RegisterCashMin;
+        if (loc.RegisterCashMax < 0) loc.RegisterCashMax = RegisterCashMax;
     }
 }
 

@@ -744,7 +744,7 @@ namespace LosSantosRED.lsr.Data
         {
             foreach (SavedBusiness biz in SavedBusinesses)
             {
-                Business savedPlace = placesOfInterest.PossibleLocations.Businesses.Where(x => x.Name == biz.Name && x.EntrancePosition == biz.EntrancePosition).FirstOrDefault();
+                GenericBusiness savedPlace = placesOfInterest.PossibleLocations.Businesses.Where(x => x.Name == biz.Name && x.EntrancePosition == biz.EntrancePosition).FirstOrDefault();
                 if (savedPlace != null)
                 {
                     player.Properties.AddOwnedLocation(savedPlace);

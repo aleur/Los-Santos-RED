@@ -45,6 +45,7 @@ public class Properties
     {
         foreach(GameLocation property in PropertyList)
         {
+            property.IsOwned = false;
             property.Reset();
         }
         PropertyList.Clear();

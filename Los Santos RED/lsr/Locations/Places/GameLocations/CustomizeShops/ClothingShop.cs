@@ -19,12 +19,12 @@ public class ClothingShop : GameLocation
     public override string TypeName { get; set; } = "Clothing Store";
     public override int MapIcon { get; set; } = (int)BlipSprite.ClothesStore;
     public override string ButtonPromptText { get; set; }
-    public override int? RegisterCashMin { get; set; } = 300;
-    public override int? RegisterCashMax { get; set; } = 1550;
-    public override int? MinPriceRefreshHours { get; set; } = 12;
-    public override int? MaxPriceRefreshHours { get; set; } = 24;
-    public override int? MinRestockHours { get; set; } = 12;
-    public override int? MaxRestockHours { get; set; } = 24;
+    public override int RegisterCashMin { get; set; } = 300;
+    public override int RegisterCashMax { get; set; } = 1550;
+    public override int MinPriceRefreshHours { get; set; } = 12;
+    public override int MaxPriceRefreshHours { get; set; } = 24;
+    public override int MinRestockHours { get; set; } = 12;
+    public override int MaxRestockHours { get; set; } = 24;
 
 
 
