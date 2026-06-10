@@ -15,7 +15,6 @@ using System.Windows.Forms;
 using System.Reflection;
 using NAudio.Wave;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
-using System.Collections;
 
 public class ActivityManager
 {
@@ -258,7 +257,6 @@ public class ActivityManager
     public bool IsUsingIllegalItem { get; set; }
     public bool IsHidingInObject { get; set; }
     public bool IsPickPocketing { get; set; }
-    public bool IsManuallyHotwiringVehicle { get; private set; }
 
     private bool isStartingPickpocket;
 
@@ -2048,7 +2046,7 @@ public class ActivityManager
 
     public void HotwireVehicle()
     {
-        if(Player.CurrentVehicle == null || !Player.CurrentVehicle.IsHotWireLocked || IsManuallyHotwiringVehicle)
+        if(Player.CurrentVehicle == null || !Player.CurrentVehicle.IsHotWireLocked)
         {
             return;
         }
@@ -2058,62 +2056,38 @@ public class ActivityManager
             Game.DisplayHelp("Screwdriver required to hotwire");
             return;
         }
-        //Player.CurrentVehicle.IsHotWireLocked = false;
+        Player.CurrentVehicle.IsHotWireLocked = false;
         GameTimeLastStartedHotwiring = Game.GameTime;
         if(!Player.CurrentVehicle.Vehicle.Exists())
         {
             return;
         }
 
+
         if(Settings.SettingsManager.ActivitySettings.UseMinigameForHotwire)
         {
-            GameFiber.StartNew(StartInteractiveHotwire);         
+            Player.CurrentVehicle.Vehicle.MustBeHotwired = true;
+            LockpickMiniGame lockpickMiniGame = new LockpickMiniGame(Interactionable);
+            lockpickMiniGame.Start();
+            while(lockpickMiniGame.IsActive)
+            {
+                Player.CurrentVehicle.Vehicle.MustBeHotwired = true;
+                GameFiber.Yield();
+            }
+            if(lockpickMiniGame.HasPickedLock)
+            {
+                Player.CurrentVehicle.Engine.SetState(true);
+            }
+            lockpickMiniGame.Dispose();
         }
         else
         {
-            Player.CurrentVehicle.IsHotWireLocked = false;
             Player.CurrentVehicle.Vehicle.MustBeHotwired = true;
             Player.CurrentVehicle.Engine.SetState(true);
             //GameFiber.Sleep(2500);
             //Player.CurrentVehicle?.Engine.Synchronize();
         }
 
-    }
-    private void StartInteractiveHotwire()
-    {
-        EntryPoint.WriteToConsole("StartInteractiveHotwire");
-        string dictionary = "veh@std@ds@base";
-        string anim = "hotwire";
-
-        IsManuallyHotwiringVehicle = true;
-        IsPerformingActivity = true;
-
-        AnimationDictionary.RequestAnimationDictionay(dictionary);
-        NativeFunction.CallByName<uint>("TASK_PLAY_ANIM", Player.Character, dictionary, anim, 4.0f, -4.0f, -1, (int)(eAnimationFlags.AF_UPPERBODY | eAnimationFlags.AF_SECONDARY | eAnimationFlags.AF_LOOPING), 0, false, false, false);//-1
-
-        int TotalPins = 2;
-        int TotalPinSteps = 2;
-        float ZoneWidth = 20f;
-        float FillSpeed = 1.0f;
-        Player.CurrentVehicle.GetHotwireStats(out TotalPins, out TotalPinSteps, out ZoneWidth, out FillSpeed);
-
-        LockpickMiniGame lockpickMiniGame = new LockpickMiniGame(Interactionable, TotalPins, TotalPinSteps, ZoneWidth, FillSpeed);
-        lockpickMiniGame.Start();
-        while (lockpickMiniGame.IsActive && Player.IsAliveAndFree)
-        {
-            GameFiber.Yield();
-        }
-        IsManuallyHotwiringVehicle = false;
-        IsPerformingActivity = false;
-        EntryPoint.WriteToConsole("StartInteractiveHotwire END LOOP!!!");
-        lockpickMiniGame.Dispose();
-        NativeFunction.Natives.CLEAR_PED_TASKS(Player.Character);
-        if (lockpickMiniGame.HasPickedLock)
-        {
-            Player.CurrentVehicle.IsHotWireLocked = false;
-            Player.CurrentVehicle.Vehicle.MustBeHotwired = true;
-            Player.CurrentVehicle.Engine.SetState(true);
-        }
     }
 
     public void OnLookedAtObject(Rage.Object currentLookedAtObject)

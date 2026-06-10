@@ -9,15 +9,12 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using LosSantosRED.lsr.Interface;
-using static System.Windows.Forms.AxHost;
 
 
 public class LockpickMiniGame
 {
     private int scaleformHandle;
     private IInteractionable Player;
-    private string AudioSoundSet;
-    
     // --- Game State Variables ---
 
     private int currentPin = 1;  // Pin 1 to 3
@@ -57,10 +54,10 @@ public class LockpickMiniGame
     {
         IsActive = true;
 
-        string scaleFormToLoad = "yoga_keys";// "yoga_buttons";
+        string scaleFormToLoad = "yoga_buttons";
         if(Player.IsUsingController)
         {
-            scaleFormToLoad = "yoga_buttons"; //"yoga_keys";
+            scaleFormToLoad = "yoga_keys";
         }
         scaleformHandle = NativeFunction.Natives.REQUEST_SCALEFORM_MOVIE<int>(scaleFormToLoad);
         while (!NativeFunction.Natives.HAS_SCALEFORM_MOVIE_LOADED<bool>(scaleformHandle))
@@ -70,15 +67,9 @@ public class LockpickMiniGame
         yogaScaleform = new Scaleform(scaleformHandle);
         ResetPin();
 
-        AudioSoundSet = "SAFE_CRACK";
-        if (Player.IsInVehicle)
-        {
-            AudioSoundSet = "DLC_HALLOWEEN_FVJ_Sounds";
-        }
-
         NativeFunction.CallByName<bool>("REQUEST_AMBIENT_AUDIO_BANK", "SAFE_CRACK", true);
 
-        //Game.RawFrameRender += OnRawFrameRender;
+        Game.RawFrameRender += OnRawFrameRender;
         GameFiber.StartNew(MainLoop);
     }
     public void MainLoop()
@@ -139,7 +130,7 @@ public class LockpickMiniGame
                         {
                             PlayLockpickSound("TUMBLER_PIN_FALL", "SAFE_CRACK_SOUNDSET");
                             ResetPin();
-                            //Game.DisplayNotification($"Moving to Pin {currentPin}/{TotalPins}");
+                            Game.DisplayNotification($"Moving to Pin {currentPin}/{TotalPins}");
                         }
                         else
                         {
@@ -160,20 +151,6 @@ public class LockpickMiniGame
     }
     private void UpdateScaleforms()
     {
-
-        if (Player.IsUsingController)
-        {
-            yogaScaleform.CallFunction("REPLACE_KEYS_WITH_STICK", 0);
-            yogaScaleform.CallFunction("REPLACE_STICK_WITH_KEYS", 1);
-        }
-        else
-        {
-            yogaScaleform.CallFunction("REPLACE_STICK_WITH_KEYS", 0);
-            yogaScaleform.CallFunction("REPLACE_KEYS_WITH_STICK", 1);
-        }
-
-
-
         yogaScaleform.CallFunction("SET_STICK_POINTER_ANGLE", 0, targetL);
         yogaScaleform.CallFunction("SET_STICK_POINTER_ANGLE", 1, targetR);
         yogaScaleform.CallFunction("SET_STICK_POINTER_HIGHLIGHT_ANGLE", 0, playerL);
@@ -186,15 +163,6 @@ public class LockpickMiniGame
         yogaScaleform.CallFunction("SET_STICK_POINTER_RGB", 0, alignedL ? 0 : 255, alignedL ? 255 : 0, 0);
         yogaScaleform.CallFunction("SET_STICK_POINTER_RGB", 1, alignedR ? 0 : 255, alignedR ? 255 : 0, 0);
 
-
-        //if (progress > 0.0f)
-        //{
-        //    yogaScaleform.CallFunction("SET_OUT_RING_TIMER", 0, progress);
-        //    yogaScaleform.CallFunction("SET_OUT_RING_TIMER", 1, progress);
-        //}
-
-        ////SET_INFO_TIMER
-        //yogaScaleform.CallFunction("TOGGLE_INPUT_FILL", true);
         NativeFunction.CallByName<int>("DRAW_SCALEFORM_MOVIE", yogaScaleform.Handle, 0.5f, 0.88f, 0.75125f, 0.32f, 255, 255, 255, 255, 0);
     }
     private void OnRawFrameRender(object sender, Rage.GraphicsEventArgs e)
@@ -229,20 +197,6 @@ public class LockpickMiniGame
         Game.DisableControlAction(0, GameControl.MoveLeftRight, true);
         Game.DisableControlAction(0, GameControl.LookUpDown, true);
         Game.DisableControlAction(0, GameControl.LookLeftRight, true);
-
-
-
-        if (Player.IsInVehicle)
-        {
-            Game.DisableControlAction(0, GameControl.VehicleMoveLeftRight, true);
-            Game.DisableControlAction(0, GameControl.VehicleAccelerate, true);
-            Game.DisableControlAction(0, GameControl.VehicleBrake, true);
-        }
-
-
-
-
-
     }
     private float NormalizeAngle(float angle) { angle %= 360; return angle > 180 ? angle - 360 : angle < -180 ? angle + 360 : angle; }
     private float LerpAngle(float start, float end, float amount) { return start + NormalizeAngle(end - start) * amount; }
@@ -250,7 +204,7 @@ public class LockpickMiniGame
     internal void Dispose()
     {
         IsActive = false;
-        //Game.RawFrameRender -= OnRawFrameRender;
+        Game.RawFrameRender -= OnRawFrameRender;
     }
 }
 
