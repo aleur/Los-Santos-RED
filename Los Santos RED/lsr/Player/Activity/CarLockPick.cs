@@ -124,18 +124,10 @@ public class CarLockPick
         {
             return false;
         }
-
-        NativeFunction.Natives.CLEAR_PED_TASKS(Player.Character);
-
-
         OriginalLockStatus = TargetVehicle.LockStatus;
         TargetVehicle.SetLock((VehicleLockStatus)3);//Attempt to lock most car doors
         Player.WeaponEquipment.SetUnarmed();
-
-        NativeFunction.Natives.TASK_ENTER_VEHICLE(Player.Character, TargetVehicle, -1, SeatTryingToEnter, 2.0f, 1, 0);
-
-
-        if (TargetVehicle.LockStatus != (VehicleLockStatus)3)
+        if(TargetVehicle.LockStatus != (VehicleLockStatus)3)
         {
             EntryPoint.WriteToConsole($"SetupLockPick Failed, Could Not Set Lock Status to 3 Current Status {(int)TargetVehicle.LockStatus}");//some IV pack cars fail even with the door open.....
             NativeFunction.Natives.TASK_ENTER_VEHICLE(Player.Character, TargetVehicle, -1, SeatTryingToEnter, 2.0f, 1, 0);

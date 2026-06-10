@@ -84,7 +84,6 @@ namespace LosSantosRED.lsr.Interface
         VehicleRaceManager VehicleRaceManager { get; }
         Violations Violations { get; }
         bool IsSetDisabledControls { get; set; }
-        GangTerritoryManager GangTerritoryManager { get; }
 
         void DisplayPlayerNotification();
         void SetWantedLevel(int selectedItem, string v1, bool v2);

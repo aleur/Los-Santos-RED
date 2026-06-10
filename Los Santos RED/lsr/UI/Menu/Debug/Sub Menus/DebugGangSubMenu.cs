@@ -92,15 +92,6 @@ public class DebugGangSubMenu : DebugSubMenu
             menu.Visible = false;
         };
 
-
-        UIMenuItem SetCurrentTerritoryOwned = new UIMenuItem("Set Current Territory Owned", "Set the current zone to be owned by your gang");
-        SetCurrentTerritoryOwned.Activated += (menu, item) =>
-        {
-            Player.GangTerritoryManager.SetTookOverZone(Player.CurrentLocation.CurrentZone);
-            menu.Visible = false;
-        };
-
-
         GangItems.AddItem(SetAsGangMember);
         GangItems.AddItem(LeaveGang);
         GangItems.AddItem(SetGangRepDefault);
@@ -112,7 +103,7 @@ public class DebugGangSubMenu : DebugSubMenu
         GangItems.AddItem(HostileGangRep);
         GangItems.AddItem(FriendlyGangRep);
         GangItems.AddItem(DispatchHitSquad);
-        GangItems.AddItem(SetCurrentTerritoryOwned);
+
     }
 }
 
