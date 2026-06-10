@@ -26,9 +26,7 @@ public class CarLockPick
     private ISettingsProvideable Settings;
     private IInteractionable Interactionable;
     private IBasicUseable BasicUseable;
-    private VehicleExt TargetVehicleExt;
-    public CarLockPick(ICarStealable player, Vehicle targetVehicle, int seatTryingToEnter, ScrewdriverItem screwdriverItem, ISettingsProvideable settings, IInteractionable interactionable, 
-        IBasicUseable basicUseable, VehicleExt targetVehicleExt)
+    public CarLockPick(ICarStealable player, Vehicle targetVehicle, int seatTryingToEnter, ScrewdriverItem screwdriverItem, ISettingsProvideable settings, IInteractionable interactionable, IBasicUseable basicUseable)
     {
         Player = player;
         TargetVehicle = targetVehicle;
@@ -37,7 +35,6 @@ public class CarLockPick
         Settings = settings;
         Interactionable = interactionable;
         BasicUseable = basicUseable;
-        TargetVehicleExt = targetVehicleExt;
     }
 
     private bool CanLockPick
@@ -209,7 +206,7 @@ public class CarLockPick
             EntryPoint.WriteToConsole("SCREWDRIVER ITEM IS NULL 2");
             return false;
         }
-        Continue = ScrewdriverItem.DoLockpickAnimation(Interactionable, BasicUseable, OpenDoor, Settings, "veh@break_in@0h@p_m_one@", Animation, false,true, TargetVehicle, SeatTryingToEnter, DoorIndex, null, TargetVehicleExt);
+        Continue = ScrewdriverItem.DoLockpickAnimation(Interactionable, BasicUseable, OpenDoor, Settings, "veh@break_in@0h@p_m_one@", Animation, false,true, TargetVehicle, SeatTryingToEnter, DoorIndex, null);
         if (!TargetVehicle.Exists())
         {
             return false;

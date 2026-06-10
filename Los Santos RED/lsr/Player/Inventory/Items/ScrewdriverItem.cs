@@ -1,6 +1,5 @@
 ﻿using LosSantosRED.lsr.Interface;
 using LosSantosRED.lsr.Player;
-using LSR.Vehicles;
 using Rage;
 using Rage.Native;
 using System;
@@ -88,9 +87,9 @@ public class ScrewdriverItem : ModItem
     }
 
 
-    public bool DoLockpickAnimation(IInteractionable Player, IBasicUseable BasicUseable, Action OnCompletedPicking, ISettingsProvideable Settings, bool showHelpText, bool isVehicle, Interior interior, VehicleExt targetVhielcExt) => DoLockpickAnimation(Player, BasicUseable, OnCompletedPicking, Settings, "", "", showHelpText, isVehicle, null, -1, -1, interior, targetVhielcExt);
+    public bool DoLockpickAnimation(IInteractionable Player, IBasicUseable BasicUseable, Action OnCompletedPicking, ISettingsProvideable Settings, bool showHelpText, bool isVehicle, Interior interior) => DoLockpickAnimation(Player, BasicUseable, OnCompletedPicking, Settings, "", "", showHelpText, isVehicle, null, -1, -1, interior);
 
-    public bool DoLockpickAnimation(IInteractionable Player, IBasicUseable BasicUseable, Action OnCompletedPicking, ISettingsProvideable Settings, string dictionary, string anim, bool showHelpText, bool isVehicle, Vehicle TargetVehicle, int SeatTryingToEnter, int DoorIndex, Interior interior, VehicleExt targetVhielcExt)
+    public bool DoLockpickAnimation(IInteractionable Player, IBasicUseable BasicUseable, Action OnCompletedPicking, ISettingsProvideable Settings, string dictionary, string anim, bool showHelpText, bool isVehicle, Vehicle TargetVehicle, int SeatTryingToEnter, int DoorIndex, Interior interior)
     {
         float LockpickAnimStopPercentage = 0.5f;
         float LockpickAnimRestartPercentage = 0.3f;
@@ -104,19 +103,6 @@ public class ScrewdriverItem : ModItem
         Player.ActivityManager.IsPerformingActivity = true;
         string animDictionary = "veh@break_in@0h@p_m_one@";
         string animName = "std_force_entry_ds";
-
-        LockpickMiniGame lockpickMiniGame = new LockpickMiniGame(Player);
-
-        if(targetVhielcExt != null)
-        {
-            int TotalPins = 2;
-            int TotalPinSteps = 3;
-            float ZoneWidth = 20f;
-            float FillSpeed = 1.0f;
-            targetVhielcExt.GetLockpickStats(out TotalPins, out TotalPinSteps, out ZoneWidth, out FillSpeed);
-
-            lockpickMiniGame = new LockpickMiniGame(Player, TotalPins, TotalPinSteps, ZoneWidth, FillSpeed);
-        }
 
         if(!string.IsNullOrEmpty(dictionary))
         {
@@ -137,14 +123,6 @@ public class ScrewdriverItem : ModItem
         bool hasPickedLock = false;
         uint GameTimeLastCheckedAlarm = Game.GameTime;
         uint GameTimeBetweenAlarmChecks = RandomItems.GetRandomNumber(GameTimeBetweenAlarmChecksMin, GameTimeBetweenAlarmChecksMax);
-
-
-        if (Settings.SettingsManager.ActivitySettings.UseMinigameForLockpick)
-        {
-            lockpickMiniGame.Start();
-        }
-
-
         while (Player.IsAliveAndFree)
         {
             float pedAnimTime = NativeFunction.CallByName<float>("GET_ENTITY_ANIM_CURRENT_TIME", Game.LocalPlayer.Character, animDictionary, animName);
@@ -175,53 +153,20 @@ public class ScrewdriverItem : ModItem
                 GameTimeLastCheckedAlarm = Game.GameTime;
             }
 
-            if (Settings.SettingsManager.ActivitySettings.UseMinigameForLockpick)
-            {
-                if (!Player.Character.IsAlive)
-                {
-                    break;
-                }
-            }
-            else
-            {
-                if (Player.IsMoveControlPressed || !Player.Character.IsAlive)
-                {
-                    break;
-                }
-            }
 
-            if (Settings.SettingsManager.ActivitySettings.UseMinigameForLockpick)
+            if (Player.IsMoveControlPressed || !Player.Character.IsAlive)
             {
-                if(!lockpickMiniGame.IsActive)
-                {
-                    if(lockpickMiniGame.HasPickedLock)
-                    {
-                        OnCompletedPicking();
-                        hasPickedLock = true;
-                        if (showHelpText)
-                        {
-                            Game.DisplayHelp("Door Opened");
-                        }
-                        break;
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
+                break;
             }
-            else
+            if (Game.GameTime - GameTimeStartedLockPickAnimation >= TimeToPick)
             {
-                if (Game.GameTime - GameTimeStartedLockPickAnimation >= TimeToPick)
+                OnCompletedPicking();
+                hasPickedLock = true;
+                if (showHelpText)
                 {
-                    OnCompletedPicking();
-                    hasPickedLock = true;
-                    if (showHelpText)
-                    {
-                        Game.DisplayHelp("Door Opened");
-                    }
-                    break;
+                    Game.DisplayHelp("Door Opened");
                 }
+                break;
             }
 
             if(isVehicle && TargetVehicle.Exists())
@@ -244,8 +189,6 @@ public class ScrewdriverItem : ModItem
             }
             GameFiber.Yield();
         }
-        lockpickMiniGame.Dispose();
-
         Player.ButtonPrompts.RemovePrompts("VehicleLockpick");
         if (hasPickedLock)
         {

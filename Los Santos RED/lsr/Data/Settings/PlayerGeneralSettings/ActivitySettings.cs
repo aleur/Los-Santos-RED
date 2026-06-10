@@ -114,8 +114,6 @@ public class ActivitySettings : ISettingsDefaultable
     public float PickPocketDistance { get; set; }
     public float AlarmPercentageBash { get; set; }
     public bool AllowSkippingCrafting { get; set; }
-    public bool UseMinigameForLockpick { get; set; }
-    public bool UseMinigameForHotwire { get; set; }
 
     [OnDeserialized()]
     private void SetValuesOnDeserialized(StreamingContext context)
@@ -206,8 +204,6 @@ public class ActivitySettings : ISettingsDefaultable
 
         AlarmPercentageBash = 50f;
         AllowSkippingCrafting = false;
-
-        UseMinigameForLockpick = true;
 
     }
 }
