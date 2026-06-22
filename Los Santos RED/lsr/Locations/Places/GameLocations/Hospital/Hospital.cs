@@ -15,7 +15,8 @@ using System.Xml.Serialization;
 
 public class Hospital : GameLocation, ILocationRespawnable, ILicensePlatePreviewable
 {
-    private ShopMenu agencyMenu;
+    private ShopMenu AgencyMenu;
+    private UIMenu TreatmentOptionsMenu;
     private List<MedicalTreatment> MedicalTreatments;
     public Hospital(Vector3 _EntrancePosition, float _EntranceHeading, string _Name, string _Description) : base(_EntrancePosition, _EntranceHeading, _Name, _Description)
     {
@@ -31,6 +32,8 @@ public class Hospital : GameLocation, ILocationRespawnable, ILicensePlatePreview
     public Vector3 RespawnLocation { get; set; }
     public float RespawnHeading { get; set; }
     public string TreatmentOptionsID { get; set; } = "DefaultMedicalTreatments";
+    [XmlIgnore]
+    public override string MenuPromptName { get; set; } = "Hospital";
     public override void StoreData(IShopMenus shopMenus, IAgencies agencies, IGangs gangs, IZones zones, IJurisdictions jurisdictions, IGangTerritories gangTerritories, INameProvideable Names, ICrimes Crimes, IPedGroups PedGroups, IEntityProvideable world,
         IStreets streets, ILocationTypes locationTypes, ISettingsProvideable settings, IPlateTypes plateTypes, IOrganizations associations, IContacts contacts, IInteriors interiors,
         ILocationInteractable player, IModItems modItems, IWeapons weapons, ITimeControllable time, IPlacesOfInterest placesOfInterest, IIssuableWeapons issuableWeapons, IHeads heads, IDispatchablePeople dispatchablePeople, ModDataFileManager modDataFileManager)
@@ -52,6 +55,13 @@ public class Hospital : GameLocation, ILocationRespawnable, ILicensePlatePreview
         if(!string.IsNullOrEmpty(TreatmentOptionsID))
         {
             MedicalTreatments = shopMenus.GetMedicalTreatments(TreatmentOptionsID);
+            UIMenuCategory = "ShopMenu";
+        }
+        if (!string.IsNullOrEmpty(BusinessID))
+        {
+            BusinessMenu = modDataFileManager.BusinessMenus.GetSpecificBusinessMenu(BusinessID);
+            if (BusinessMenu != null)
+                BusinessMenu.SetupBusiness(this, modDataFileManager.BusinessMenus.GetSpecificPropertyMenu(BusinessMenu.PropertyMenuID));
         }
     }
     public override void AddDistanceOffset(Vector3 offsetToAdd)
@@ -110,13 +120,29 @@ public class Hospital : GameLocation, ILocationRespawnable, ILicensePlatePreview
             {
                 SetupLocationCamera(locationCamera, isInside, true);
                 CreateInteractionMenu();
-                if (Player.IsEMT)
+                if (MedicalTreatments != null && MedicalTreatments.Any())
                 {
-                    InteractAsEMT(ModItems, World, Settings, Weapons, Time);
+                    // placeholder
                 }
-                else
+                if (BusinessMenu != null)
+                {
+                    Business = new Business(MenuPool, InteractionMenu, BusinessMenu, Player, Time, Settings, this);
+                }
+                HasMenuSwitch = MedicalTreatments != null && MedicalTreatments.Any() && Business != null;
+                if (MedicalTreatments != null && MedicalTreatments.Any())
                 {
                     InteractAsOther();
+                    UIMenuCategory = "ShopMenu";
+                    InteractionMenu.Visible = true;
+                    ProcessHospitalMenu();
+                }
+                else if (BusinessMenu != null)
+                {
+                    Business.CreateBusinessMenu(ModItems, World, Weapons);
+                    UIMenuCategory = "BusinessMenu";
+                    InteractionMenu.Visible = true;
+                    Business.ProcessBusinessMenu();
+                    Business.DisposeBusinessMenu();
                 }
                 DisposeInteractionMenu();
                 DisposeCamera(isInside);
@@ -130,10 +156,55 @@ public class Hospital : GameLocation, ILocationRespawnable, ILicensePlatePreview
             }
         }, "HospitalInteract");
     }
+    public override void SwitchMenus()
+    {
+        if (UIMenuCategory == "ShopMenu")
+        {
+            InteractAsOther();
+            InteractionMenu.Visible = true;
+            ProcessHospitalMenu();
+        }
+        else if (UIMenuCategory == "BusinessMenu")
+        {
+            Business.CreateBusinessMenu(ModItems, World, Weapons);
+            InteractionMenu.Visible = true;
+            Business.ProcessBusinessMenu();
+            Business.DisposeBusinessMenu();
+        }
+    }
+    private void SetupMenu()
+    {
+        /* removed for now
+        if (Player.IsEMT)
+        {
+            InteractAsEMT(ModItems, World, Settings, Weapons, Time);
+        }
+        else
+        {
+            InteractAsOther();
+        }*/
+    }
+    private void ProcessHospitalMenu()
+    {
+        while (MenuPool.IsAnyMenuOpen() && UIMenuCategory == "ShopMenu")
+        {
+            MenuPool.ProcessMenus();
+            GameFiber.Yield();
+        }
+        if (UIMenuCategory == "BusinessMenu")
+        {
+            MenuPool.Where(x => x != InteractionMenu).ToList().ForEach(x => // To deal with the multiple UIMenus created. Otherwise, causes multiple layers of UI.
+            {
+                MenuPool.Remove(x);
+            });
+            InteractionMenu.Clear();
+            SwitchMenus();
+        }
+    }
     private void InteractAsEMT(IModItems modItems, IEntityProvideable world, ISettingsProvideable settings, IWeapons weapons, ITimeControllable time)
     {
-        agencyMenu = AssignedAgency.GenerateMenu(ModItems);
-        Transaction = new Transaction(MenuPool, InteractionMenu, agencyMenu, this);
+        AgencyMenu = AssignedAgency.GenerateMenu(ModItems);
+        Transaction = new Transaction(MenuPool, InteractionMenu, AgencyMenu, this);
         Transaction.LicensePlatePreviewable = this;
         if ((VehicleDeliveryLocations == null || !VehicleDeliveryLocations.Any()) && PossibleVehicleSpawns?.Any() == true)
         {
@@ -155,20 +226,21 @@ public class Hospital : GameLocation, ILocationRespawnable, ILicensePlatePreview
         Transaction.IsPurchasing = false;
         Transaction.RotateVehiclePreview = false;
         Transaction.CreateTransactionMenu(Player, modItems, world, settings, weapons, time);
+        UIMenuCategory = "ShopMenu";
         InteractionMenu.Visible = true;
         Transaction.ProcessTransactionMenu();
         Transaction.DisposeTransactionMenu();
     }
     private void InteractAsOther()
     {
-        UIMenu treatmentOptionsSubMenu = MenuPool.AddSubMenu(InteractionMenu, "Treatment Options");
-        treatmentOptionsSubMenu.SubtitleText = "Pick a Treatment";
+        TreatmentOptionsMenu = MenuPool.AddSubMenu(InteractionMenu, "Treatment Options");
+        TreatmentOptionsMenu.SubtitleText = "Pick a Treatment";
         InteractionMenu.MenuItems[InteractionMenu.MenuItems.Count() - 1].Description = "Pick one of our state of the art treatment options!";
         if (MedicalTreatments != null && MedicalTreatments.Any())
         {
             foreach (MedicalTreatment medicalTreatment in MedicalTreatments)
             {
-                medicalTreatment.AddToMenu(this, treatmentOptionsSubMenu,Player);
+                medicalTreatment.AddToMenu(this, TreatmentOptionsMenu,Player);
             }
         }
         UIMenuItem PayHospitalBills = new UIMenuItem("Pay Hospital Bills", "Pay your outstanding hospital bills.") { RightLabel = $"${Player.Respawning.HospitalBillPastDue}" };
@@ -187,8 +259,6 @@ public class Hospital : GameLocation, ILocationRespawnable, ILicensePlatePreview
         };
         PayHospitalBills.Enabled = Player.Respawning.HospitalBillPastDue > 0;
         InteractionMenu.AddItem(PayHospitalBills);
-        InteractionMenu.Visible = true;
-        ProcessInteractionMenu();
     }
     public void DisplayInsufficientFundsMessage()
     {

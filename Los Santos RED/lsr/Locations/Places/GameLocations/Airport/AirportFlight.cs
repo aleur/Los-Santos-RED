@@ -31,11 +31,11 @@ public class AirportFlight
     [XmlIgnore]
     public double Distance { get; set; }
     [XmlIgnore]
-    private string FormattedHunger => HungerGain >= 0 ? $"~g~{HungerGain}~s~" : $"~r~{HungerGain}~s~";
+    private string FormattedHunger => HungerGain >= 0 ? $"~g~+{HungerGain}~s~" : $"~r~{HungerGain}~s~";
     [XmlIgnore]
-    private string FormattedThirst => ThirstGain >= 0 ? $"~g~{ThirstGain}~s~" : $"~r~{ThirstGain}~s~";
+    private string FormattedThirst => ThirstGain >= 0 ? $"~g~+{ThirstGain}~s~" : $"~r~{ThirstGain}~s~";
     [XmlIgnore]
-    private string FormattedSleep => SleepGain >= 0 ? $"~g~{SleepGain}~s~" : $"~r~{SleepGain}~s~";
+    private string FormattedSleep => SleepGain >= 0 ? $"~g~+{SleepGain}~s~" : $"~r~{SleepGain}~s~";
 
 
 

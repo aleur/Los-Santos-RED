@@ -29,8 +29,6 @@ public class DeadDrop : GameLocation
     public override float MapIconScale { get; set; } = 1.0f;
     public override float MapIconRadius { get; set; } = 55.0f;
     public override float MapOpenIconAlpha { get; set; } = 0.35f;
-
-
     [XmlIgnore]
     public bool InteractionComplete { get; set; } = false;
     [XmlIgnore]
@@ -39,6 +37,7 @@ public class DeadDrop : GameLocation
     public int MoneyAmount { get; set; } = 500;
     [XmlIgnore]
     public WeaponInformation WeaponInformation { get; set; }
+    [XmlIgnore]
     public ModItem ModItem { get; set; }
     public float ItemAmount { get; set; } = 1.0f;
     public bool CanUse => !IsEnabled;

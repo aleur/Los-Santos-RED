@@ -297,12 +297,10 @@ namespace LosSantosRED.lsr
             }
             else if (Player.ButtonPrompts.IsGroupPressed("BusinessMenu"))
             {
-                Player.ButtonPrompts.RemovePrompts("BusinessMenu");
                 Player.CurrentInteractedLocation.UIMenuCategory = "BusinessMenu";
             }
             else if (Player.ButtonPrompts.IsGroupPressed("ShopMenu"))
             {
-                Player.ButtonPrompts.RemovePrompts("ShopMenu");
                 Player.CurrentInteractedLocation.UIMenuCategory = "ShopMenu";
             }
         }

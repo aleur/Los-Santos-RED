@@ -24,6 +24,8 @@ public class GamblingDen : GameLocation
     {
 
     }
+    [XmlIgnore]
+    public override string MenuPromptName { get; set; } = "Gamble";
     public override string TypeName { get; set; } = "Casino";
     public override int MapIcon { get; set; } = 680;//402 = car repair
     public override bool ShowsOnDirectory { get; set; } = false;
@@ -110,10 +112,26 @@ ILocationInteractable player, IModItems modItems, IWeapons weapons, ITimeControl
             {
                 SetupLocationCamera(locationCamera, isInside, false);
                 CreateInteractionMenu();
-                Transaction = new Transaction(MenuPool, InteractionMenu, Menu, this);
-                InteractionMenu.Visible = true;
-                Interact();
-                ProcessInteractionMenu();
+                if (BusinessMenu != null)
+                {
+                    Business = new Business(MenuPool, InteractionMenu, BusinessMenu, Player, Time, Settings, this);
+                }
+                HasMenuSwitch = GamblingParameters != null && (GamblingParameters.RouletteGameRulesList.Any() || GamblingParameters.BlackJackGameRulesList.Any()) && Business != null;
+                if (GamblingParameters != null && (GamblingParameters.RouletteGameRulesList.Any() || GamblingParameters.BlackJackGameRulesList.Any()))
+                {
+                    Interact();
+                    UIMenuCategory = "ShopMenu";
+                    InteractionMenu.Visible = true;
+                    ProcessGamblingDenMenu();
+                }
+                else if (BusinessMenu != null)
+                {
+                    Business.CreateBusinessMenu(ModItems, World, Weapons);
+                    UIMenuCategory = "BusinessMenu";
+                    InteractionMenu.Visible = true;
+                    Business.ProcessBusinessMenu();
+                    Business.DisposeBusinessMenu();
+                }
                 DisposeInteractionMenu();
                 DisposeCamera(isInside);
                 DisposeInterior();
@@ -125,6 +143,39 @@ ILocationInteractable player, IModItems modItems, IWeapons weapons, ITimeControl
                 EntryPoint.ModController.CrashUnload();
             }
         }, "GamblingDenInteract");
+    }
+    public override void SwitchMenus()
+    {
+        if (UIMenuCategory == "ShopMenu")
+        {
+            Interact();
+            InteractionMenu.Visible = true;
+            ProcessGamblingDenMenu();
+        }
+        else if (UIMenuCategory == "BusinessMenu")
+        {
+            Business.CreateBusinessMenu(ModItems, World, Weapons);
+            InteractionMenu.Visible = true;
+            Business.ProcessBusinessMenu();
+            Business.DisposeBusinessMenu();
+        }
+    }
+    private void ProcessGamblingDenMenu()
+    {
+        while (MenuPool.IsAnyMenuOpen() && UIMenuCategory == "ShopMenu")
+        {
+            MenuPool.ProcessMenus();
+            GameFiber.Yield();
+        }
+        if (UIMenuCategory == "BusinessMenu")
+        {
+            MenuPool.Where(x => x != InteractionMenu).ToList().ForEach(x => // To deal with the multiple UIMenus created. Otherwise, causes multiple layers of UI.
+            {
+                MenuPool.Remove(x);
+            });
+            InteractionMenu.Clear();
+            SwitchMenus();
+        }
     }
     private void Interact()
     {

@@ -11,20 +11,17 @@ public class PropertyMenu
     {
 
     }
-    public PropertyMenu(string iD, string name)
+    public PropertyMenu(string iD)
     {
         ID = iD;
-        Name = name;
     }
-    public PropertyMenu(string iD, string name, int purchasePrice, int salesPrice)
+    public PropertyMenu(string iD, int purchasePrice, int salesPrice)
     {
         ID = iD;
-        Name = name;
         PurchasePrice = purchasePrice;
         SalesPrice = salesPrice;
     }
     public string ID { get; set; }
-    public string Name { get; set; }
     //
     public int PurchasePrice { get; set; }
     public int SalesPrice { get; set; }

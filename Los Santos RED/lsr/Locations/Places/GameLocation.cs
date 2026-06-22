@@ -294,6 +294,12 @@ public class GameLocation : ILocationDispatchable
     [XmlIgnore]
     public string UIMenuCategory { get; set; }
     [XmlIgnore]
+    public virtual string MenuPromptName { get; set; } = "Shop";
+    [XmlIgnore]
+    public virtual string BusinessMenuPromptName { get; set; } = "Property";
+    [XmlIgnore]
+    public bool HasMenuSwitch { get; set; }
+    [XmlIgnore]
     public bool MenuSwitchAvailable { get; set; }
     [XmlIgnore]
     public ShopMenu Menu { get; set; }
@@ -352,7 +358,7 @@ public class GameLocation : ILocationDispatchable
     public virtual int PayoutMax { get; set; } = -1;
     public virtual int SalesPrice { get; set; } = -1;
     public virtual int MaxSalesPrice { get; set; } = -1;
-    public int GrowthPercentage { get; set; } = -1;
+    public virtual int GrowthPercentage { get; set; } = -1;
     public string IsCashPurchaseOnly { get; set; }
     [XmlIgnore]
     public bool CashPurchaseOnly
@@ -605,7 +611,6 @@ public class GameLocation : ILocationDispatchable
                 CreateInteractionMenu();
                 if (Menu != null)
                 {
-                    HandleVariableItems();
                     Transaction = new Transaction(MenuPool, InteractionMenu, Menu, this);
                     Transaction.VehicleDeliveryLocations = VehicleDeliveryLocations;
                     Transaction.VehiclePreviewPosition = VehiclePreviewLocation;
@@ -614,7 +619,7 @@ public class GameLocation : ILocationDispatchable
                 {
                     Business = new Business(MenuPool, InteractionMenu, BusinessMenu, Player, Time, Settings, this);
                 }
-                MenuSwitchAvailable = Transaction != null && Business != null;
+                HasMenuSwitch = Transaction != null && Business != null;
                 if (Menu != null)
                 {
                     Transaction.CreateTransactionMenu(Player, ModItems, World, Settings, Weapons, Time);

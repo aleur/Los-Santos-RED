@@ -32,6 +32,8 @@ public class Forger : GameLocation
     {
 
     }
+    [XmlIgnore]
+    public override string MenuPromptName { get; set; } = "Forger";
     public override string TypeName { get; set; } = "Forger";
     public override int MapIcon { get; set; } = 438;//402 = car repair
     public override bool ShowsOnDirectory => false;
@@ -91,11 +93,32 @@ public class Forger : GameLocation
             try
             {
                 SetupLocationCamera(locationCamera, isInside, false);
-                CreateInteractionMenu();
-                Transaction = new Transaction(MenuPool, InteractionMenu, Menu, this);
-                InteractionMenu.Visible = true;
-                Interact();
-                ProcessInteractionMenu();
+                CreateInteractionMenu();/*
+                if (Menu != null)
+                {
+                    HandleVariableItems();
+                    Transaction = new Transaction(MenuPool, InteractionMenu, Menu, this);
+                }*/
+                if (BusinessMenu != null)
+                {
+                    Business = new Business(MenuPool, InteractionMenu, BusinessMenu, Player, Time, Settings, this);
+                }
+                HasMenuSwitch = /*Transaction != null && */Business != null;
+                if (true/*Menu != null*/) // placeholder for forger for now
+                {
+                    SetupMenu();
+                    UIMenuCategory = "ShopMenu";
+                    InteractionMenu.Visible = true;
+                    ProcessForgerMenu();
+                }
+                else if (BusinessMenu != null)
+                {
+                    Business.CreateBusinessMenu(ModItems, World, Weapons);
+                    UIMenuCategory = "BusinessMenu";
+                    InteractionMenu.Visible = true;
+                    Business.ProcessBusinessMenu();
+                    Business.DisposeBusinessMenu();
+                }
                 DisposeInteractionMenu();
                 DisposeCamera(isInside);
                 DisposeInterior();
@@ -108,7 +131,40 @@ public class Forger : GameLocation
             }
         }, "ForgerInteract");
     }
-    private void Interact()
+    public override void SwitchMenus()
+    {
+        if (UIMenuCategory == "ShopMenu")
+        {
+            SetupMenu();
+            InteractionMenu.Visible = true;
+            ProcessForgerMenu();
+        }
+        else if (UIMenuCategory == "BusinessMenu")
+        {
+            Business.CreateBusinessMenu(ModItems, World, Weapons);
+            InteractionMenu.Visible = true;
+            Business.ProcessBusinessMenu();
+            Business.DisposeBusinessMenu();
+        }
+    }
+    private void ProcessForgerMenu()
+    {
+        while (MenuPool.IsAnyMenuOpen() && UIMenuCategory == "ShopMenu")
+        {
+            MenuPool.ProcessMenus();
+            GameFiber.Yield();
+        }
+        if (UIMenuCategory == "BusinessMenu")
+        {
+            MenuPool.Where(x => x != InteractionMenu).ToList().ForEach(x => // To deal with the multiple UIMenus created. Otherwise, causes multiple layers of UI.
+            {
+                MenuPool.Remove(x);
+            });
+            InteractionMenu.Clear();
+            SwitchMenus();
+        }
+    }
+    private void SetupMenu()
     {
         AddLicensePlateItems();
         AddIdentificationItems();

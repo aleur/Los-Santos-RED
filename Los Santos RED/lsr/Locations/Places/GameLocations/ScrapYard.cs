@@ -26,6 +26,8 @@ public class ScrapYard : GameLocation
     public override string ButtonPromptText { get; set; }
     public float VehiclePickupDistance { get; set; } = 25f;
     public int ScrapValuePerVolume { get; set; } = 100;
+    [XmlIgnore]
+    public override string MenuPromptName { get; set; } = "Scrap Yard";
     public ScrapYard(Vector3 _EntrancePosition, float _EntranceHeading, string _Name, string _Description) : base(_EntrancePosition, _EntranceHeading, _Name, _Description)
     {
 
@@ -74,10 +76,18 @@ public class ScrapYard : GameLocation
             {
                 SetupLocationCamera(locationCamera, isInside, true);
                 CreateInteractionMenu();
-                InteractionMenu.Visible = true;
-                InteractionMenu.OnItemSelect += InteractionMenu_OnItemSelect;
+                if (BusinessMenu != null)
+                {
+                    Business = new Business(MenuPool, InteractionMenu, BusinessMenu, Player, Time, Settings, this);
+                }
+                HasMenuSwitch = Business != null;
+
+                //InteractionMenu.OnItemSelect += InteractionMenu_OnItemSelect;
                 GenerateScrapYardMenu();
-                ProcessInteractionMenu();
+                UIMenuCategory = "ShopMenu";
+                InteractionMenu.Visible = true;
+                ProcessScrapYardMenu();
+
                 DisposeInteractionMenu();
                 DisposeCamera(isInside);
                 DisposeInterior();
@@ -89,6 +99,39 @@ public class ScrapYard : GameLocation
                 EntryPoint.ModController.CrashUnload();
             }
         }, "HotelInteract");
+    }
+    public override void SwitchMenus()
+    {
+        if (UIMenuCategory == "ShopMenu")
+        {
+            GenerateScrapYardMenu();
+            InteractionMenu.Visible = true;
+            ProcessScrapYardMenu();
+        }
+        else if (UIMenuCategory == "BusinessMenu")
+        {
+            Business.CreateBusinessMenu(ModItems, World, Weapons);
+            InteractionMenu.Visible = true;
+            Business.ProcessBusinessMenu();
+            Business.DisposeBusinessMenu();
+        }
+    }
+    private void ProcessScrapYardMenu()
+    {
+        while (MenuPool.IsAnyMenuOpen() && UIMenuCategory == "ShopMenu")
+        {
+            MenuPool.ProcessMenus();
+            GameFiber.Yield();
+        }
+        if (UIMenuCategory == "BusinessMenu")
+        {
+            MenuPool.Where(x => x != InteractionMenu).ToList().ForEach(x => // To deal with the multiple UIMenus created. Otherwise, causes multiple layers of UI.
+            {
+                MenuPool.Remove(x);
+            });
+            InteractionMenu.Clear();
+            SwitchMenus();
+        }
     }
     private void GenerateScrapYardMenu()
     {

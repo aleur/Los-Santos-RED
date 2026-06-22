@@ -303,15 +303,13 @@ public class ButtonPrompts
         {
             RemovePrompts("BusinessMenu");
             RemovePrompts("ShopMenu");
-            AddPrompt("BusinessMenu", $"Property", $"BusinessMenu", Settings.SettingsManager.KeySettings.InteractPositiveOrYes, 1);
-            EntryPoint.WriteToConsole("prop prompt added");
+            AddPrompt("BusinessMenu", $"{Player.CurrentInteractedLocation.BusinessMenuPromptName}", $"BusinessMenu", Settings.SettingsManager.KeySettings.InteractPositiveOrYes, 1);
         }
         else if (!HasPrompt($"ShopMenu") && Player.CurrentInteractedLocation.UIMenuCategory == "BusinessMenu" && Player.CurrentInteractedLocation.IsOpen(World.Time.CurrentHour))
         {
             RemovePrompts("BusinessMenu");
             RemovePrompts("ShopMenu");
-            AddPrompt("ShopMenu", $"Shop", $"ShopMenu", Settings.SettingsManager.KeySettings.InteractPositiveOrYes, 1);
-            EntryPoint.WriteToConsole("shop prompt added");
+            AddPrompt("ShopMenu", $"{Player.CurrentInteractedLocation.MenuPromptName}", $"ShopMenu", Settings.SettingsManager.KeySettings.InteractPositiveOrYes, 1);
         }
     }
     private void ScenarioPrompts()
@@ -532,7 +530,7 @@ public class ButtonPrompts
         {
             Prompts.RemoveAll(x => x.Group == "InteractableLocation");
         }
-        if (!addedPromptGroup && Player.ActivityManager.IsInteractingWithLocation && Player.CurrentInteractedLocation?.InteractionMenu?.Visible != null && Player.CurrentInteractedLocation.MenuSwitchAvailable && !World.Time.IsFastForwarding)
+        if (!addedPromptGroup && Player.ActivityManager.IsInteractingWithLocation && Player.CurrentInteractedLocation?.InteractionMenu?.Visible == true && Player.CurrentInteractedLocation.HasMenuSwitch && !World.Time.IsFastForwarding)
         {
             LocationMenuPrompts();
             addedPromptGroup = true;

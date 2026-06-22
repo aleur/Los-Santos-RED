@@ -23,6 +23,8 @@ public class Hotel : GameLocation
     public override int RacketeeringAmountMin { get; set; } = 2000;
     public override int RacketeeringAmountMax { get; set; } = 5000;
     public List<HotelRoom> HotelRooms { get; set; } = new List<HotelRoom>();
+    [XmlIgnore]
+    public override string MenuPromptName { get; set; } = "Hotel";
 
     public Hotel(Vector3 _EntrancePosition, float _EntranceHeading, string _Name, string _Description, string menuID) : base(_EntrancePosition, _EntranceHeading, _Name, _Description)
     {
@@ -71,13 +73,26 @@ public class Hotel : GameLocation
             {
                 SetupLocationCamera(locationCamera, isInside, true);
                 CreateInteractionMenu();
-                InteractionMenu.Visible = true;
-                InteractionMenu.OnItemSelect += InteractionMenu_OnItemSelect;
-                GenerateHotelMenu();
-                while (IsAnyMenuVisible || Time.IsFastForwarding || KeepInteractionGoing)
+                if (BusinessMenu != null)
                 {
-                    MenuPool.ProcessMenus();
-                    GameFiber.Yield();
+                    Business = new Business(MenuPool, InteractionMenu, BusinessMenu, Player, Time, Settings, this);
+                }
+                HasMenuSwitch = Menu != null && Menu.Items.Any() && Business != null;
+                if (Menu != null && Menu.Items.Any())
+                {
+                    InteractionMenu.OnItemSelect += InteractionMenu_OnItemSelect;
+                    GenerateHotelMenu();
+                    UIMenuCategory = "ShopMenu";
+                    InteractionMenu.Visible = true;
+                    ProcessHotelMenu();
+                }
+                else if (BusinessMenu != null)
+                {
+                    Business.CreateBusinessMenu(ModItems, World, Weapons);
+                    UIMenuCategory = "BusinessMenu";
+                    InteractionMenu.Visible = true;
+                    Business.ProcessBusinessMenu();
+                    Business.DisposeBusinessMenu();
                 }
                 DisposeInteractionMenu();
                 DisposeCamera(isInside);
@@ -90,6 +105,41 @@ public class Hotel : GameLocation
                 EntryPoint.ModController.CrashUnload();
             }
         }, "HotelInteract");
+    }
+    public override void SwitchMenus()
+    {
+        if (UIMenuCategory == "ShopMenu")
+        {
+            InteractionMenu.OnItemSelect += InteractionMenu_OnItemSelect;
+            GenerateHotelMenu();
+            InteractionMenu.Visible = true;
+            ProcessHotelMenu();
+        }
+        else if (UIMenuCategory == "BusinessMenu")
+        {
+            InteractionMenu.OnItemSelect -= InteractionMenu_OnItemSelect;
+            Business.CreateBusinessMenu(ModItems, World, Weapons);
+            InteractionMenu.Visible = true;
+            Business.ProcessBusinessMenu();
+            Business.DisposeBusinessMenu();
+        }
+    }
+    private void ProcessHotelMenu()
+    {
+        while ((MenuPool.IsAnyMenuOpen() || Time.IsFastForwarding || KeepInteractionGoing) && UIMenuCategory == "ShopMenu")
+        {
+            MenuPool.ProcessMenus();
+            GameFiber.Yield();
+        }
+        if (UIMenuCategory == "BusinessMenu")
+        {
+            MenuPool.Where(x => x != InteractionMenu).ToList().ForEach(x => // To deal with the multiple UIMenus created. Otherwise, causes multiple layers of UI.
+            {
+                MenuPool.Remove(x);
+            });
+            InteractionMenu.Clear();
+            SwitchMenus();
+        }
     }
     private void GenerateHotelMenu()
     {

@@ -28,6 +28,8 @@ public class CarCrusher : GameLocation
     public float VehiclePickupDistance { get; set; } = 15f;
     public int StandardCrushPrice { get; set; } = 500;
     public int PerBodyCrushFee { get; set; } = 2000;
+    [XmlIgnore]
+    public override string MenuPromptName { get; set; } = "Crusher";
     public CarCrusher(Vector3 _EntrancePosition, float _EntranceHeading, string _Name, string _Description) : base(_EntrancePosition, _EntranceHeading, _Name, _Description)
     {
 
@@ -75,9 +77,17 @@ public class CarCrusher : GameLocation
             {
                 SetupLocationCamera(locationCamera, isInside, true);
                 CreateInteractionMenu();
-                InteractionMenu.Visible = true;
+                if (BusinessMenu != null)
+                {
+                    Business = new Business(MenuPool, InteractionMenu, BusinessMenu, Player, Time, Settings, this);
+                }
+                HasMenuSwitch = Business != null;
+
                 GenerateCrusherMenu();
-                ProcessInteractionMenu();
+                UIMenuCategory = "ShopMenu";
+                InteractionMenu.Visible = true;
+                ProcessCarCrusherMenu();
+
                 DisposeInteractionMenu();
                 DisposeCamera(isInside);
                 DisposeInterior();
@@ -89,6 +99,39 @@ public class CarCrusher : GameLocation
                 EntryPoint.ModController.CrashUnload();
             }
         }, "CarCrusherInteract");
+    }
+    public override void SwitchMenus()
+    {
+        if (UIMenuCategory == "ShopMenu")
+        {
+            GenerateCrusherMenu();
+            InteractionMenu.Visible = true;
+            ProcessCarCrusherMenu();
+        }
+        else if (UIMenuCategory == "BusinessMenu")
+        {
+            Business.CreateBusinessMenu(ModItems, World, Weapons);
+            InteractionMenu.Visible = true;
+            Business.ProcessBusinessMenu();
+            Business.DisposeBusinessMenu();
+        }
+    }
+    private void ProcessCarCrusherMenu()
+    {
+        while (MenuPool.IsAnyMenuOpen() && UIMenuCategory == "ShopMenu")
+        {
+            MenuPool.ProcessMenus();
+            GameFiber.Yield();
+        }
+        if (UIMenuCategory == "BusinessMenu")
+        {
+            MenuPool.Where(x => x != InteractionMenu).ToList().ForEach(x => // To deal with the multiple UIMenus created. Otherwise, causes multiple layers of UI.
+            {
+                MenuPool.Remove(x);
+            });
+            InteractionMenu.Clear();
+            SwitchMenus();
+        }
     }
     private void GenerateCrusherMenu()
     {

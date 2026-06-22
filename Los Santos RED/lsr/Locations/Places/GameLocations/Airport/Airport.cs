@@ -35,7 +35,10 @@ public class Airport : GameLocation, ILocationSetupable
     }
     public override string TypeName { get; set; } = "Airport";
     public override int MapIcon { get; set; } = (int)BlipSprite.Airport;
+    [XmlIgnore]
     public override string ButtonPromptText { get; set; }
+    [XmlIgnore]
+    public override string MenuPromptName { get; set; } = "Airport";
     public string AirportID { get; set; }
     public Vector3 ArrivalPosition { get; set; }
     public float ArrivalHeading { get; set; }
@@ -119,7 +122,6 @@ public class Airport : GameLocation, ILocationSetupable
                 IsFlyingToLocation = false;
                 SetupLocationCamera(locationCamera, isInside, true);
                 CreateInteractionMenu();
-                InteractionMenu.Visible = true;
                 if (FlightOptions != null && FlightOptions.Any())
                 {
                     HandleVariableItems();
@@ -128,7 +130,7 @@ public class Airport : GameLocation, ILocationSetupable
                 {
                     Business = new Business(MenuPool, InteractionMenu, BusinessMenu, Player, Time, Settings, this);
                 }
-                MenuSwitchAvailable = FlightOptions != null && FlightOptions.Any() && Business != null;
+                HasMenuSwitch = FlightOptions != null && FlightOptions.Any() && Business != null;
                 if (FlightOptions != null && FlightOptions.Any())
                 {
                     SetupMenu();
@@ -181,7 +183,7 @@ public class Airport : GameLocation, ILocationSetupable
         }
         if (UIMenuCategory == "BusinessMenu")
         {
-            MenuPool.Where(x => x.ParentMenu != null && x.ParentMenu != InteractionMenu).ToList().ForEach(x => // To deal with those not attached to ParentMenu. Otherwise, causes multiple layers of UI.
+            MenuPool.Where(x => x != InteractionMenu).ToList().ForEach(x => // To deal with those not attached to ParentMenu. Otherwise, causes multiple layers of UI.
             {
                 EntryPoint.WriteToConsole($"{x.CurrentItem.Text}");
                 MenuPool.Remove(x); // Instead of x.ParentMenu.Clear(); x.ParentMenu.Close(); which also works. Removes duplicates of UIMenu as well.

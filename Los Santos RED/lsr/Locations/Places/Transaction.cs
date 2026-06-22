@@ -316,9 +316,9 @@ public class Transaction
         }
         if (Store.UIMenuCategory == "BusinessMenu")
         {
-            MenuPool.Where(x => x.ParentMenu != null && x.ParentMenu != ParentMenu).ToList().ForEach(x => // To deal with those not attached to ParentMenu. Otherwise, causes multiple layers of UI.
+            MenuPool.Where(x => x != ParentMenu).ToList().ForEach(x => // To deal with those not attached to ParentMenu. Otherwise, causes multiple layers of UI.
             {
-                EntryPoint.WriteToConsole($"{x.CurrentItem.Text}");
+                //EntryPoint.WriteToConsole($"{x.CurrentItem.Text}");
                 /* Not really needed + clashes with interior handling kinda
                 x.Clear();
                 x.Close();*/
