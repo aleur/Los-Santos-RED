@@ -80,6 +80,7 @@ public class BurnerPhoneMapsApp : BurnerPhoneApp
                 {
                     GameFiber.Yield();
                 }
+                Game.RawFrameRender -= (s, e) => MenuPool.DrawBanners(e.Graphics);
                 Player.CellPhone.Close(250);
             }
             catch (Exception ex)
@@ -96,10 +97,6 @@ public class BurnerPhoneMapsApp : BurnerPhoneApp
             MenuPool.ProcessMenus();
         }
     }
-    public void OnLeftMaps()
-    {
-
-    }
     private void SetMenuBanner(UIMenu menu)
     {
         if (MapsMenuBanner != null)
@@ -115,7 +112,7 @@ public class BurnerPhoneMapsApp : BurnerPhoneApp
     private void AddDestinationMenu()
     {
         UIMenu DestinationSubMenu = MenuPool.AddSubMenu(MapsMenu, "Locations");
-        MapsMenu.MenuItems[MapsMenu.MenuItems.Count() - 1].Description = "Find your way around with Nudle Maps, the smartest way to navigate the city without getting lost.";
+        MapsMenu.MenuItems[MapsMenu.MenuItems.Count() - 1].Description = $"Find your way around with {Name}, the smartest way to navigate the city without getting lost.";
         SetMenuBanner(DestinationSubMenu);
 
         DestinationSubMenu.OnMenuOpen += (sender1) =>

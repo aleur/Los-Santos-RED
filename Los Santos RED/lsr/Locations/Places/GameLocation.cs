@@ -567,7 +567,10 @@ public class GameLocation : ILocationDispatchable
         Menu = shopMenus.GetSpecificInstancedMenu(MenuID);
         if (Menu != null) UIMenuCategory = "ShopMenu";
         BusinessMenu = modDataFileManager.BusinessMenus.GetSpecificBusinessMenu(BusinessID);
-        if (BusinessMenu != null) BusinessMenu.SetupBusiness(this, modDataFileManager.BusinessMenus.GetSpecificPropertyMenu(BusinessMenu.PropertyMenuID));
+        if (BusinessMenu != null)
+        {
+            BusinessMenu.SetupBusinessData(this, modDataFileManager.BusinessMenus.GetSpecificPropertyMenu(BusinessMenu.PropertyMenuID));
+        }
         if (HasInterior)
         {
             interior = interiors?.GetInteriorByLocalID(InteriorID);

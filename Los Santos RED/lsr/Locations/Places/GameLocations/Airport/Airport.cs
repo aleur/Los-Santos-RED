@@ -77,8 +77,10 @@ public class Airport : GameLocation, ILocationSetupable
         if (!string.IsNullOrEmpty(BusinessID))
         {
             BusinessMenu = modDataFileManager.BusinessMenus.GetSpecificBusinessMenu(BusinessID);
-            if (BusinessMenu != null) 
-                BusinessMenu.SetupBusiness(this, modDataFileManager.BusinessMenus.GetSpecificPropertyMenu(BusinessMenu.PropertyMenuID));
+            if (BusinessMenu != null)
+            {
+                BusinessMenu.SetupBusinessData(this, modDataFileManager.BusinessMenus.GetSpecificPropertyMenu(BusinessMenu.PropertyMenuID));
+            }
         }
     }
     public override void OnInteract()//ILocationInteractable player, IModItems modItems, IEntityProvideable world, ISettingsProvideable settings, IWeapons weapons, ITimeControllable time, IPlacesOfInterest placesOfInterest)

@@ -44,6 +44,10 @@ public class BurnerPhoneApp
         }
         BurnerPhone.ReturnHome(Index);
     }
+    public virtual void OnLeftApp()
+    {
+
+    }
     public virtual void Update()
     {
 

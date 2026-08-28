@@ -70,7 +70,8 @@ public class GenericBusiness : GameLocation, ILocationSetupable, IPayoutDisbursa
     {
         possibleLocations.Businesses.Add(this);
         base.AddLocation(possibleLocations);
-    }/*
+    }
+    /*
     public override void OnInteract()
     {
         if (BusinessInterior != null && BusinessInterior.IsTeleportEntry && IsOwned)

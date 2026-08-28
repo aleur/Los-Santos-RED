@@ -61,7 +61,9 @@ public class Hospital : GameLocation, ILocationRespawnable, ILicensePlatePreview
         {
             BusinessMenu = modDataFileManager.BusinessMenus.GetSpecificBusinessMenu(BusinessID);
             if (BusinessMenu != null)
-                BusinessMenu.SetupBusiness(this, modDataFileManager.BusinessMenus.GetSpecificPropertyMenu(BusinessMenu.PropertyMenuID));
+            {
+                BusinessMenu.SetupBusinessData(this, modDataFileManager.BusinessMenus.GetSpecificPropertyMenu(BusinessMenu.PropertyMenuID));
+            }
         }
     }
     public override void AddDistanceOffset(Vector3 offsetToAdd)

@@ -74,10 +74,13 @@ public class BusinessMenus : IBusinessMenus
         PossibleBusinessMenus.BusinessMenuList.AddRange(
             new List<BusinessMenu>()
             {
+                // Lucrative
                 new BusinessMenu("ConvenienceStoreMenu", "ConvenienceStoreProperty"),
                 new BusinessMenu("GenericBusinessMenu", "GenericBusinessProperty"),
                 new BusinessMenu("SmallAirstripMenu", "SmallAirstripProperty"),
                 new BusinessMenu("DealershipMenu", "DealershipProperty"),
+                // Non-lucrative
+                new BusinessMenu("GenericBuildingMenu", "GenericBuildingProperty")
             }
         );
     }
@@ -86,6 +89,7 @@ public class BusinessMenus : IBusinessMenus
         PossibleBusinessMenus.PropertyMenuList.AddRange(
             new List<PropertyMenu>()
             {
+                // Lucrative
                 new PropertyMenu("ConvenienceStoreProperty", 50000, 10000) { MaxSalesPrice = 0, CashPurchaseOnly = false, PayoutFrequency = 7, PayoutMin = 1000, PayoutMax = 5000, GrowthPercentage = 20, 
                                                                                            RacketeeringAmountMin = 500, MinPriceRefreshHours = 0, MaxPriceRefreshHours = 0, MinRestockHours = 0, MaxRestockHours = 0, 
                                                                                            RacketeeringAmountMax = 1000, RegisterCashMax = 1550, RegisterCashMin = 250 },
@@ -97,7 +101,11 @@ public class BusinessMenus : IBusinessMenus
                                                                                            RacketeeringAmountMax = 1000, RegisterCashMax = 1550, RegisterCashMin = 250 },
                 new PropertyMenu("DealershipProperty", 500000, 200000) { MaxSalesPrice = 0, CashPurchaseOnly = false, PayoutFrequency = 7, PayoutMin = 10000, PayoutMax = 100000, GrowthPercentage = 50,
                                                                                            RacketeeringAmountMin = 5000, MinPriceRefreshHours = 0, MaxPriceRefreshHours = 0, MinRestockHours = 0, MaxRestockHours = 0,
-                                                                                           RacketeeringAmountMax = 10000, RegisterCashMax = 3050, RegisterCashMin = 1000 }
+                                                                                           RacketeeringAmountMax = 10000, RegisterCashMax = 3050, RegisterCashMin = 1000 },
+                // Non-lucrative
+                new PropertyMenu("GenericBuildingProperty", 200000, 100000) { MaxSalesPrice = 0, CashPurchaseOnly = false, PayoutFrequency = 0, PayoutMin = 0, PayoutMax = 0, GrowthPercentage = 0,
+                                                                                           RacketeeringAmountMin = 0, MinPriceRefreshHours = 0, MaxPriceRefreshHours = 0, MinRestockHours = 0, MaxRestockHours = 0,
+                                                                                           RacketeeringAmountMax = 0, RegisterCashMax = 0, RegisterCashMin = 0 },
             }
         );
     }

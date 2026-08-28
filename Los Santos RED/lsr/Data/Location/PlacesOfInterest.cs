@@ -73,6 +73,7 @@ public class PlacesOfInterest : IPlacesOfInterest
     private List<PlasticSurgeryClinic> PlasticSurgeryClinics;
     private List<BarberShop> BarberShopPlaces;
     private List<GenericBusiness> Businesses;
+    private List<Property> Properties;
     private PedCustomizerLocation DefaultPedCustomizerLocation;
 
     public PossibleLocations PossibleLocations { get; private set; }
@@ -237,6 +238,7 @@ public class PlacesOfInterest : IPlacesOfInterest
         DefaultConfig_PlasticSurgeryClinics();
         DefaultConfig_TattooShops();
         DefaultConfig_Businesses();
+        DefaultConfig_Properties();
 
         PossibleLocations.DeadDrops.AddRange(DeadDrops);
         PossibleLocations.CarCrushers.AddRange(CarCrushers);
@@ -288,6 +290,7 @@ public class PlacesOfInterest : IPlacesOfInterest
         PossibleLocations.PlasticSurgeryClinics.AddRange(PlasticSurgeryClinics);
         PossibleLocations.TattooShops.AddRange(TattooShopPlaces);
         PossibleLocations.Businesses.AddRange(Businesses);
+        PossibleLocations.Properties.AddRange(Properties);
         PossibleLocations.PedCustomizerLocation = DefaultPedCustomizerLocation;
 
 
@@ -760,9 +763,32 @@ public class PlacesOfInterest : IPlacesOfInterest
         */
         Businesses = new List<GenericBusiness>()
         {
+            // K-Town
             new GenericBusiness(new Vector3(-582.2298f, -1008.865f, 22.32969f), 269.7768f, "K-Town Watches", "") { BusinessID = "GenericBusinessMenu"},
             new GenericBusiness(new Vector3(-582.2222f, -984.9955f, 25.98572f), 272.19f, "K-Town Shoe Store", "") { BusinessID = "GenericBusinessMenu"},
             new GenericBusiness(new Vector3(-582.2017f, -1000.755f, 25.98572f), 267.1015f, "K-Town Electrical Appliances", "") { BusinessID = "GenericBusinessMenu"},
+            // Strawberry
+            new GenericBusiness(new Vector3(84.28909f, -1552.026f, 29.59777f), 51.86531f, "Suds Law Laundromat", "") { BusinessID = "GenericBusinessMenu"},
+            new GenericBusiness(new Vector3(48.74524f, -1594.555f, 29.59777f), 50.71333f, "Totally Rental", "") { BusinessID = "GenericBusinessMenu"},
+            new GenericBusiness(new Vector3(168.7193f, -1505.449f, 29.27198f), 137.6462f, "Go and Wash", "") { BusinessID = "GenericBusinessMenu"},
+            new GenericBusiness(new Vector3(94.74931f, -1506.961f, 29.2536f), 93.83825f, "Timmy's Flowers", "") { BusinessID = "GenericBusinessMenu"},
+            new GenericBusiness(new Vector3(65.65405f, -1467.278f, 29.30209f), 229.004f, "Leroy's Electricals", "") { BusinessID = "GenericBusinessMenu"},
+            new GenericBusiness(new Vector3(-80.79017f, -1326.081f, 29.26141f), 92.60159f, "Mechanic", "") { BusinessID = "GenericBusinessMenu"},
+            new GenericBusiness(new Vector3(-82.16396f, -1385.858f, 29.49153f), 359.8931f, "LS Paper Co", "") { BusinessID = "GenericBusinessMenu"},
+            new GenericBusiness(new Vector3(152.7511f, -1362.896f, 29.33068f), 232.5547f, "Suds Quality Cleaners", "") { BusinessID = "GenericBusinessMenu"},
+            new GenericBusiness(new Vector3(123.0579f, -1347.816f, 29.29153f), 136.92f, "Gav's Cash Exchange", "") { BusinessID = "GenericBusinessMenu"},
+            new GenericBusiness(new Vector3(118.1554f, -1343.884f, 29.29151f), 126.7689f, "Smoker's Emporium", "") { BusinessID = "GenericBusinessMenu"},
+            new GenericBusiness(new Vector3(51.22361f, -1317.927f, 29.28722f), 324.8754f, "Fern's Electronic Diagnostics", "") { BusinessID = "GenericBusinessMenu"},
+            new GenericBusiness(new Vector3(198.12f, -1276.617f, 29.3251f), 258.0571f, "Alfonzo's Appliances", "") { BusinessID = "GenericBusinessMenu"},
+            new GenericBusiness(new Vector3(199.3355f, -1269.007f, 29.17549f), 260.0699f, "Gloria's Fashion Boutique", "")  { BusinessID = "GenericBusinessMenu"}
+        };
+    }
+    private void DefaultConfig_Properties()
+    {
+        Properties = new List<Property>()
+        {
+            // Strawberry
+            new Property(new Vector3(128.0054f, -1577.686f, 29.72744f), 319.6475f, "Small Warehouse", "") { BusinessID = "SmallWarehouseMenu"}
         };
     }
     private void DefaultConfig_TattooShops()

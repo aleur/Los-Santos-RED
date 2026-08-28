@@ -32,7 +32,7 @@ public class BusinessMenu
     public string PropertyMenuID { get; set; }
     public string AmenitiesGroupID { get; set; } 
     public List<string> AvailableAmenities { get; set; }
-    public void SetupBusiness(GameLocation loc, PropertyMenu pm)
+    public void SetupBusinessData(GameLocation loc, PropertyMenu pm)
     {
         pm.OverrideData(loc);
     }

@@ -368,7 +368,7 @@ public class BurnerPhoneContactsApp : BurnerPhoneApp
             UpdateContact(BurnerPhone.LastCalledContact);
         }
     }
-    public void OnLeftCall()
+    public override void OnLeftApp()
     {
         BurnerPhone.LastCalledContact = null;
         isDialActive = false;

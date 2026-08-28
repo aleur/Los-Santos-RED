@@ -296,8 +296,8 @@ public class PlayerOtherSettings : ISettingsDefaultable
         AllowCameraControlWhenEntering = false;
         AllowCameraControlWhenExiting = false;
 
-        BurnerPhoneMapsAppName = "Nudle Maps";
-        BurnerPhoneMapsAppBannerLocation = "stores\\nudlemaps.png";
+        BurnerPhoneMapsAppName = "Eyefind Maps";
+        BurnerPhoneMapsAppBannerLocation = "stores\\eyefind.png";
     }
 
 }

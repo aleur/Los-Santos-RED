@@ -48,6 +48,7 @@ public class BurnerPhone
     public BurnerPhoneFlashlightApp FlashlightApp { get; private set; }
     public BurnerPhoneMapsApp MapsApp { get; private set; }
     public BurnerPhoneSettingsApp SettingsApp { get; private set; }
+    public BurnerPhoneSetupLocationApp BurnerPhoneBuilderApp { get; private set; }
     private BurnerPhoneApp CurrentBurnerApp;
     private bool pressedDirection;
 
@@ -75,6 +76,7 @@ public class BurnerPhone
         FlashlightApp = new BurnerPhoneFlashlightApp(this, Player, Time, Settings, 2, ModItems);
         MapsApp = new BurnerPhoneMapsApp(this, Player, Time, Settings, 3, PlacesOfInterest, World);
         SettingsApp = new BurnerPhoneSettingsApp(this, Player, Time, Settings, 4);
+        BurnerPhoneBuilderApp = new BurnerPhoneSetupLocationApp(this, Player, Time, Settings, 5, PlacesOfInterest, World, World.Streets);
 
         PhoneApps.Add(MessagesApp);
         PhoneApps.Add(ContactsApp);
@@ -84,6 +86,7 @@ public class BurnerPhone
         }
         PhoneApps.Add(MapsApp);
         PhoneApps.Add(SettingsApp);
+        PhoneApps.Add(BurnerPhoneBuilderApp);
 
         MaxColumns = 3;//hardcoded to the phone
         MaxRows = 1 + (PhoneApps.Count() / 3);
@@ -119,8 +122,10 @@ public class BurnerPhone
         {
             PlayPutAwaySound();
         }
-        ContactsApp.OnLeftCall();
-        MapsApp.OnLeftMaps();
+        foreach (BurnerPhoneApp bpa in PhoneApps)
+        {
+            bpa.OnLeftApp();
+        }
         isPhoneActive = false;
         NativeFunction.Natives.DESTROY_MOBILE_PHONE();
         Game.DisableControlAction(0, GameControl.Sprint, false);

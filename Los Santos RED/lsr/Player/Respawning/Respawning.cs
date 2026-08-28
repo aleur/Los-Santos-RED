@@ -144,7 +144,7 @@ public class Respawning// : IRespawning
         {
             ResetPlayer(true, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
             Game.DisplayNotification(BlankContactPicture, BlankContactPicture, StaticStrings.OfficerFriendlyContactName, "~r~Expedited Service Fee", BribedCopResponses.PickRandom());
-            Player.BankAccounts.GiveMoney(-1 * possibleBribe.Amount, true);
+            Player.BankAccounts.GiveMoney(-1 * possibleBribe.Amount, false);
             GameTimeLastBribedPolice = Game.GameTime;
             NativeHelper.PlaySuccessSound();
             List<string> OfficerFriendlyResponses = new List<string>() { 
