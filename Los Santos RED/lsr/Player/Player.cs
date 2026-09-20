@@ -187,11 +187,13 @@ namespace Mod
             VehicleManager = new VehicleManager(this, World, Settings);
             StealthManager = new StealthManager(this, World, Settings, TimeControllable);
             RacingManager = new VehicleRaceManager(this, Settings, World,Crimes,Weapons,Names,ModItems,shopMenus, this);
+            CriminalRecord = new CriminalRecord();
         }
         public IntimidationManager IntimidationManager { get; private set; }
         public CuffManager CuffManager { get; private set; }
         public RelationshipManager RelationshipManager { get; private set; }
         public GPSManager GPSManager { get; private set; }
+        public CriminalRecord CriminalRecord { get; set; }
         public CriminalHistory CriminalHistory { get; private set; }
         public PlayerTasks PlayerTasks { get; private set; }
         public VehicleManager VehicleManager { get; private set; }
@@ -706,7 +708,7 @@ namespace Mod
         }
         public void Reset(bool resetWanted, bool resetTimesDied, bool resetWeapons, bool resetCriminalHistory, bool resetInventory, bool resetIntoxication, bool resetRelationships, bool resetOwnedVehicles, 
             bool resetCellphone, bool resetActiveTasks, bool resetProperties, bool resetHealth, bool resetNeeds, bool resetGroup, bool resetLicenses, bool resetActivites, bool resetGracePeriod, 
-            bool resetBankAccounts, bool resetSavedGame, bool resetMessages, bool resetInteriors, bool resetGambling, bool resetPersistVehicle)
+            bool resetBankAccounts, bool resetSavedGame, bool resetMessages, bool resetInteriors, bool resetGambling, bool resetPersistVehicle, bool resetCriminalRecord)
         {
             IsDead = false;
             IsBusted = false;
@@ -750,6 +752,10 @@ namespace Mod
                 //Surrendering.Reset();
 
                 Update();
+            }
+            if (resetCriminalRecord)
+            {
+                CriminalRecord.Reset();
             }
             if (resetTimesDied)
             {

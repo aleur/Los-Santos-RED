@@ -15,6 +15,7 @@ using System.Net.Http.Headers;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using static CriminalRecord;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace LosSantosRED.lsr.Data
@@ -68,6 +69,7 @@ namespace LosSantosRED.lsr.Data
         public int Armor { get; set; }
         public int MaxHealth { get; set; }
         public string CurrentTeleportInterior { get; set; }
+        public CriminalRecord CriminalRecord { get; set; } = new CriminalRecord();
         public PedVariation CurrentModelVariation { get; set; }
         public DriversLicense DriversLicense { get; set; }
         public CCWLicense CCWLicense { get; set; }
@@ -121,8 +123,25 @@ namespace LosSantosRED.lsr.Data
             SaveCellPhone(player); 
             SaveOwnedProperties(player);
             SavePurchasedClothingItem(player);
+            SaveCriminalRecord(player);
         }
 
+        private void SaveCriminalRecord(ISaveable player)
+        {
+            CriminalRecord.TrafficViolationsFines = player.CriminalRecord.TrafficViolationsFines;
+            EntryPoint.WriteToConsole($"{CriminalRecord.TrafficViolationsFines} - SAVING TRAFFIC FINES (CRIMINAL RECORD)");
+
+            CriminalRecord.PastCitationsList = player.CriminalRecord.PastCitations.Select(kvp => new CitationEntry
+            {
+                Key = kvp.Key,
+                Value = kvp.Value
+            })
+            .ToList(); ;
+            foreach (var c in CriminalRecord.PastCitationsList)
+            {
+                EntryPoint.WriteToConsole($"{c.Key} - SAVING PAST CITATION (CRIMINAL RECORD)");
+            }
+        }
         private void SavePurchasedClothingItem(ISaveable player)
         {
             SavedPurchasedClothingItems.Clear();
@@ -353,6 +372,7 @@ namespace LosSantosRED.lsr.Data
                 LoadCellPhoneSettings(player);
                 LoadAgencies(agencies, player);
                 LoadHealth(player);
+                LoadCriminalRecord(player);
 
                 ////LEGACY TO BE REMOVED
                 //LoadResidences(player, placesOfInterest, modItems, settings);//LEGACY TO BE REMOVED
@@ -371,7 +391,30 @@ namespace LosSantosRED.lsr.Data
                 Game.DisplayNotification("Error Loading Save");
             }
         }
+        private void LoadCriminalRecord(IInventoryable player)
+        {
+            EntryPoint.WriteToConsole($"CRIMINAL RECORD LOADING");
+            if (CriminalRecord == null)
+            {
+                return;
+            }
+            EntryPoint.WriteToConsole(
+                $"PastCitationsList count: {CriminalRecord.PastCitationsList?.Count ?? -1}"
+            );
 
+            EntryPoint.WriteToConsole(
+                $"PastCitations dictionary count: {CriminalRecord.PastCitations?.Count ?? -1}"
+            );
+
+            player.CriminalRecord.Reset();
+            player.CriminalRecord.TrafficViolationsFines = CriminalRecord.TrafficViolationsFines;
+
+            foreach (var c in CriminalRecord.PastCitationsList)
+            {
+                EntryPoint.WriteToConsole($"{c.Key} - {c.Value} CITATION LOADED (CRIMINAL RECORD)");
+            }
+            player.CriminalRecord.PastCitations = CriminalRecord.PastCitationsList.ToDictionary(x => x.Key, x => x.Value);
+        }
         private void LoadSavedClothingItems(IInventoryable player, IShopMenus shopMenus)
         {
             //do we really wnat to save the whole xml again each time? would make it easier

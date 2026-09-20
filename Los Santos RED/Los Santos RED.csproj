@@ -312,6 +312,7 @@
     <Compile Include="lsr\Player\Cellphone\Burner\Apps\Debug\BurnerPhoneSetupLocationApp.cs" />
     <Compile Include="lsr\Player\Cellphone\Burner\Apps\BurnerPhoneMapsApp.cs" />
     <Compile Include="lsr\Player\Crafting\Craft.cs" />
+    <Compile Include="lsr\Player\Crime\CriminalRecord.cs" />
     <Compile Include="lsr\Player\Gambling\Blackjack Games\BlackJackGame.cs" />
     <Compile Include="lsr\Player\Gambling\Blackjack Games\BlackjackGameUI.cs" />
     <Compile Include="lsr\Player\Gambling\Blackjack Games\Card.cs" />
