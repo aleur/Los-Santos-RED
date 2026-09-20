@@ -69,6 +69,7 @@ public class VehiclesTab
             string DescriptionHeaderText = $"{Model}";
             if (car.Vehicle.Exists())
             {
+                DescriptionText += car.HasBeenSeenByPoliceDuringWanted ? $"~n~Status: ~r~WANTED~s~" : $"~n~Status: ~s~None~s~";
                 LocationData myData = new LocationData(car.Vehicle, Streets, Zones, Interiors, Settings);
                 myData.Update(car.Vehicle, false);
 

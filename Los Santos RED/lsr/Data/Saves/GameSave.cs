@@ -15,6 +15,7 @@ using System.Net.Http.Headers;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
+using static CriminalRecord;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement.TaskbarClock;
 
 namespace LosSantosRED.lsr.Data
@@ -68,6 +69,7 @@ namespace LosSantosRED.lsr.Data
         public int Armor { get; set; }
         public int MaxHealth { get; set; }
         public string CurrentTeleportInterior { get; set; }
+        public CriminalRecord CriminalRecord { get; set; } = new CriminalRecord();
         public PedVariation CurrentModelVariation { get; set; }
         public DriversLicense DriversLicense { get; set; }
         public CCWLicense CCWLicense { get; set; }
@@ -121,8 +123,34 @@ namespace LosSantosRED.lsr.Data
             SaveCellPhone(player); 
             SaveOwnedProperties(player);
             SavePurchasedClothingItem(player);
+            SaveCriminalRecord(player);
         }
 
+        private void SaveCriminalRecord(ISaveable player)
+        {
+            CriminalRecord.TrafficViolationsFines = player.CriminalRecord.TrafficViolationsFines;
+            EntryPoint.WriteToConsole($"{CriminalRecord.TrafficViolationsFines} - SAVING TRAFFIC FINES (CRIMINAL RECORD)");
+
+            CriminalRecord.PastCitationsList = player.CriminalRecord.PastCitations.Select(kvp => new RecordEntry
+            {
+                Key = kvp.Key,
+                Value = kvp.Value
+            })
+            .ToList(); ;
+            foreach (var c in CriminalRecord.PastCitationsList)
+            {
+                EntryPoint.WriteToConsole($"{c.Key} - SAVING PAST CITATION (CRIMINAL RECORD)");
+            }
+
+            if (player.CriminalHistory.CurrentHistory != null)
+            {
+                CriminalRecord.CurrentHistory = player.CriminalHistory.CurrentHistory;
+                EntryPoint.WriteToConsole($"{CriminalRecord.CurrentHistory.DateTimeLastWantedEnded} - SAVING DateTimeLastWantedEnded (CRIMINAL RECORD)");
+                EntryPoint.WriteToConsole($"{CriminalRecord.CurrentHistory.ExpirationDate} - SAVING ExpirationDate (CRIMINAL RECORD)");
+            }/*
+            CriminalRecord.DateTimeLastWantedEnded = player.CriminalRecord.DateTimeLastWantedEnded;
+            CriminalRecord.ExpirationDate = player.CriminalRecord.ExpirationDate;;*/
+        }
         private void SavePurchasedClothingItem(ISaveable player)
         {
             SavedPurchasedClothingItems.Clear();
@@ -194,6 +222,7 @@ namespace LosSantosRED.lsr.Data
                     VehicleSaveStatus vss;
                     vss = new VehicleSaveStatus(car.Vehicle.Model.Hash, car.Vehicle.Position, car.Vehicle.Heading);
                     vss.IsImpounded = car.IsImpounded;
+                    vss.IsWanted = car.HasBeenSeenByPoliceDuringWanted;
                     vss.DateTimeImpounded = car.DateTimeImpounded;
                     vss.TimesImpounded = car.TimesImpounded;
                     vss.ImpoundedLocation = car.ImpoundedLocation;
@@ -340,6 +369,7 @@ namespace LosSantosRED.lsr.Data
                 LoadMoney(player);
                 LoadWeapons(weapons);
                 LoadInventory(player, modItems);
+                LoadCriminalRecord(player);
                 LoadLicenses(player);
                 LoadVehicles(player, world,settings, modItems, placesOfInterest, time, weapons);
                 LoadPosition(player, placesOfInterest, world, interactionable);
@@ -371,7 +401,41 @@ namespace LosSantosRED.lsr.Data
                 Game.DisplayNotification("Error Loading Save");
             }
         }
+        private void LoadCriminalRecord(IInventoryable player)
+        {/*
+            EntryPoint.WriteToConsole($"CRIMINAL RECORD LOADING");*/
+            if (CriminalRecord == null)
+            {
+                return;
+            }/*
+            EntryPoint.WriteToConsole(
+                $"PastCitationsList count: {CriminalRecord.PastCitationsList?.Count ?? -1}"
+            );
 
+            EntryPoint.WriteToConsole(
+                $"PastCitations dictionary count: {CriminalRecord.PastCitations?.Count ?? -1}"
+            );*/
+            player.CriminalRecord.Reset();
+            player.CriminalHistory.Reset();
+            player.CriminalRecord.TrafficViolationsFines = CriminalRecord.TrafficViolationsFines;
+/*
+            foreach (var c in CriminalRecord.PastCitationsList)
+            {
+                EntryPoint.WriteToConsole($"{c.Key} - {c.Value} CITATION LOADED (CRIMINAL RECORD)");
+            }*/
+            player.CriminalRecord.PastCitations = CriminalRecord.PastCitationsList.ToDictionary(x => x.Key, x => x.Value);/*
+            player.CriminalRecord.DateTimeLastWantedEnded = CriminalRecord.DateTimeLastWantedEnded;
+            player.CriminalRecord.ExpirationDate = CriminalRecord.ExpirationDate;*/
+            if (CriminalRecord.CurrentHistory != null)
+            {
+                player.CriminalRecord.CurrentHistory = CriminalRecord.CurrentHistory;
+/*
+                EntryPoint.WriteToConsole($"{CriminalRecord.CurrentHistory.DateTimeLastWantedEnded} - LOADING DateTimeLastWantedEnded (CRIMINAL RECORD)");
+                EntryPoint.WriteToConsole($"{CriminalRecord.CurrentHistory.ExpirationDate} - LOADING ExpirationDate (CRIMINAL RECORD)");*/
+
+                player.CriminalHistory.LoadHistory(CriminalRecord.CurrentHistory);
+            }
+        }
         private void LoadSavedClothingItems(IInventoryable player, IShopMenus shopMenus)
         {
             //do we really wnat to save the whole xml again each time? would make it easier
@@ -528,6 +592,7 @@ namespace LosSantosRED.lsr.Data
                     MyVeh.CanHaveRandomItems = false;
                     MyVeh.CanHaveRandomCash = false;
                     MyVeh.CanHaveRandomWeapons = false;
+                    MyVeh.HasBeenSeenByPoliceDuringWanted = OwnedVehicleVariation.IsWanted;
                     MyVeh.AddVehicleToList(World);
                     //World.Vehicles.AddEntity(MyVeh, ResponseType.None);
                     OwnedVehicleVariation.VehicleVariation?.Apply(MyVeh);

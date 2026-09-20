@@ -11,6 +11,8 @@ namespace LosSantosRED.lsr.Interface
 {
     public interface ISaveable
     {
+        CriminalHistory CriminalHistory { get; set; }
+        CriminalRecord CriminalRecord { get; set; } 
         Respawning Respawning { get; }
         CellPhone CellPhone { get; }
         RelationshipManager RelationshipManager { get; }

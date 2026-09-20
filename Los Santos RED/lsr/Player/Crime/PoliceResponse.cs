@@ -51,7 +51,7 @@ namespace LosSantosRED.lsr
         public bool IsDeadlyChase => CurrentPoliceState == PoliceState.DeadlyChase;
         public int CountCloseVehicleChasingCops { get; private set; }
         public bool IsWeaponsFree { get; set; }
-        public DateTime DateTimeLastWantedEnded { get; private set; }
+        public DateTime DateTimeLastWantedEnded { get; set; }
         public Vector3 LastWantedCenterPosition { get; set; }
         public bool LethalForceAuthorized => CrimesObserved.Any(x => x.AssociatedCrime.ResultsInLethalForce);
         public string ObservedCrimesDisplay => string.Join(",", CrimesObserved.Select(x => x.AssociatedCrime.Name));

@@ -10,6 +10,7 @@ namespace LosSantosRED.lsr.Interface
 {
     public interface IPoliceRespondable
     {
+        CriminalHistory CriminalHistory { get; set; }
         Respawning Respawning { get; }
         LocationData CurrentLocation { get; set; }
         WeaponEquipment WeaponEquipment { get; }

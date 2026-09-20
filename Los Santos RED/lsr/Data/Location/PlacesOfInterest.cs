@@ -7,6 +7,7 @@ using LosSantosRED.lsr.Locations;
 using Rage;
 using Rage.Native;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
@@ -16,6 +17,7 @@ using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
 
 public class PlacesOfInterest : IPlacesOfInterest
@@ -780,7 +782,21 @@ public class PlacesOfInterest : IPlacesOfInterest
             new GenericBusiness(new Vector3(118.1554f, -1343.884f, 29.29151f), 126.7689f, "Smoker's Emporium", "") { BusinessID = "GenericBusinessMenu"},
             new GenericBusiness(new Vector3(51.22361f, -1317.927f, 29.28722f), 324.8754f, "Fern's Electronic Diagnostics", "") { BusinessID = "GenericBusinessMenu"},
             new GenericBusiness(new Vector3(198.12f, -1276.617f, 29.3251f), 258.0571f, "Alfonzo's Appliances", "") { BusinessID = "GenericBusinessMenu"},
-            new GenericBusiness(new Vector3(199.3355f, -1269.007f, 29.17549f), 260.0699f, "Gloria's Fashion Boutique", "")  { BusinessID = "GenericBusinessMenu"}
+            new GenericBusiness(new Vector3(199.3355f, -1269.007f, 29.17549f), 260.0699f, "Gloria's Fashion Boutique", "")  { BusinessID = "GenericBusinessMenu"},
+            new GenericBusiness(new Vector3(-162.1556f, -1423.26f, 31.17823f), 122.05f, "Happy Shark Bail Bonds", "") { BusinessID = "GenericBusinessMenu"},
+            new GenericBusiness(new Vector3(-159.358f, -1431.88f, 31.26926f), 87.2167f, "Snapper's Delight Photos", "") { BusinessID = "GenericBusinessMenu"},
+            new GenericBusiness(new Vector3(-42.40126f, -1474.666f, 31.92724f), 8.258836f, "On The Bone Butcher", "") { BusinessID = "GenericBusinessMenu"},
+            new GenericBusiness(new Vector3(-85.68632f, -1284.549f, 29.29813f), 88.50616f, "ThriftEx", "") { BusinessID = "GenericBusinessMenu"},
+            new GenericBusiness(new Vector3(89.58535f, -1411.532f, 29.42088f), 321.8957f, "Family Dental", "") { BusinessID = "GenericBusinessMenu"},
+            
+            // Davis
+            new GenericBusiness(new Vector3(225.3234f, -1539.803f, 29.30062f), 309.7928f, "She Nails", "") { BusinessID = "GenericBusinessMenu"},
+            new GenericBusiness(new Vector3(218.5385f, -1531.212f, 29.29156f), 305.2029f, "Porn Crackers", "") { BusinessID = "GenericBusinessMenu"},
+            new GenericBusiness(new Vector3(215.7002f, -1523.562f, 29.29151f), 273.7956f, "Sheet Yourself Laundromat", "") { BusinessID = "GenericBusinessMenu"},
+            new GenericBusiness(new Vector3(236.6949f, -1500.156f, 29.29166f), 223.7354f, "Zany's Hot Deals", "") { BusinessID = "GenericBusinessMenu"},
+            new GenericBusiness(new Vector3(243.7926f, -1492.932f, 29.29153f), 224.9865f, "Bad Day Loans", "") { BusinessID = "GenericBusinessMenu"},
+            new GenericBusiness(new Vector3(247.6f, -1489.471f, 29.2913f), 219.9342f, "Bad Day Goods", "") { BusinessID = "GenericBusinessMenu"}
+
         };
     }
     private void DefaultConfig_Properties()
@@ -788,7 +804,8 @@ public class PlacesOfInterest : IPlacesOfInterest
         Properties = new List<Property>()
         {
             // Strawberry
-            new Property(new Vector3(128.0054f, -1577.686f, 29.72744f), 319.6475f, "Small Warehouse", "") { BusinessID = "SmallWarehouseMenu"}
+            new Property(new Vector3(128.0054f, -1577.686f, 29.72744f), 319.6475f, "Small Warehouse", "") { BusinessID = "GenericBuildingMenu"},
+            new Property(new Vector3(-296.3015f, -1353.265f, 31.31189f), 267.523f, "Rundown Warehouse", "") { BusinessID = "GenericBuildingMenu"}
         };
     }
     private void DefaultConfig_TattooShops()
@@ -2419,6 +2436,7 @@ public class PlacesOfInterest : IPlacesOfInterest
             new LiquorStore(new Vector3(-406.0117f, 6062.374f, 31.50013f), 132.2045f, "Liquor", "","LiquorStoreMenu"){ OpenTime = 4, CloseTime = 22 },
             new LiquorStore(new Vector3(579.2075f, 2677.982f, 41.84144f), 10.21047f, "Jr. Market Liquors", "","LiquorStoreMenu"){ OpenTime = 4, CloseTime = 22 },
             new LiquorStore(new Vector3(910.836f, 3644.788f, 32.67847f), 180.167f, "Liquor Market", "","LiquorStoreMenu"){ OpenTime = 4, CloseTime = 22 },
+            new LiquorStore(new Vector3(-20.48388f, -1472.918f, 30.84754f), 5.780936f, "Liquor Store", "","LiquorStoreMenu"){ OpenTime = 0, CloseTime = 24 },
 
         };
     }
@@ -3512,6 +3530,7 @@ public class PlacesOfInterest : IPlacesOfInterest
             new Restaurant(new Vector3(-138.4921f, -256.509f, 43.59497f), 290.1001f, "Cluckin' Bell", "Taste the cock","CluckinBellMenu", FoodType.Chicken | FoodType.FastFood){OpenTime = 5, CloseTime = 23, BannerImagePath = "stores\\cluckin.png", },
             new Restaurant(new Vector3(-184.9376f, -1428.169f, 31.47968f), 33.8636f, "Cluckin' Bell", "Taste the cock","CluckinBellMenu", FoodType.Chicken | FoodType.FastFood){ OpenTime = 5, CloseTime = 23,BannerImagePath = "stores\\cluckin.png", },
             new Restaurant(new Vector3(-1681.603f, -1096.505f, 13.15227f), 180.3125f, "Cluckin' Bell", "Taste the cock","CluckinBellMenu", FoodType.Chicken | FoodType.FastFood) { OpenTime = 5, CloseTime = 23,BannerImagePath = "stores\\cluckin.png", },
+            new Restaurant(new Vector3(224.3761f, -1510.948f, 29.29166f), 223.5544f, "Fowl Mouthed Chicken", "","BishopsChickenMenu", FoodType.Chicken | FoodType.FastFood) { OpenTime = 5, CloseTime = 23 },
             //General    
             new Restaurant(new Vector3(-1222.546f, -807.5845f, 16.59777f), 305.3918f, "Lettuce Be", "A real meat free experience","GenericMenu", FoodType.Generic),
             new Restaurant(new Vector3(-1196.705f, -1167.969f, 7.695099f), 108.4535f, "Lettuce Be", "A real meat free experience","GenericMenu", FoodType.Generic),

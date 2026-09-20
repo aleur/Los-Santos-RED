@@ -11,6 +11,8 @@ namespace LosSantosRED.lsr.Interface
 {
     public interface IInventoryable
     {
+        CriminalHistory CriminalHistory { get; set; }
+        CriminalRecord CriminalRecord { get; set;  }
         Respawning Respawning { get; }
         RelationshipManager RelationshipManager { get; }
         CellPhone CellPhone { get; }

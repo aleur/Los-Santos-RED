@@ -12,6 +12,8 @@ namespace LosSantosRED.lsr.Interface
 {
     public interface IRespawnable : ICameraControllable
     {
+        CriminalHistory CriminalHistory { get; }
+        CriminalRecord CriminalRecord { get; set; }
         BankAccounts BankAccounts { get; }
         bool IsBusted { get; }
         PoliceResponse PoliceResponse { get; }
@@ -50,7 +52,7 @@ namespace LosSantosRED.lsr.Interface
 
         void Reset(bool resetWanted, bool resetTimesDied, bool clearWeapons, bool clearCriminalHistory, bool clearInventory, bool clearIntoxication, bool resetGangRelationships, bool clearVehicleOwnership, 
             bool resetCellphone, bool clearActiveTasks, bool clearProperties, bool resetHealth, bool resetNeeds, bool resetGroup, bool resetLicenses, bool resetACtivites, bool resetGracePeriod, bool resetBankAccounts, bool resetSavedGame, 
-            bool resetPendingMessages, bool resetInteriors, bool resetGambling, bool resetPersistVehicles);
+            bool resetPendingMessages, bool resetInteriors, bool resetGambling, bool resetPersistVehicles, bool clearCriminalRecord);
         void SetWantedLevel(int maxWantedLastLife, string v1, bool v2);
         int FineAmount();
         void SetNotBusted();

@@ -4,18 +4,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Serialization;
 
+[Serializable]
 public class CrimeEvent
 {
     private uint GameTimeLastOccurred;
     private uint InstanceDuration = 20000;
+    public CrimeEvent()
+    {
+
+    }
     public CrimeEvent(Crime crimeToReport, CrimeSceneDescription currentInfo)
     {
         AssociatedCrime = crimeToReport;
+        AssociatedCrimeID = AssociatedCrime.ID;
         CurrentInformation = currentInfo;
         GameTimeLastOccurred = Game.GameTime;
     }
+    [XmlIgnore]
     public Crime AssociatedCrime { get; set; }
+    public string AssociatedCrimeID { get; set; }
+    [XmlIgnore]
     public CrimeSceneDescription CurrentInformation { get; set; }
     public int Instances { get; set; } = 1;
     public bool CanAddInstance
