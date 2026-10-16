@@ -41,10 +41,11 @@ public enum eCustomDrivingStyles : int
 
 	VanillaAvoidCarsObeyLights = VanillaDrivingStyles.DF_SwerveAroundAllCars | VanillaDrivingStyles.DF_StopAtLights | VanillaDrivingStyles.DF_SteerAroundObjects | VanillaDrivingStyles.DF_UseShortCutLinks | VanillaDrivingStyles.DF_ChangeLanesAroundObstructions | VanillaDrivingStyles.DF_StopForCars,
 
+    PoliceFollow = VanillaDrivingStyles.DF_SwerveAroundAllCars | (int)VehicleDrivingFlags.AllowWrongWay | VanillaDrivingStyles.DF_SteerAroundObjects | VanillaDrivingStyles.DF_UseShortCutLinks | VanillaDrivingStyles.DF_ChangeLanesAroundObstructions | (int)VehicleDrivingFlags.AllowMedianCrossing | 524288 | VanillaDrivingStyles.DF_StopForCars,
 
 
-	//RegularDrivingClose = (int)VehicleDrivingFlags.FollowTraffic | (int)VehicleDrivingFlags.YieldToCrossingPedestrians | 8 | (int)VehicleDrivingFlags.RespectIntersections | 256 | (int)VehicleDrivingFlags.DriveBySight,
-	Code2 = (int)VehicleDrivingFlags.DriveAroundVehicles | (int)VehicleDrivingFlags.DriveAroundPeds | 8 | (int)VehicleDrivingFlags.DriveAroundObjects | (int)VehicleDrivingFlags.AllowWrongWay | (int)VehicleDrivingFlags.AllowMedianCrossing | 524288 | (int)VanillaDrivingStyles.DF_StopForCars,  //20220531 allowwrongway and median crossing is new
+    //RegularDrivingClose = (int)VehicleDrivingFlags.FollowTraffic | (int)VehicleDrivingFlags.YieldToCrossingPedestrians | 8 | (int)VehicleDrivingFlags.RespectIntersections | 256 | (int)VehicleDrivingFlags.DriveBySight,
+    Code2 = (int)VehicleDrivingFlags.DriveAroundVehicles | (int)VehicleDrivingFlags.DriveAroundPeds | 8 | (int)VehicleDrivingFlags.DriveAroundObjects | (int)VehicleDrivingFlags.AllowWrongWay | (int)VehicleDrivingFlags.AllowMedianCrossing | 524288 | (int)VanillaDrivingStyles.DF_StopForCars,  //20220531 allowwrongway and median crossing is new
 	
 	
 	
@@ -60,10 +61,23 @@ public enum eCustomDrivingStyles : int
     RacingOLD2 = (int)VanillaDrivingStyles.DF_SwerveAroundAllCars | (int)VanillaDrivingStyles.DF_SteerAroundObjects | (int)VanillaDrivingStyles.DF_UseShortCutLinks | (int)VanillaDrivingStyles.DF_ChangeLanesAroundObstructions,//(int)VehicleDrivingFlags.DriveAroundVehicles | (int)VehicleDrivingFlags.DriveAroundPeds | 8 | (int)VehicleDrivingFlags.DriveAroundObjects | (int)VehicleDrivingFlags.AllowWrongWay | (int)VehicleDrivingFlags.AllowMedianCrossing | 524288 | 4194304,
 	Racing = 4|8|16|32| 262144| 524288,
 
+
+	RacingNew = (int)VanillaDrivingStyles.DF_SwerveAroundAllCars | (int)VanillaDrivingStyles.DF_SteerAroundStationaryCars | (int)VanillaDrivingStyles.DF_SteerAroundPeds | 
+		(int)VanillaDrivingStyles.DF_SteerAroundObjects  | (int)VanillaDrivingStyles.DF_DriveIntoOncomingTraffic | 
+		(int)VanillaDrivingStyles.DF_UseShortCutLinks | (int)VanillaDrivingStyles.DF_ChangeLanesAroundObstructions | (int)VanillaDrivingStyles.DF_UseSwitchedOffNodes,
+
+   
     //Panic = (int)VehicleDrivingFlags.DriveAroundVehicles | (int)VehicleDrivingFlags.DriveAroundPeds | 8 | (int)VehicleDrivingFlags.DriveAroundObjects | (int)VehicleDrivingFlags.AllowWrongWay | (int)VehicleDrivingFlags.AllowMedianCrossing | 524288,
 
     Vanilla_Alerted = (int)786469,
 
+	RacingNew2 = 786468,//(int)VanillaDrivingStyles.DF_SwerveAroundAllCars | (int) VanillaDrivingStyles.DF_SteerAroundObjects | (int)VanillaDrivingStyles.DF_UseShortCutLinks | (int)VanillaDrivingStyles.DF_ChangeLanesAroundObstructions,
+    RacingNew2Close = 4980772,
+
+
+    RacingNew3 = 786468,
+    RacingNew3Close = 786468 | (int)VehicleDrivingFlags.DriveBySight,
+    CopRacingNew2Based = (int)VanillaDrivingStyles.DF_SwerveAroundAllCars | (int)VanillaDrivingStyles.DF_SteerAroundObjects | (int)VanillaDrivingStyles.DF_SteerAroundPeds | (int)VanillaDrivingStyles.DF_UseShortCutLinks | (int)VanillaDrivingStyles.DF_ChangeLanesAroundObstructions | (int)VehicleDrivingFlags.AllowWrongWay | VanillaDrivingStyles.DF_DriveIntoOncomingTraffic | (int)VanillaDrivingStyles.DF_UseSwitchedOffNodes,
 
 
     DrunkDriving = VanillaDrivingStyles.DF_ChangeLanesAroundObstructions | VanillaDrivingStyles.DF_UseWanderFallbackInsteadOfStraightLine | VanillaDrivingStyles.DF_DriveIntoOncomingTraffic | VanillaDrivingStyles.DF_SwerveAroundAllCars,

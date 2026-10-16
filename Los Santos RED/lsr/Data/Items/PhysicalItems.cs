@@ -28,10 +28,10 @@ public class PhysicalItems : IPropItems
     }
     public void ReadConfig(string configName)
     {
-        string fileName = string.IsNullOrEmpty(configName) ? "PhysicalItems*.xml" : $"PhysicalItems_{configName}.xml";
+        string fileName = string.IsNullOrEmpty(configName) ? "PhysicalItems_*.xml" : $"PhysicalItems_{configName}.xml";
 
         DirectoryInfo LSRDirectory = new DirectoryInfo("Plugins\\LosSantosRED");
-        FileInfo ConfigFile = LSRDirectory.GetFiles(fileName).OrderByDescending(x => x.Name).FirstOrDefault();
+        FileInfo ConfigFile = LSRDirectory.GetFiles(fileName).Where(x => !x.Name.Contains("+")).OrderByDescending(x => x.Name).FirstOrDefault();
         if (ConfigFile != null && !configName.Equals("Default"))
         {
             EntryPoint.WriteToConsole($"Loaded Physical Items config: {ConfigFile.FullName}", 0);
@@ -47,6 +47,14 @@ public class PhysicalItems : IPropItems
             EntryPoint.WriteToConsole($"No Physical Items config found, creating default", 0);
             DefaultConfig();
         }
+        //Load Additive
+        foreach (FileInfo fileInfo in LSRDirectory.GetFiles("PhysicalItems+_*.xml").OrderByDescending(x => x.Name))
+        {
+            EntryPoint.WriteToConsole($"Loaded ADDITIVE Physical Items config  {fileInfo.FullName}", 0);
+            List<PhysicalItem> additivePossibleItems = Serialization.DeserializeParams<PhysicalItem>(fileInfo.FullName);
+            PhysicalItemsList.RemoveAll(x => additivePossibleItems.Any(y => y.ID == x.ID));
+            PhysicalItemsList.AddRange(additivePossibleItems);
+        }
     }
     private void DefaultConfig()
     {
@@ -56,8 +64,46 @@ public class PhysicalItems : IPropItems
         DefaultConfig_Drugs();
         DefaultConfig_Tools();
         DefaultConfig_ArmorHealth();
+        DefaultConfig_Trophies();
         DefaultConfig_FEE();
         Serialization.SerializeParams(PhysicalItemsList, ConfigFileName);
+    }
+
+    private void DefaultConfig_Trophies()
+    {
+        PhysicalItemsList.AddRange(new List<PhysicalItem>
+        { 
+            new PhysicalItem("m25_2_prop_m52_trpy_100races", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_10yo", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_3commaclub", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_500mil", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_adversary", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_arcademaster", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_arenawarlegend", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_carcollector", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_careercriminal", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_cayoperico", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_collector", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_completionist", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_diamondcasino", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_doomsday", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_entrepreneur", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_flightschool", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_gtav", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_heistpro", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_lscm", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_mastermind", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_ninefig", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_platinum", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_rank100", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_rank500", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_rank1000", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_spotlight", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_story", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_vault", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_wellliked", new List<PropAttachment>(){ } ),
+            new PhysicalItem("m25_2_prop_m52_trpy_worldrecord", new List<PropAttachment>(){ } ),
+        });
     }
 
     private void DefaultConfig_FEE()
@@ -85,7 +131,12 @@ public class PhysicalItems : IPropItems
             new PhysicalItem("prop_bodyarmour_05", new List<PropAttachment>() { new PropAttachment("LeftHand", "BONETAG_L_PH_HAND", new Vector3(0.0f, 0.0f, 0.0f), new Rotator(0.0f, 0.0f, 0.0f)) }){ IsLarge = true },
             new PhysicalItem("prop_bodyarmour_06", new List<PropAttachment>() { new PropAttachment("LeftHand", "BONETAG_L_PH_HAND", new Vector3(0.0f, 0.0f, 0.0f), new Rotator(0.0f, 0.0f, 0.0f)) }){ IsLarge = true },
             new PhysicalItem("prop_ld_health_pack", new List<PropAttachment>() { new PropAttachment("LeftHand", "BONETAG_L_PH_HAND", new Vector3(0.0f, 0.0f, 0.0f), new Rotator(0.0f, 0.0f, 0.0f)) }),
+            new PhysicalItem("prop_gaffer_leg_bind", new List<PropAttachment>() { new PropAttachment("LeftHand", "BONETAG_L_PH_HAND", new Vector3(0.0f, 0.0f, 0.0f), new Rotator(0.0f, 0.0f, 0.0f)) }),
+            new PhysicalItem("xm_prop_x17_bag_med_01a", new List<PropAttachment>() { new PropAttachment("LeftHand", "BONETAG_L_PH_HAND", new Vector3(0.0f, 0.0f, 0.0f), new Rotator(0.0f, 0.0f, 0.0f)) }),
+            new PhysicalItem("m25_1_prop_m51_adrenalineshot_01a", new List<PropAttachment>() { new PropAttachment("LeftHand", "BONETAG_L_PH_HAND", new Vector3(0.0f, 0.0f, 0.0f), new Rotator(0.0f, 0.0f, 0.0f)) }),
+            
             //prop_ld_health_pack
+            //m25_1_prop_m51_adrenalineshot_01a
         });
         //prop_armour_pickup
     }
@@ -164,8 +215,9 @@ public class PhysicalItems : IPropItems
             new PhysicalItem("ng_proc_sodacup_01a", new List<PropAttachment>() { new PropAttachment("LeftHand", "BONETAG_L_PH_HAND", new Vector3(0.0f, 0.0f, -0.2f), new Rotator(0.0f, 0.0f, 0.0f)) }){ CleanupItemImmediately = true },
             new PhysicalItem("ng_proc_sodacup_01b", new List<PropAttachment>() { new PropAttachment("LeftHand", "BONETAG_L_PH_HAND", new Vector3(0.0f, 0.0f, -0.2f), new Rotator(0.0f, 0.0f, 0.0f)) }){ CleanupItemImmediately = true },
             new PhysicalItem("ng_proc_sodacup_01c", new List<PropAttachment>() { new PropAttachment("LeftHand", "BONETAG_L_PH_HAND", new Vector3(0.0f, 0.0f, -0.2f), new Rotator(0.0f, 0.0f, 0.0f)) }),
-
-
+            new PhysicalItem("prop_plastic_cup_02", new List<PropAttachment>() { new PropAttachment("LeftHand", "BONETAG_L_PH_HAND", new Vector3(0.0f, 0.0f, 0.0f), new Rotator(0.0f, 0.0f, 0.0f)) }){  },
+            
+            //
 
              new PhysicalItem("prop_cs_milk_01", new List<PropAttachment>() { new PropAttachment("LeftHand", "BONETAG_L_PH_HAND", new Vector3(0.0f, 0.0f, 0.0f),new Rotator(0.0f, 0.0f, 0.0f)) }),
              
@@ -412,16 +464,22 @@ public class PhysicalItems : IPropItems
                 new PropAttachment("LeftHand", "BONETAG_L_PH_HAND", new Vector3(0.1170f, 0.0610f, 0.0150f), new Rotator(-47.199f, 166.62f, -19.9f)),
                 new PropAttachment("RightHand", "BONETAG_R_PH_HAND", new Vector3(0.1170f, 0.0610f, 0.0150f), new Rotator(-47.199f, 166.62f, -19.9f)),
                 new PropAttachment("RightHandWeapon","BONETAG_R_PH_HAND",new Vector3(0.04f,0.08f,0.01f),new Rotator(100f, 0f, 0f)),
+                new PropAttachment("RightHandPick", "BONETAG_R_PH_HAND", new Vector3(-0.7899995f, 0f, 0.3599999f),new Rotator(0f, -100f, 0f)),
+
+
+
             }) { AliasWeaponHash = 2578778090 },//generic screwdriver
             new PhysicalItem("gr_prop_gr_sdriver_01", new List<PropAttachment>() { 
                 new PropAttachment("LeftHand", "BONETAG_L_PH_HAND", new Vector3(0.0f, 0.0f, 0.0f), new Rotator(0f, 0f, 0f)),
                 new PropAttachment("RightHand", "BONETAG_R_PH_HAND", new Vector3(0.04f,0.07f,-0.01f),new Rotator(0f, 0f, -180f)),
                 new PropAttachment("RightHandWeapon","BONETAG_R_PH_HAND",new Vector3(0.04f,0.07f,-0.01f),new Rotator(0f, 0f, -180f)),
+                new PropAttachment("RightHandPick", "BONETAG_R_PH_HAND", new Vector3(-0.7899995f, 0f, 0.3599999f),new Rotator(0f, -100f, 0f)),
             }){ AliasWeaponHash = 2578778090 },//flint flathead screwdriver
             new PhysicalItem("gr_prop_gr_sdriver_02", new List<PropAttachment>() { 
                 new PropAttachment("LeftHand", "BONETAG_L_PH_HAND", new Vector3(0.0f, 0.0f, 0.0f), new Rotator(0f, 0f, 0f)),
                 new PropAttachment("RightHand", "BONETAG_R_PH_HAND", new Vector3(0.04f,0.07f,-0.01f),new Rotator(0f, 0f, -180f)),
                 new PropAttachment("RightHandWeapon","BONETAG_R_PH_HAND",new Vector3(0.04f,0.07f,-0.01f),new Rotator(0f, 0f, -180f)),
+                new PropAttachment("RightHandPick", "BONETAG_R_PH_HAND", new Vector3(-0.7899995f, 0f, 0.3599999f),new Rotator(0f, -100f, 0f)),
             }){ AliasWeaponHash = 2578778090 },//flint multi bit screwdriver
 
 

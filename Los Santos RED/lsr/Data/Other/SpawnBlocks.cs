@@ -37,21 +37,16 @@ public class SpawnBlocks : ISpawnBlocks
         {
             EntryPoint.WriteToConsole($"No Spawn Blocks config found, creating default", 0);
             DefaultConfig_LibertyCity();
-            DefaultConfig_SunshineDream();
             DefaultConfig();
         }
     }
     private void DefaultConfig_LibertyCity()
     {
         PossibleSpawnBlocks spawnBlocksLC = new PossibleSpawnBlocks();
-        Serialization.SerializeParam(spawnBlocksLC, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LibertyConfigFolder}\\SpawnBlocks_{StaticStrings.LibertyConfigSuffix}.xml");
-        Serialization.SerializeParam(spawnBlocksLC, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LPPConfigFolder}\\SpawnBlocks_{StaticStrings.LPPConfigSuffix}.xml");
+        //Serialization.SerializeParam(spawnBlocksLC, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LibertyConfigFolder}\\SpawnBlocks_{StaticStrings.LibertyConfigSuffix}.xml");
+        //Serialization.SerializeParam(spawnBlocksLC, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LPPConfigFolder}\\SpawnBlocks_{StaticStrings.LPPConfigSuffix}.xml");
     }
-    private void DefaultConfig_SunshineDream()
-    {
-        PossibleSpawnBlocks spawnBlocksLC = new PossibleSpawnBlocks();
-        Serialization.SerializeParam(spawnBlocksLC, "Plugins\\LosSantosRED\\AlternateConfigs\\SunshineDream\\SpawnBlocks_SunshineDream.xml");
-    }
+
     public void DefaultConfig()
     {
         CarGenerators();

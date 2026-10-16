@@ -6,6 +6,7 @@ using LosSantosRED.lsr.Interface;
 using LosSantosRED.lsr.Player.Activity;
 using LSR.Vehicles;
 using Microsoft.VisualBasic.Logging;
+using Mod;
 using NAudio.Gui;
 using Rage;
 using Rage.Native;
@@ -19,19 +20,26 @@ using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Security.Cryptography.X509Certificates;
 using System.Security.Policy;
 using System.Security.Principal;
 using System.Text;
 using System.Windows.Forms;
+//using System.Windows.Media;
+
+//using System.Windows.Media;
+
 
 
 //using System.Windows.Media;
 //using System.Windows.Media;
 //using System.Windows.Media;
 using System.Xml.Linq;
+using static DispatchScannerFiles;
 //using System.Windows.Media;
 //using System.Windows.Media;
 //using System.Windows.Media;
@@ -97,6 +105,7 @@ public class Debug
     private Rage.Object chairProp;
     private Cop LastPed;
     private Rage.Object PumpHandleProp;
+    private bool IsTrafficDisabled;
 
     public Debug(PlateTypes plateTypes, Mod.World world, Mod.Player targetable, IStreets streets, Dispatcher dispatcher, Zones zones, Crimes crimes, ModController modController, Settings settings, Mod.Tasker tasker, Mod.Time time, Agencies agencies, Weapons weapons, ModItems modItems, WeatherReporting weather, PlacesOfInterest placesOfInterest, Interiors interiors, Gangs gangs, Input input, ShopMenus shopMenus, ModDataFileManager modDataFileManager)
     {
@@ -216,7 +225,7 @@ public class Debug
         }
         if (Settings.SettingsManager.DebugSettings.ShowCivilianPerceptionArrows)
         {
-            EntryPoint.WriteToConsole("DRAW DEBUG ARROWS");
+           // EntryPoint.WriteToConsole("DRAW DEBUG ARROWS");
             List<PedExt> AllPeds = World.Pedestrians.CivilianList;
             AllPeds.AddRange(World.Pedestrians.GangMemberList);
             AllPeds.AddRange(World.Pedestrians.MerchantList);
@@ -527,15 +536,447 @@ public class Debug
         }
         return ret;
     }
+
+
+    private int renderTargetId = -1;
+    private int scaleformHandle = -1;
+    private string targetName = "tvscreen";
+    // Prop model for a standard flat screen TV
+    private uint tvModelHash = Game.GetHashKey("m25_2_prop_m52_mansiontv");
+
+    public void InitializeTv()
+    {
+        // 1. Load the scaleform movie (e.g., MP_BIG_MESSAGE_FREEMODE)
+        scaleformHandle = NativeFunction.Natives.REQUEST_SCALEFORM_MOVIE<int>("MP_BIG_MESSAGE_FREEMODE");
+        while (!NativeFunction.Natives.HAS_SCALEFORM_MOVIE_LOADED<bool>(scaleformHandle))
+        {
+            GameFiber.Yield();
+        }
+
+        // Call a function on the scaleform to set up text
+        NativeFunction.Natives.BEGIN_SCALEFORM_MOVIE_METHOD(scaleformHandle, "SHOW_SHARD_CENTERED_TOP_MP_MESSAGE");
+        NativeFunction.Natives.SCALEFORM_MOVIE_METHOD_ADD_PARAM_PLAYER_NAME_STRING("TV POWERED BY RPH");
+        NativeFunction.Natives.SCALEFORM_MOVIE_METHOD_ADD_PARAM_PLAYER_NAME_STRING("Render Target Active");
+        NativeFunction.Natives.END_SCALEFORM_MOVIE_METHOD();
+
+        // 2. Find the closest TV object near the player
+        Vector3 playerPos = Game.LocalPlayer.Character.Position;
+        int tvObject = NativeFunction.Natives.GET_CLOSEST_OBJECT_OF_TYPE<int>(
+            playerPos.X, playerPos.Y, playerPos.Z, 10.0f, tvModelHash, false, false, false
+        );
+
+        if (tvObject == 0)
+        {
+            Game.DisplayNotification("No TV object found nearby!");
+            return;
+        }
+
+        // 3. Register and link the render target
+        if (!NativeFunction.Natives.IS_NAMED_RENDERTARGET_REGISTERED<bool>(targetName))
+        {
+            NativeFunction.Natives.REGISTER_NAMED_RENDERTARGET(targetName, false);
+        }
+
+        NativeFunction.Natives.LINK_NAMED_RENDERTARGET(tvModelHash);
+        renderTargetId = NativeFunction.Natives.GET_NAMED_RENDERTARGET_RENDER_ID<int>(targetName);
+    }
+
+    public void DrawLoop()
+    {
+        // Run this inside a continuous GameFiber loop
+        if (renderTargetId != -1 && scaleformHandle != -1)
+        {
+            // Set the drawing focus to the TV screen texture
+            NativeFunction.Natives.SET_TEXT_RENDER_ID(renderTargetId);
+
+            // Draw the scaleform (parameters: handle, x, y, width, height, r, g, b, a, unk)
+            NativeFunction.Natives.DRAW_SCALEFORM_MOVIE(scaleformHandle, 0.5f, 0.5f, 1.0f, 1.0f, 255, 255, 255, 255, 0);
+
+            // Reset the render target back to the default game screen
+            NativeFunction.Natives.SET_TEXT_RENDER_ID(NativeFunction.Natives.GET_DEFAULT_SCRIPT_RENDERTARGET_RENDER_ID<int>());
+        }
+    }
+
+
+
+
+    private int CreateNamedRenderTargetForModel(string name, uint model)
+    {
+        int handle = 0;
+        if(!NativeFunction.Natives.IS_NAMED_RENDERTARGET_REGISTERED<bool>(name))
+        {
+            NativeFunction.Natives.REGISTER_NAMED_RENDERTARGET(name, 0);
+        }
+
+        if(!NativeFunction.Natives.IS_NAMED_RENDERTARGET_LINKED<bool>(model))
+        {
+            NativeFunction.Natives.LINK_NAMED_RENDERTARGET(model);
+        }
+        if(NativeFunction.Natives.IS_NAMED_RENDERTARGET_REGISTERED<bool>(name))
+        {
+            handle = NativeFunction.Natives.GET_NAMED_RENDERTARGET_RENDER_ID<int> (name);
+        }
+        return handle;
+    }
+
     private void DebugNumpad4()
     {
-
-
-
-        foreach(VehicleExt vehicle in World.Vehicles.NonServiceVehicles)
+        if (Player.CurrentVehicle != null && Player.CurrentVehicle.Vehicle.Exists())
         {
-            EntryPoint.WriteToConsole($"NonServiceVehicles: {vehicle.Handle} {vehicle.IsMotorcycle}");
+            EntryPoint.WriteToConsole($"CurrentGear: {Player.CurrentVehicle.Vehicle.CurrentGear} Forward Vector:{Player.CurrentVehicle.Vehicle.ForwardVector}");
         }
+
+        GameFiber.StartNew(delegate
+        {
+            while (!Game.IsKeyDown(Keys.O) && EntryPoint.ModController.IsRunning)
+            {
+                if (1==1)//!Game.IsControlPressed(0, GameControl.VehicleAccelerate))// && !NativeFunction.Natives.IS_DISABLED_CONTROL_PRESSED<bool>(0, 71))
+                {
+                    NativeFunction.Natives.SET_CONTROL_VALUE_NEXT_FRAME(0, (int)GameControl.VehicleAccelerate, Settings.SettingsManager.VehicleSettings.TransmissionDriveCreepPercentage);
+
+
+                    EntryPoint.WriteToConsole($"SET_CONTROL_VALUE_NEXT_FRAME");
+                    //EntryPoint.WriteToConsole("TRANSMISSION DRIVE CREEP RUNNING! 2");
+                }
+                GameFiber.Yield();
+            }
+
+        }, "Run Debug Logic");
+        GameFiber.Sleep(500);
+
+
+
+
+
+
+        /*	local model = GetHashKey("des_tvsmash_start"); -- 2054093856
+	local pos = { x = -810.59, y = 170.46, z = 77.25 };
+	local entity = GetClosestObjectOfType(pos.x, pos.y, pos.z, 0.05, model, 0, 0, 0)
+	local handle = CreateNamedRenderTargetForModel("tvscreen", model)
+	while true do
+		SetTextRenderId(handle) -- set render target
+		Set_2dLayer(4)
+		Citizen.InvokeNative(0xC6372ECD45D73BCD, 1)
+			DrawRect(0.5, 0.5, 1.0, 0.5, 255, 0, 0, 255); -- WOAH!
+		SetTextRenderId(GetDefaultScriptRendertargetRenderId()) -- reset
+		Citizen.InvokeNative(0xC6372ECD45D73BCD, 0)
+		Citizen.Wait(0)
+
+
+
+
+        function CreateNamedRenderTargetForModel(name, model)
+	local handle = 0
+	if not IsNamedRendertargetRegistered(name) then
+		RegisterNamedRendertarget(name, 0)
+	end
+	if not IsNamedRendertargetLinked(model) then
+		LinkNamedRendertarget(model)
+	end
+	if IsNamedRendertargetRegistered(name) then
+		handle = GetNamedRendertargetRenderId(name)
+	end
+
+	return handle
+end
+
+
+
+	end*/
+        //InitializeTv();
+
+        //uint modelHash = 4330783;//4330783,new Vector3(63.19641f, -78.62871f, -73.48909f)//m25_2_prop_m52_mansiontv 4330783
+        //Vector3 pos = new Vector3(63.19641f, -78.62871f, -73.48909f);
+        //Entity tvEntity = NativeFunction.Natives.GET_CLOSEST_OBJECT_OF_TYPE<Entity>(pos.X, pos.Y, pos.Z, 0.05, modelHash, 0, 0, 0);
+        //int handle = CreateNamedRenderTargetForModel("tvscreen", modelHash);
+        //GameFiber.StartNew(delegate
+        //{      
+        //    while (!Game.IsKeyDown(Keys.O))
+        //    {
+        //        //NativeFunction.Natives.SET_TEXT_RENDER_ID(handle);
+        //        DrawLoop();
+        //        GameFiber.Yield();
+        //    }
+
+        //}, "Run Debug Logic");
+        //GameFiber.Sleep(500);
+
+
+
+        //int Flags = 0;
+        //if (int.TryParse(NativeHelper.GetKeyboardInput("1024"), out Flags))
+        //{
+
+        //    NativeFunction.Natives.SET_PED_TO_RAGDOLL(Player.Character, 4000, 5000, 1, 1, 1, 1);
+        //    NativeFunction.Natives.CREATE_NM_MESSAGE(1, 0);
+        //    NativeFunction.Natives.GIVE_PED_NM_MESSAGE(Player.Character);
+        //    NativeFunction.Natives.CREATE_NM_MESSAGE(1, Flags);
+        //    NativeFunction.Natives.GIVE_PED_NM_MESSAGE(Player.Character);
+        //    GameFiber.Sleep(1000);
+        //    Game.DisplaySubtitle("RAN NM MESSAGE");
+        //}
+
+
+
+
+        /*Vector3 coords = Player.Character.Position;
+
+        coords = new Vector3(coords.X, coords.Y, GetGroundZ(coords)); 
+        float amount = 75f;
+        float width = 0.25f + (amount / 100f);//Change this formula to adjust the size of the decal
+        float height = 0.25f + (amount / 100f);// Change this formula to adjust the size of the decal
+        uint RemovalTime = 60000;
+        int decalID = NativeFunction.Natives.ADD_DECAL<int>(
+            1110,
+            coords,
+            0.0f, 0.0f, -1.0f,
+            0.0f, 1.0f, 0.0f,
+            width, height,
+            0.3f, 0.0f, 0.0f, 1.0f,
+            RemovalTime,
+            false, false, false);
+
+        */
+
+        //NativeHelper.AddDecal(Player.Character.Position, 1110,1.0f,1.0f,0.3f,0.0f,0.0f,1.0f,20f);
+        //EntryPoint.WriteToConsole("DEBUG ADDED DRIP");
+        //GameFiber.Sleep(500);
+
+
+        //int Flags = 0;
+        //if (int.TryParse(NativeHelper.GetKeyboardInput("4096"), out Flags))
+        //{
+
+
+        //    NativeFunction.Natives.TASK_LEAVE_ANY_VEHICLE(Player.Character, 0, Flags);
+        //}
+
+        //NativeFunction.Natives.CLEAR_WEATHER_TYPE_PERSIST();
+        //NativeFunction.Natives.SET_RANDOM_WEATHER_TYPE();
+        //NativeFunction.Natives.CLEAR_WEATHER_TYPE_PERSIST();
+        //GameFiber.Sleep(500);
+        //return;
+
+        //GameFiber.StartNew(delegate
+        //{
+        //    float prevSpeed = 0.0f;
+        //    string CurrentSubtitle = "";
+        //    bool isAccelerating = false;
+        //    bool isBraking = false;
+        //    bool isTurning = false;
+        //    Vehicle coolVeh = Player.Character.CurrentVehicle;
+        //    float CurrentSpeed = 0.0f;
+        //    float speedThreshold = Settings.SettingsManager.PoliceTaskSettings.ForceAssistSpeedChangeThreshold;
+        //    float turningRadius = Settings.SettingsManager.PoliceTaskSettings.ForceAssistTurningRadiusLimit;
+        //    while (!Game.IsKeyDown(Keys.O))
+        //    {
+
+
+        //        if(Player.Character.CurrentVehicle.Exists())
+        //        {
+
+        //            CurrentSpeed = coolVeh.Speed;
+
+        //            if (CurrentSpeed > prevSpeed)
+        //            {
+        //                isAccelerating = true;
+        //            }
+        //            else
+        //            {
+        //                isAccelerating = false;
+        //            }
+
+        //            float speedDiff = CurrentSpeed - prevSpeed;
+        //            if (speedDiff < speedThreshold)
+        //            {
+        //                isBraking = true;
+        //            }
+        //            else
+        //            {
+        //                isBraking = false;
+        //            }
+
+
+
+        //            prevSpeed = CurrentSpeed;
+        //            if(coolVeh.SteeringAngle > turningRadius)
+        //            {
+        //                isTurning = true;
+        //            }
+        //            else
+        //            {
+        //                isTurning = false;
+        //            }
+
+        //            bool isApplyingForce = false;
+
+        //            if (!isTurning)
+        //            {
+        //                if (isAccelerating)
+        //                {
+        //                    isApplyingForce = true;
+        //                    coolVeh.ApplyForce(new Vector3(0.0f,1.0f,0.0f) * Settings.SettingsManager.PoliceTaskSettings.ForceAssistAmount, Vector3.Zero, true, true);
+        //                }
+        //                else if (isBraking)
+        //                {
+        //                    isApplyingForce = true;
+        //                    coolVeh.ApplyForce(new Vector3(0.0f, -1.0f* Settings.SettingsManager.PoliceTaskSettings.ForceAssistAmount, 0.0f) , Vector3.Zero, true, true);
+        //                }
+
+        //            }
+        //            CurrentSubtitle = $"isAccelerating{isAccelerating} isBraking{isBraking} CurrentSpeed:{Math.Round(CurrentSpeed,2)} PrevSpeed:{Math.Round(prevSpeed,2)} Diff:{Math.Round(speedDiff, 2)} isTurning {isTurning}  isApplyingForce{isApplyingForce}";
+
+        //        }
+
+
+
+
+
+
+        //        Game.DisplaySubtitle(CurrentSubtitle);
+        //        GameFiber.Yield();
+        //    }
+
+        //}, "Run Debug Logic");
+        //GameFiber.Sleep(500);
+
+
+
+
+
+        //Cop found = World.Pedestrians.PoliceList.OrderBy(x => x.DistanceToPlayer).FirstOrDefault();
+        //if(found == null || !found.Pedestrian.Exists())
+        //{
+        //    return;
+        //}
+        //EntryPoint.WriteToConsole($"TASK_COMBAT_PED {found.Handle} DefaultCombatFlag:{found.DefaultCombatFlag}");
+
+        //found.Pedestrian.RelationshipGroup.SetRelationshipWith(Game.LocalPlayer.Character.RelationshipGroup, Relationship.Hate);
+
+        //NativeFunction.Natives.TASK_COMBAT_PED(found.Pedestrian, Player.Character, found.DefaultCombatFlag, 16);
+
+
+        //NativeFunction.Natives.SET_RADIO_TO_STATION_NAME("RADIO_23_INTEGRITY");
+
+        // NativeFunction.Natives.x477D9DB48F889591("RADIO_01_CLASS_ROCK", true);
+
+        //NativeFunction.CallByHash<bool>(0x477D9DB48F889591, "RADIO_01_CLASS_ROCK", true);
+
+        //GameFiber.Sleep(500);
+
+        /*        float LockpickAnimStopPercentage = 0.5f;
+        float LockpickAnimRestartPercentage = 0.3f;
+        float LockpickAnimIntroRate = 8.0f;
+        float LockpickAnimOutroRate = -8.0f;
+        int LockpickAnimFlags = 0;
+        float LockpickAnimAnimRate = 1.0f;
+        GameFiber.StartNew(delegate
+        {
+            
+            string animDictionary = "veh@break_in@0h@p_m_one@";
+            string animName = "std_force_entry_ds";
+            AnimationDictionary.RequestAnimationDictionay(animDictionary);
+            NativeFunction.Natives.TASK_PLAY_ANIM(Game.LocalPlayer.Character, animDictionary, animName, Settings.SettingsManager.DebugSettings.LockpickAnimIntroRate, 
+                Settings.SettingsManager.DebugSettings.LockpickAnimOutroRate, -1, Settings.SettingsManager.DebugSettings.LockpickAnimFlags, 0, false, false, false);
+
+
+            bool isLooping = false;
+
+            while (!Player.IsMoveControlPressed)
+            {
+                float pedAnimTime = NativeFunction.CallByName<float>("GET_ENTITY_ANIM_CURRENT_TIME", Game.LocalPlayer.Character, animDictionary, animName);
+                if(pedAnimTime >= Settings.SettingsManager.DebugSettings.LockpickAnimStopPercentage)
+                {
+                    isLooping = true;
+                    NativeFunction.Natives.SET_ANIM_RATE(Game.LocalPlayer.Character, -1.0f * Settings.SettingsManager.DebugSettings.LockpickAnimAnimRate, 0, false);
+                    NativeFunction.Natives.SET_ANIM_RATE(Game.LocalPlayer.Character, -1.0f * Settings.SettingsManager.DebugSettings.LockpickAnimAnimRate, 1, false);
+                    NativeFunction.Natives.SET_ANIM_RATE(Game.LocalPlayer.Character, -1.0f * Settings.SettingsManager.DebugSettings.LockpickAnimAnimRate, 2, false);
+                    //NativeFunction.Natives.SET_ENTITY_ANIM_CURRENT_TIME(Game.LocalPlayer.Character, animDictionary, animName, Settings.SettingsManager.DebugSettings.LockpickAnimRestartPercentage);
+                }
+                else if (isLooping && pedAnimTime <= Settings.SettingsManager.DebugSettings.LockpickAnimRestartPercentage)
+                {
+                    NativeFunction.Natives.SET_ANIM_RATE(Game.LocalPlayer.Character,Settings.SettingsManager.DebugSettings.LockpickAnimAnimRate, 0, false);
+                    NativeFunction.Natives.SET_ANIM_RATE(Game.LocalPlayer.Character, Settings.SettingsManager.DebugSettings.LockpickAnimAnimRate, 1, false);
+                    NativeFunction.Natives.SET_ANIM_RATE(Game.LocalPlayer.Character, Settings.SettingsManager.DebugSettings.LockpickAnimAnimRate, 2, false);
+                    //NativeFunction.Natives.SET_ENTITY_ANIM_CURRENT_TIME(Game.LocalPlayer.Character, animDictionary, animName, Settings.SettingsManager.DebugSettings.LockpickAnimRestartPercentage);
+                }
+
+                GameFiber.Yield();
+            }
+            NativeFunction.Natives.SET_ENTITY_ANIM_CURRENT_TIME(Game.LocalPlayer.Character, animDictionary, animName, Settings.SettingsManager.DebugSettings.LockpickAnimStopPercentage);
+            NativeFunction.Natives.SET_ANIM_RATE(Game.LocalPlayer.Character, 1.0f, 2, false);
+
+        }, "Run Debug Logic");
+        GameFiber.Sleep(500);
+
+        */
+
+
+
+
+        //GameFiber.StartNew(delegate
+        //{
+        //    Vector3 BasePosition = new Vector3(1171.136f, -2563.416f, 34.28861f);
+        //    float BaseHeading = 286.6383f;
+        //    Vector3 NewPosition = NativeHelper.GetOffsetPosition(BasePosition, BaseHeading, -10f);
+        //    Vector3 NewPosition1 = NativeHelper.GetOffsetPosition(BasePosition, BaseHeading-90f, 10f);
+        //    uint GameTimeStarted = Game.GameTime;
+        //    while (Game.GameTime - GameTimeStarted <= 20000)
+        //    {
+
+        //            Rage.Debug.DrawArrowDebug(BasePosition, Vector3.Zero, Rotator.Zero, 1f, Color.Red);
+        //            Rage.Debug.DrawArrowDebug(NewPosition, Vector3.Zero, Rotator.Zero, 1f, Color.White);
+        //        Rage.Debug.DrawArrowDebug(NewPosition1, Vector3.Zero, Rotator.Zero, 1f, Color.Green);
+        //        GameFiber.Yield();
+        //    }
+
+        //}, "Run Debug Logic");
+        // GameFiber.Sleep(500);
+
+
+
+        //if(!Game.LocalPlayer.Character.CurrentVehicle.Exists())
+        //{
+        //    return;
+        //}
+        //Ped randomPed = new Ped("a_m_m_paparazzi_01", Game.LocalPlayer.Character.GetOffsetPositionFront(10f).Around2D(10f),0f);
+        //GameFiber.Yield();
+        //if (!randomPed.Exists())
+        //{
+        //    return;
+        //}
+        //randomPed.RandomizeVariation();
+        //if (!Game.LocalPlayer.Character.CurrentVehicle.Exists())
+        //{
+        //    return;
+        //}
+        //randomPed.WarpIntoVehicle(Game.LocalPlayer.Character.CurrentVehicle, -1);
+        //Vector3 PlaceToDriveTo = new Vector3(0f,0f,300f);
+        //NativeFunction.Natives.TASK_HELI_MISSION(randomPed, randomPed.CurrentVehicle, 0, 0, PlaceToDriveTo.X, PlaceToDriveTo.Y, PlaceToDriveTo.Z, 4, 50f, 10f, -1f, 60, 60, -1.0f, 0);//9 = circle
+        //randomPed.BlockPermanentEvents = true;
+        //randomPed.IsPersistent = true;
+
+
+        //Game.LocalPlayer.Character.CurrentVehicle.Position = Game.LocalPlayer.Character.CurrentVehicle.Position + new Vector3(0f, 0f, 250f);
+
+        //foreach(VehicleExt vehicle in World.Vehicles.NonServiceVehicles)
+        //{
+        //    EntryPoint.WriteToConsole($"NonServiceVehicles: {vehicle.Handle} {vehicle.IsMotorcycle}");
+        //}
+
+
+
+        //foreach(PedExt pedext in World.Pedestrians.LivingPeople)
+        //{
+        //    if(!pedext.Pedestrian.Exists())
+        //    {
+        //        continue;
+        //    }
+        //    bool takesDamageInvehicle = NativeFunction.Natives.GET_PED_CONFIG_FLAG<bool>(pedext.Pedestrian, 250, true);
+        //    bool flyThroughwindscreen = NativeFunction.Natives.GET_PED_CONFIG_FLAG<bool>(pedext.Pedestrian, 32, true);
+
+        //    EntryPoint.WriteToConsole($"{pedext.Handle} {pedext.GroupName} {pedext.Pedestrian.Health} takesDamageInvehicle{takesDamageInvehicle} flyThroughwindscreen{flyThroughwindscreen}");
+        //}
 
 
         //int trackID = NativeFunction.Natives.GET_AUDIBLE_MUSIC_TRACK_TEXT_ID<int>();
@@ -808,7 +1249,6 @@ public class Debug
         //SpawnLocation spawnLocation = new SpawnLocation(location.EntrancePosition);
         //spawnLocation.GetClosestStreet(false);
         //spawnLocation.GetClosestSideOfRoad();
-
         //GameFiber.StartNew(delegate
         //{
         //    uint GameTimeStarted = Game.GameTime;
@@ -1169,15 +1609,70 @@ public class Debug
     }
 
 
-   
+
 
     private void DebugNumpad5()
 {
-        if(Player.CurrentVehicle == null || !Player.CurrentVehicle.Vehicle.Exists())
-        {
-            return;
-        }
-        Game.DisplaySubtitle($"Has Ficticious Plate {Player.CurrentVehicle?.HasObviousFicticiousPlate(Player)} {Player.CurrentVehicle?.CarPlate?.OriginalModelHash} {Player.CurrentVehicle?.Vehicle.Model.Hash}");
+        //StartDebugFightClub(true);
+        //int Flags = 0;
+        //if (int.TryParse(NativeHelper.GetKeyboardInput("20"), out Flags))
+        //{
+
+        //    Player.HealthState.DebugSetRagdoll(Flags);
+        //    GameFiber.Sleep(500);
+        //    //Game.DisplaySubtitle("RAN NM MESSAGE");
+        //}
+
+
+        
+
+        //GenericMinigame genericMinigame = new GenericMinigame();
+        //genericMinigame.Start(Player);
+        //GameFiber.StartNew(delegate
+        //{
+        //    try
+        //    {
+        //        while (!Game.IsKeyDown(Keys.J))
+        //        {
+        //            genericMinigame.Update();
+        //            GameFiber.Yield();
+        //        }
+
+        //        NativeFunction.Natives.SET_PLAYER_CONTROL(Game.LocalPlayer, true, 0);
+
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        EntryPoint.WriteToConsole(ex.Message + " " + ex.StackTrace, 0);
+        //        EntryPoint.ModController.CrashUnload();
+        //    }
+        //}, "BurnerPhone");
+
+
+        //GameFiber.Sleep(500);
+
+
+
+        //if(IsTrafficDisabled)
+        //{
+        //    World.SetTrafficEnabled();
+        //    EntryPoint.WriteToConsole("SET TRAFFIC ENABLED");
+        //}
+        //else
+        //{
+        //    World.SetTrafficDisabled();
+        //    EntryPoint.WriteToConsole("SET TRAFFIC DISABLED");
+        //}
+
+
+        //IsTrafficDisabled = !IsTrafficDisabled;
+
+
+        //if(Player.CurrentVehicle == null || !Player.CurrentVehicle.Vehicle.Exists())
+        //{
+        //    return;
+        //}
+        //Game.DisplaySubtitle($"Has Ficticious Plate {Player.CurrentVehicle?.HasObviousFicticiousPlate(Player)} {Player.CurrentVehicle?.CarPlate?.OriginalModelHash} {Player.CurrentVehicle?.Vehicle.Model.Hash}");
 
         //CanineUnit k9 = World.Pedestrians.PoliceCanines.Where(x => x.Pedestrian.Exists()).OrderBy(x=> x.DistanceToPlayer).FirstOrDefault();
         //if(k9 == null)
@@ -1669,6 +2164,63 @@ public class Debug
         //SpawnGunAttackers();
     }
 
+    //private void StartDebugFightClub(bool isPlayer)
+    //{
+    //    Vector3 ArenaCenter = new Vector3(1155.039f,3102.574f, 40.41409f);
+
+    //    SpawnPlace firstSpawn = new SpawnPlace(new Vector3(1155.683f, 3099.726f, 40.41409f), 14.22223f);
+    //    SpawnPlace secondSpawn = new SpawnPlace(new Vector3(1154.417f, 3105.639f, 40.41409f), 193.7743f);
+    //    SpawnPlace thirdSpawn = new SpawnPlace(new Vector3(1150.119f, 3101.229f, 40.41409f), 286.4763f);
+    //    SpawnPlace fourthSpawn = new SpawnPlace(new Vector3(1159.48f, 3103.968f, 40.41409f), 105.1117f);
+
+
+    //    List<SpawnPlace> spectatorPlaces = new List<SpawnPlace>() { 
+    //        new SpawnPlace(new Vector3(1162.14f, 3100.934f, 40.41409f), 73.75758f),
+    //        new SpawnPlace(new Vector3(1149.294f, 3106.389f, 40.41409f), 233.9551f),
+    //        new SpawnPlace(new Vector3(1151.215f, 3095.373f, 40.416f), 328.3329f),
+    //    };
+
+
+    //    FightClubArena fightClubArena = new FightClubArena(ArenaCenter,new List<SpawnPlace>() { firstSpawn, secondSpawn, thirdSpawn, fourthSpawn }, spectatorPlaces, spectatorPlaces);
+
+    //    int Flags = 2;
+    //    if (!int.TryParse(NativeHelper.GetKeyboardInput("2"), out Flags))
+    //    {
+    //        return;
+    //    }
+    //    FightClubFight fightClubFight = new FightClubFight(fightClubArena,null, isPlayer, Flags, World,Settings, Player, Player);
+    //    fightClubFight.Setup();
+    //    fightClubFight.Begin();
+    //    GameFiber FightClubDebug = GameFiber.StartNew(delegate
+    //    {
+    //        while (!fightClubFight.IsEnded || EntryPoint.ModController.IsRunning)
+    //        {
+    //            fightClubFight.Update();
+    //            GameFiber.Yield();
+    //        }
+    //        //fightClubFight.Dispose();
+    //    }, "FightClubDebug");
+    //    GameFiber.Sleep(500);
+
+
+    //}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
     private void OffsetGarbage()
 {
 
@@ -1723,16 +2275,18 @@ GameFiber.StartNew(delegate
     private void DebugNumpad6()
     {
 
+        NativeFunction.Natives.STOP_GAMEPLAY_HINT(true);
+        //StartDebugFightClub(false);
 
 
 
 
 
 
-        
-        World.Places.StaticPlaces.DebugDeactivateAllLocations();
-        Game.DisplaySubtitle("DeactivatedLocations");
-        GameFiber.Sleep(2000);
+
+        //World.Places.StaticPlaces.DebugDeactivateAllLocations();
+        //Game.DisplaySubtitle("DeactivatedLocations");
+        //GameFiber.Sleep(2000);
 
 
         ////X:124.8145 Y:-747.5364 Z:242.152
@@ -4378,83 +4932,83 @@ private void contacttest()
 //        _iFruit.RightButtonIcon = SoftKeyIcon.Website;
 //        */
 
-            //        // New contact (wait 4 seconds (4000ms) before picking up the phone)
-            //        iFruitContact contactA = new iFruitContact("Unknown Gang Boss", 40);
-            //        contactA.Answered += ContactAnswered;   // Linking the Answered event with our function
-            //        contactA.DialTimeout = 4000;            // Delay before answering
-            //        contactA.Active = true;                 // true = the contact is available and will answer the phone
-            //        contactA.Icon = ContactIcon.MP_MexBoss;      // Contact's icon
-            //        _iFruit.Contacts.Add(contactA);         // Add the contact to the phone
+        //        // New contact (wait 4 seconds (4000ms) before picking up the phone)
+        //        iFruitContact contactA = new iFruitContact("Unknown Gang Boss", 40);
+        //        contactA.Answered += ContactAnswered;   // Linking the Answered event with our function
+        //        contactA.DialTimeout = 4000;            // Delay before answering
+        //        contactA.Active = true;                 // true = the contact is available and will answer the phone
+        //        contactA.Icon = ContactIcon.MP_MexBoss;      // Contact's icon
+        //        _iFruit.Contacts.Add(contactA);         // Add the contact to the phone
 
-            //        // New contact (wait 4 seconds before displaying "Busy...")
-            //        iFruitContact contactB = new iFruitContact("Families Boss", 41);
-            //        contactB.DialTimeout = 4000;
-            //        contactB.Active = false;                // false = the contact is busy
-            //        contactB.Icon = ContactIcon.Blocked;
-            //        contactB.Bold = true;                   // Set the contact name in bold
-            //        _iFruit.Contacts.Add(contactB);
-
-
-
-            //        while (!Game.IsKeyDownRightNow(Keys.P))
-            //        {
-            //            Game.DisplayHelp($"Press P to Stop");
-            //            _iFruit.Update();
-
-            //            GameFiber.Yield();
-            //        }
-
-            //    }, "Run Debug Logic");
-            //}
-            //catch (Exception ex)
-            //{
-            //    Game.DisplayNotification("Shit CRASHES!!!");
-            //}
+        //        // New contact (wait 4 seconds before displaying "Busy...")
+        //        iFruitContact contactB = new iFruitContact("Families Boss", 41);
+        //        contactB.DialTimeout = 4000;
+        //        contactB.Active = false;                // false = the contact is busy
+        //        contactB.Icon = ContactIcon.Blocked;
+        //        contactB.Bold = true;                   // Set the contact name in bold
+        //        _iFruit.Contacts.Add(contactB);
 
 
 
-
-
-        }
-
-        //private void ContactAnswered(iFruitContact contact)
-        //{
-        //    // The contact has answered, we can execute our code
-        //    Game.DisplayNotification("The contact has answered.");
-
-        //    // We need to close the phone at a moment.
-        //    // We can close it as soon as the contact pick up calling _iFruit.Close().
-        //    // Here, we will close the phone in 5 seconds (5000ms).
-        //    _iFruit.Close(5000);
-        //}
-
-        //private void CreatePointChecker()
-        //{
-
-        //    Vector3 CoolPos = Game.LocalPlayer.Character.Position.Around2D(10f);
-        //    Color coolColor = Color.Yellow;
-        //    GameFiber.StartNew(delegate
-        //    {
-        //        while (!Game.IsKeyDown(Keys.O))
+        //        while (!Game.IsKeyDownRightNow(Keys.P))
         //        {
-        //            if(Extensions.PointIsInFrontOfPed(Game.LocalPlayer.Character,CoolPos))
-        //            {
-        //                coolColor = Color.Red;
-        //            }
-        //            else
-        //            {
-        //                coolColor = Color.Yellow;
-        //            }
-        //            float Result = Extensions.GetDotVectorResult(Game.LocalPlayer.Character, CoolPos);
-        //            Game.DisplayHelp($"Press O to Stop GetDotVectorResult {Result}");
-        //            Rage.Debug.DrawArrowDebug(CoolPos, Vector3.Zero, Rotator.Zero, 1f, coolColor);
+        //            Game.DisplayHelp($"Press P to Stop");
+        //            _iFruit.Update();
 
         //            GameFiber.Yield();
         //        }
 
         //    }, "Run Debug Logic");
         //}
-        private void BrowseTimecycles()
+        //catch (Exception ex)
+        //{
+        //    Game.DisplayNotification("Shit CRASHES!!!");
+        //}
+
+
+
+
+
+    }
+
+    //private void ContactAnswered(iFruitContact contact)
+    //{
+    //    // The contact has answered, we can execute our code
+    //    Game.DisplayNotification("The contact has answered.");
+
+    //    // We need to close the phone at a moment.
+    //    // We can close it as soon as the contact pick up calling _iFruit.Close().
+    //    // Here, we will close the phone in 5 seconds (5000ms).
+    //    _iFruit.Close(5000);
+    //}
+
+    //private void CreatePointChecker()
+    //{
+
+    //    Vector3 CoolPos = Game.LocalPlayer.Character.Position.Around2D(10f);
+    //    Color coolColor = Color.Yellow;
+    //    GameFiber.StartNew(delegate
+    //    {
+    //        while (!Game.IsKeyDown(Keys.O))
+    //        {
+    //            if(Extensions.PointIsInFrontOfPed(Game.LocalPlayer.Character,CoolPos))
+    //            {
+    //                coolColor = Color.Red;
+    //            }
+    //            else
+    //            {
+    //                coolColor = Color.Yellow;
+    //            }
+    //            float Result = Extensions.GetDotVectorResult(Game.LocalPlayer.Character, CoolPos);
+    //            Game.DisplayHelp($"Press O to Stop GetDotVectorResult {Result}");
+    //            Rage.Debug.DrawArrowDebug(CoolPos, Vector3.Zero, Rotator.Zero, 1f, coolColor);
+
+    //            GameFiber.Yield();
+    //        }
+
+    //    }, "Run Debug Logic");
+    //}
+    private void BrowseTimecycles()
     {
         try
         {
@@ -5288,7 +5842,7 @@ private void contacttest()
             uint currentWeapon;
             NativeFunction.Natives.GET_CURRENT_PED_WEAPON<bool>(ped.Pedestrian, out currentWeapon, true);
             uint RG = NativeFunction.Natives.GET_PED_RELATIONSHIP_GROUP_HASH<uint>(ped.Pedestrian);
-            EntryPoint.WriteToConsole($"Handle {ped.Pedestrian.Handle}-{ped.DistanceToPlayer}-Cells:{NativeHelper.MaxCellsAway(EntryPoint.FocusCellX, EntryPoint.FocusCellY, ped.CellX, ped.CellY)} {ped.Pedestrian.Model.Name} {ped.Name} ${ped.Money} CanSeePlayer{ped.CanSeePlayer} MENU? {ped.HasMenu} IsUnconscious:{ped.IsUnconscious} Alive:{ped.Pedestrian.IsAlive} Task: {ped.CurrentTask?.Name}-{ped.CurrentTask?.SubTaskName} OtherCrimes {ped.OtherCrimesWitnessed.Count()}  PlayerCrimes {ped.PlayerCrimesWitnessed.Count()} WantedLevel = {ped.WantedLevel} IsDeadlyChase = {ped.IsDeadlyChase} IsBusted {ped.IsBusted} IsArrested {ped.IsArrested} IsInVehicle {ped.IsInVehicle} ViolationWantedLevel = {ped.CurrentlyViolatingWantedLevel} Weapon {currentWeapon} Reason {ped.PedViolations.CurrentlyViolatingWantedLevelReason} Stunned {ped.Pedestrian.IsStunned} Task {ped.CurrentTask?.Name}-{ped.CurrentTask?.SubTaskName} WasEverSetPersistent:{ped.WasEverSetPersistent} Call:{ped.WillCallPolice} Fight:{ped.WillFight} WillFightPolice {ped.WillFightPolice} NewGroup:{ped.Pedestrian.RelationshipGroup.Name} NativeGroup:{RG}", 5);
+            EntryPoint.WriteToConsole($"Handle {ped.Pedestrian.Handle}-{ped.DistanceToPlayer}-Cells:{NativeHelper.MaxCellsAway(EntryPoint.FocusCellX, EntryPoint.FocusCellY, ped.CellX, ped.CellY)} {ped.Pedestrian.Model.Name} {ped.Name} ${ped.Money} CanSeePlayer{ped.CanSeePlayer} {ped.Handle} PPS:{ped.PlayerPerception.PlayerPerceptionString} MENU? {ped.HasMenu} IsUnconscious:{ped.IsUnconscious} Alive:{ped.Pedestrian.IsAlive} Task: {ped.CurrentTask?.Name}-{ped.CurrentTask?.SubTaskName} OtherCrimes {ped.OtherCrimesWitnessed.Count()}  PlayerCrimes {ped.PlayerCrimesWitnessed.Count()} WantedLevel = {ped.WantedLevel} IsDeadlyChase = {ped.IsDeadlyChase} IsBusted {ped.IsBusted} IsArrested {ped.IsArrested} IsInVehicle {ped.IsInVehicle} ViolationWantedLevel = {ped.CurrentlyViolatingWantedLevel} Weapon {currentWeapon} Reason {ped.PedViolations.CurrentlyViolatingWantedLevelReason} Stunned {ped.Pedestrian.IsStunned} Task {ped.CurrentTask?.Name}-{ped.CurrentTask?.SubTaskName} WasEverSetPersistent:{ped.WasEverSetPersistent} Call:{ped.WillCallPolice} Fight:{ped.WillFight} WillFightPolice {ped.WillFightPolice} NewGroup:{ped.Pedestrian.RelationshipGroup.Name} NativeGroup:{RG} IsMovingAway:{ped.DistanceChecker.IsMovingAway} WasModSpawned:{ped.WasModSpawned} IsPersistent{ped.Pedestrian.IsPersistent}", 5);
         }
         EntryPoint.WriteToConsole($"============================================ CIVIES END", 5);
         EntryPoint.WriteToConsole($"============================================ SECURITY START", 5);
@@ -5323,7 +5877,7 @@ private void contacttest()
                 weaponinventorystring += " Has Long Gun";
             }
             string Text = $"Handle {ped.Pedestrian.Handle}-{ped.DistanceToPlayer}-Cells:{NativeHelper.MaxCellsAway(EntryPoint.FocusCellX, EntryPoint.FocusCellY, ped.CellX, ped.CellY)} {ped.Pedestrian.Model.Name} {ped.Name} ${ped.Money} CanSeePlayer{ped.CanSeePlayer} {ped.AssignedAgency?.ID} IsUnconscious:{ped.IsUnconscious} " +
-                $"Alive:{ped.Pedestrian.IsAlive} Task: {ped.CurrentTask?.Name}-{ped.CurrentTask?.SubTaskName} OtherCrimes {ped.OtherCrimesWitnessed.Count()}  PlayerCrimes {ped.PlayerCrimesWitnessed.Count()} " +
+                $"Alive:{ped.Pedestrian.IsAlive} Task: {ped.CurrentTask?.Name}-{ped.CurrentTask?.SubTaskName} OtherCrimes {ped.OtherCrimesWitnessed.Count()}  PlayerCrimes {ped.PlayerCrimesWitnessed.Count()} {string.Join(",",ped.PlayerCrimesWitnessed.ToList())} " +
                 $"IsInVehicle {ped.IsInVehicle} ReactionTier: {ped.PedReactions.ReactionTier} WeaponSet {weaponinventorystring} DebugWeaponState {ped.WeaponInventory.DebugWeaponState}" +
                 $"Weapon {currentWeapon} Stunned {ped.Pedestrian.IsStunned} WasEverSetPersistent:{ped.WasEverSetPersistent} " +
                 $"Call:{ped.WillCallPolice} Fight:{ped.WillFight} NewGroup:{ped.Pedestrian.RelationshipGroup.Name} NativeGroup:{RG} HasTaser {ped.HasTaser} SpawnRequirement {ped.LocationTaskRequirements.TaskRequirements}";
@@ -5469,11 +6023,11 @@ private void contacttest()
             uint currentWeapon;
             NativeFunction.Natives.GET_CURRENT_PED_WEAPON<bool>(ped.Pedestrian, out currentWeapon, true);
             uint RG = NativeFunction.Natives.GET_PED_RELATIONSHIP_GROUP_HASH<uint>(ped.Pedestrian);
-            EntryPoint.WriteToConsole($"Handle {ped.Pedestrian.Handle}-{ped.DistanceToPlayer}-Cells:{NativeHelper.MaxCellsAway(EntryPoint.FocusCellX, EntryPoint.FocusCellY, ped.CellX, ped.CellY)} {ped.Pedestrian.Model.Name} {ped.Name} ${ped.Money} " +
+            EntryPoint.WriteToConsole($"Handle {ped.Pedestrian.Handle}-{ped.Handle}-{ped.DistanceToPlayer}-Cells:{NativeHelper.MaxCellsAway(EntryPoint.FocusCellX, EntryPoint.FocusCellY, ped.CellX, ped.CellY)} {ped.Pedestrian.Model.Name} {ped.Name} ${ped.Money} " +
                 $"HasWeapon: {ped.HasWeapon}  CanSeePlayer{ped.CanSeePlayer} MENU? {ped.HasMenu} IsUnconscious:{ped.IsUnconscious} Task: {ped.CurrentTask?.Name}-{ped.CurrentTask?.SubTaskName} OtherCrimes {ped.OtherCrimesWitnessed.Count()}  PlayerCrimes {ped.PlayerCrimesWitnessed.Count()} " +
                 $"WantedLevel = {ped.WantedLevel} IsDeadlyChase = {ped.IsDeadlyChase} IsBusted {ped.IsBusted} IsArrested {ped.IsArrested} IsInVehicle {ped.IsInVehicle} ViolationWantedLevel = {ped.CurrentlyViolatingWantedLevel} Weapon {currentWeapon} " +
                 $"Reason {ped.PedViolations.CurrentlyViolatingWantedLevelReason} Stunned {ped.Pedestrian.IsStunned} Task {ped.CurrentTask?.Name}-{ped.CurrentTask?.SubTaskName} WasEverSetPersistent:{ped.WasEverSetPersistent} Call:{ped.WillCallPolice} " +
-                $"Fight:{ped.WillFight} NewGroup:{ped.Pedestrian.RelationshipGroup.Name} NativeGroup:{RG} WasModSpawned:{ped.WasModSpawned} CanConverse:{ped.CanConverse} Tasked{ped.CanBeTasked} AmbientTasked{ped.CanBeAmbientTasked}", 5);
+                $"Fight:{ped.WillFight} NewGroup:{ped.Pedestrian.RelationshipGroup.Name} NativeGroup:{RG} WasModSpawned:{ped.WasModSpawned} CanConverse:{ped.CanConverse} Tasked{ped.CanBeTasked} AmbientTasked{ped.CanBeAmbientTasked} SpawnRequirement {ped.LocationTaskRequirements.TaskRequirements}", 5);
         }
         EntryPoint.WriteToConsole($"============================================ SERVICE END", 5);
         EntryPoint.WriteToConsole($"============================================ DEAD START", 5);
@@ -5538,8 +6092,9 @@ private void contacttest()
 
             bool canSeePlayer = cop.CanSeePlayer;
 
-            string retardedcops = $"IsDriver:{cop.IsDriver}";
+            string retardedcops = $"IsDriver:{cop.IsDriver} RelationshipGroup:{cop.Pedestrian.RelationshipGroup.Name}";
 
+            
 
             if (cop.CurrentTask?.OtherTarget?.Pedestrian.Exists() == true)
             {
@@ -5618,7 +6173,7 @@ private void contacttest()
             {
                 EntryPoint.WriteToConsole($"Num6: Cop {cop.Pedestrian.Handle}-Cells:{NativeHelper.MaxCellsAway(EntryPoint.FocusCellX, EntryPoint.FocusCellY, cop.CellX, cop.CellY)}-{cop.DistanceToPlayer} {cop.Pedestrian.Model.Name} Name:{cop.Name} {cop.GroupName} weaponhash {currentWeapon} IsUnconscious:{cop.IsUnconscious} IsMale:{cop.Pedestrian.IsMale} " +
                     $"TaskStatus:{cop.Pedestrian.Tasks.CurrentTaskStatus} Weapons: {cop.CopDebugString} Task: {cop.CurrentTask?.Name}-{cop.CurrentTask?.SubTaskName} Target:{cop.CurrentTask.OtherTarget.Pedestrian.Handle} IsRespondingToInvestigation {cop.IsRespondingToInvestigation} IsRespondingToCitizenWanted {cop.IsRespondingToCitizenWanted} IsInVehicle {cop.IsInVehicle} Vehicle  {VehString} {combat} WEapon: {Weapon} {VehicleWeapon} " +
-                    $"HasLoggedDeath {cop.HasLoggedDeath} WasModSpawned {cop.WasModSpawned} RGotIn:{cop.RecentlyGotInVehicle} RGotOut:{cop.RecentlyGotOutOfVehicle} WeaponSet {weaponinventorystring} DebugWeaponState {cop.WeaponInventory.DebugWeaponState}", 5);
+                    $"HasLoggedDeath {cop.HasLoggedDeath} WasModSpawned {cop.WasModSpawned} RelationshipGroup:{cop.Pedestrian.RelationshipGroup} RGotIn:{cop.RecentlyGotInVehicle} RGotOut:{cop.RecentlyGotOutOfVehicle} WeaponSet {weaponinventorystring} DebugWeaponState {cop.WeaponInventory.DebugWeaponState}", 5);
 
             }
 
@@ -5626,7 +6181,7 @@ private void contacttest()
             {
                 EntryPoint.WriteToConsole($"Num6: Cop {cop.Pedestrian.Handle}-Cells:{NativeHelper.MaxCellsAway(EntryPoint.FocusCellX, EntryPoint.FocusCellY, cop.CellX, cop.CellY)}-{cop.DistanceToPlayer} {cop.Pedestrian.Model.Name} Name:{cop.Name} {cop.GroupName} weaponhash {currentWeapon} IsUnconscious:{cop.IsUnconscious} IsMale:{cop.Pedestrian.IsMale} " +
                     $"TaskStatus:{cop.Pedestrian.Tasks.CurrentTaskStatus} Weapons: {cop.CopDebugString} Task: {cop.CurrentTask?.Name}-{cop.CurrentTask?.SubTaskName} Target:{0} IsRespondingToInvestigation {cop.IsRespondingToInvestigation} IsRespondingToCitizenWanted {cop.IsRespondingToCitizenWanted} IsInVehicle {cop.IsInVehicle} Vehicle  {VehString} {combat} weapon: {Weapon} {VehicleWeapon} " +
-                    $"HasLoggedDeath {cop.HasLoggedDeath} WasModSpawned {cop.WasModSpawned} RGotIn:{cop.RecentlyGotInVehicle} RGotOut:{cop.RecentlyGotOutOfVehicle} WeaponSet {weaponinventorystring} DebugWeaponState {cop.WeaponInventory.DebugWeaponState}", 5);
+                    $"HasLoggedDeath {cop.HasLoggedDeath} WasModSpawned {cop.WasModSpawned} RelationshipGroup:{cop.Pedestrian.RelationshipGroup} RGotIn:{cop.RecentlyGotInVehicle} RGotOut:{cop.RecentlyGotOutOfVehicle} WeaponSet {weaponinventorystring} DebugWeaponState {cop.WeaponInventory.DebugWeaponState}", 5);
             }
 
         }
@@ -5741,6 +6296,7 @@ private void contacttest()
                 {
                     Car.LicensePlate = NewPlateNumber;
                 }
+
                 NativeFunction.CallByName<int>("SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX", Car, NewType.Index);
                 Game.DisplaySubtitle($" PlateIndex: {PlateIndex}, Index: {NewType.Index}, State: {NewType.StateID}, Description: {NewType.Description}");
             }

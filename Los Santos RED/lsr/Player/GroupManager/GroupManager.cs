@@ -1,4 +1,5 @@
-﻿using LosSantosRED.lsr.Interface;
+﻿using LosSantosRED.lsr.Helper;
+using LosSantosRED.lsr.Interface;
 using LSR.Vehicles;
 using Rage;
 using Rage.Native;
@@ -18,6 +19,9 @@ public class GroupManager
     private ITargetable Targetable;
     private bool IsSetCombatSpacing = false;
     private int selectedMode = 0;
+    private bool HasShownAutoDrivePrompt = false;
+    private readonly string autoDriveHelpText = "Use map waypoints to set the drivers destination.";
+
     public List<GroupMember> CurrentGroupMembers { get; private set; } = new List<GroupMember>();
     public int PlayerGroup { get; private set; }
     public int MemberCount => CurrentGroupMembers.Count();
@@ -29,7 +33,7 @@ public class GroupManager
     public bool AlwaysArmed { get; set; } = false;
     public bool NeverArmed { get; set; } = false;
     public bool AutoArmed { get; set; } = true;
-
+    public bool PlayerDriverWander { get; set; } = false;
     public GroupManager(IGroupManageable player, ITargetable targetable, ISettingsProvideable settings, IEntityProvideable world, IGangs gangs, IWeapons weapons)
     {
         Player = player;
@@ -54,6 +58,10 @@ public class GroupManager
                 Remove(sc.PedExt);
                 //EntryPoint.WriteToConsoleTestLong("Remove Group Member (Busted)");
             }
+        }
+        foreach(GroupMember gm in CurrentGroupMembers)
+        {
+            gm.PedExt.StabilityForceApplier();
         }
     }
     public GroupMember GetMember(PedExt toget)
@@ -234,6 +242,73 @@ public class GroupManager
     private void PlayToggleSound()
     {
         NativeFunction.Natives.PLAY_SOUND_FRONTEND(-1, "SELECT", "HUD_FRONTEND_DEFAULT_SOUNDSET", false);
+    }
+
+    public void OnToggledPlayerDriverWander()
+    {
+        PlayerDriverWander = !PlayerDriverWander;
+        UpdateAllTasking();
+        Game.DisplaySubtitle($"Player Driver Wander {(PlayerDriverWander ? "Enabled" : "Disabled")}");
+    }
+
+    public void OnPlayerGotInVehicle()
+    {
+        if(HasShownAutoDrivePrompt)
+        {
+            return;
+        }
+        if (Player.IsInVehicle && Player.IsDriver)
+        {
+            Game.DisplayHelp($"{autoDriveHelpText}");
+            HasShownAutoDrivePrompt = true;
+        }
+    }
+
+    public void OnTeleportedOutside(Interior interior, GameLocation currentLocation)
+    {
+        if(currentLocation == null)
+        {
+            return;
+        }
+        TeleportGroupMembersToPosition(new SpawnLocation(currentLocation.EntrancePosition, currentLocation.EntranceHeading));
+
+    }
+    private void TeleportGroupMembersToPosition(SpawnLocation startingLocation)
+    {
+        foreach (GroupMember groupMember in CurrentGroupMembers.Where(x => x.PedExt != null && x.PedExt.Pedestrian.Exists() && !x.PedExt.IsDead && !x.PedExt.IsBusted && !x.PedExt.IsArrested && !x.PedExt.IsUnconscious).ToList())
+        {
+            if (groupMember.PedExt.DistanceToPlayer > Settings.SettingsManager.GroupSettings.TeleportDistanceRequirement)
+            {
+                continue;
+            }
+
+           Vector3 OffsetLocation = NativeHelper.GetOffsetPosition(startingLocation.InitialPosition, startingLocation.Heading, 1.5f);
+
+            SpawnLocation toSpawn = new SpawnLocation(OffsetLocation.Around2D(1.5f), startingLocation.Heading);
+            if (groupMember.PedExt.IsInVehicle && groupMember.PedExt.Pedestrian.CurrentVehicle.Exists())
+            {
+                bool isPedInPlayerVehicle = Player.CurrentVehicle != null && Player.CurrentVehicle.Vehicle.Exists() && Player.CurrentVehicle.Vehicle.Handle == groupMember.PedExt.Pedestrian.CurrentVehicle.Handle;
+                if (!isPedInPlayerVehicle && Settings.SettingsManager.GroupSettings.AllowTeleportingGroupMembersInOtherVehicles)
+                {
+                    groupMember.PedExt.Pedestrian.CurrentVehicle.Position = toSpawn.InitialPosition;
+                    groupMember.PedExt.Pedestrian.CurrentVehicle.Heading = toSpawn.Heading;
+                }
+            }
+            else
+            {
+                groupMember.PedExt.Pedestrian.Position = toSpawn.InitialPosition;
+                groupMember.PedExt.Pedestrian.Heading = toSpawn.Heading;
+            }
+        }
+    }
+
+    public void OnTeleportedInside(Interior interior)
+    {
+        if(interior == null)
+        {
+            return;
+        }
+        TeleportGroupMembersToPosition(new SpawnLocation(interior.InteriorEgressPosition, interior.InteriorEgressHeading));
     }
 }
 

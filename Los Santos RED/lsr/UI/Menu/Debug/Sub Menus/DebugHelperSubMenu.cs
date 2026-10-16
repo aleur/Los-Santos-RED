@@ -80,7 +80,15 @@ public class DebugHelperSubMenu : DebugSubMenu
         };
         HelperMenuItem.AddItem(spawnNearbyItems);
 
+        UIMenuListScrollerItem<Dispatch> dispatchScroller = new UIMenuListScrollerItem<Dispatch>("Dispatches", "Get a list of dispatches to play", Player.Scanner.GetDispatchList());
 
+        ;
+        dispatchScroller.Activated += (menu, item) =>
+        {
+            Player.Scanner.PlayDispatchDebug(dispatchScroller.SelectedItem);
+            menu.Visible = false;
+        };
+        HelperMenuItem.AddItem(dispatchScroller);
 
 
 
@@ -384,9 +392,17 @@ public class DebugHelperSubMenu : DebugSubMenu
         HelperMenuItem.AddItem(playAudio);
 
 
+        UIMenuItem AimGun = new UIMenuItem("Aim Gun", "");
+        AimGun.Activated += (menu, item) =>
+        {
 
 
+                NativeFunction.Natives.TASK_AIM_GUN_AT_COORD(Game.LocalPlayer.Character,Game.LocalPlayer.Character.GetOffsetPositionFront(10f),-1,false,false);
+            
+        };
+        HelperMenuItem.AddItem(AimGun);
 
+        //TASK_AIM_GUN_AT_COORD
 
 
     }

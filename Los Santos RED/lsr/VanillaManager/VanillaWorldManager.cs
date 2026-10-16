@@ -21,7 +21,8 @@ public class VanillaWorldManager
     private uint GameTimeLastTerminatedAudio;
     private bool isVanillaCarRaceActive;
     private uint GameTimeLastSetMaxWanted;
-
+    private int pauseHoldCounter = 0;
+    private bool hasRestoredFog;
     public VanillaWorldManager(ISettingsProvideable settings)
     {
         Settings = settings;
@@ -120,8 +121,18 @@ public class VanillaWorldManager
         //        ActivateVanillaCarRace();
         //    }
         //}
-
-
+        if (Settings.SettingsManager.VanillaSettings.SupressPauseMenu)
+        {
+            SupressPauseMenu();
+        }
+        if (Settings.SettingsManager.VanillaSettings.RevealMap)
+        {
+            RevealMap();
+        }
+        else
+        {
+            RestoreFogOfWar();
+        }
 
         if (Settings.SettingsManager.PoliceSettings.TakeExclusiveControlOverWantedLevel)
         {
@@ -239,6 +250,34 @@ public class VanillaWorldManager
         Game.StartNewScript("blip_controller");
         isVanillaBlipsActive = true;
     }
+    private void SupressPauseMenu()
+    {
+        bool pausePressed =
+            Game.IsControlJustPressed(0, GameControl.FrontendPause) ||
+            Game.IsKeyDownRightNow(System.Windows.Forms.Keys.Escape);
 
+        if (pausePressed)
+        {
+            if (!NativeFunction.Natives.IS_PAUSE_MENU_ACTIVE<bool>())
+            {
+                NativeFunction.Natives.ACTIVATE_FRONTEND_MENU(
+                NativeFunction.Natives.GET_HASH_KEY<int>("FE_MENU_VERSION_MP_PAUSE"), 0, -1
+                );
+            }
+        }
+    }
+        private void RevealMap()
+    {
+        hasRestoredFog = false;
+        NativeFunction.Natives.SET_MINIMAP_HIDE_FOW(true);
+    }
+    private void RestoreFogOfWar()
+    {
+        if (hasRestoredFog)
+            return;
+
+        NativeFunction.Natives.SET_MINIMAP_HIDE_FOW(false);
+        hasRestoredFog = true;
+    }
 }
 

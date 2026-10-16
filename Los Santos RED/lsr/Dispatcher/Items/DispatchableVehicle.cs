@@ -4,10 +4,13 @@ using LosSantosRED.lsr.Interface;
 using LSR.Vehicles;
 using Rage;
 using Rage.Native;
+using RAGENativeUI.Elements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Windows.Forms;
 
 [Serializable]
 public class DispatchableVehicle
@@ -41,11 +44,12 @@ public class DispatchableVehicle
     public int RequiredPrimaryColorID { get; set; } = -1;
     public int RequiredSecondaryColorID { get; set; } = -1;
 
-
+    public int RequiredPearlescentColorID { get; set; } = -1;
+    public int RequiredWindowTintID { get; set; } = -1;
 
     public int RequiredInteriorColorID { get; set; } = -1;
     public int RequiredDashColorID { get; set; } = -1;
-
+    public int RequiredWheelColorID { get; set; } = -1;
     public List<int> RequiredLiveries { get; set; } = new List<int>();
     public List<DispatchableVehicleExtra> VehicleExtras { get; set; } = new List<DispatchableVehicleExtra>();
     public List<DispatchableVehicleMod> VehicleMods { get; set; } = new List<DispatchableVehicleMod>();
@@ -72,6 +76,13 @@ public class DispatchableVehicle
 
     public List<string> RequestedPlateTypes { get; set; }
 
+
+    public int WheelType { get; set; } = -1;
+
+
+
+    public bool SetRandomCustomization { get; set; } = false;
+    public float RandomCustomizationPercentage { get; set; } = 0f;
     public string GetDescription()
     {
         string description = "";
@@ -92,28 +103,28 @@ public class DispatchableVehicle
         isHelicopter = NativeFunction.Natives.IS_THIS_MODEL_A_HELI<bool>(Game.GetHashKey(ModelName));
         isPlane = NativeFunction.Natives.IS_THIS_MODEL_A_PLANE<bool>(Game.GetHashKey(ModelName));
         isMotorcycle = NativeFunction.Natives.IS_THIS_MODEL_A_BIKE<bool>(Game.GetHashKey(ModelName));
-#if DEBUG
-        if(isMotorcycle)
-        {
-            EntryPoint.WriteToConsole($"{DebugName} {ModelName} is motorcycle");
-        }
-        if (isHelicopter)
-        {
-            EntryPoint.WriteToConsole($"{DebugName} {ModelName} is heli");
-        }
-        if (isPlane)
-        {
-            EntryPoint.WriteToConsole($"{DebugName} {ModelName} is plane");
-        }
-        if (isBoat)
-        {
-            EntryPoint.WriteToConsole($"{DebugName} {ModelName} is boat");
-        }
-        //if (isCar)
-        //{
-        //    EntryPoint.WriteToConsole($"{DebugName} {ModelName} is car");
-        //}
-#endif
+//#if DEBUG
+//        if (isMotorcycle)
+//        {
+//            EntryPoint.WriteToConsole($"{DebugName} {ModelName} is motorcycle");
+//        }
+//        if (isHelicopter)
+//        {
+//            EntryPoint.WriteToConsole($"{DebugName} {ModelName} is heli");
+//        }
+//        if (isPlane)
+//        {
+//            EntryPoint.WriteToConsole($"{DebugName} {ModelName} is plane");
+//        }
+//        if (isBoat)
+//        {
+//            EntryPoint.WriteToConsole($"{DebugName} {ModelName} is boat");
+//        }
+//        //if (isCar)
+//        //{
+//        //    EntryPoint.WriteToConsole($"{DebugName} {ModelName} is car");
+//        //}
+//#endif
         if (RequestedPlateTypes != null)
         {
             foreach (string plateTypeName in RequestedPlateTypes)
@@ -138,12 +149,12 @@ public class DispatchableVehicle
         int adjustmentAmount = 0;
         if (SpawnAdjustmentAmounts != null && SpawnAdjustmentAmounts.Any())
         {
-            foreach(SpawnAdjustmentAmount spawnAdjustmentAmount in SpawnAdjustmentAmounts)
+            foreach (SpawnAdjustmentAmount spawnAdjustmentAmount in SpawnAdjustmentAmounts)
             {
-                if(eSpawnAdjustment.HasFlag(spawnAdjustmentAmount.eSpawnAdjustment))
+                if (eSpawnAdjustment.HasFlag(spawnAdjustmentAmount.eSpawnAdjustment))
                 {
                     adjustmentAmount += spawnAdjustmentAmount.PercentAmount;
-                   // EntryPoint.WriteToConsole($"CurrentAdjustedSpawnChance eSpawnAdjustment {eSpawnAdjustment}, spawnAdjustmentAmount enum:{spawnAdjustmentAmount.eSpawnAdjustment} value:{spawnAdjustmentAmount.PercentAmount}");
+                    // EntryPoint.WriteToConsole($"CurrentAdjustedSpawnChance eSpawnAdjustment {eSpawnAdjustment}, spawnAdjustmentAmount enum:{spawnAdjustmentAmount.eSpawnAdjustment} value:{spawnAdjustmentAmount.PercentAmount}");
                 }
             }
         }
@@ -155,7 +166,7 @@ public class DispatchableVehicle
             }
             else
             {
-                return 0 + adjustmentAmount;
+                return 0;
             }
         }
         else
@@ -170,7 +181,7 @@ public class DispatchableVehicle
     public bool CanCurrentlySpawn(int WantedLevel, bool allowDLC) => CurrentSpawnChance(WantedLevel, allowDLC) > 0;
     public int CurrentSpawnChance(int WantedLevel, bool allowDLC)
     {
-        if(RequiresDLC && !allowDLC)
+        if (RequiresDLC && !allowDLC)
         {
             return 0;
         }
@@ -253,22 +264,28 @@ public class DispatchableVehicle
         {
             return;
         }
+
+        if (WheelType != -1)
+        {
+            NativeFunction.Natives.SET_VEHICLE_WHEEL_TYPE(vehicleExt.Vehicle, WheelType);
+        }
+
         if (VehicleMods != null && VehicleMods.Any())
-        { 
+        {
             //EntryPoint.WriteToConsole("SETTING VEHICLE MODS");
             NativeFunction.Natives.SET_VEHICLE_MOD_KIT(vehicleExt.Vehicle, 0);
             foreach (DispatchableVehicleMod dispatchableVehicleMod in VehicleMods)
             {
-               // EntryPoint.WriteToConsole($"VEHICLE MODS: ID: {dispatchableVehicleMod.ModID}");
+                // EntryPoint.WriteToConsole($"VEHICLE MODS: ID: {dispatchableVehicleMod.ModID}");
                 if (RandomItems.RandomPercent(dispatchableVehicleMod.Percentage) && dispatchableVehicleMod.DispatchableVehicleModValues != null)
                 {
                     DispatchableVehicleModValue value = dispatchableVehicleMod.PickValue();//.DispatchableVehicleModValues.PickValue();
                     if (value != null)
                     {
-                       // EntryPoint.WriteToConsole($"VEHICLE MODS: ID: {dispatchableVehicleMod.ModID} VALUE: {value.Value}");
+                        // EntryPoint.WriteToConsole($"VEHICLE MODS: ID: {dispatchableVehicleMod.ModID} VALUE: {value.Value}");
                         NativeFunction.Natives.SET_VEHICLE_MOD(vehicleExt.Vehicle, dispatchableVehicleMod.ModID, value.Value, false);
                         //GameFiber.Yield();
-                        if(!vehicleExt.Vehicle.Exists())
+                        if (!vehicleExt.Vehicle.Exists())
                         {
                             break;
                         }
@@ -288,7 +305,7 @@ public class DispatchableVehicle
             NativeFunction.Natives.SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX(vehicleExt.Vehicle, ForcedPlateType);
         }
 
-        if(FinalPlateType != null)
+        if (FinalPlateType != null)
         {
             string plateNumber = FinalPlateType.GenerateNewLicensePlateNumber();
             vehicleExt.Vehicle.LicensePlate = plateNumber;
@@ -313,9 +330,19 @@ public class DispatchableVehicle
                 NativeFunction.Natives.SET_VEHICLE_EXTRA_COLOUR_6(vehicleExt.Vehicle, chosenColor);
             }
         }
-        if (RequiredPrimaryColorID != -1)
+        if (RequiredPrimaryColorID != -1 || RequiredSecondaryColorID != -1)
         {
-            NativeFunction.Natives.SET_VEHICLE_COLOURS(vehicleExt.Vehicle, RequiredPrimaryColorID, RequiredSecondaryColorID == -1 ? RequiredPrimaryColorID : RequiredSecondaryColorID);
+            int currentPrimaryColor;
+            int currentSecondaryColor;
+            unsafe
+            {
+                NativeFunction.CallByName<int>("GET_VEHICLE_COLOURS", vehicleExt.Vehicle, &currentPrimaryColor, &currentSecondaryColor);
+            }
+
+            int newPrimary = (RequiredPrimaryColorID != -1) ? RequiredPrimaryColorID : currentPrimaryColor;
+            int newSecondary = (RequiredSecondaryColorID != -1) ? RequiredSecondaryColorID : currentSecondaryColor;
+
+            NativeFunction.Natives.SET_VEHICLE_COLOURS(vehicleExt.Vehicle, newPrimary, newSecondary);
         }
         if (RequiredInteriorColorID != -1)
         {
@@ -325,14 +352,106 @@ public class DispatchableVehicle
         {
             NativeFunction.Natives.SET_VEHICLE_EXTRA_COLOUR_6(vehicleExt.Vehicle, RequiredDashColorID);
         }
+        if (RequiredWheelColorID != -1)
+        {
+            //NativeFunction.Natives.SET_VEHICLE_EXTRA_COLOUR_6(vehicleExt.Vehicle, RequiredDashColorID);
+            int pearlescentColor;
+            int wheelColor;
+            unsafe
+            {
+                NativeFunction.CallByName<int>("GET_VEHICLE_EXTRA_COLOURS", vehicleExt.Vehicle, &pearlescentColor, &wheelColor);
+            }
+            NativeFunction.Natives.SET_VEHICLE_EXTRA_COLOURS(vehicleExt.Vehicle, pearlescentColor, RequiredWheelColorID);
+        }
+        if (RequiredPearlescentColorID != -1)
+        {
+            int pearlescentColor;
+            int wheelColor;
+            unsafe
+            {
+                NativeFunction.CallByName<int>("GET_VEHICLE_EXTRA_COLOURS", vehicleExt.Vehicle, &pearlescentColor, &wheelColor);
+            }
+            NativeFunction.Natives.SET_VEHICLE_EXTRA_COLOURS(vehicleExt.Vehicle, RequiredPearlescentColorID, wheelColor);
+        }
+        GameFiber.Yield();// Is this required here? It's finished with colors yields then gets tint, is (!vehicleExt.Vehicle.Exists()) check needed after every yield?
+        if (!vehicleExt.Vehicle.Exists())
+        {
+            return;
+        }
+        if (RequiredWindowTintID != -1)
+        {
+            NativeFunction.Natives.SET_VEHICLE_WINDOW_TINT(vehicleExt.Vehicle, RequiredWindowTintID);
+        }
         GameFiber.Yield();
         if (!vehicleExt.Vehicle.Exists())
         {
             return;
         }
-        NativeFunction.Natives.SET_VEHICLE_DIRT_LEVEL(vehicleExt.Vehicle, RandomItems.GetRandomNumber(0.0f, MaxRandomDirtLevel.Clamp(0.0f,15.0f)));
+        NativeFunction.Natives.SET_VEHICLE_DIRT_LEVEL(vehicleExt.Vehicle, RandomItems.GetRandomNumber(0.0f, MaxRandomDirtLevel.Clamp(0.0f, 15.0f)));
         RequiredVariation?.Apply(vehicleExt);
         GameFiber.Yield();
+        if (!vehicleExt.Vehicle.Exists())
+        {
+            return;
+        }
+        if(SetRandomCustomization && RandomItems.RandomPercent(RandomCustomizationPercentage))
+        {
+            SetVehicleRandomCustomization(vehicleExt);
+        }
+        if (IsMotorcycle && vehicleExt.Vehicle.Exists())
+        {
+            int frontMod = NativeFunction.Natives.GET_VEHICLE_MOD<int>(vehicleExt.Vehicle, 23);
+            bool frontVariation = NativeFunction.Natives.GET_VEHICLE_MOD_VARIATION<bool>(vehicleExt.Vehicle, 23);
+            NativeFunction.Natives.SET_VEHICLE_MOD(vehicleExt.Vehicle, 24, frontMod, frontVariation);
+        }
+    }
+
+    private void SetVehicleRandomCustomization(VehicleExt vehicleExt)
+    {
+        if (vehicleExt == null || !vehicleExt.Vehicle.Exists())
+        {
+            return;
+        }
+        List<int> ModTypesToRandomize = new List<int>()
+        {
+          0,1,2,3,4,5,6,7,8,9,10,11,12,13,15,25,26,32,33,35,37,39,41,43,44,45,46,47,48
+        };
+        float ModKitTypePercentage = 45f;
+        NativeFunction.Natives.SET_VEHICLE_MOD_KIT(vehicleExt.Vehicle, 0);
+        foreach (int modKitIdType in ModTypesToRandomize)
+        {
+            if(!vehicleExt.Vehicle.Exists())
+            {
+                return;
+            }
+            int TotalMods = NativeFunction.Natives.GET_NUM_VEHICLE_MODS<int>(vehicleExt.Vehicle, modKitIdType);
+            if (TotalMods <= 0)
+            {
+                continue;
+            }
+            if(!RandomItems.RandomPercent(ModKitTypePercentage))
+            {
+                continue;
+            }
+            int toSet = RandomItems.GetRandomNumberInt(0, TotalMods - 1);
+            NativeFunction.Natives.SET_VEHICLE_MOD(vehicleExt.Vehicle, modKitIdType, toSet, false);
+            GameFiber.Yield();
+            EntryPoint.WriteToConsole($"modKitIdType:{modKitIdType} toSet{toSet}");
+        }
+        float ExtraPercentage = 35f;
+        for (int i = 0; i < 12; i++)
+        {
+            int myId = i;
+            if (!RandomItems.RandomPercent(ExtraPercentage))
+            {
+                continue;
+            }
+            if (NativeFunction.Natives.DOES_EXTRA_EXIST<bool>(vehicleExt.Vehicle, i))
+            {
+                NativeFunction.Natives.SET_VEHICLE_EXTRA(vehicleExt.Vehicle, i, false);
+                EntryPoint.WriteToConsole($"EXTRA: i{i}");
+            }
+        }
     }
 
 

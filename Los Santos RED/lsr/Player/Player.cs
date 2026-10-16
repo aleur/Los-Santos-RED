@@ -20,7 +20,7 @@ namespace Mod
                           IBusRideable, IGangRelateable, IWeaponSwayable, IWeaponRecoilable, IWeaponSelectable, ICellPhoneable, ITaskAssignable, IContactInteractable, IContactRelateable, ILicenseable, IPropertyOwnable,
                           ILocationInteractable, IButtonPromptable, IHumanStateable, IStanceable, IItemEquipable, IDestinateable, IVehicleOwnable, IBankAccountHoldable, IActivityManageable, IHealthManageable, IGroupManageable,
                           IMeleeManageable, ISeatAssignable, ICameraControllable, IPlayerVoiceable, IClipsetManageable, IOutfitManageable, IArmorManageable, IRestrictedAreaManagable, ITaxiRideable, IGangBackupable, IInteriorManageable, 
-                            ICuffable, IIntimidationManageable, ICasinoGamePlayable, IVehicleManageable, IStealthManageable, IRaceable
+                            ICuffable, IIntimidationManageable, ICasinoGamePlayable, IVehicleManageable, IStealthManageable, IRaceable, IGangTerritoryManageable, IFightClubable
     {
         public int UpdateState = 0;
         private float CurrentVehicleRoll;
@@ -80,6 +80,8 @@ namespace Mod
         private ISeats Seats;
         private IAgencies Agencies;
         private IVehicleSeatAndDoorLookup VehicleSeatDoorData;
+        private IDispatchablePeople DispatchablePeople;
+        private IDispatchableVehicles DispatchableVehicles;
         private Vehicle VehicleTryingToEnter;
         private int SeatTryingToEnter;
         private bool currentlyHasScrewdriver;
@@ -98,10 +100,13 @@ namespace Mod
         private uint KillerHandle;
         private bool HasThrownInTunnel;
         private bool prevIsBreakingIntoCar;
+        private InteriorDoor ClosestDoor;
+        private uint GameTimeLastSetBreakIn;
 
         public Player(string modelName, bool isMale, string suspectsName, IEntityProvideable provider, ITimeControllable timeControllable, IStreets streets, IZones zones, ISettingsProvideable settings, IWeapons weapons, IRadioStations radioStations, IScenarios scenarios, ICrimes crimes
             , IAudioPlayable audio, IAudioPlayable secondaryAudio, IPlacesOfInterest placesOfInterest, IInteriors interiors, IModItems modItems, IIntoxicants intoxicants, IGangs gangs, IJurisdictions jurisdictions, IGangTerritories gangTerritories, IGameSaves gameSaves, INameProvideable names, IShopMenus shopMenus
-            , IPedGroups pedGroups, IDances dances, ISpeeches speeches, ISeats seats, IAgencies agencies, ISavedOutfits savedOutfits, IVehicleSeatAndDoorLookup vehicleSeatDoorData, ICellphones cellphones, IContacts contacts, IVehicleRaces vehicleRaces)
+            , IPedGroups pedGroups, IDances dances, ISpeeches speeches, ISeats seats, IAgencies agencies, ISavedOutfits savedOutfits, IVehicleSeatAndDoorLookup vehicleSeatDoorData, 
+            ICellphones cellphones, IContacts contacts, IVehicleRaces vehicleRaces, IDispatchableVehicles dispatchableVehicles, IDispatchablePeople dispatchablePeople)
         {
             ModelName = modelName;
             IsMale = isMale;
@@ -125,8 +130,10 @@ namespace Mod
             Agencies = agencies;
             VehicleSeatDoorData = vehicleSeatDoorData;
             Contacts = contacts;
+            DispatchableVehicles = dispatchableVehicles;
+            DispatchablePeople = dispatchablePeople;
             Scanner = new Scanner(provider, this, audio, secondaryAudio, Settings, TimeControllable, PlacesOfInterest);
-            HealthState = new HealthState(new PedExt(Game.LocalPlayer.Character, Settings, Crimes, Weapons, PlayerName, "Person", World), Settings, true);
+            HealthState = new HealthState(new PedExt(Game.LocalPlayer.Character, Settings, Crimes, Weapons, PlayerName, "Person", World), Settings, true, this);
             if (CharacterModelIsFreeMode)
             {
                 HealthState.MyPed.VoiceName = FreeModeVoice;
@@ -147,7 +154,7 @@ namespace Mod
             CellPhone = new CellPhone(this, this, jurisdictions, Settings, TimeControllable, gangs, PlacesOfInterest, Zones, streets, GangTerritories, Crimes, World, ModItems, Weapons, Names, shopMenus, cellphones, Contacts, Agencies);
             PlayerTasks = new PlayerTasks(this, TimeControllable, gangs, PlacesOfInterest, Settings, World, Crimes, names, Weapons, shopMenus, ModItems, pedGroups, Agencies, gangTerritories, zones);
             Licenses = new Licenses(this);
-            Properties = new Properties(this, PlacesOfInterest, TimeControllable);
+            Properties = new Properties(this, PlacesOfInterest, TimeControllable, World);
             ButtonPrompts = new ButtonPrompts(this, Settings, World);
             Injuries = new Injuries(this, Settings);
             Dances = dances;
@@ -158,17 +165,18 @@ namespace Mod
             GPSManager = new GPSManager(this, World, Settings, TimeControllable);
             VehicleOwnership = new VehicleOwnership(this, World, Settings);
             BankAccounts = new BankAccounts(this, Settings, PlacesOfInterest);
-            ActivityManager = new ActivityManager(this, settings, this, this, this, this, this, TimeControllable, RadioStations, Crimes, ModItems, Dances, World, Intoxicants, this, Speeches, Seats, Weapons, PlacesOfInterest, Zones, shopMenus, gangs, 
-                gangTerritories, VehicleSeatDoorData, cellphones, vehicleRaces, this);
+            ActivityManager = new ActivityManager(this, settings, this, this, this, this, this, TimeControllable, RadioStations, Crimes, ModItems, Dances, World, Intoxicants, 
+                this, Speeches, Seats, Weapons, PlacesOfInterest, Zones, shopMenus, gangs, 
+                gangTerritories, VehicleSeatDoorData, cellphones, vehicleRaces, this, DispatchableVehicles, DispatchablePeople, this);
             HealthManager = new HealthManager(this, Settings);
             ArmorManager = new ArmorManager(this, settings);
             GroupManager = new GroupManager(this, this, Settings, World, gangs, Weapons);
             MeleeManager = new MeleeManager(this, Settings);
             PlayerVoice = new PlayerVoice(this, Settings, Speeches);
             ClipsetManager = new ClipsetManager(this, Settings);
-            OutfitManager = new OutfitManager(this, savedOutfits);
+            OutfitManager = new OutfitManager(this, savedOutfits, Settings, this);
             OfficerMIAWatcher = new OfficerMIAWatcher(World, this, this, Settings, TimeControllable);
-            RestrictedAreaManager = new RestrictedAreaManager(this, this, World, Settings);
+            RestrictedAreaManager = new RestrictedAreaManager(this, this, World, Settings, TimeControllable);
             TaxiManager = new TaxiManager(this, World,PlacesOfInterest, Settings);
             GangBackupManager = new GangBackupManager(World, this);
             InteriorManager = new InteriorManager(World, PlacesOfInterest, Settings, this, this, this);
@@ -178,7 +186,8 @@ namespace Mod
             GamblingManager = new GamblingManager(this, Settings, TimeControllable);
             VehicleManager = new VehicleManager(this, World, Settings);
             StealthManager = new StealthManager(this, World, Settings, TimeControllable);
-            RacingManager = new RacingManager(this, Settings, World,Crimes,Weapons,Names,ModItems,shopMenus, this);
+            VehicleRaceManager = new VehicleRaceManager(this, Settings, World,Crimes,Weapons,Names,ModItems,shopMenus, this);
+            GangTerritoryManager = new GangTerritoryManager(this, Settings, World, GangTerritories, PlacesOfInterest, TimeControllable, Zones);
         }
         public IntimidationManager IntimidationManager { get; private set; }
         public CuffManager CuffManager { get; private set; }
@@ -228,7 +237,9 @@ namespace Mod
         public InteriorManager InteriorManager { get; private set; }
         public WeatherReporting Weather { get; set; }
         public StealthManager StealthManager { get; private set; }
-        public RacingManager RacingManager { get; private set; }
+        public VehicleRaceManager VehicleRaceManager { get; private set; }
+
+        public GangTerritoryManager GangTerritoryManager { get; private set; }
         public float ActiveDistance => Investigation.IsActive ? Investigation.Distance : WantedLevel >= 6 ? 5000f : 500f + (WantedLevel * 200f);
         public bool AnyGangMemberCanHearPlayer { get; set; }
         public bool AnyGangMemberCanSeePlayer { get; set; }
@@ -241,8 +252,7 @@ namespace Mod
         public bool AnyPoliceKnowInteriorLocation { get; set; }
         public bool AnyPoliceRecentlySeenPlayer { get; set; }
         public bool AnyPoliceSawPlayerViolating { get; set; }
-
-
+        
         public bool IsInWantedActiveMode => SearchMode.IsInActiveMode;
         public int AssignedSeat => -1;
         public VehicleExt AssignedVehicle => null;
@@ -277,6 +287,7 @@ namespace Mod
         public string DebugString { get; set; }
         public bool DiedInVehicle { get; private set; }
         public float FootSpeed { get; set; }
+        public bool IsWearingMask => OutfitManager.HasMaskOn;
         public string FreeModeVoice { get; set; }//IsMale ? Settings.SettingsManager.PlayerOtherSettings.MaleFreeModeVoice : Settings.SettingsManager.PlayerOtherSettings.FemaleFreeModeVoice;
         public string Gender => IsMale ? "M" : "F";
         public int GroupID { get; set; }
@@ -314,8 +325,8 @@ namespace Mod
         public bool IsBeingANuisance { get; set; }
         public bool IsBeingBooked { get; set; }
         public bool IsBreakingIntoCar => IsCarJacking || IsLockPicking || IsHotWiring || isJacking;
-        public bool IsBustable => !Settings.SettingsManager.ViolationSettings.IsUnBustable && IsAliveAndFree && PoliceResponse.HasBeenWantedFor >= 3000 && !ActivityManager.IsCommitingSuicide && !ActivityManager.IsHoldingHostage && !RecentlyBusted && !IsAiming && !RecentlyShot && !RecentlyResistedArrest && !PoliceResponse.IsWeaponsFree && (IsIncapacitated || (!IsMoving && !IsMovingDynamically)) && (!IsInVehicle || WantedLevel == 1 || IsIncapacitated);
-        public bool IsDetainable => !Settings.SettingsManager.ViolationSettings.IsUnBustable && IsAliveAndFree && !ActivityManager.IsCommitingSuicide && !ActivityManager.IsHoldingHostage && !RecentlyBusted && !RecentlyResistedArrest && !IsAiming && !RecentlyShot && !PoliceResponse.IsWeaponsFree && (IsIncapacitated || (!IsMoving && !IsMovingDynamically)) && (!IsInVehicle || IsIncapacitated);
+        public bool IsBustable => !Settings.SettingsManager.ViolationSettings.IsUnBustable && IsAliveAndFree && PoliceResponse.HasBeenWantedFor >= 3000 && !ActivityManager.IsCommitingSuicide && !ActivityManager.IsHoldingHostage && !RecentlyBusted && !IsAiming && !RecentlyShot && !RecentlyResistedArrest && !PoliceResponse.IsWeaponsFree && (IsIncapacitated || (IsMovingSlowly && !IsMovingDynamically)) && (!IsInVehicle || WantedLevel == 1 || IsIncapacitated);
+        public bool IsDetainable => !Settings.SettingsManager.ViolationSettings.IsUnBustable && IsAliveAndFree && !ActivityManager.IsCommitingSuicide && !ActivityManager.IsHoldingHostage && !RecentlyBusted && !RecentlyResistedArrest && !IsAiming && !RecentlyShot && !PoliceResponse.IsWeaponsFree && (IsIncapacitated || (IsMovingSlowly && !IsMovingDynamically)) && (!IsInVehicle || IsIncapacitated);
         public bool IsAnimal => false;
         public bool IsBusted { get; private set; }
         public bool IsCarJacking { get; set; }
@@ -327,6 +338,8 @@ namespace Mod
         public bool IsSecurityGuard { get; set; } = false;
         public bool IsRidingOnTrain { get; set; }
         public bool HasBustPowers => IsCop || IsSecurityGuard;
+
+        public bool AlwaysBreakIn => GameTimeLastSetBreakIn != 0 && Game.GameTime - GameTimeLastSetBreakIn <= 5000;
         //public bool IsHidingInVehicle { get; private set; }
         public bool CanBustPeds => (IsCop || IsSecurityGuard) && !IsIncapacitated;
         public bool IsServicePed => IsCop || IsEMT || IsFireFighter;
@@ -342,6 +355,9 @@ namespace Mod
         public bool IsDriver { get; private set; }
         public bool IsDuckingInVehicle { get; set; } = false;
         public bool IsSetDisabledControls { get; set; } = false;
+
+        public bool IsSetDisabledControlsWithCamera { get; set; } = false;
+
         public bool IsGangMember => RelationshipManager.GangRelationships.CurrentGang != null;
         public Gang CurrentGang => RelationshipManager.GangRelationships.CurrentGang;
         public bool IsGettingIntoAVehicle
@@ -359,6 +375,7 @@ namespace Mod
         public bool IsHotWiring { get; private set; }
         public bool IsInAirVehicle { get; private set; }
         public bool IsInAutomobile { get; private set; }
+        public bool IsInArmedMilitaryVehicle { get; private set; }
         public bool IsOnBicycle { get; private set; }
         public bool IsIncapacitated => IsStunned || IsRagdoll;
         public bool IsInCover { get; private set; }
@@ -375,7 +392,7 @@ namespace Mod
                 if (isInVehicle != value)
                 {
                     isInVehicle = value;
-                    OnIsInVehicleChanged();
+                    OnIsInVehicleChanged();       
                 }
             }
         }
@@ -416,6 +433,7 @@ namespace Mod
         public bool IsSleeping { get; set; } = false;
         public bool IsSleepingOutside { get; set; } = false;
         public bool IsStill { get; private set; }
+        public bool IsMovingSlowly { get; private set; }
         public bool IsStunned { get; private set; }
         public bool IsTransacting { get; set; }
         public bool IsVisiblyArmed { get; set; }
@@ -451,7 +469,7 @@ namespace Mod
         public bool ReleasedFireWeapon { get; set; }
         public List<VehicleExt> ReportedStolenVehicles => TrackedVehicles.Where(x => x.NeedsToBeReportedStolen && !x.HasBeenDescribedByDispatch && !x.AddedToReportedStolenQueue).ToList();
         public float SearchModePercentage => SearchMode.SearchModePercentage;
-        public bool ShouldCheckViolations => !Settings.SettingsManager.ViolationSettings.TreatAsCop && !IsCop && !RecentlyStartedPlaying;
+        public bool ShouldCheckViolations => !Settings.SettingsManager.ViolationSettings.TreatAsCop && !IsCop && !RecentlyStartedPlaying && !IsCustomizingPed;
         public int SpeechSkill { get; set; }
         public uint TargettingHandle
         {
@@ -503,6 +521,11 @@ namespace Mod
         public Crafting Crafting { get; set; }
         public bool IsConsideredNight { get; private set; }
 
+
+
+        public bool DisableMainMenu { get; set; }
+
+
         //public bool IsPoorWeather => Weather.IsPoorWeather;
 
 
@@ -539,9 +562,11 @@ namespace Mod
             CuffManager.Setup();
             RadarDetector.Setup();
             GamblingManager.Setup();
-            RacingManager.Setup();
+            VehicleRaceManager.Setup();
             VehicleManager.Setup();
             StealthManager.Setup();
+            OutfitManager.Setup();
+            GangTerritoryManager.Setup();
             ModelName = Game.LocalPlayer.Character.Model.Name;
             CurrentModelVariation = NativeHelper.GetPedVariation(Game.LocalPlayer.Character);
             FreeModeVoice = Game.LocalPlayer.Character.IsMale ? Settings.SettingsManager.PlayerOtherSettings.MaleFreeModeVoice : Settings.SettingsManager.PlayerOtherSettings.FemaleFreeModeVoice;
@@ -550,6 +575,24 @@ namespace Mod
                 UpdateCurrentVehicle();
                 VehicleOwnership.TakeOwnershipOfVehicle(CurrentVehicle, false);
             }
+            SetPlayerFlags();
+
+
+
+            WeaponEquipment.Setup();
+            CellPhone.Start();
+            GangBackupManager.Setup();
+            IntimidationManager.Setup();
+            SpeechSkill = RandomItems.GetRandomNumberInt(Settings.SettingsManager.PlayerOtherSettings.PlayerSpeechSkill_Min, Settings.SettingsManager.PlayerOtherSettings.PlayerSpeechSkill_Max);
+            Update();
+            foreach(GameLocation bl in PlacesOfInterest.PossibleLocations.InteractableLocations())
+            {
+                bl.SetupPlayer(this);
+            }
+        }
+
+        private void SetPlayerFlags()
+        {
             disableAutoEngineStart = Settings.SettingsManager.VehicleSettings.DisableAutoEngineStart;
             if (Settings.SettingsManager.VehicleSettings.DisableAutoEngineStart)
             {
@@ -557,7 +600,8 @@ namespace Mod
             }
             if (Settings.SettingsManager.VehicleSettings.DisableAutoHelmet)
             {
-                NativeFunction.Natives.SET_PED_CONFIG_FLAG<bool>(Game.LocalPlayer.Character, (int)PedConfigFlags._PED_FLAG_PUT_ON_MOTORCYCLE_HELMET, false);
+                NativeFunction.Natives.SET_PED_CONFIG_FLAG<bool>(Game.LocalPlayer.Character, (int)PedConfigFlags._PED_FLAG_DISABLE_AUTO_HELMET_BIKES, true);
+                NativeFunction.Natives.SET_PED_CONFIG_FLAG<bool>(Game.LocalPlayer.Character, (int)PedConfigFlags._PED_FLAG_DISABLE_AUTO_HELMET_PLANES, true);
             }
             if (Settings.SettingsManager.PlayerOtherSettings.DisableVanillaGangHassling)
             {
@@ -571,29 +615,17 @@ namespace Mod
             {
                 NativeFunction.Natives.SET_PED_CONFIG_FLAG<bool>(Game.LocalPlayer.Character, 427, true);
             }
-            WeaponEquipment.Setup();
-            CellPhone.Start();
-            GangBackupManager.Setup();
-            IntimidationManager.Setup();
-            SpeechSkill = RandomItems.GetRandomNumberInt(Settings.SettingsManager.PlayerOtherSettings.PlayerSpeechSkill_Min, Settings.SettingsManager.PlayerOtherSettings.PlayerSpeechSkill_Max);
-            Update();
-            foreach(GameLocation bl in PlacesOfInterest.PossibleLocations.InteractableLocations())
-            {
-                bl.SetupPlayer(this);
-            }
         }
-
- 
 
         public void Update()
         {
             UpdateVehicleData();
-            if (Settings.SettingsManager.PerformanceSettings.EnablePerformanceUpdateMode)
+            if (Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
             {
                 GameFiber.Yield();
             }
             UpdateWeaponData();
-            if (Settings.SettingsManager.PerformanceSettings.EnablePerformanceUpdateMode)
+            if (Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
             {
                 GameFiber.Yield();
             }
@@ -605,12 +637,12 @@ namespace Mod
                 IntoxicationIsPrimary = true;
             }
             Intoxication.Update(IntoxicationIsPrimary);
-            if (Settings.SettingsManager.PerformanceSettings.EnablePerformanceUpdateMode)
-            {
-                GameFiber.Yield();
-            }
+            //if (Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
+            //{
+            //    GameFiber.Yield();
+            //}
             Injuries.Update(!IntoxicationIsPrimary);
-            if (Settings.SettingsManager.PerformanceSettings.EnablePerformanceUpdateMode)
+            if (Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
             {
                 GameFiber.Yield();
             }
@@ -618,13 +650,13 @@ namespace Mod
             BankAccounts.Update();
             HealthManager.Update();
             GroupManager.Update();
-            if (Settings.SettingsManager.PerformanceSettings.EnablePerformanceUpdateMode)
+            if (Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
             {
                 GameFiber.Yield();
             }
             ButtonPrompts.Update();
             MeleeManager.Update();
-            if (Settings.SettingsManager.PerformanceSettings.EnablePerformanceUpdateMode)
+            if (Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
             {
                 GameFiber.Yield();
             }
@@ -638,7 +670,7 @@ namespace Mod
             GangBackupManager.Update();
             InteriorManager.Update();
             CuffManager.Update();
-            if (Settings.SettingsManager.PerformanceSettings.EnablePerformanceUpdateMode)
+            if (Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
             {
                 GameFiber.Yield();
             }
@@ -646,7 +678,8 @@ namespace Mod
             IntimidationManager.Update();
             VehicleManager.Update();
             StealthManager.Update();
-            RacingManager.Update();
+            VehicleRaceManager.Update();
+            GangTerritoryManager.Update();
             //UpdateHiding();
         }
 
@@ -678,7 +711,7 @@ namespace Mod
         }
         public void Reset(bool resetWanted, bool resetTimesDied, bool resetWeapons, bool resetCriminalHistory, bool resetInventory, bool resetIntoxication, bool resetRelationships, bool resetOwnedVehicles, 
             bool resetCellphone, bool resetActiveTasks, bool resetProperties, bool resetHealth, bool resetNeeds, bool resetGroup, bool resetLicenses, bool resetActivites, bool resetGracePeriod, 
-            bool resetBankAccounts, bool resetSavedGame, bool resetMessages, bool resetInteriors, bool resetGambling, bool resetPersistVehicle)
+            bool resetBankAccounts, bool resetSavedGame, bool resetMessages, bool resetInteriors, bool resetGambling, bool resetPersistVehicle, bool resetGangTerritory)
         {
             IsDead = false;
             IsBusted = false;
@@ -686,6 +719,9 @@ namespace Mod
             IsBeingBooked = false;
             Game.LocalPlayer.HasControl = true;
             BeingArrested = false;
+
+
+            HealthState.UpdateCharacterPed(new PedExt(Game.LocalPlayer.Character, Settings, Crimes, Weapons, PlayerName, "Person", World));
             HealthState.Reset();
             if (resetActivites)
             {
@@ -810,13 +846,19 @@ namespace Mod
                 VehicleManager.Reset();
             }
 
+            if(resetGangTerritory)
+            {
+                GangTerritoryManager.Reset();
+            }
+
             if (Settings.SettingsManager.VehicleSettings.DisableAutoEngineStart)
             {
                 NativeFunction.Natives.SET_PED_CONFIG_FLAG<bool>(Game.LocalPlayer.Character, (int)PedConfigFlags._PED_FLAG_DISABLE_STARTING_VEH_ENGINE, true);
             }
             if (Settings.SettingsManager.VehicleSettings.DisableAutoHelmet)
             {
-                NativeFunction.Natives.SET_PED_CONFIG_FLAG<bool>(Game.LocalPlayer.Character, (int)PedConfigFlags._PED_FLAG_PUT_ON_MOTORCYCLE_HELMET, false);
+                NativeFunction.Natives.SET_PED_CONFIG_FLAG<bool>(Game.LocalPlayer.Character, (int)PedConfigFlags._PED_FLAG_DISABLE_AUTO_HELMET_BIKES, true);
+                NativeFunction.Natives.SET_PED_CONFIG_FLAG<bool>(Game.LocalPlayer.Character, (int)PedConfigFlags._PED_FLAG_DISABLE_AUTO_HELMET_PLANES, true);
             }
             if (Settings.SettingsManager.PlayerOtherSettings.AllowRunningInInteriors)
             {
@@ -870,9 +912,11 @@ namespace Mod
             GamblingManager.Dipsose();
             VehicleManager.Dispose();
             StealthManager.Dispose();
-            RacingManager.Dispose();
+            VehicleRaceManager.Dispose();
+            GangTerritoryManager.Dispose();
             NativeFunction.Natives.SET_PED_RESET_FLAG(Game.LocalPlayer.Character, 186, true);
-            NativeFunction.Natives.SET_PED_CONFIG_FLAG<bool>(Game.LocalPlayer.Character, (int)PedConfigFlags._PED_FLAG_PUT_ON_MOTORCYCLE_HELMET, true);
+            NativeFunction.Natives.SET_PED_CONFIG_FLAG<bool>(Game.LocalPlayer.Character, (int)PedConfigFlags._PED_FLAG_DISABLE_AUTO_HELMET_BIKES, false);
+            NativeFunction.Natives.SET_PED_CONFIG_FLAG<bool>(Game.LocalPlayer.Character, (int)PedConfigFlags._PED_FLAG_DISABLE_AUTO_HELMET_PLANES, false);
             NativeFunction.Natives.SET_PED_CONFIG_FLAG<bool>(Game.LocalPlayer.Character, (int)PedConfigFlags._PED_FLAG_DISABLE_STARTING_VEH_ENGINE, false);
             NativeFunction.Natives.SET_PED_IS_DRUNK<bool>(Game.LocalPlayer.Character, false);
             NativeFunction.Natives.RESET_PED_MOVEMENT_CLIPSET<bool>(Game.LocalPlayer.Character);
@@ -890,7 +934,8 @@ namespace Mod
             NativeFunction.Natives.SET_PED_AS_COP(Game.LocalPlayer.Character, false);      
             if (Settings.SettingsManager.PlayerOtherSettings.SetSlowMoOnDeath)
             {
-                Game.TimeScale = 1f;
+                //Game.TimeScale = 1f;
+                NativeFunction.Natives.SET_TIME_SCALE(1.0f);
             }
             NativeFunction.Natives.ENABLE_ALL_CONTROL_ACTIONS(0);//enable all controls in case we left some disabled
             NativeFunction.Natives.SET_CAN_ATTACK_FRIENDLY(Character, false, false);
@@ -907,7 +952,18 @@ namespace Mod
         public void ChangeName(string newName)
         {
             PlayerName = newName;
-            //EntryPoint.WriteToConsole($"PLAYER EVENT: ChangeName {newName}");
+
+            SetBlipName();
+            EntryPoint.WriteToConsole($"PLAYER EVENT: ChangeName {newName}");
+        }
+        private void SetBlipName()
+        {
+            int PlayerBlipID = NativeFunction.Natives.GET_MAIN_PLAYER_BLIP_ID<int>();
+            if(NativeFunction.Natives.DOES_BLIP_EXIST<bool>(PlayerBlipID))
+            {
+                NativeFunction.Natives.SET_BLIP_NAME_FROM_TEXT_FILE(PlayerBlipID, PlayerName);
+                EntryPoint.WriteToConsole($"PLAYER EVENT: ChangeName AND SET BLIP {PlayerName}");
+            }
         }
         public void DisplayPlayerNotification()
         {
@@ -925,12 +981,18 @@ namespace Mod
         }
 
 
-             
-
+       
+        public void OnBecamePedFromCustomzer()
+        {
+            SetPlayerFlags();
+        }
         public void SetDemographics(string modelName, bool isMale, string playerName, int money, int speechSkill, string voiceName)
         {
             ModelName = modelName;
-            PlayerName = playerName;
+
+            ChangeName(playerName);
+
+            //PlayerName = playerName;
             IsMale = isMale;
             BankAccounts.SetCash(money);
             SpeechSkill = speechSkill;// 
@@ -1032,6 +1094,10 @@ namespace Mod
         {
             GameTimeLastFedUpCop = Game.GameTime;
         }
+        public void SetCarBreakIn()
+        {
+            GameTimeLastSetBreakIn = Game.GameTime;
+        }
         public void ShootAt(Vector3 TargetCoordinate)
         {
             NativeFunction.CallByName<bool>("SET_PED_SHOOTS_AT_COORD", Game.LocalPlayer.Character, TargetCoordinate.X, TargetCoordinate.Y, TargetCoordinate.Z, true);
@@ -1041,12 +1107,18 @@ namespace Mod
         {
             GameTimeLastShot = Game.GameTime;
         }
+        public void SetDefaultCop()
+        {
+            SetAgencyStatus(Agencies.GetDefaultAgency());
+        }
         public void SetAgencyStatus(Agency toassign)
         {
             if(toassign == null)
             {
                 return;
             }
+
+
             if(toassign.ResponseType == ResponseType.LawEnforcement)
             {
                 Cop meAsCop = new Cop(Character, Settings, Character.MaxHealth, toassign, true, Crimes, Weapons, PlayerName, ModelName, World);
@@ -1179,11 +1251,14 @@ namespace Mod
         public void OnKilledCop()
         {
             PlayerVoice.OnKilledCop();
+            EntryPoint.WriteToConsole($"PLAYER EVENT: Player Killed Cop");
         }
         public void OnKilledCivilian()
         {
             PlayerVoice.OnKilledCivilian();
+            EntryPoint.WriteToConsole($"PLAYER EVENT: Player killed civilian");
         }
+
         public void OnLawEnforcementSpawn(Agency agency, DispatchableVehicle vehicleType, DispatchablePerson officerType)
         {
             GameFiber.Yield();
@@ -1196,6 +1271,10 @@ namespace Mod
                 else if (agency?.ID == "NOOSE")
                 {
                     Scanner.OnNooseDeployed();
+                }
+                else if (officerType?.GroupName == "SWAT")
+                {
+                    Scanner.OnSWATDeployed();
                 }
                 else if (agency?.ID == "FIB" && WantedLevel >= 4)
                 {
@@ -1274,7 +1353,7 @@ namespace Mod
             }
             if (Settings.SettingsManager.VehicleSettings.InjureOnVehicleCrash && (amount >= Settings.SettingsManager.VehicleSettings.VehicleCrashInjureMinVehicleDamageTrigger) && IsInVehicle)
             {
-                float HealthToRemove = amount * Settings.SettingsManager.VehicleSettings.VehicleCrashInjureScalar;
+                float HealthToRemove = amount * Settings.SettingsManager.VehicleSettings.VehicleCrashInjureScalar * RandomItems.GetRandomNumber(1.0f - Settings.SettingsManager.VehicleSettings.VehicleCrashInjureRandomizePercentage, 1.0f + Settings.SettingsManager.VehicleSettings.VehicleCrashInjureRandomizePercentage); ;
                 int healthToRemove = (int)Math.Ceiling(HealthToRemove);
                 HealthManager.ChangeHealth(-1 * healthToRemove);
                 HealthState.SimpleRefresh(this);
@@ -1302,14 +1381,14 @@ namespace Mod
             PlayerVoice.OnWantedSearchMode();
         }
         public void OnWeaponsFree() => Scanner.OnWeaponsFree();
-        public void OnHitSquadDispatched(Gang enemyGang)
+        public void OnHitSquadDispatched(Gang enemyGang, bool forceNoText)
         {
 
             if (enemyGang == null)
             {
                 return;
             }
-            if (Settings.SettingsManager.GangSettings.SendHitSquadText)
+            if (Settings.SettingsManager.GangSettings.SendHitSquadText && !forceNoText)
             {
                 PlayerTasks.GangTasks.SendHitSquadMessage(enemyGang.Contact);
                 EntryPoint.WriteToConsole($"OnHitSquadDispatched SendHitSquadMessage {enemyGang.ShortName}");
@@ -1374,7 +1453,7 @@ namespace Mod
         private void OnExcessiveSpeed()
         {
             GameFiber.Yield();
-            if (IsWanted && VehicleSpeedMPH >= 75f && IsInWantedActiveMode && AnyPoliceCanSeePlayer && TimeInCurrentVehicle >= 10000 && !isCheckingExcessSpeed && IsAliveAndFree)
+            if (IsWanted && VehicleSpeedMPH >= 55f && IsInWantedActiveMode && AnyPoliceCanSeePlayer && TimeInCurrentVehicle >= 10000 && !isCheckingExcessSpeed && IsAliveAndFree)
             {
                 GameFiber SpeedWatcher = GameFiber.StartNew(delegate
                 {
@@ -1408,6 +1487,7 @@ namespace Mod
                 {
                     UpdateCurrentVehicle();
                     HandleVehicleEntry();
+                    
                 }
             }
             isGettingIntoVehicle = IsGettingIntoAVehicle;
@@ -1434,10 +1514,10 @@ namespace Mod
                 CurrentVehicle.AttemptToLock();
             }
             HandleScrewdriver();
-            if ((IsNotHoldingEnter || ActivityManager.HasScrewdriverInHand) && VehicleTryingToEnter.Driver == null && VehicleTryingToEnter.LockStatus == (VehicleLockStatus)7 && (!Settings.SettingsManager.VehicleSettings.RequireScrewdriverForLockPickEntry || currentlyHasScrewdriver))//no driver && Unlocked
+            if ((IsNotHoldingEnter || ActivityManager.HasScrewdriverInHand) && !AlwaysBreakIn && VehicleTryingToEnter.Driver == null && VehicleTryingToEnter.LockStatus == (VehicleLockStatus)7 && (!Settings.SettingsManager.VehicleSettings.RequireScrewdriverForLockPickEntry || currentlyHasScrewdriver))//no driver && Unlocked
             {
                 EntryPoint.WriteToConsole($"PLAYER EVENT: LockPick Start", 3);
-                CarLockPick MyLockPick = new CarLockPick(this, VehicleTryingToEnter, SeatTryingToEnter, ActivityManager.CurrentScrewdriver);
+                CarLockPick MyLockPick = new CarLockPick(this, VehicleTryingToEnter, SeatTryingToEnter, ActivityManager.CurrentScrewdriver, Settings, this,this, CurrentVehicle);
                 MyLockPick.PickLock();
             }
             else if (IsNotHoldingEnter && SeatTryingToEnter == -1 && VehicleTryingToEnter.Driver != null && VehicleTryingToEnter.Driver.IsAlive) //Driver
@@ -1457,6 +1537,12 @@ namespace Mod
         }
         private bool IsFreeToEnter()
         {
+
+            if(EntryPoint.IsLSPDFRIntegrationEnabled)
+            {
+                return true;
+            }
+
             if(CurrentVehicle.HasBeenEnteredByPlayer || CurrentVehicle.IsAlwaysOpenForPlayer)
             {
                 CurrentVehicle.Vehicle.LockStatus = (VehicleLockStatus)1;
@@ -1571,11 +1657,21 @@ namespace Mod
                 {
                     Scanner.OnGotInVehicle();
                 }
+
+                if(CurrentVehicle == null)
+                {
+                    UpdateCurrentVehicle();
+                }
+
                 //RemoveOwnedVehicleBlip();
                 if (CurrentVehicle != null)
                 {
+                    
                     CurrentVehicle.HasAutoSetRadio = false;
+                    CurrentVehicle.ResetTopSpeed();
                 }
+                GroupManager.OnPlayerGotInVehicle();
+
                 EntryPoint.WriteToConsole("OnIsInVehicleChanged CHANGED TO TRUE");
             }
             else
@@ -1587,6 +1683,18 @@ namespace Mod
                     Scanner.OnGotOutOfVehicle();
                 }
                 //CreateOwnedVehicleBlip();
+
+
+                //if(PreviousVehicle != null && Settings.SettingsManager.VehicleSettings.AllowSetTransmissionState)
+                //{
+                //    PreviousVehicle.Transmission.SetParked();
+                //}
+
+                //if (CurrentVehicle != null && Settings.SettingsManager.VehicleSettings.AllowSetTransmissionState)
+                //{
+                //    CurrentVehicle.Transmission.SetParked();
+                //}
+
 
                 if (!Settings.SettingsManager.PlayerOtherSettings.AllowMobileRadioOnFoot && IsMobileRadioEnabled && !ActivityManager.IsDancing)
                 {
@@ -1614,7 +1722,8 @@ namespace Mod
             ActivityManager.OnPlayerBusted();
             if (Settings.SettingsManager.PlayerOtherSettings.SetSlowMoOnBusted)
             {
-                Game.TimeScale = Settings.SettingsManager.PlayerOtherSettings.SlowMoOnBustedSpeed;// 0.4f;
+                //Game.TimeScale = Settings.SettingsManager.PlayerOtherSettings.SlowMoOnBustedSpeed;// 0.4f;
+                NativeFunction.Natives.SET_TIME_SCALE(Settings.SettingsManager.PlayerOtherSettings.SlowMoOnBustedSpeed);
             }
             //NativeHelper.DisablePlayerControl();
             //Game.LocalPlayer.HasControl = false;
@@ -1640,7 +1749,8 @@ namespace Mod
 
             if (Settings.SettingsManager.PlayerOtherSettings.SetSlowMoOnDeath)
             {
-                Game.TimeScale = Settings.SettingsManager.PlayerOtherSettings.SlowMoOnDeathSpeed;// 0.4f;
+                //Game.TimeScale = Settings.SettingsManager.PlayerOtherSettings.SlowMoOnDeathSpeed;// 0.4f;
+                NativeFunction.Natives.SET_TIME_SCALE(Settings.SettingsManager.PlayerOtherSettings.SlowMoOnDeathSpeed);
             }
             Scanner.OnSuspectWasted();
             ActivityManager.OnPlayerDied();
@@ -1804,8 +1914,11 @@ namespace Mod
         }
 
         //Crimes
-        public void AddCrime(Crime crimeObserved, bool isObservedByPolice, Vector3 Location, VehicleExt VehicleObserved, WeaponInformation WeaponObserved, bool HaveDescription, bool AnnounceCrime, bool isForPlayer)
+        public void AddCrime(Crime crimeObserved, bool isObservedByPolice, Vector3 Location, VehicleExt VehicleObserved, WeaponInformation WeaponObserved, bool HaveDescription, bool AnnounceCrime, bool isForPlayer, bool alwaysAddInstance)
         {
+
+            //EntryPoint.WriteToConsole("AddCrime START");
+
             if(crimeObserved == null)
             {
                 return;
@@ -1824,7 +1937,11 @@ namespace Mod
             }
             GameFiber.Yield();//TR 6 this is new, seems helpful so far with no downsides
             CrimeSceneDescription description = new CrimeSceneDescription(!IsInVehicle, isObservedByPolice, Location, HaveDescription) { InteriorSeen = isForPlayer ? CurrentLocation.CurrentInterior : null, VehicleSeen = VehicleObserved, WeaponSeen = WeaponObserved, Speed = Game.LocalPlayer.Character.Speed };
-            PoliceResponse.AddCrime(crimeObserved, description, isForPlayer);
+            PoliceResponse.AddCrime(crimeObserved, description, isForPlayer, alwaysAddInstance);
+
+
+
+
             if (!isObservedByPolice && IsNotWanted)
             {
                 Investigation.Start(Location, PoliceResponse.PoliceHaveDescription, true, false, false, isForPlayer ? CurrentLocation.CurrentInterior : null);
@@ -1833,6 +1950,8 @@ namespace Mod
             {
                 Scanner.AnnounceCrime(crimeObserved, description);
             }
+
+            //EntryPoint.WriteToConsole("AddCrime END");
         }
         public void AddMedicalEvent(Vector3 position)
         {
@@ -1847,7 +1966,7 @@ namespace Mod
         {
             Crime crimeObserved = Crimes.GetCrime(StaticStrings.KillingPoliceCrimeID);
             CrimeSceneDescription description = new CrimeSceneDescription(!IsInVehicle, false, position, false);
-            PoliceResponse.AddCrime(crimeObserved, description, false);
+            PoliceResponse.AddCrime(crimeObserved, description, false, false);
             Investigation.Start(position, false, true, false, false);
             Scanner.OnOfficerMIA();
         }
@@ -1863,7 +1982,7 @@ namespace Mod
                 crimeObserved = Crimes.GetCrime(StaticStrings.CivilianTrespessingCrimeID);
             }
             CrimeSceneDescription description = new CrimeSceneDescription(!IsInVehicle, false, Position, true);
-            PoliceResponse.AddCrime(crimeObserved, description, false);
+            PoliceResponse.AddCrime(crimeObserved, description, false, false);
             Investigation.Start(Position, true, true, false, false, CurrentLocation.CurrentInterior);
             Scanner.AnnounceCrime(crimeObserved, description);
             EntryPoint.WriteToConsole("OnSeenInRestrictedAreaOnCamera");
@@ -2020,6 +2139,9 @@ namespace Mod
             UpdateDuckingInVehicle();
             VehicleOwnership.Update();
             CheckAutoEngineDisableToggled();
+
+
+           
         }
         private void UpdateInVehicleData()
         {
@@ -2060,7 +2182,7 @@ namespace Mod
                 IsOnBicycle = CurrentVehicle.IsBicycle;
                 IsOnMotorcycle = CurrentVehicle.IsMotorcycle;
                 IsInAutomobile = !(IsInAirVehicle || Game.LocalPlayer.Character.IsInSeaVehicle || IsOnBicycle || IsOnMotorcycle || Game.LocalPlayer.Character.IsInHelicopter);
-
+                IsInArmedMilitaryVehicle = CurrentVehicle.VehicleClass == VehicleClass.Military && CurrentVehicle.Vehicle.Exists() && NativeFunction.Natives.DOES_VEHICLE_HAVE_WEAPONS<bool>(CurrentVehicle.Vehicle);
                 VehicleSpeed = CurrentVehicle.Vehicle.Speed;
                 IsHotWiring = CurrentVehicle != null && CurrentVehicle.Vehicle.Exists() && CurrentVehicle.IsStolen && CurrentVehicle.Vehicle.MustBeHotwired;
                 CurrentVehicleRoll = NativeFunction.Natives.GET_ENTITY_ROLL<float>(CurrentVehicle.Vehicle); ;
@@ -2085,6 +2207,11 @@ namespace Mod
                     OnCurrentVehicleChanged();
                     prevCurrentVehicleHandle = CurrentVehicle.Handle;
                 }
+
+                if(CurrentVehicle.SetNewTopSpeed)
+                {
+                    CurrentVehicle.ResetTopSpeed();
+                }
             }
             else
             {
@@ -2092,6 +2219,7 @@ namespace Mod
                 IsOnMotorcycle = false;
                 IsInAutomobile = false;
                 CurrentVehicleIsRolledOver = false;
+                IsInArmedMilitaryVehicle = false;
                 VehicleSpeed = 0f;
                 prevCurrentVehicleHandle = 0;
             }
@@ -2178,7 +2306,7 @@ namespace Mod
                 GameTimeLastMovedFast = 0;
             }
             IsStill = VehicleSpeed <= 0.1f;
-
+            IsMovingSlowly = VehicleSpeed <= 2.0f;
             if (VehicleSpeedMPH >= 25f)
             {
                 if (GameTimeStartedMovingFast == 0)
@@ -2249,8 +2377,8 @@ namespace Mod
             {
                 GameTimeLastMovedFast = 0;
             }
-            IsStill = Character.IsStill;
-
+            IsStill =  Character.IsStill;
+            IsMovingSlowly = PlayerSpeed <= 2.0f;
             if (PlayerSpeed >= 3.0f)
             {
                 if (GameTimeStartedMovingFast == 0)
@@ -2366,6 +2494,7 @@ namespace Mod
                 CurrentVehicle = null;
                 return;
             }
+
             uint newVehicleHandle = vehicle.Handle;
             if (CurrentVehicle == null)
             {
@@ -2617,6 +2746,30 @@ namespace Mod
                 }
                 //EntryPoint.WriteToConsole($"CLOSEST LOCATION UPDATE RAN! HasLocation:{ClosestInteractableLocation?.Name} {ClosestDistance}");
             }
+            GameLocation closeLocation = World.Places.ActiveLocations.Where(x => x.HasInterior && x.Interior != null && x.Interior.Doors != null && x.Interior.Doors.Any(y => y.IsLocked)).OrderBy(z=> z.DistanceToPlayer).FirstOrDefault();
+            if (closeLocation != null)
+            {
+                //EntryPoint.WriteToConsole("BY AN INTERIOR WITH DOORS THAT ARE LOCKED");
+                ClosestDoor = closeLocation.Interior.Doors.Where(x => x.IsLocked && x.Position.DistanceTo2D(Position) <= 1.5f).OrderBy(x=> x.Position.DistanceTo2D(Position)).FirstOrDefault();
+            }
+            else
+            {
+                ClosestDoor = null;
+            }
+            ActivityManager.SetCurrentDoor(ClosestDoor, closeLocation?.Interior);
+        }
+        public void HasSetOffAlarm(GameLocation gameLocation)
+        {
+            Vector3 position = Position;
+            if(gameLocation != null)
+            {
+                position = gameLocation.EntrancePosition;
+            }
+            Crime crimeObserved = Crimes.GetCrime(StaticStrings.BreakingEnteringAudibleCrimeID);
+            CrimeSceneDescription description = new CrimeSceneDescription(!IsInVehicle, false, position, false);
+            PoliceResponse.AddCrime(crimeObserved, description, false, false);
+            Investigation.Start(position,false,true,false,false);
+            Scanner.AnnounceCrime(crimeObserved, description);
         }
         private void UpdateClosestLookedAtObject()
         {
@@ -2638,6 +2791,9 @@ namespace Mod
                     ActivityManager.OnLookedAtObject(CurrentLookedAtObject);
 
                     prevCurrentLookedAtObjectHandle = CurrentLookedAtObject.Handle;
+
+                    EntryPoint.WriteToConsole($"STARTED LOOKING AT OBJECT {CurrentLookedAtObject.Model.Hash} {CurrentLookedAtObject.Position}");
+
                 }
             }
             else

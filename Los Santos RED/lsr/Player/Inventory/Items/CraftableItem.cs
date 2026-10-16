@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LosSantosRED.lsr.Interface;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Xml.Serialization;
@@ -24,31 +25,60 @@ public class CraftableItem
     public bool SingleUnit { get; set; }
     public string Category { get; set; }
     public List<Ingredient> Ingredients { get; set; }
-    public int Cooldown { get; set;}
+    public int Cooldown { get; set; } = 2000;
     public string CrimeId { get; set; }
     public HashSet<string> CraftingFlags { get; set; }
-    [XmlIgnore]
-    private string _ingredientList;
-    [XmlIgnore]
-    public string IngredientList
-    {
-        get
-        {
-            if (_ingredientList == null)
-            {
-                _ingredientList = GetIngredients();
-            }
-            return _ingredientList;
-        }
+
+
+
+    public bool HasCustomAnimations => !string.IsNullOrEmpty(AnimationDictionary) && !string.IsNullOrEmpty(AnimationName);
+
+    //[XmlIgnore]
+    //private string _ingredientList;
+    //[XmlIgnore]
+    //public string IngredientList
+    //{
+    //    get
+    //    {
+    //        if (_ingredientList == null)
+    //        {
+    //            _ingredientList = GetIngredients();
+    //        }
+    //        return "Ingredients Required: ~n~" + _ingredientList;
+    //    }
+    //}
+
+
+    public Func<int,string> GetResultantFormatter(IModItems modItems)
+    {  
+        return v => v == 1 ? $"{ResultantAmount} {modItems.Get(Resultant).MeasurementName}(s) of {Resultant}" : $"{v} Batches - " + (SingleUnit ? 1 : ResultantAmount * v) + $" {modItems.Get(Resultant).MeasurementName}(s) of {Resultant}";
     }
-    public string GetIngredients(int quantity = 1)
+    public string GetIngredientDescription(int quantity, IModItems modItems)
     {
+        ModItem resultantItem = modItems?.Get(Resultant);
         StringBuilder ingredientStringBuilder = new StringBuilder();
         foreach (var ingredient in Ingredients)
         {
-            ingredientStringBuilder.Append($"X{ingredient.Quantity * quantity} {ingredient.IngredientName}\n");
+            if (!ingredient.IsConsumed)
+            {
+                quantity = 1;
+            }
+            ModItem relatedItem = modItems?.Get(ingredient.IngredientName);
+            string modItemDescription = "Item(s)";
+            if (relatedItem != null)
+            {
+                modItemDescription = relatedItem.MeasurementName + "(s)";
+            }
+            ingredientStringBuilder.Append($"{ingredient.IngredientName} - {ingredient.Quantity * quantity} {modItemDescription}~n~");
         }
-        return ingredientStringBuilder.ToString().Trim();
+        string extendeddescription = "";
+        if(resultantItem != null && !string.IsNullOrEmpty(resultantItem.Description))
+        {
+            extendeddescription = resultantItem.Description + "~n~~n~";
+        }
+
+        ingredientStringBuilder.Append("~n~~g~Result:~s~ " + (SingleUnit ? 1 : ResultantAmount * quantity) + $" {modItems.Get(Resultant).MeasurementName}(s) of {Resultant}");
+        return extendeddescription + "~r~Ingredients Required:~s~ ~n~" + ingredientStringBuilder.ToString().Trim();
     }
 
 }

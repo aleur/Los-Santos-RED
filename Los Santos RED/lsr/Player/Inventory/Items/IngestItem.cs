@@ -34,6 +34,11 @@ public class IngestItem : ConsumableItem
         }
         return false;
     }
+    public override void AddToList(PossibleItems possibleItems)
+    {
+        possibleItems?.IngestItems.RemoveAll(x => x.Name == Name);
+        possibleItems?.IngestItems.Add(this);
+    }
 
 }
 

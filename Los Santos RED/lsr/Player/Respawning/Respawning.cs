@@ -112,6 +112,17 @@ public class Respawning// : IRespawning
 
 
     }
+
+
+    public void ForceRespawnAtPosition(Vector3 positionToSpawn, float HeadingToSpawn)
+    {
+        Game.FadeScreenOut(1000, true);
+        Respawn(false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
+        Player.Character.Position = positionToSpawn;
+        Player.Character.Heading = HeadingToSpawn;
+        Game.FadeScreenIn(1000, true);
+    }
+
     public bool BribePolice(ModUIMenu menu, PossibleBribe possibleBribe)
     {
         CalculateBribe();
@@ -142,7 +153,7 @@ public class Respawning// : IRespawning
         }
         else
         {
-            ResetPlayer(true, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
+            ResetPlayer(true, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
             Game.DisplayNotification(BlankContactPicture, BlankContactPicture, StaticStrings.OfficerFriendlyContactName, "~r~Expedited Service Fee", BribedCopResponses.PickRandom());
             Player.BankAccounts.GiveMoney(-1 * possibleBribe.Amount, true);
             GameTimeLastBribedPolice = Game.GameTime;
@@ -176,7 +187,7 @@ public class Respawning// : IRespawning
     public void PayFine()
     {
         int FineAmount = Player.FineAmount();
-        ResetPlayer(true, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
+        ResetPlayer(true, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
         if (Player.BankAccounts.GetMoney(true) < FineAmount)
         {
             BailFeePastDue += FineAmount;       
@@ -196,14 +207,32 @@ public class Respawning// : IRespawning
         GameTimeLastPaidFine = Game.GameTime;
         Player.Scanner.OnPaidFine();
     }
+
+
+
+
     public void GetBooked(ILocationRespawnable respawnableLocation)
     {
         Player.IsBeingBooked = true;
+
+
+
         while (Player.IsIncapacitated)
         {
             GameFiber.Sleep(500);
         }
+
+
+
         EntryPoint.WriteToConsole("GetBooked Start");
+
+
+
+
+
+
+
+        //Search Player
         VehicleExt vehicleToSearch = GetVehicleToSearch();
         SearchActivity searchActivity = new SearchActivity(Player, World, PoliceRespondable, SeatAssignable, Settings, Time, ModItems, vehicleToSearch, Weapons);
         searchActivity.Setup();
@@ -211,9 +240,19 @@ public class Respawning// : IRespawning
         if (!searchActivity.IsActive)
         {
             EntryPoint.WriteToConsole("GetBooked Search Didnt start, ending");
-            SkipBooking(respawnableLocation);
+            SkipBooking(respawnableLocation, null);
             return;
         }
+
+
+
+
+
+
+
+
+
+
         GameFiber.StartNew(delegate
         {
             try
@@ -221,6 +260,8 @@ public class Respawning// : IRespawning
                 EntryPoint.WriteToConsole("GetBooked Waiting for search acitivty start");
                 Player.ButtonPrompts.AddPrompt("GetBooked", "Skip To Booking", "SkipBooking", GameControl.Attack, 15);
                 bool shouldSkip = false;
+
+
                 while (searchActivity.IsActive)
                 {
                     if(Player.ButtonPrompts.IsPressed("SkipBooking"))
@@ -233,16 +274,20 @@ public class Respawning// : IRespawning
                 if(shouldSkip)
                 {
                     EntryPoint.WriteToConsole("GetBooked skip triggered 1");
-                    SkipBooking(respawnableLocation);
+                    SkipBooking(respawnableLocation, null);
                     return;
                 }
                 EntryPoint.WriteToConsole("GetBooked Search Ended");
                 if (!searchActivity.CompletedSearch)
                 {
                     EntryPoint.WriteToConsole("GetBooked search didnt complete, ending with skip");
-                    SkipBooking(respawnableLocation);
+                    SkipBooking(respawnableLocation, null);
                     return;
                 }
+
+
+
+
                 BookingActivity bookingActivity = new BookingActivity(Player, World, PoliceRespondable, respawnableLocation, SeatAssignable, Settings);
                 bookingActivity.Setup();
                 bookingActivity.Start();
@@ -259,7 +304,7 @@ public class Respawning// : IRespawning
                 if (shouldSkip)
                 {
                     EntryPoint.WriteToConsole("GetBooked skip triggered 2");
-                    SkipBooking(respawnableLocation);
+                    SkipBooking(respawnableLocation, bookingActivity);
                     return;
                 }
                 while (Player.IsArrested && EntryPoint.ModController.IsRunning && Player.IsInVehicle)
@@ -271,17 +316,32 @@ public class Respawning// : IRespawning
                     }
                     GameFiber.Yield();
                 }
+
+                
+
                 if (shouldSkip)
                 {
                     EntryPoint.WriteToConsole("GetBooked skip triggered 2");
-                    SkipBooking(respawnableLocation);
+                    SkipBooking(respawnableLocation, bookingActivity);
                     return;
                 }
+
+
+
+
+
+
+                Player.ButtonPrompts.RemovePrompts("GetBooked");
+
+
+
+
+
                 //Finally just fade out as we cant escape yet
 
                 if (Player.IsArrested)
                 {
-                    SkipBooking(respawnableLocation);
+                    SkipBooking(respawnableLocation, bookingActivity);
                 }
             }
             catch (Exception ex)
@@ -291,11 +351,27 @@ public class Respawning// : IRespawning
             }
         }, "Searching");
     }
-    private void SkipBooking(ILocationRespawnable respawnableLocation)
+
+
+
+
+
+
+
+
+
+
+    private void SkipBooking(ILocationRespawnable respawnableLocation, BookingActivity bookingActivity)
     {
         SurrenderToPolice(respawnableLocation);
         Player.IsBeingBooked = false;
         Player.ButtonPrompts.RemovePrompts("GetBooked");
+
+        if(bookingActivity != null)
+        {
+            bookingActivity.OnSkipBookingPressed();
+        }
+
     }
 
     public void AskAboutCrimes()
@@ -356,7 +432,7 @@ public class Respawning// : IRespawning
                 };
             Game.DisplaySubtitle("~g~Cop: ~s~" + TalkOutResponsePositive.PickRandom());
             GameFiber.Sleep(4000);
-            ResetPlayer(true, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
+            ResetPlayer(true, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
             Player.Scanner.OnTalkedOutOfTicket();
             return true;
         }
@@ -383,7 +459,7 @@ public class Respawning// : IRespawning
     }
     public void ResistArrest()
     {
-        ResetPlayer(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false);
+        ResetPlayer(false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, true, false, false, false, false, false, false);
         GameTimeLastResistedArrest = Game.GameTime;
     }
     public void RespawnAtCurrentLocation(bool withInvicibility, bool resetWanted, bool clearCriminalHistory, bool clearInventory)
@@ -391,7 +467,7 @@ public class Respawning// : IRespawning
         if (CanUndie)
         {
             int wantedLevel = Player.WantedLevel;
-            Respawn(resetWanted, true, false, false, clearCriminalHistory, clearInventory, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
+            Respawn(resetWanted, true, false, false, clearCriminalHistory, clearInventory, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
             Player.SetWantedLevel(wantedLevel, "RespawnAtCurrentLocation", true);
             if (withInvicibility & Settings.SettingsManager.RespawnSettings.InvincibilityOnRespawn)
             {
@@ -421,7 +497,7 @@ public class Respawning// : IRespawning
         {
             ImpoundNotification = ImpoundVehicles();
         }
-        Respawn(true, true, true, false, true, false, true, false, false, false, false, false, true,true, false, true, true, false, false, false, true, false);//we are already removing the weapons above, done need to do it twice with the old bug
+        Respawn(true, true, true, false, true, false, true, false, false, false, false, false, true,true, false, true, true, false, false, false, true, false, false);//we are already removing the weapons above, done need to do it twice with the old bug
         Player.PlayerTasks.OnStandardRespawn();
 
         SetPlayerAtLocation(respawnableLocation);
@@ -470,7 +546,7 @@ public class Respawning// : IRespawning
             RemoveIllegalWeapons();
         }    
         ImpoundNotification = ImpoundVehicles();
-        ResetPlayer(true, true, false, false, true, false, true,false, false, false, false, false,true, true, false, true, true, false,false, false, true, false);//if you pass clear weapons here it will just remover everything anwyays
+        ResetPlayer(true, true, false, false, true, false, true,false, false, false, false, false,true, true, false, true, true, false,false, false, true, false, false);//if you pass clear weapons here it will just remover everything anwyays
         Player.PlayerTasks.OnStandardRespawn();
         SetPlayerAtLocation(respawnableLocation);
         HasIllegalItems = false;
@@ -588,10 +664,10 @@ public class Respawning// : IRespawning
     }
     private void ResetPlayer(bool resetWanted, bool resetHealth, bool resetTimesDied, bool clearWeapons, bool clearCriminalHistory, bool clearInventory, bool clearIntoxication, bool resetGangRelationships, 
         bool clearVehicleOwnership,bool resetCellphone, bool clearActiveTasks, bool clearProperties, bool resetNeeds, bool resetGroup, bool resetLicenses, bool resetActivites, bool resetGracePeriod, 
-        bool resetBankAccounts, bool resetSavedGame, bool resetPendingMessages, bool resetInteriors, bool resetGambling)
+        bool resetBankAccounts, bool resetSavedGame, bool resetPendingMessages, bool resetInteriors, bool resetGambling, bool resetGangTerritory)
     {
         Player.Reset(resetWanted, resetTimesDied, clearWeapons, clearCriminalHistory, clearInventory, clearIntoxication, resetGangRelationships, clearVehicleOwnership, resetCellphone, clearActiveTasks, clearProperties, resetHealth, resetNeeds,
-            resetGroup, resetLicenses, resetActivites, resetGracePeriod, resetBankAccounts, resetSavedGame, resetPendingMessages, resetInteriors, resetGambling, false);
+            resetGroup, resetLicenses, resetActivites, resetGracePeriod, resetBankAccounts, resetSavedGame, resetPendingMessages, resetInteriors, resetGambling, false, resetGangTerritory);
         // CurrentPlayer.UnSetArrestedAnimation();
 
         NativeFunction.Natives.SET_ENABLE_HANDCUFFS(Game.LocalPlayer.Character, false);
@@ -601,7 +677,8 @@ public class Respawning// : IRespawning
         NativeFunction.Natives.xC0AA53F866B3134D();//FORCE_GAME_STATE_PLAYING
         if (Settings.SettingsManager.PlayerOtherSettings.SetSlowMoOnDeath)
         {
-            Game.TimeScale = 1f;
+            //Game.TimeScale = 1f;
+            NativeFunction.Natives.SET_TIME_SCALE(1.0f);
         }
         if(Settings.SettingsManager.PlayerOtherSettings.SetCutToBlackDeath && Game.IsScreenFadedOut)
         {
@@ -627,12 +704,12 @@ public class Respawning// : IRespawning
         Player.Surrendering.UnSetArrestedAnimation();
     }
     private void Respawn(bool resetWanted, bool resetHealth, bool resetTimesDied, bool clearWeapons, bool clearCriminalHistory, bool clearInventory, bool clearIntoxication, bool resetGangRelationships, bool clearOwnedVehicles, bool resetCellphone,
-        bool clearActiveTasks, bool clearProperties, bool resetNeeds, bool resetGroup, bool resetLicenses, bool resetActivites, bool resetGracePeriod, bool resetBankAccounts, bool resetSavedGame, bool resetPendingMessages, bool resetInteriors, bool resetGambling)
+        bool clearActiveTasks, bool clearProperties, bool resetNeeds, bool resetGroup, bool resetLicenses, bool resetActivites, bool resetGracePeriod, bool resetBankAccounts, bool resetSavedGame, bool resetPendingMessages, bool resetInteriors, bool resetGambling, bool resetGangTerritory)
     {
         try
         {
             ResurrectPlayer(resetTimesDied);
-            ResetPlayer(resetWanted, resetHealth, resetTimesDied, clearWeapons, clearCriminalHistory, clearInventory, clearIntoxication, resetGangRelationships, clearOwnedVehicles, resetCellphone, clearActiveTasks, clearProperties, resetNeeds, resetGroup, resetLicenses, resetActivites, resetGracePeriod, resetBankAccounts, resetSavedGame, resetPendingMessages, resetInteriors, resetGambling);
+            ResetPlayer(resetWanted, resetHealth, resetTimesDied, clearWeapons, clearCriminalHistory, clearInventory, clearIntoxication, resetGangRelationships, clearOwnedVehicles, resetCellphone, clearActiveTasks, clearProperties, resetNeeds, resetGroup, resetLicenses, resetActivites, resetGracePeriod, resetBankAccounts, resetSavedGame, resetPendingMessages, resetInteriors, resetGambling, resetGangTerritory);
             Game.HandleRespawn();
             Time.UnPauseTime();
             GameTimeLastRespawned = Game.GameTime;
@@ -765,7 +842,8 @@ public class Respawning// : IRespawning
             Game.DisplayHelp("Search Failed");
             if (Settings.SettingsManager.PlayerOtherSettings.SetSlowMoOnBusted)
             {
-                Game.TimeScale = Settings.SettingsManager.PlayerOtherSettings.SlowMoOnBustedSpeed;
+                //Game.TimeScale = Settings.SettingsManager.PlayerOtherSettings.SlowMoOnBustedSpeed;
+                NativeFunction.Natives.SET_TIME_SCALE(Settings.SettingsManager.PlayerOtherSettings.SlowMoOnBustedSpeed);
             }
             menu?.Show();
             return;
@@ -782,14 +860,15 @@ public class Respawning// : IRespawning
                 CrimeEvent highestPriorityCrimeEvent = Player.PoliceResponse.CrimesObserved.OrderBy(x => x.AssociatedCrime.Priority).FirstOrDefault();
                 if (searchActivity.CompletedSearch && !searchActivity.FoundIllegalItems && (highestPriorityCrimeEvent == null || highestPriorityCrimeEvent.AssociatedCrime.CanReleaseOnCleanSearch))
                 {
-                    ResetPlayer(true, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
+                    ResetPlayer(true, false, false, false, true, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false);
                     Player.Scanner.OnTalkedOutOfTicket();
                 }
                 else
                 {
                     if (Settings.SettingsManager.PlayerOtherSettings.SetSlowMoOnBusted)
                     {
-                        Game.TimeScale = Settings.SettingsManager.PlayerOtherSettings.SlowMoOnBustedSpeed;
+                        //Game.TimeScale = Settings.SettingsManager.PlayerOtherSettings.SlowMoOnBustedSpeed;
+                        NativeFunction.Natives.SET_TIME_SCALE(Settings.SettingsManager.PlayerOtherSettings.SlowMoOnBustedSpeed);
                     }
                     menu?.Show();
                 }

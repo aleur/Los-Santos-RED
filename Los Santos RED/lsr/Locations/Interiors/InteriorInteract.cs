@@ -13,6 +13,8 @@ using System.Xml.Serialization;
 [XmlInclude(typeof(ExitInteriorInteract))]
 [XmlInclude(typeof(AnimationInteract))]
 [XmlInclude(typeof(ToiletInteract))]
+[XmlInclude(typeof(TeleportInteract))]
+[XmlInclude(typeof(MultiTeleportInteract))]
 [XmlInclude(typeof(SinkInteract))]
 
 
@@ -20,7 +22,12 @@ using System.Xml.Serialization;
 [XmlInclude(typeof(MoneyTheftInteract))]
 [XmlInclude(typeof(ItemTheftInteract))]
 [XmlInclude(typeof(SalonInteract))]
-[XmlInclude(typeof(CraftInteriortInteract))]
+[XmlInclude(typeof(CraftInteriorInteract))]
+[XmlInclude(typeof(DisplayInteract))]
+[XmlInclude(typeof(AudioEmitterInteract))]
+[XmlInclude(typeof(TryOnInteract))]
+[XmlInclude(typeof(GamblingInteract))]
+[XmlInclude(typeof(FightClubInteract))]
 //UrinalInteract
 //ToiletInteract
 public class InteriorInteract
@@ -57,7 +64,7 @@ public class InteriorInteract
     public Vector3 CameraDirection { get; set; } = Vector3.Zero;
     public Rotator CameraRotation { get; set; }
     public virtual string ButtonPromptText { get; set; } = "Interact";
-    public bool AutoCamera { get; set; } = true;
+    public virtual bool AutoCamera { get; set; } = true;
     public float DistanceTo => distanceTo;
     public bool CanAddPrompt => canAddPrompt;
     public bool HasCustomCamera => CameraPosition != Vector3.Zero;
@@ -65,11 +72,16 @@ public class InteriorInteract
     public bool UseNavmesh { get; set; } = true;
     public bool WithWarp { get; set; } = false;
     public bool ForceIsntantCamera { get; set; } = false;
-
-
     public bool IsAutoInteract { get; set; } = false;
+
+
+    public string GroupName { get; set; }
+    public virtual int MarkerType { get; set; } = 0;
     public virtual bool ShouldAddPrompt => !Interior.IsMenuInteracting && distanceTo <= InteractDistance && !Player.ActivityManager.IsInteracting && Player.ActivityManager.CanPerformActivitiesOnFoot;
-    public virtual void Setup(IModItems modItems, IClothesNames clothesNames)
+    
+    public virtual bool ShouldHideMarker { get; set; } = false;
+    
+    public virtual void Setup(IModItems modItems, IClothesNames clothesNames, IRadioStations radioStations)
     {
         ModItems = modItems;
         ClothesNames = clothesNames;
@@ -78,9 +90,17 @@ public class InteriorInteract
     {
 
     }
-    public void DisplayMarker(int markerType, float zOffset, float markerScale)
+    public virtual void OnInteriorUnloaded()
+    {
+
+    }
+    public virtual void DisplayMarker(int markerType, float zOffset, float markerScale)
     {
         if(DistanceTo >= 30)
+        {
+            return;
+        }
+        if(ShouldHideMarker)
         {
             return;
         }
@@ -121,11 +141,12 @@ public class InteriorInteract
             OnInteract();
         }
     }
-    public virtual void SetupFake(IInteractionable player, ISettingsProvideable settings, GameLocation interactableLocation, ILocationInteractable locationInteractable)
+    public virtual void SetupFake(IInteractionable player, ISettingsProvideable settings, GameLocation interactableLocation, Interior interior, ILocationInteractable locationInteractable)
     {
         Player = player;
         Settings = settings;
         InteractableLocation = interactableLocation;
+        Interior = interior;
         LocationInteractable = locationInteractable;
     }
     public virtual void Update(IInteractionable player, ISettingsProvideable settings, GameLocation interactableLocation, Interior interior, ILocationInteractable locationInteractable)
@@ -188,7 +209,7 @@ public class InteriorInteract
             LocationCamera.AutoInterior(Position, Heading, wait, true);
         }        
     }
-    protected virtual void WaitForAnimation(string animDict, string animName)
+    public virtual void WaitForAnimation(string animDict, string animName)
     {
         string PlayingDict = animDict;
         string PlayingAnim = animName;
@@ -347,6 +368,24 @@ public class InteriorInteract
         }
         return isInPosition;
     }
+
+
+    public void MoveToPositionWithoutWaiting(float speed)
+    {
+        if(Player.IsInVehicle)
+        {
+            return;
+        }
+        if (UseNavmesh)
+        {
+            NativeFunction.Natives.TASK_FOLLOW_NAV_MESH_TO_COORD(Player.Character, Position.X, Position.Y, Position.Z, speed, -1, 0.1f, 0, Heading);
+        }
+        else
+        {
+            NativeFunction.Natives.TASK_GO_STRAIGHT_TO_COORD(Player.Character, Position.X, Position.Y, Position.Z, speed, 5000, Heading, 0.5f);
+        }
+    }
+
 
     public virtual void AddDistanceOffset(Vector3 offsetToAdd)
     {

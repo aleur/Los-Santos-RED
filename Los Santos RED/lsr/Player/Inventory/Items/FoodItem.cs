@@ -48,6 +48,11 @@ public class FoodItem : ConsumableItem
         }
         return description;
     }
+    public override void AddToList(PossibleItems possibleItems)
+    {
+        possibleItems?.FoodItems.RemoveAll(x => x.Name == Name);
+        possibleItems?.FoodItems.Add(this);
+    }
 
 }
 

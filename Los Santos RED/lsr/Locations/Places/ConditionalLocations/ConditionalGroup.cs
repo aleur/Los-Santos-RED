@@ -30,6 +30,10 @@ public class ConditionalGroup
     protected DispatchablePerson DispatchablePerson;
     protected DispatchableVehicle DispatchableVehicle;
     protected GameLocation GameLocation;
+    protected Interior Interior;
+    private IDispatchablePeople DispatchablePeople;
+    private IDispatchableVehicles DispatchableVehicles;
+
     public string Name { get; set; }
     public float Percentage { get; set; }
     public float OverrideNightPercentage { get; set; } = -1.0f;
@@ -44,7 +48,8 @@ public class ConditionalGroup
     [XmlIgnore]
     public bool AttemptedSpawn { get; private set; }
     public virtual void AttemptSpawn(IDispatchable player, IAgencies agencies, IGangs gangs, IZones zones, IJurisdictions jurisdictions, IGangTerritories gangTerritories, ISettingsProvideable settings, IEntityProvideable world, string masterAssociationID, 
-        IWeapons weapons, INameProvideable names, ICrimes crimes, IPedGroups pedGroups, IShopMenus shopMenus, IWeatherReportable weatherReporter, ITimeControllable time, IModItems modItems, GameLocation gameLocation)
+        IWeapons weapons, INameProvideable names, ICrimes crimes, IPedGroups pedGroups, IShopMenus shopMenus, IWeatherReportable weatherReporter, ITimeControllable time, IModItems modItems,
+        GameLocation gameLocation, IDispatchablePeople dispatchablePeople, IDispatchableVehicles dispatchableVehicles, Interior interior)
     {
         Player = player;
         Agencies = agencies;
@@ -63,6 +68,9 @@ public class ConditionalGroup
         Time = time;
         ModItems = modItems;
         GameLocation = gameLocation;
+        Interior = interior;
+        DispatchablePeople = dispatchablePeople;
+        DispatchableVehicles = dispatchableVehicles;
         AttemptedSpawn = DetermineRun();
         if (!AttemptedSpawn)
         {
@@ -72,7 +80,7 @@ public class ConditionalGroup
         {
             foreach (ConditionalLocation cl in PossiblePedSpawns)
             {
-                cl.AttemptSpawn(Player, true, true, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World, masterAssociationID, Weapons, Names, Crimes, PedGroups, ShopMenus, WeatherReporter, Time, ModItems, GameLocation);
+                cl.AttemptSpawn(Player, true, true, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World, masterAssociationID, Weapons, Names, Crimes, PedGroups, ShopMenus, WeatherReporter, Time, ModItems, GameLocation, DispatchablePeople, DispatchableVehicles, Interior);
                 GameFiber.Yield();
             }
         }
@@ -81,7 +89,7 @@ public class ConditionalGroup
         {
             foreach (ConditionalLocation cl in PossibleVehicleSpawns)
             {
-                cl.AttemptSpawn(Player, false, true, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World, masterAssociationID, Weapons, Names, Crimes, PedGroups, ShopMenus, WeatherReporter, Time, ModItems, GameLocation);
+                cl.AttemptSpawn(Player, false, true, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World, masterAssociationID, Weapons, Names, Crimes, PedGroups, ShopMenus, WeatherReporter, Time, ModItems, GameLocation, DispatchablePeople, DispatchableVehicles, Interior);
                 GameFiber.Yield();
             }
         }
@@ -131,6 +139,26 @@ public class ConditionalGroup
         return RandomItems.RandomPercent(Percentage);
     }
 
+    public void UpdateAssociation(string updateToID, string toReplaceID)
+    {
+        List<ConditionalLocation> totalList = new List<ConditionalLocation> { };
+        totalList.AddRange(PossiblePedSpawns.ToList());
+        totalList.AddRange(PossibleVehicleSpawns.ToList());
+        foreach (ConditionalLocation conditionalLocation in totalList)
+        {
+            conditionalLocation.UpdateAssociation(updateToID, toReplaceID);
+        }
+    }
 
+    public void ResetAssociation()
+    {
+        List<ConditionalLocation> totalList = new List<ConditionalLocation> { };
+        totalList.AddRange(PossiblePedSpawns.ToList());
+        totalList.AddRange(PossibleVehicleSpawns.ToList());
+        foreach (ConditionalLocation conditionalLocation in totalList)
+        {
+            conditionalLocation.ResetAssociation();
+        }
+    }
 }
 

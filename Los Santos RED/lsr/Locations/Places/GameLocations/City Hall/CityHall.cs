@@ -241,7 +241,7 @@ public class CityHall : GameLocation
             if(Player.BankAccounts.GetMoney(true) >= NameChangeFee)
             {
                 string NewName = NativeHelper.GetKeyboardInput("");
-                if(NewName != "")
+                if (!string.IsNullOrEmpty(NewName))
                 {
                     Player.BankAccounts.GiveMoney(-1 * NameChangeFee, true);
                     Player.ChangeName(NewName);

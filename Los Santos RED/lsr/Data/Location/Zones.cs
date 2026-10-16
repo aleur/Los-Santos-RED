@@ -19,7 +19,7 @@ public class Zones : IZones
         string fileName = string.IsNullOrEmpty(configName) ? "Zones*.xml" : $"Zones_{configName}.xml";
 
         DirectoryInfo LSRDirectory = new DirectoryInfo("Plugins\\LosSantosRED");
-        FileInfo ConfigFile = LSRDirectory.GetFiles(fileName).OrderByDescending(x => x.Name).FirstOrDefault();
+        FileInfo ConfigFile = LSRDirectory.GetFiles(fileName).Where(x => !x.Name.Contains("+")).OrderByDescending(x => x.Name).FirstOrDefault();
         if (ConfigFile != null && !configName.Equals("Default"))
         {
             EntryPoint.WriteToConsole($"Loaded Zones config: {ConfigFile.FullName}", 0);
@@ -35,7 +35,6 @@ public class Zones : IZones
             EntryPoint.WriteToConsole($"No Zones config found, creating default", 0);
             DefaultConfig();
             DefaultConfig_LibertyCity();
-            DefaultConfig_SunshineDream();
         }
     }
 
@@ -137,7 +136,7 @@ public class Zones : IZones
             new Zone("LAGO", "Lago Zancudo", StaticStrings.BlaineCountyID, StaticStrings.SanAndreasStateID, true, eLocationEconomy.Middle, eLocationType.Wilderness),
             new Zone("MTJOSE", "Mount Josiah", StaticStrings.BlaineCountyID, StaticStrings.SanAndreasStateID, true, eLocationEconomy.Middle, eLocationType.Wilderness),
             new Zone("NCHU", "North Chumash", StaticStrings.BlaineCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Middle, eLocationType.Rural),
-            new Zone("SLAB", "Stab City", StaticStrings.BlaineCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Poor, eLocationType.Rural) { DealerMenuContainerID = StaticStrings.ToiletCleanerAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.ToiletCleanerAreaDrugCustomerMenuGroupID },
+            new Zone("SLAB", "Stab City", StaticStrings.BlaineCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Poor, eLocationType.Rural) { DisableGangTakeover = true, DealerMenuContainerID = StaticStrings.ToiletCleanerAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.ToiletCleanerAreaDrugCustomerMenuGroupID },
             new Zone("ZANCUDO", "Zancudo River", StaticStrings.BlaineCountyID, StaticStrings.SanAndreasStateID, true, eLocationEconomy.Poor, eLocationType.Wilderness),
 
             //Vespucci
@@ -152,11 +151,11 @@ public class Zones : IZones
 
             //Central
             new Zone("BANNING", "Banning", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Poor, eLocationType.Downtown) { DealerMenuContainerID = StaticStrings.CrackAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.CrackAreaDrugCustomerMenuGroupID },
-            new Zone("CHAMH", "Chamberlain Hills", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Poor, eLocationType.Downtown) { DealerMenuContainerID = StaticStrings.MarijuanaAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.MarijuanaAreaDrugCustomerMenuGroupID },
-            new Zone("DAVIS", "Davis", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Poor, eLocationType.Downtown) { DealerMenuContainerID = StaticStrings.CrackAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.CrackAreaDrugCustomerMenuGroupID },
+            new Zone("CHAMH", "Chamberlain Hills", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Poor, eLocationType.Downtown) { DisableGangTakeover = true, DealerMenuContainerID = StaticStrings.MarijuanaAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.MarijuanaAreaDrugCustomerMenuGroupID },
+            new Zone("DAVIS", "Davis", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Poor, eLocationType.Downtown) { DisableGangTakeover = true, DealerMenuContainerID = StaticStrings.CrackAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.CrackAreaDrugCustomerMenuGroupID },
             new Zone("DOWNT", "Downtown", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Poor, eLocationType.Downtown),
             new Zone("PBOX", "Pillbox Hill", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Poor, eLocationType.Downtown){ DealerMenuContainerID = StaticStrings.HeroinAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.HeroinAreaDrugCustomerMenuGroupID } ,
-            new Zone("RANCHO", "Rancho", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Poor, eLocationType.Downtown) { DealerMenuContainerID = StaticStrings.CrackAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.CrackAreaDrugCustomerMenuGroupID },
+            new Zone("RANCHO", "Rancho", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Poor, eLocationType.Downtown) { DisableGangTakeover = true,  DealerMenuContainerID = StaticStrings.CrackAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.CrackAreaDrugCustomerMenuGroupID },
             new Zone("SKID", "Mission Row", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Poor, eLocationType.Downtown){ DealerMenuContainerID = StaticStrings.HeroinAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.HeroinAreaDrugCustomerMenuGroupID } ,
             new Zone("STAD", "Maze Bank Arena", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, true, eLocationEconomy.Middle, eLocationType.Industrial) { DealerMenuContainerID = StaticStrings.CrackAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.CrackAreaDrugCustomerMenuGroupID },
             new Zone("STRAW", "Strawberry", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Poor, eLocationType.Downtown){ DealerMenuContainerID = StaticStrings.MarijuanaAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.MarijuanaAreaDrugCustomerMenuGroupID },
@@ -164,7 +163,7 @@ public class Zones : IZones
             new Zone("LEGSQU", "Legion Square", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, true, eLocationEconomy.Poor, eLocationType.Downtown){ DealerMenuContainerID = StaticStrings.HeroinAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.HeroinAreaDrugCustomerMenuGroupID } ,
 
             //East LS
-            new Zone("CYPRE", "Cypress Flats", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Poor, eLocationType.Industrial){ DealerMenuContainerID = StaticStrings.MarijuanaAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.MarijuanaAreaDrugCustomerMenuGroupID },
+            new Zone("CYPRE", "Cypress Flats", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Poor, eLocationType.Industrial){DisableGangTakeover = true,  DealerMenuContainerID = StaticStrings.MarijuanaAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.MarijuanaAreaDrugCustomerMenuGroupID },
             new Zone("LMESA", "La Mesa", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Poor, eLocationType.Industrial) { DealerMenuContainerID = StaticStrings.MethamphetamineAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.MethamphetamineAreaDrugCustomerMenuGroupID },
             new Zone("MIRR", "Mirror Park", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Poor, eLocationType.Suburb) { DealerMenuContainerID = StaticStrings.MethamphetamineAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.MethamphetamineAreaDrugCustomerMenuGroupID },
             new Zone("MURRI", "Murrieta Heights", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Poor, eLocationType.Industrial){ DealerMenuContainerID = StaticStrings.MarijuanaAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.MarijuanaAreaDrugCustomerMenuGroupID },
@@ -173,7 +172,7 @@ public class Zones : IZones
             //Vinewood
             new Zone("ALTA", "Alta", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Middle, eLocationType.Downtown),
             new Zone("DTVINE", "Downtown Vinewood", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Rich, eLocationType.Downtown){ DealerMenuContainerID = StaticStrings.CokeAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.CokeAreaDrugCustomerMenuGroupID },
-            new Zone("EAST_V", "East Vinewood", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Middle, eLocationType.Suburb) { DealerMenuContainerID = StaticStrings.MethamphetamineAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.MethamphetamineAreaDrugCustomerMenuGroupID },
+            new Zone("EAST_V", "East Vinewood", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Middle, eLocationType.Suburb) {DisableGangTakeover = true,  DealerMenuContainerID = StaticStrings.MethamphetamineAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.MethamphetamineAreaDrugCustomerMenuGroupID },
             new Zone("HAWICK", "Hawick", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Rich, eLocationType.Downtown){ DealerMenuContainerID = StaticStrings.CokeAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.CokeAreaDrugCustomerMenuGroupID },
             new Zone("HORS", "Vinewood Racetrack", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, true, eLocationEconomy.Middle, eLocationType.Rural),
             new Zone("VINE", "Vinewood", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Middle, eLocationType.Downtown){ DealerMenuContainerID = StaticStrings.CokeAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.CokeAreaDrugCustomerMenuGroupID },
@@ -219,6 +218,17 @@ public class Zones : IZones
             new Zone("TATAMO", "Tataviam Mountains", StaticStrings.LosSantosCountyID, StaticStrings.SanAndreasStateID, true, eLocationEconomy.Poor, eLocationType.Wilderness),
             new Zone("WINDF", "Ron Alternates Wind Farm", StaticStrings.LosSantosCountyID, StaticStrings.SanAndreasStateID, true, eLocationEconomy.Poor, eLocationType.Wilderness),
 
+            new Zone("CYPRE2", "Cypress Industrial", StaticStrings.CityOfLosSantosCountyID, StaticStrings.SanAndreasStateID, false, eLocationEconomy.Poor, eLocationType.Industrial)
+            {
+                DealerMenuContainerID = StaticStrings.MarijuanaAreaDrugDealerMenuGroupID, CustomerMenuContainerID = StaticStrings.MarijuanaAreaDrugCustomerMenuGroupID,Boundaries =
+                new Vector2[] {
+                    new Vector2(935.9811f, -1902.274f),
+                    new Vector2(1120.571f, -1891.891f),
+                    new Vector2(1063.934f, -1708.617f),
+                    new Vector2(917.0331f, -1723.506f),
+                },
+                DisableGangTakeover = true,
+            },
 
 
             //UNKNWON 
@@ -343,328 +353,17 @@ public class Zones : IZones
             //LEAPE
             //Other
             new Zone("OCEANA", "Atlantic Ocean", StaticStrings.LibertyCityCountyID, StaticStrings.LibertyStateID, false, eLocationEconomy.Middle, eLocationType.Rural),
-            new Zone("SANAND", "Outskirts", StaticStrings.LibertyCityCountyID, StaticStrings.LibertyStateID, false, eLocationEconomy.Middle, eLocationType.Rural),
+            new Zone("SANAND", "Outskirts", StaticStrings.LibertyCityCountyID, StaticStrings.LibertyStateID, false, eLocationEconomy.Middle, eLocationType.Rural), // Disables LS zone around Vagos den 
             };
-        Serialization.SerializeParams(LibertyCityZones, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LibertyConfigFolder}\\Zones_{StaticStrings.LibertyConfigSuffix}.xml");
+        //Serialization.SerializeParams(LibertyCityZones, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LibertyConfigFolder}\\Zones_{StaticStrings.LibertyConfigSuffix}.xml");
 
         List<Zone> LPPZones = new List<Zone>();
         LPPZones.AddRange(LibertyCityZones);
-        LPPZones.AddRange(ZoneList);
-        Serialization.SerializeParams(LPPZones, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LPPConfigFolder}\\Zones_{StaticStrings.LPPConfigSuffix}.xml");
+        //LPPZones.AddRange(ZoneList);
+        Serialization.SerializeParams(LPPZones, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LPPConfigFolder}\\Zones+_{StaticStrings.LPPConfigSuffix}.xml");
     }
 
-    private void DefaultConfig_SunshineDream()
-    {
-        List<Zone> MiamiDriver3Zones = new List<Zone>
-        {
-            //original
-            new Zone("MFLATO", "Atlantic Ocean", StaticStrings.ViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFLBSB", "Biscayne Bay", StaticStrings.ViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            new Zone("MFLMIA", "Vice", StaticStrings.CityOfViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            new Zone("MFLMIB", "Vice Beach", StaticStrings.CityOfViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFLSPB", "South Point Beach", StaticStrings.CityOfViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFLADD", "Art Deco District", StaticStrings.CityOfViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFLBKL", "Brickell", StaticStrings.CityOfViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFLCCG", "Coconut Grove", StaticStrings.CityOfViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFLCRW", "Douglas", StaticStrings.CityOfViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFLCRG", "Coral Gables", StaticStrings.CityOfViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFLMB", "Mid Beach", StaticStrings.CityOfViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            new Zone("MFLCC", "City Center", StaticStrings.CityOfViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFLFMG", "Flamingo", StaticStrings.CityOfViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFLBSH", "Leaf Links", StaticStrings.CityOfViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),//"Bayshore"
-            //new Zone("MFLSB", "South Beach", StaticStrings.CityOfViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFLBI", "Belle Isle", StaticStrings.ViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFLSI", "Star Island", StaticStrings.ViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFLWI", "Watson Island", StaticStrings.ViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFLDI", "Port of Vice", StaticStrings.ViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFSMRI", "San Marco Island", StaticStrings.ViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFLDLI", "Di-Lido Island", StaticStrings.ViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFLSMI", "San Marino Island", StaticStrings.ViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            new Zone("MFLFSI", "Fisher Island", StaticStrings.ViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFLFMP", "Flamingo Park", StaticStrings.ViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFLSPP", "South Point Park", StaticStrings.ViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFDMIA", "Downtown Vice", StaticStrings.CityOfViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFOMNI", "Omni", StaticStrings.ViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFLPKW", "Park West", StaticStrings.ViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFOTWN", "Overtown", StaticStrings.CityOfViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFLUMP", "Riverside", StaticStrings.CityOfViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFLSPG", "Spring Garden", StaticStrings.CityOfViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFLHVA", "Little Havana", StaticStrings.CityOfViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            //new Zone("MFLFMI", "Flagler Memorial Island", StaticStrings.ViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Rich, eLocationType.Downtown),
-            ////Other
-            //new Zone("OCEANA", "Atlantic Ocean", StaticStrings.ViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Middle, eLocationType.Rural),
-            new Zone("SANAND", "Outskirts", StaticStrings.ViceCountyID, StaticStrings.LeonidaStateID, false, eLocationEconomy.Middle, eLocationType.Rural),
-
-
-
-            //from configs
-            new Zone() {
-            InternalGameName = "OCEANA",
-            DisplayName = "Atlantic Ocean",
-            CountyID = "PacificOcean",
-            StateID = StaticStrings.LeonidaStateID,
-            Economy = eLocationEconomy.Poor,
-            Type = eLocationType.Wilderness,
-            },
-            new Zone() {
-            InternalGameName = "MFLBSH",
-            DisplayName = "Leaf Links",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            Type = eLocationType.Suburb,
-            },
-            new Zone() {
-            InternalGameName = "MFLMB",
-            DisplayName = "Washington Beach",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            IsSpecificLocation = true,
-            Type = eLocationType.Downtown,
-            DealerMenuContainerID = "CokeAreaDrugDealerMenuGroupID",
-            CustomerMenuContainerID = "CokeAreaDrugCustomerMenuGroupID",
-            },
-            new Zone() {
-            InternalGameName = "MFLFMG",
-            DisplayName = "Washington",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            IsSpecificLocation = true,
-            Type = eLocationType.Downtown,
-            },
-            new Zone() {
-            InternalGameName = "MFLFMP",
-            DisplayName = "Washington Park",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            IsSpecificLocation = true,
-            Type = eLocationType.Wilderness,
-            DealerMenuContainerID = "MarijuanaAreaDrugDealerMenuGroupID",
-            CustomerMenuContainerID = "MarijuanaAreaDrugCustomerMenuGroupID",
-            },
-            new Zone() {
-            InternalGameName = "MFLADD",
-            DisplayName = "Ocean View",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            IsSpecificLocation = true,
-            Type = eLocationType.Downtown,
-            },
-            new Zone() {
-            InternalGameName = "MFLSB",
-            DisplayName = "Ocean Beach",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            IsSpecificLocation = true,
-            Type = eLocationType.Suburb,
-            DealerMenuContainerID = "CokeAreaDrugDealerMenuGroupID",
-            CustomerMenuContainerID = "CokeAreaDrugCustomerMenuGroupID",
-            },
-            new Zone() {
-            InternalGameName = "MFLSPP",
-            DisplayName = "Ocean Heights Park",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            IsSpecificLocation = true,
-            Type = eLocationType.Wilderness,
-            },
-            new Zone() {
-            InternalGameName = "MFLSPB",
-            DisplayName = "Ocean Heights Beach",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            IsSpecificLocation = true,
-            Type = eLocationType.Suburb,
-            },
-            new Zone() {
-            InternalGameName = "MFLDLI",
-            DisplayName = "Starfish Island",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            Economy = eLocationEconomy.Rich,
-            Type = eLocationType.Suburb,
-            },
-            new Zone() {
-            InternalGameName = "MFSMRI",
-            DisplayName = "Clymenus Island",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            Economy = eLocationEconomy.Rich,
-            Type = eLocationType.Suburb,
-            },
-            new Zone() {
-            InternalGameName = "MFLSI",
-            DisplayName = "Meteor Island",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            Economy = eLocationEconomy.Rich,
-            Type = eLocationType.Suburb,
-            },
-            new Zone() {
-            InternalGameName = "MFLBI",
-            DisplayName = "Beast Isle",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            Economy = eLocationEconomy.Rich,
-            Type = eLocationType.Wilderness,
-            },
-            new Zone() {
-            InternalGameName = "MFLSMI",
-            DisplayName = "Prawn Island",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            Economy = eLocationEconomy.Rich,
-            Type = eLocationType.Suburb,
-            },
-            new Zone() {
-            InternalGameName = "MFLWI",
-            DisplayName = "Sherlock Island",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            Economy = eLocationEconomy.Poor,
-            DealerMenuContainerID = "MethamphetamineAreaDrugDealerMenuGroupID",
-            CustomerMenuContainerID = "MethamphetamineAreaDrugCustomerMenuGroupID",
-            },
-            new Zone() {
-            InternalGameName = "MFLDI",
-            DisplayName = "VicePort",
-            CountyID = StaticStrings.ViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            Economy = eLocationEconomy.Poor,
-            Type = eLocationType.Industrial,
-            DealerMenuContainerID = "SPANKAreaDrugDealerMenuGroupID",
-            CustomerMenuContainerID = "SPANKAreaDrugCustomerMenuGroupID",
-            },
-            new Zone() {
-            InternalGameName = "MFLBSB",
-            DisplayName = "Ocean Bay",
-            CountyID = StaticStrings.ViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            },
-            new Zone() {
-            InternalGameName = "MFLFMI",
-            DisplayName = "Escobar Memorial Island ",
-            CountyID = StaticStrings.ViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            Economy = eLocationEconomy.Poor,
-            Type = eLocationType.Wilderness,
-            },
-            new Zone() {
-            InternalGameName = "MFOMNI",
-            DisplayName = "Hyman District",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            IsSpecificLocation = true,
-            Type = eLocationType.Downtown,
-            },
-            new Zone() {
-            InternalGameName = "MFLPKW",
-            DisplayName = "West Haven",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            IsSpecificLocation = true,
-            Type = eLocationType.Downtown,
-            },
-            new Zone() {
-            InternalGameName = "MFDMIA",
-            DisplayName = "Downtown Vice City",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            IsSpecificLocation = true,
-            Type = eLocationType.Downtown,
-            },
-            new Zone() {
-            InternalGameName = "MFLBKL",
-            DisplayName = "Felicity",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            IsSpecificLocation = true,
-            Economy = eLocationEconomy.Rich,
-            Type = eLocationType.Downtown,
-            },
-            new Zone() {
-            InternalGameName = "MFOTWN",
-            DisplayName = "Little Dominica",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            IsSpecificLocation = true,
-            Economy = eLocationEconomy.Poor,
-            Type = eLocationType.Suburb,
-            DealerMenuContainerID = "CrackAreaDrugDealerMenuGroupID",
-            CustomerMenuContainerID = "CrackAreaDrugCustomerMenuGroupID",
-            },
-            new Zone() {
-            InternalGameName = "MFLUMP",
-            DisplayName = "Rockridge",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            IsSpecificLocation = true,
-            Type = eLocationType.Suburb,
-            DealerMenuContainerID = "ToiletCleanerAreaDrugDealerMenuGroupID",
-            CustomerMenuContainerID = "ToiletCleanerAreaDrugCustomerMenuGroupID",
-            },
-            new Zone() {
-            InternalGameName = "MFLSPG",
-            DisplayName = "Olympic Heights",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            IsSpecificLocation = true,
-            Type = eLocationType.Suburb,
-            DealerMenuContainerID = "HeroinAreaDrugDealerMenuGroupID",
-            CustomerMenuContainerID = "HeroinAreaDrugCustomerMenuGroupID",
-            },
-            new Zone() {
-            InternalGameName = "MFLHVA",
-            DisplayName = "Little Havana",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            IsSpecificLocation = true,
-            Type = eLocationType.Suburb,
-            DealerMenuContainerID = "CokeAreaDrugDealerMenuGroupID",
-            CustomerMenuContainerID = "CokeAreaDrugCustomerMenuGroupID",
-            },
-            new Zone() {
-            InternalGameName = "MFLCRW",
-            DisplayName = "Coral City",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            IsSpecificLocation = true,
-            Type = eLocationType.Suburb,
-            },
-            new Zone() {
-            InternalGameName = "MFLCRG",
-            DisplayName = "Coral City",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            IsSpecificLocation = true,
-            Economy = eLocationEconomy.Rich,
-            Type = eLocationType.Suburb,
-            },
-            new Zone() {
-            InternalGameName = "MFLCCG",
-            DisplayName = "Banana Grove",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            IsSpecificLocation = true,
-            Type = eLocationType.Suburb,
-            DealerMenuContainerID = "MarijuanaAreaDrugDealerMenuGroupID",
-            CustomerMenuContainerID = "MarijuanaAreaDrugCustomerMenuGroupID",
-            },
-            new Zone() {
-            InternalGameName = "MFGVCR",
-            DisplayName = "Federal District",
-            CountyID = StaticStrings.CityOfViceCountyID,
-            StateID = StaticStrings.LeonidaStateID,
-            IsSpecificLocation = true,
-            Type = eLocationType.Downtown,
-            },
-
-
-
-
-
-            };
-        Serialization.SerializeParams(MiamiDriver3Zones, "Plugins\\LosSantosRED\\AlternateConfigs\\SunshineDream\\Zones_SunshineDream.xml");
-    }
+   
 
     //private bool IsPointInPolygon(Vector2 point, Vector2[] polygon)
     //{

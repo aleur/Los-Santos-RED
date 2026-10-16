@@ -71,7 +71,17 @@ public class WeaponRecoil
         {
             AdjustPitchInVehicle();
             AdjustHeadingInVehicle();
-            NativeFunction.Natives.FORCE_CAMERA_RELATIVE_HEADING_AND_PITCH(CurrentPitch + AdjustedPitch, CurrentHeading + AdjustedHeading, Settings.SettingsManager.RecoilSettings.SmoothRate);
+            //NativeFunction.Natives.FORCE_CAMERA_RELATIVE_HEADING_AND_PITCH(CurrentPitch + AdjustedPitch, CurrentHeading + AdjustedHeading, Settings.SettingsManager.RecoilSettings.SmoothRate);
+
+
+            NativeFunction.Natives.SET_GAMEPLAY_CAM_RELATIVE_PITCH(CurrentPitch + AdjustedPitch + Settings.SettingsManager.RecoilSettings.InVehicleVerticalScalar, Settings.SettingsManager.RecoilSettings.SmoothRate);
+            if (Math.Abs(AdjustedHeading) > 0)
+            {
+                NativeFunction.Natives.SET_GAMEPLAY_CAM_RELATIVE_HEADING(CurrentHeading + AdjustedHeading);
+            }
+
+
+
         }
         else
         {

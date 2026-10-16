@@ -104,8 +104,11 @@ public class GangSettings : ISettingsDefaultable
     public uint MinTimeBetweenHitSquads { get; set; }
     public uint MaxTimeBetweenHitSquads { get; set; }
 
+    public uint MinTimeBetweenHitSquadsDuringWar { get; set; }
+    public uint MaxTimeBetweenHitSquadsDuringWar { get; set; }
 
-   // [Description("Maximum gang boats that can be spawned.")]
+
+    // [Description("Maximum gang boats that can be spawned.")]
     //public int BoatSpawnLimit_Default { get; set; }
 
     [Description("Maximum gang helicopters that can be spawned.")]
@@ -150,18 +153,19 @@ public class GangSettings : ISettingsDefaultable
     [Description("Maximum additional time (in ms) between gang members speaking when in weapons free mode.")]
     public int TimeBetweenGangSpeak_HighCombat_Randomizer_Max { get; set; }
 
-    public int RepDeductedKilled { get; set; }
+
     [Description("Reputation deducted when killing an enemy Gang Member.")]
-    public int RepDeductedKilledTerritory { get; set; }
+    public int RepDeductedKilled { get; set; }
     [Description("Additional reputation deducted if an enemy Gang Member is killed in their territory.")]
-    public int RepDeductedInjured { get; set; }
+    public int RepDeductedKilledTerritory { get; set; }
     [Description("Reputation deducted when injuring an enemy Gang Member.")]
-    public int RepDeductedInjuredTerritory { get; set; }
+    public int RepDeductedInjured { get; set; }
     [Description("Additional reputation deducted if an enemy Gang Member is injured in their territory.")]
-    public int RepDeductedCarjacked { get; set; }
+    public int RepDeductedInjuredTerritory { get; set; }
     [Description("Reputation deducted when carjacking an enemy Gang Member.")]
-    public int RepDeductedCarjackedTerritory { get; set; }
+    public int RepDeductedCarjacked { get; set; }
     [Description("Additional reputation deducted if an enemy Gang Member is carjacked in their territory.")]
+    public int RepDeductedCarjackedTerritory { get; set; }
 
     public int IdleSpeakPercentage { get; set; }
     public int SevereCombatSpeakPercentage { get; set; }
@@ -169,6 +173,24 @@ public class GangSettings : ISettingsDefaultable
     public int FleeingSpeakPercentage { get; set; }
     public bool AllowBackupAssaultSpawns { get; set; }
     public bool AllowNonEnemyTargets { get; set; }
+    public bool AllowFlyThroughWindshield { get; set; }
+    public float FlyThroughWindshieldPercent { get; set; }
+
+
+    public bool DisableVanillaGangZoneTakeover { get; set; }
+
+    public bool EnableTerritoryRetaliation { get; set; }
+    public uint TerritoryRetaliationTimeToReturnMin { get; set; }
+    public uint TerritoryRetaliationTimeToReturnMax { get; set; }
+    public uint TerritoryRetaliationStartTimeMin { get; set; }
+    public uint TerritoryRetaliationStartTimeMax { get; set; }
+    public float TerritoryRetaliationPercentageMin { get; set; }
+    public float TerritoryRetaliationPercentageMax { get; set; }
+    public uint TerritoryRetaliationTimeMin { get; set; }
+    public uint TerritoryRetaliationTimeMax { get; set; }
+    public float TerritoryRetaliationPercentageDecreaseBasedOnTimesPlayerDefended { get; set; }
+    public float WarefareCloseDistance { get; set; }
+    public float TerritoryRetaliationAutoDefendPercentage { get; set; }
 
 
     public GangSettings()
@@ -194,18 +216,18 @@ public class GangSettings : ISettingsDefaultable
         PercentSpawnOutsideTerritory = 10;
         ManageDispatching = true;
 
-        TimeBetweenSpawn = 10000;//10000;
+        TimeBetweenSpawn = 8000;// 10000;//10000;
 
-        TimeBetweenSpawn_DowntownAdditional = 10000;
+        TimeBetweenSpawn_DowntownAdditional = 8000;// 10000;
         TimeBetweenSpawn_WildernessAdditional = 80000;
-        TimeBetweenSpawn_RuralAdditional = 50000;
-        TimeBetweenSpawn_SuburbAdditional = 20000;
-        TimeBetweenSpawn_IndustrialAdditional = 20000;
+        TimeBetweenSpawn_RuralAdditional = 35000;// 50000;
+        TimeBetweenSpawn_SuburbAdditional = 15000;// 20000;
+        TimeBetweenSpawn_IndustrialAdditional = 16000;// 20000;
 
 
 
 
-        MinDistanceToSpawnOnFoot = 125f;//75f// 50f;
+        MinDistanceToSpawnOnFoot = 95f;// 125f;//75f// 50f;
         MaxDistanceToSpawnOnFoot = 225f;//200f// 150f;
 
 
@@ -214,21 +236,21 @@ public class GangSettings : ISettingsDefaultable
 
 
 
-        TotalSpawnedMembersLimit = 10;// 8;// 10;////12;// 16;//5
-        TotalSpawnedAmbientMembersLimit = 8;// 4;// 5;// 8;
+        TotalSpawnedMembersLimit = 16;// 14;// 10;// 8;// 10;////12;// 16;//5
+        TotalSpawnedAmbientMembersLimit = 12;// 10;// 8;// 4;// 5;// 8;
 
-        TotalSpawnedAmbientMembersLimit_Downtown = 6;// 4;// 5;
-        TotalSpawnedAmbientMembersLimit_Wilderness = 2;
-        TotalSpawnedAmbientMembersLimit_Rural = 3;
-        TotalSpawnedAmbientMembersLimit_Suburb = 4;
-        TotalSpawnedAmbientMembersLimit_Industrial = 4;// 3;// 4;
+        TotalSpawnedAmbientMembersLimit_Downtown = 12;// 8;// 6;// 4;// 5;
+        TotalSpawnedAmbientMembersLimit_Wilderness = 3;// 2;
+        TotalSpawnedAmbientMembersLimit_Rural = 6;// 5;// 3;
+        TotalSpawnedAmbientMembersLimit_Suburb = 8;// 7;// 5;// 4;
+        TotalSpawnedAmbientMembersLimit_Industrial = 6;// 5;// 4;// 3;// 4;
 
-        AmbientSpawnPercentage = 60;
+        AmbientSpawnPercentage = 80;// 60;
         AmbientSpawnPercentage_Wilderness = 35;
-        AmbientSpawnPercentage_Rural = 45;
-        AmbientSpawnPercentage_Suburb = 55;
-        AmbientSpawnPercentage_Industrial = 55;
-        AmbientSpawnPercentage_Downtown = 75;
+        AmbientSpawnPercentage_Rural = 65;// 45;
+        AmbientSpawnPercentage_Suburb = 70;// 60;// 55;
+        AmbientSpawnPercentage_Industrial = 65;// 55;
+        AmbientSpawnPercentage_Downtown = 85;// 75;
 
 
 
@@ -255,7 +277,7 @@ public class GangSettings : ISettingsDefaultable
         EscortSpeedNormal = 30f;
         DenSpawningWhenPlayerWantedMaxWanted = 4;
         AmbientSpawningWhenPlayerWantedMaxWanted = 4;
-        AmbientSpawnPedestrianAttemptPercentage = 20f;
+        AmbientSpawnPedestrianAttemptPercentage = 40f;// 20f;
 
         DistanceToReportRepChanges = 75f;
         GameTimeToReportRepChanges = 45000;
@@ -266,7 +288,12 @@ public class GangSettings : ISettingsDefaultable
         AllowHitSquads = true;
 
         MinTimeBetweenHitSquads = 900000;
-        MaxTimeBetweenHitSquads = 1500000;
+        MaxTimeBetweenHitSquads = 1500000*3;
+
+
+        MinTimeBetweenHitSquadsDuringWar = 60000;
+        MaxTimeBetweenHitSquadsDuringWar = 120000;
+
         AllowHitSquadsOnlyEnemy = false;
 
        // BoatSpawnLimit_Default = 1;
@@ -318,8 +345,25 @@ public class GangSettings : ISettingsDefaultable
         AllowNonEnemyTargets = true;
 
         // RemoveNonSpawnedGangMembersOnFoot_Extra = false;
+        AllowFlyThroughWindshield = true;
+
+        EnableTerritoryRetaliation = true;
 
 
+        TerritoryRetaliationStartTimeMin  = 60000 * 3;
+        TerritoryRetaliationStartTimeMax = 60000 * 10;
+        TerritoryRetaliationPercentageMin = 20f;
+        TerritoryRetaliationPercentageMax = 50f;
+        TerritoryRetaliationTimeMin = 60000 * 5;
+        TerritoryRetaliationTimeMax = 60000 * 10;
+        TerritoryRetaliationTimeToReturnMin = 60000 * 8;
+        TerritoryRetaliationTimeToReturnMax = 60000 * 10;
+
+        TerritoryRetaliationPercentageDecreaseBasedOnTimesPlayerDefended = 5f;
+        DisableVanillaGangZoneTakeover = true;
+        WarefareCloseDistance = 300f;
+
+        TerritoryRetaliationAutoDefendPercentage = 20f;
 
     }
 

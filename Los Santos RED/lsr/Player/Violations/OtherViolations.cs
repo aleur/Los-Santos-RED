@@ -61,6 +61,10 @@ public class OtherViolations
         {
             Violations.AddViolating(StaticStrings.PublicIntoxicationCrimeID);
         }
+        if (Player.IsInVehicle && Player.VehicleRaceManager.IsStreetRacing)
+        {
+            Violations.AddViolating(StaticStrings.StreetRacingCrimeID);
+        }
         if (Player.RecentlyFedUpCop)
         {
             Violations.AddViolating(StaticStrings.InsultingOfficerCrimeID);
@@ -159,7 +163,8 @@ public class OtherViolations
     }
     private void SuspiciousUpdate()
     {
-        if (Player.Investigation.IsSuspicious || Player.IsDoingSuspiciousActivity)//when near investigation blip with description
+
+        if (Player.Investigation.IsSuspicious || Player.IsDoingSuspiciousActivity || Player.OutfitManager.HasMaskOn)//when near investigation blip with description
         {
             Violations.AddViolating(StaticStrings.SuspiciousActivityCrimeID);
         }
@@ -192,6 +197,10 @@ public class OtherViolations
         if (Player.ActivityManager.IsBuryingBody)
         {
             Violations.AddViolating(StaticStrings.BuryingABody);
+        }
+        if(Player.IsInArmedMilitaryVehicle)
+        {
+            Violations.AddViolating(StaticStrings.StolenArmedMilitaryVehicleCrimeID);
         }
         CheckVehicleInvasion();
     }

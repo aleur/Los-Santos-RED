@@ -29,6 +29,7 @@ namespace LosSantosRED.lsr
         private HashSet<Crime> GracePeriodCrimes = new HashSet<Crime>();
         private Vector3 CurrentWantedCenter;
         private float CurrentPlayerDistance;
+        private bool hasShownIdentifiedMessage;
 
         public TrainStopper TrainStopper { get; private set; }
         private enum PoliceState
@@ -64,7 +65,7 @@ namespace LosSantosRED.lsr
         public int CurrentRespondingPoliceCount { get; private set; }
 
 
-
+        public bool HasPlayerBeenIdentified { get; private set; }
 
 
         public bool HasShotAtPolice => InstancesOfCrime("KillingPolice") > 0 || InstancesOfCrime("FiringWeaponNearPolice") > 0;
@@ -224,6 +225,10 @@ namespace LosSantosRED.lsr
                 {
                     PlayerSeenInVehicleDuringWanted = true;
                 }
+                if(Player.AnyPoliceCanRecognizePlayer && Player.WantedLevel >= 2 && !Player.IsWearingMask && HasBeenWantedFor >= 10000 && WantedLevelHasBeenRadioedIn)
+                {
+                    HasPlayerBeenIdentified = true;
+                }
             }
             else
             {
@@ -245,7 +250,21 @@ namespace LosSantosRED.lsr
             }
             PoliceKilledUpdate();
             UpdateWantedSize();
+
+            if(HasPlayerBeenIdentified && !hasShownIdentifiedMessage)
+            {
+                ShowIdentifiedMessage();
+            }
+
         }
+
+        private void ShowIdentifiedMessage()
+        {
+            EntryPoint.WriteToConsole("YOU HAVE BEEN IDENTIFIED DURING THE WANTED");
+            Player.Scanner.OnPlayerIdentified();
+            hasShownIdentifiedMessage = true;
+        }
+
         private void UpdateWantedSize()
         {      
             if(!WantedLevelHasBeenRadioedIn)
@@ -275,7 +294,7 @@ namespace LosSantosRED.lsr
             }
             TrainStopper.Dispose();
         }
-        public CrimeSceneDescription AddCrime(Crime CrimeInstance, CrimeSceneDescription crimeSceneDescription, bool isForPlayer)
+        public CrimeSceneDescription AddCrime(Crime CrimeInstance, CrimeSceneDescription crimeSceneDescription, bool isForPlayer, bool alwaysAddInstance)
         {
             //this is a fucking mess of references and isnt working properly at all
             //instances still dont work, need to rethink this entire approach, maybe store the latest info separate from the crime?
@@ -285,6 +304,10 @@ namespace LosSantosRED.lsr
             PlaceLastReportedCrimeInterior = crimeSceneDescription.InteriorSeen;
             if (Player.IsAlive)//Player.IsAliveAndFree)// && !CurrentPlayer.RecentlyBribedPolice)
             {
+
+                //EntryPoint.WriteToConsole($"AddCrime CrimeInstance {CrimeInstance.Name}");
+
+
                 if (crimeSceneDescription.HaveDescription && isForPlayer)
                 {
                     PoliceHaveDescription = crimeSceneDescription.HaveDescription;
@@ -301,12 +324,29 @@ namespace LosSantosRED.lsr
                 }
                 if (PreviousViolation != null)
                 {
-                    PreviousViolation.AddInstance();
+                    if (alwaysAddInstance)
+                    {
+                        PreviousViolation.ForceAddInstance();
+                    }
+                    else
+                    {
+                        PreviousViolation.AddInstance();
+                    }
                     crimeSceneDescription.InstancesObserved = PreviousViolation.Instances;
                     PreviousViolation.CurrentInformation = crimeSceneDescription;
+
+
+                    if (CrimeInstance.ID == StaticStrings.KillingPoliceCrimeID)
+                    {
+                        EntryPoint.WriteToConsole($"AddCrime CrimeInstance {CrimeInstance.Name} alwaysAddInstance{alwaysAddInstance} HAS PREVIOUS VIOLATION PreviousViolation.Instances{PreviousViolation.Instances} crimeSceneDescription.InstancesObserved{crimeSceneDescription.InstancesObserved}");
+                    }
+
                 }
                 else
                 {
+
+
+
                     //EntryPoint.WriteToConsole($"PLAYER EVENT: ADD CRIME: {CrimeInstance.Name} ByPolice: {crimeSceneDescription.SeenByOfficers} Instances {crimeSceneDescription.InstancesObserved}", 3);
                     if (crimeSceneDescription.SeenByOfficers)
                     {
@@ -316,7 +356,11 @@ namespace LosSantosRED.lsr
                     {
                         CrimesReported.Add(new CrimeEvent(CrimeInstance, crimeSceneDescription));
                     }
-                }
+                    if (CrimeInstance.ID == StaticStrings.KillingPoliceCrimeID)
+                    {
+                        EntryPoint.WriteToConsole($"AddCrime CrimeInstance {CrimeInstance.Name} IS NEW VIOLATION  alwaysAddInstance{alwaysAddInstance} crimeSceneDescription.InstancesObserved{crimeSceneDescription.InstancesObserved}");
+                    }
+                    }
                 if (crimeSceneDescription.SeenByOfficers && Player.WantedLevel != CrimeInstance.ResultingWantedLevel && isForPlayer)
                 {
                     Player.SetWantedLevel(CrimeInstance.ResultingWantedLevel, CrimeInstance.Name, true);
@@ -374,6 +418,8 @@ namespace LosSantosRED.lsr
         }
         public void OnBecameWanted()
         {
+            HasPlayerBeenIdentified = false;
+            hasShownIdentifiedMessage = false;
             GameTimeWantedStarted = Game.GameTime;
             GameTimeWantedLevelStarted = Game.GameTime;
             PlaceWantedStarted = Game.LocalPlayer.Character.Position;
@@ -422,6 +468,8 @@ namespace LosSantosRED.lsr
         }
         public void Reset()
         {
+            HasPlayerBeenIdentified = false;
+            hasShownIdentifiedMessage = false;
             Player.SetWantedLevel(0, "Police Response Reset", true);
             IsWeaponsFree = false;
             PlayerSeenDuringWanted = false;
@@ -437,6 +485,7 @@ namespace LosSantosRED.lsr
             CrimesReported.Clear();
             TrainStopper.Reset();
             CountCloseVehicleChasingCops = 0;
+
         }
         private void AssignCops()
         {

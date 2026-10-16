@@ -37,16 +37,20 @@ public class VehicleManager
     }
     public void Update()
     {
+        if(!EntryPoint.ModController.IsRunning)
+        {
+            return;
+        }
         foreach(StoredVehicle sv in PersistantVehicles)
         {
             if(sv.VehicleExt == null || !sv.VehicleExt.Vehicle.Exists())
             {
                 continue;
             }
-            if(sv.VehicleExt.DistanceChecker.DistanceToPlayer >= 500f)
+            if(sv.VehicleExt.DistanceChecker.DistanceToPlayer >= Settings.SettingsManager.VehicleSettings.PlayerEnteredPersistantVehicleDistanceLimit)//500f)
             {
                 sv.VehicleExt.Vehicle.IsPersistent = false;
-                EntryPoint.WriteToConsole("Removeing Persist Vehicle as you moved too far away");
+                EntryPoint.WriteToConsole("Removing Persist Vehicle as you moved too far away");
             }
         }
         PersistantVehicles.RemoveAll(x => x.VehicleExt != null && !x.VehicleExt.Vehicle.Exists());
@@ -126,7 +130,7 @@ public class VehicleManager
                 storedVehicle.VehicleExt.Vehicle.IsPersistent = false;
             }
         }
-        EntryPoint.WriteToConsole($"UNPERSISTED ALL VEHICLES");
+        //EntryPoint.WriteToConsole($"UNPERSISTED ALL VEHICLES");
     }
 
     public void OnTookOwnership(VehicleExt toOwn)

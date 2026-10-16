@@ -36,6 +36,9 @@ public class RecoilSettings : ISettingsDefaultable
     public bool ApplyRecoilToSnipers { get; set; }
     public float SmoothRate { get; set; }
 
+
+    public float InVehicleVerticalScalar { get; set; }
+
     public RecoilSettings()
     {
         SetDefault();
@@ -43,7 +46,7 @@ public class RecoilSettings : ISettingsDefaultable
     public void SetDefault()
     {
         ApplyRecoil = true;
-        ApplyRecoilInVehicle = false;
+        ApplyRecoilInVehicle = true;
         ApplyRecoilOnFoot = true;
         VerticalRecoilAdjuster = 1.0f;
         HorizontalRecoilAdjuster = 1.0f;
@@ -62,5 +65,8 @@ public class RecoilSettings : ISettingsDefaultable
         ApplyRecoilToSnipers = true;
         ApplyRecoilWithController = false;
         SmoothRate = 1.0f;
+
+
+        InVehicleVerticalScalar = 2.75f;
     }
 }

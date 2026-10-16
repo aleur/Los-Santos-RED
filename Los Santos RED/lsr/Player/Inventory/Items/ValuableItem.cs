@@ -14,4 +14,9 @@ public class ValuableItem : ModItem
     {
 
     }
+    public override void AddToList(PossibleItems possibleItems)
+    {
+        possibleItems?.ValuableItems.RemoveAll(x => x.Name == Name);
+        possibleItems?.ValuableItems.Add(this);
+    }
 }

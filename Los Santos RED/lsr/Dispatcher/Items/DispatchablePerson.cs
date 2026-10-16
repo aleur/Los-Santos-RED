@@ -44,8 +44,8 @@ public class DispatchablePerson
 
     public int VehicleAccuracyMin { get; set; } = 1;//2;//5
     public int VehicleAccuracyMax { get; set; } = 4;//5
-    public int VehicleShootRateMin { get; set; } = 5;//10;//20
-    public int VehicleShootRateMax { get; set; } = 10;//15;//20
+    public int VehicleShootRateMin { get; set; } = 60;//5;//10;//20
+    public int VehicleShootRateMax { get; set; } = 100;//10;//15;//20
 
 
     public int TurretAccuracyMin { get; set; } = 10;
@@ -66,6 +66,10 @@ public class DispatchablePerson
     public string OverrideLessLethalWeaponsID { get; set; }
     public string OverrideSideArmsID { get; set; }
     public string OverrideLongGunsID { get; set; }
+
+
+    public int OverrideRacePlayerPercentage { get; set; } = -1;
+
     [XmlIgnore]
     public List<IssuableWeapon> OverrideSideArms { get; set; } = new List<IssuableWeapon>();
     [XmlIgnore]
@@ -98,6 +102,15 @@ public class DispatchablePerson
 
     public PedPropComponent OverrideHelmet { get; set; }
     public float NoHelmetPercentage { get; set; } = 0f;
+
+    public bool ShrinkHeadForMask { get; set; } = false;
+
+
+
+    public bool IsInvisibleAndInvulnerable { get; set; } = false;
+
+
+
     public string GetDescription()
     {
         string description = "";
@@ -169,6 +182,7 @@ public class DispatchablePerson
         {
             return;
         }
+        pedExt.IsAnimal = IsAnimal;
         pedExt.Accuracy = RandomItems.GetRandomNumberInt(AccuracyMin, AccuracyMax);
         pedExt.ShootRate = RandomItems.GetRandomNumberInt(ShootRateMin, ShootRateMax);
         pedExt.CombatAbility = RandomItems.GetRandomNumberInt(CombatAbilityMin, CombatAbilityMax);
@@ -274,6 +288,15 @@ public class DispatchablePerson
         {
             CombatFloatsToSet.ForEach(x => x.ApplyToPed(pedExt.Pedestrian));
         }
+        if(IsInvisibleAndInvulnerable)
+        {
+            pedExt.Pedestrian.IsVisible = false;
+            pedExt.Pedestrian.IsInvincible = true;
+            pedExt.Pedestrian.CanBePulledOutOfVehicles = false;
+            pedExt.Pedestrian.CanBeShotInVehicles = false;
+            NativeFunction.Natives.SET_PED_COMBAT_ATTRIBUTES(pedExt.Pedestrian, (int)eCombat_Attribute.CA_LEAVE_VEHICLES, false);
+            NativeFunction.Natives.BLOCK_ALL_SPEECH_FROM_PED(pedExt.Pedestrian, true, true);
+        }
     }
     public DispatchablePerson()
     {
@@ -344,11 +367,11 @@ public class DispatchablePerson
             }
             if (isSlow)
             {
-                variationToSet = RequiredVariation.ApplyToPedSlow(ped, setDefaultFirst);
+                variationToSet = RequiredVariation.ApplyToDispatchablePedSlow(ped, setDefaultFirst);
             }
             else
             {
-                variationToSet = RequiredVariation.ApplyToPed(ped, setDefaultFirst, false);
+                variationToSet = RequiredVariation.ApplyToPed(ped, setDefaultFirst, false, true);
             }
             if (RandomizeHead)//need to have a variation for this as its just freemode otherwise
             {
@@ -358,7 +381,7 @@ public class DispatchablePerson
                 if (rhd != null)
                 {
                     RandomHeadData rhd2 = PossibleHeads.Where(x => x.IsMale == isMale && x.Name != rhd.Name).PickRandom();
-                    SetRandomizeHead(ped, rhd, rhd2, variationToSet, true);
+                    SetRandomizeHead(ped, rhd, rhd2, variationToSet, true, ShrinkHeadForMask);
                 }
             }
             if (OptionalProps != null)
@@ -439,7 +462,7 @@ public class DispatchablePerson
         
 
     }
-    public void SetRandomizeHead(Ped ped, RandomHeadData myHead, RandomHeadData blendHead, PedVariation pedVariation, bool allowMorph)
+    public void SetRandomizeHead(Ped ped, RandomHeadData myHead, RandomHeadData blendHead, PedVariation pedVariation, bool allowMorph, bool shrinkHead)
     {
         GameFiber.Yield();
         if(!ped.Exists())
@@ -552,13 +575,25 @@ public class DispatchablePerson
             new FaceFeature(18, "Chin Hole") { RangeLow = 0.0f },
             new FaceFeature(19, "Neck Thickness") { RangeLow = 0.0f },
         };
+
+        List<int> shrinkHeadID = new List<int>() { 1,2,4,8,9,10,13,14,15,17,19 };
+
         foreach (FaceFeature faceFeature in FaceFeatures)
         {
             if (!ped.Exists())
             {
                 return;
             }
-            if(RandomItems.RandomPercent(FaceFeatureRandomizePercentage))
+
+            if(ShrinkHeadForMask && shrinkHeadID.Contains(faceFeature.Index))
+            {
+
+                float newScale = faceFeature.RangeLow;
+                NativeFunction.Natives.x71A5C1DBA060049E(ped, faceFeature.Index, newScale);
+                pedVariation.FaceFeatures.Add(new FaceFeature(faceFeature.Index, faceFeature.Name) { Index = faceFeature.Index, Scale = newScale, RangeLow = faceFeature.RangeLow, RangeHigh = faceFeature.RangeHigh });
+                GameFiber.Yield();
+            }
+            else if(RandomItems.RandomPercent(FaceFeatureRandomizePercentage))
             {
                 float newScale = RandomItems.GetRandomNumber(faceFeature.RangeLow/2.0f, faceFeature.RangeHigh/2.0f);
                 NativeFunction.Natives.x71A5C1DBA060049E(ped, faceFeature.Index, newScale);

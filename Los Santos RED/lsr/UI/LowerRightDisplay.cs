@@ -301,7 +301,7 @@ public class LowerRightDisplay
             }
         }
 
-        if(DisplayablePlayer.IntimidationManager.IsMinimumIntimidating)
+        if(!DisplayablePlayer.IsCop && DisplayablePlayer.IntimidationManager.IsMinimumIntimidating)
         {
             if (PlayerDisplay == "")
             {
@@ -313,7 +313,7 @@ public class LowerRightDisplay
             }
         }
         string stealthText = DisplayablePlayer.StealthManager.GetUIText();
-        if (!string.IsNullOrEmpty(stealthText))
+        if (!DisplayablePlayer.IsCop && !string.IsNullOrEmpty(stealthText))
         {
             PlayerDisplay += $" {UI.CurrentDefaultTextColor}{stealthText}";
         }
@@ -376,7 +376,10 @@ public class LowerRightDisplay
                 StreetDisplay += $" at {UI.CurrentDefaultTextColor}{DisplayablePlayer.CurrentLocation.CurrentCrossStreet.ProperStreetName} {UI.CurrentDefaultTextColor}";
             }
         }
-        
+        //if(DisplayablePlayer.CurrentLocation.CurrentZone!= null && DisplayablePlayer.CurrentLocation.CurrentZone.IsContestedTerritory)
+        //{
+        //    StreetDisplay = $"~r~ !!! ~s~{StreetDisplay}";
+        //}
         return StreetDisplay;
     }
     private string GetVehicleStatusDisplay()
@@ -385,6 +388,9 @@ public class LowerRightDisplay
         if (DisplayablePlayer.CurrentVehicle != null && (DisplayablePlayer.IsInAutomobile || DisplayablePlayer.IsOnMotorcycle))//was game.localpalyer.character.isinanyvehicle(false)
         {
             CurrentSpeedDisplay = $" {UI.CurrentDefaultTextColor}" + "";
+
+
+
             if (DisplayablePlayer.CurrentVehicle.Vehicle.Exists() && DisplayablePlayer.CurrentVehicle.IsCar && !DisplayablePlayer.CurrentVehicle.Engine.IsRunning)
             {
                 CurrentSpeedDisplay = $" {UI.CurrentDefaultTextColor}" + "ENGINE OFF";
@@ -451,6 +457,14 @@ public class LowerRightDisplay
                     }
                 }
             }
+
+
+
+            if (Settings.SettingsManager.VehicleSettings.AllowSetTransmissionState && DisplayablePlayer.CurrentVehicle.Vehicle.Exists())
+            {
+                CurrentSpeedDisplay += $" [{DisplayablePlayer.CurrentVehicle.Transmission.TransmissionSymbol}] ";
+            }
+
             if (DisplayablePlayer.Violations.TrafficViolations.IsViolatingAnyTrafficLaws)
             {
                 CurrentSpeedDisplay += $" ~r~!{UI.CurrentDefaultTextColor}";
@@ -495,6 +509,10 @@ public class LowerRightDisplay
                 else if (DisplayablePlayer.CurrentVehicle.CarPlate != null && DisplayablePlayer.CurrentVehicle.CarPlate.IsWanted)
                 {
                     CurrentSpeedDisplay += $" ~o~Plate Known to Police{UI.CurrentDefaultTextColor}";
+                }
+                if (DisplayablePlayer.TimeInCurrentVehicle > 0 && DisplayablePlayer.TimeInCurrentVehicle <= 10000 && DisplayablePlayer.IsNotWanted)
+                {
+                    CurrentSpeedDisplay += " " + DisplayablePlayer.CurrentVehicle.GetCarName();
                 }
             }
         }

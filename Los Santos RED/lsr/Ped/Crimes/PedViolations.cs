@@ -87,14 +87,14 @@ public class PedViolations
 
     public bool IsVisiblyArmed { get; set; }
 
-    public void Update(IPoliceRespondable player, bool OnlyCorrupt)
+    public void Update(IPoliceRespondable player)
     {
         if (Settings.SettingsManager.CivilianSettings.CheckCivilianCrimes)
         {
             CrimesViolating.Clear();
             if (!PedExt.IsArrested)
             {
-                CheckCrimes(player, OnlyCorrupt);
+                CheckCrimes(player);
 
                 if (IsWanted && !PedExt.IsDead && !PedExt.IsArrested)
                 {
@@ -164,12 +164,11 @@ public class PedViolations
             //EntryPoint.WriteToConsoleTestLong($"Removing Wanted Level, No Near Cops {PedExt?.Handle}");
         }
     }
-    private void CheckCrimes(IPoliceRespondable player, bool OnlyCorrupt)
+    private void CheckCrimes(IPoliceRespondable player)
     {
         if (PedExt.Pedestrian.Exists() && !PedExt.IsBusted)
         {
-            if(OnlyCorrupt)
-            {
+
                 if (PedExt.IsDealingDrugs)//if (PedExt.WasEverSetPersistent && NativeFunction.Natives.IS_ENTITY_PLAYING_ANIM<bool>(PedExt.Pedestrian, "switch@franklin@002110_04_magd_3_weed_exchange", "002110_04_magd_3_weed_exchange_shopkeeper", 3) || NativeFunction.Natives.GET_ENTITY_ANIM_CURRENT_TIME<float>(PedExt.Pedestrian, "switch@franklin@002110_04_magd_3_weed_exchange", "002110_04_magd_3_weed_exchange_shopkeeper") > 0f)
                 {
                     AddViolating(Crimes?.CrimeList.FirstOrDefault(x => x.ID == "DealingDrugs"));//lslife integration?
@@ -178,8 +177,8 @@ public class PedViolations
                 {
                     AddViolating(Crimes?.CrimeList.FirstOrDefault(x => x.ID == "DealingGuns"));//lslife integration?
                 }
-                return;
-            }
+               // return;OOPSIE DAISEY
+            
 
 
 
@@ -258,21 +257,42 @@ public class PedViolations
             }
 
 
-            if (!IsDeadlyChase && !CrimesObserved.Any(x => x.ID == "KillingPolice"))//only loop if we have to
+            //if (!IsDeadlyChase && !CrimesObserved.Any(x => x.ID == "KillingPolice"))//only loop if we have to
+            //{
+            //    foreach (Cop cop in World.Pedestrians.AllPoliceList)
+            //    {
+            //        if (cop.Pedestrian.Exists() && cop.Pedestrian.IsDead)
+            //        {
+            //            if (cop.CheckKilledBy(PedExt.Pedestrian))//this is already logged so only comparing uints? no game calls
+            //            {
+            //                AddObserved(Crimes?.CrimeList.FirstOrDefault(x => x.ID == "KillingPolice"));//add killing police observed, then get outta here
+            //                //AddObserved(Crimes?.CrimeList.FirstOrDefault(x => x.ID == "TerroristActivity"));//add TerroristActivity just for 4 stars on some peds
+            //                break;
+            //            }
+            //        }
+            //    }
+            //}
+            //int copsKilledObserved = CrimesObserved.Where(x => x.ID == StaticStrings.KillingPoliceCrimeID).Count();
+            //if (PedExt.CopsKilled > copsKilledObserved)
+            //{
+            //    int difference = PedExt.CopsKilled - copsKilledObserved;
+            //    for (int i = 0; i < difference; i++)
+            //    {
+            //        AddObserved(Crimes?.CrimeList.FirstOrDefault(x => x.ID == StaticStrings.KillingPoliceCrimeID));
+            //        EntryPoint.WriteToConsole($"{PedExt.Handle} ADDING COP KILLED OBSERVED");
+            //    }
+            //}
+            if(PedExt.CopsKilled > 0)
             {
-                foreach (Cop cop in World.Pedestrians.AllPoliceList)
-                {
-                    if (cop.Pedestrian.Exists() && cop.Pedestrian.IsDead)
-                    {
-                        if (cop.CheckKilledBy(PedExt.Pedestrian))//this is already logged so only comparing uints? no game calls
-                        {
-                            AddObserved(Crimes?.CrimeList.FirstOrDefault(x => x.ID == "KillingPolice"));//add killing police observed, then get outta here
-                            //AddObserved(Crimes?.CrimeList.FirstOrDefault(x => x.ID == "TerroristActivity"));//add TerroristActivity just for 4 stars on some peds
-                            break;
-                        }
-                    }
-                }
+                AddViolating(Crimes?.CrimeList.FirstOrDefault(x => x.ID == StaticStrings.KillingPoliceCrimeID));
             }
+            if(PedExt.CopsKilled >= 3)
+            {
+                AddViolating(Crimes?.CrimeList.FirstOrDefault(x => x.ID == StaticStrings.TerroristActivityCrimeID));
+            }
+
+
+
             //GameFiber.Yield();
             if (PedExt.Pedestrian.Exists() && !PedExt.IsInVehicle)//do a yiled above
             {

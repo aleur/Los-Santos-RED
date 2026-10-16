@@ -32,7 +32,8 @@ public class Dispatcher
     private IPlacesOfInterest PlacesOfInterest;
     private IModItems ModItems;
     private IInteriors Interiors;
-
+    private IDispatchablePeople DispatchablePeople;
+    private IDispatchableVehicles DispatchableVehicles;
 
     public LEDispatcher LEDispatcher { get; private set; }
     public EMSDispatcher EMSDispatcher { get; private set; }
@@ -45,7 +46,7 @@ public class Dispatcher
 
     public Dispatcher(IEntityProvideable world, IDispatchable player, IAgencies agencies, ISettingsProvideable settings, IStreets streets, IZones zones, IJurisdictions jurisdictions, IWeapons weapons, INameProvideable names, ICrimes crimes,
         IPedGroups pedGroups, IGangs gangs, IGangTerritories gangTerritories, IShopMenus shopMenus, IPlacesOfInterest placesOfInterest, IWeatherReportable weatherReporter, ITimeControllable time, IModItems modItems, 
-        IOrganizations organizations, IInteriors interiors)
+        IOrganizations organizations, IInteriors interiors, IDispatchablePeople dispatchablePeople , IDispatchableVehicles dispatchableVehicles)
     {
         Player = player;
         World = world;
@@ -67,17 +68,20 @@ public class Dispatcher
         ModItems = modItems;
         Organizations = organizations;
         Interiors = interiors;
+        DispatchablePeople = dispatchablePeople;
+        DispatchableVehicles = dispatchableVehicles;
     }
     public void Setup()
     {
         GameTimeStartedDispatch = Game.GameTime;
-        LEDispatcher = new LEDispatcher(World, Player, Agencies, Settings, Streets, Zones, Jurisdictions, Weapons, Names, PlacesOfInterest, ModItems, ShopMenus);
-        EMSDispatcher = new EMSDispatcher(World, Player, Agencies, Settings, Streets, Zones, Jurisdictions, Weapons, Names, PlacesOfInterest, ModItems, ShopMenus);
+        LEDispatcher = new LEDispatcher(World, Player, Agencies, Settings, Streets, Zones, Jurisdictions, Weapons, Names, PlacesOfInterest, ModItems, ShopMenus, Crimes);
+        EMSDispatcher = new EMSDispatcher(World, Player, Agencies, Settings, Streets, Zones, Jurisdictions, Weapons, Names, PlacesOfInterest, ModItems, ShopMenus, Crimes);
         SecurityDispatcher = new SecurityDispatcher(World, Player, Agencies, Settings, Streets, Zones, Jurisdictions, Weapons, Names, PlacesOfInterest, Crimes, ModItems, ShopMenus);
-        FireDispatcher = new FireDispatcher(World, Player, Agencies, Settings, Streets, Zones, Jurisdictions, Weapons, Names, PlacesOfInterest, ModItems, ShopMenus);
+        FireDispatcher = new FireDispatcher(World, Player, Agencies, Settings, Streets, Zones, Jurisdictions, Weapons, Names, PlacesOfInterest, ModItems, ShopMenus, Crimes);
         ZombieDispatcher = new ZombieDispatcher(World, Player, Settings, Streets, Zones, Jurisdictions, Weapons, Names, Crimes);
         GangDispatcher = new GangDispatcher(World, Player, Gangs, Settings, Streets, Zones, GangTerritories, Weapons, Names, PedGroups, Crimes, ShopMenus, PlacesOfInterest, ModItems, this);
-        LocationDispatcher = new LocationDispatcher(World, Player, Gangs, Settings, Streets, Zones, GangTerritories, Weapons, Names, PedGroups, Crimes, ShopMenus, PlacesOfInterest, Agencies, Jurisdictions, WeatherReporter, Time, ModItems, Interiors);
+        LocationDispatcher = new LocationDispatcher(World, Player, Gangs, Settings, Streets, Zones, GangTerritories, Weapons, Names, PedGroups, Crimes, ShopMenus, PlacesOfInterest, 
+            Agencies, Jurisdictions, WeatherReporter, Time, ModItems, Interiors, DispatchablePeople, DispatchableVehicles);
         TaxiDispatcher = new TaxiDispatcher(World, Player, Agencies,Settings, Streets,Zones,Jurisdictions,Weapons,Names,PlacesOfInterest,Organizations,Crimes,ModItems,ShopMenus);
     }
     public void Dispatch()
@@ -98,6 +102,11 @@ public class Dispatcher
         }
         GameFiber.Yield();
         if (!EntryPoint.ModController.IsRunning)
+        {
+            return;
+        }
+
+        if(World.IsTrafficDisabled)
         {
             return;
         }
@@ -143,19 +152,19 @@ public class Dispatcher
         {
             GameFiber.Yield();
         }
-        if (Settings.SettingsManager.PerformanceSettings.EnablePerformanceUpdateMode)
-        {
-            GameFiber.Yield();
-        }
+        //if (Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
+        //{
+        //    GameFiber.Yield();
+        //}
         if (!EntryPoint.ModController.IsRunning)
         {
             return;
         }
         LocationDispatcher.Dispatch();
-        if (Settings.SettingsManager.PerformanceSettings.EnablePerformanceUpdateMode)
-        {
-            GameFiber.Yield();
-        }
+        //if (Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
+        //{
+        //    GameFiber.Yield();
+        //}
         if (!EntryPoint.ModController.IsRunning)
         {
             return;
@@ -197,9 +206,44 @@ public class Dispatcher
         GameFiber.Yield();
         GangDispatcher.Recall();
         TaxiDispatcher.Recall();
-        RecallCivilians();
+        //RecallCivilianPeds();
+        RecallCivilianVehicles();
     }
-    private void RecallCivilians()
+    //private void RecallCivilianPeds()
+    //{
+    //    try
+    //    {
+    //        foreach (PedExt civilianPedExt in World.Pedestrians.CivilianList.Where(x => !x.IsManuallyDeleted && x.WasModSpawned && x.HasExistedFor >= 12000 && x.Pedestrian.Exists() && x.Pedestrian.IsPersistent).ToList())//NonServiceVehicles//&& !x.WasSpawnedEmpty//15000
+    //        {
+    //            if (!civilianPedExt.Pedestrian.Exists())
+    //            {
+    //                continue;
+    //            }
+    //            float distanceTo = civilianPedExt.DistanceToPlayer;//Vehicle.DistanceTo2D(Game.LocalPlayer.Character);
+    //            civilianPedExt.DistanceChecker.UpdateMovement(distanceTo);
+    //            if (civilianPedExt.DistanceChecker.IsMovingAway && distanceTo >= 275f)//325f)//275f)//250f)
+    //            {
+    //                if(civilianPedExt.Pedestrian.CurrentVehicle.Exists())
+    //                {
+    //                    civilianPedExt.Pedestrian.CurrentVehicle.IsPersistent = false;
+    //                }
+
+    //                if (civilianPedExt.Pedestrian.IsPersistent)
+    //                {
+    //                    EntryPoint.PersistentPedsNonPersistent++;
+    //                }
+    //                EntryPoint.WriteToConsole($"GENERAL DISPATCHER NON PERSIST 1 FAR PED distanceTo{distanceTo} {civilianPedExt.Handle}");
+    //                civilianPedExt.Pedestrian.IsPersistent = false;
+    //            }
+    //            GameFiber.Yield();
+    //        }
+    //    }
+    //    catch (InvalidOperationException ex)
+    //    {
+    //        EntryPoint.WriteToConsole($"Remove Far Peds, Collection Modified Error: {ex.Message} {ex.StackTrace}", 0);
+    //    }
+    //}
+    private void RecallCivilianVehicles()
     {
         if (!Settings.SettingsManager.WorldSettings.CleanupVehicles)
         {
@@ -209,7 +253,7 @@ public class Dispatcher
         {
             foreach (VehicleExt civilianCar in World.Vehicles.NonPoliceList.Where(x => !x.IsOwnedByPlayer && !x.IsManualCleanup && x.WasModSpawned  && x.HasExistedFor >= 12000 && x.Vehicle.Exists() && x.Vehicle.IsPersistent).ToList())//NonServiceVehicles//&& !x.WasSpawnedEmpty//15000
             {
-                if (!civilianCar.Vehicle.Exists() || civilianCar.Vehicle.Occupants.Any(x => x.Exists() && x.IsAlive))
+                if (!civilianCar.Vehicle.Exists())// || civilianCar.Vehicle.Occupants.Any(x => x.Exists() && x.IsAlive))
                 {
                     continue;
                 }
@@ -299,6 +343,27 @@ public class Dispatcher
     public void ForceTaxiSpawn(TaxiFirm taxifirmID)
     {
         TaxiDispatcher.ForceTaxiSpawn(taxifirmID);
+    }
+
+    public PedExt SpawnCivilian(SpawnLocation SpawnLocation, DispatchableVehicle DispatchableVehicle, DispatchablePerson DispatchablePerson, GameLocation GameLocation, Interior Interior)
+    {
+        EntryPoint.WriteToConsole("CIVILIAN CONDITIONAL SPAWN TASK RUN START");
+        try
+        {
+            CivilianSpawnTask civilianSpawnTask = new CivilianSpawnTask(SpawnLocation, DispatchableVehicle, DispatchablePerson, false, false, true, Settings, Crimes, Weapons, Names, World, ModItems, ShopMenus);//, Names, true, Crimes, PedGroups, ShopMenus, World, ModItems, ForceMelee, ForceSidearm, ForceLongGun);// Settings.SettingsManager.Police.SpawnedAmbientPoliceHaveBlip);
+            //civilianSpawnTask.PossibleHeads = GameLocation.VendorPossibleHeads;
+            civilianSpawnTask.AllowAnySpawn = true;
+            civilianSpawnTask.AllowBuddySpawn = false;
+            civilianSpawnTask.AttemptSpawn();
+            civilianSpawnTask.PostRun(null, GameLocation, Interior);
+            return civilianSpawnTask.CreatedPeople.FirstOrDefault() ;
+            //civilianSpawnTask.CreatedPeople.ForEach(x => { x.EnableAutoCleanup = true; });
+        }
+        catch (Exception ex)
+        {       
+            EntryPoint.WriteToConsole($"Civilian Dispatcher Spawn Error: {ex.Message} : {ex.StackTrace}", 0);
+            return null;
+        }
     }
     public bool DispatchGangBackup(Gang requestedGang, int membersToSpawn, string requiredVehicleModel)
     {

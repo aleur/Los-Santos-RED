@@ -18,6 +18,11 @@ public class SpawnLocation
     {
         InitialPosition = initialPosition;
     }
+    public SpawnLocation(Vector3 initialPosition, float heading)
+    {
+        InitialPosition = initialPosition;
+        Heading = heading;
+    }
     public bool HasStreetPosition { get; private set; }
     public bool HasSideOfRoadPosition { get; private set; }
     public bool HasSpawns => InitialPosition != Vector3.Zero && (IsWater || StreetPosition != Vector3.Zero);
@@ -70,6 +75,18 @@ public class SpawnLocation
             StreetPosition = sideOfRoad;
         }
     }
+
+    public void GetClosestSideOfRoadForward()
+    {
+        Vector3 sideOfRoad = Vector3.Zero;
+        if (NativeFunction.Natives.GET_POSITION_BY_SIDE_OF_ROAD<bool>(StreetPosition.X, StreetPosition.Y, StreetPosition.Z, 0, out sideOfRoad))
+        {
+            HasStreetPosition = true;
+            HasSideOfRoadPosition = true;
+            StreetPosition = sideOfRoad;
+        }
+    }
+
     public void GetRoadBoundaryPosition()
     {
         Vector3 roadBoundaryPosition = Vector3.Zero;

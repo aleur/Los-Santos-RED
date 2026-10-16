@@ -9,13 +9,17 @@ public class VanillaRestrictedArea
     public List<AngledRestrictedArea> AngledRestrictedAreas { get; set; }
     public void Update(ILocationInteractable player)
     {
+        if (EntryPoint.IsLSPDFRIntegrationEnabled)
+        {
+            return;
+        }
         isPlayerViolating = false;
         foreach(AngledRestrictedArea angledRestrictedArea in AngledRestrictedAreas)
         {
             if(angledRestrictedArea.CheckInside(player.Position))
             {
                 isPlayerViolating = true;
-                EntryPoint.WriteToConsole("PLAYER IS INSIDE ANGLED AREA VIOLATIONS!");
+                //EntryPoint.WriteToConsole("PLAYER IS INSIDE ANGLED AREA VIOLATIONS!");
                 return;
             }
         }

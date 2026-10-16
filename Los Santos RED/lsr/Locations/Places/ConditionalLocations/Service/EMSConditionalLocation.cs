@@ -20,7 +20,7 @@ public class EMSConditionalLocation : ConditionalLocation
     }
     public override bool DetermineRun(bool force)
     {
-        if (!Settings.SettingsManager.EMSSettings.ManageDispatching)
+        if (!Settings.SettingsManager.EMSSettings.ManageDispatching || EntryPoint.IsLSPDFRIntegrationEnabled)
         {
             return false;
         }
@@ -46,7 +46,7 @@ public class EMSConditionalLocation : ConditionalLocation
     {
         try
         {
-            EMTSpawnTask eMTSpawnTask = new EMTSpawnTask(Agency, SpawnLocation, DispatchableVehicle, DispatchablePerson, Settings.SettingsManager.EMSSettings.ShowSpawnedBlips, Settings, Weapons, Names, true, World, ModItems, ShopMenus);
+            EMTSpawnTask eMTSpawnTask = new EMTSpawnTask(Agency, SpawnLocation, DispatchableVehicle, DispatchablePerson, Settings.SettingsManager.EMSSettings.ShowSpawnedBlips, Settings, Weapons, Names, true, World, ModItems, ShopMenus, Crimes);
             eMTSpawnTask.AllowAnySpawn = true;
             eMTSpawnTask.AllowBuddySpawn = false;
             eMTSpawnTask.SpawnRequirement = TaskRequirements;
@@ -54,7 +54,7 @@ public class EMSConditionalLocation : ConditionalLocation
             eMTSpawnTask.PlacePedOnGround = DispatchableVehicle == null;// true;
             eMTSpawnTask.AttemptSpawn();
 
-            eMTSpawnTask.PostRun(this, GameLocation);
+            eMTSpawnTask.PostRun(this, GameLocation, Interior);
             //eMTSpawnTask.CreatedPeople.ForEach(x => { World.Pedestrians.AddEntity(x); x.IsLocationSpawned = true; AddLocationRequirements(x); });
             //eMTSpawnTask.CreatedPeople.ForEach(x => World.Pedestrians.AddEntity(x));
             //eMTSpawnTask.CreatedVehicles.ForEach(x => x.AddVehicleToList(World));//why twice?

@@ -47,6 +47,7 @@ public class Agency : IPlatePrefixable, IGeneratesDispatchables
     public string LicensePlatePrefix { get; set; } = "";
     public int SpawnLimit { get; set; } = 99;
     public bool CanSpawnAnywhere { get; set; } = false;
+    public bool CanAmbientlySpawnAnywhere { get; set; } = false;
     public bool SpawnsOnHighway { get; set; } = false;
     public uint MinWantedLevelSpawn { get; set; } = 0;
     public uint MaxWantedLevelSpawn { get; set; } = 6;
@@ -64,7 +65,7 @@ public class Agency : IPlatePrefixable, IGeneratesDispatchables
 
 
     public float PercentageWithLongGuns { get; set; } = 100f;
-    public float PercentageUsingLongGunsWheneverPossible { get; set; } = 40f;
+    public float PercentageUsingLongGunsWheneverPossible { get; set; } = 20f;
 
     [XmlIgnore]
     public List<RandomHeadData> PossibleHeads { get; set; } = new List<RandomHeadData>();
@@ -99,21 +100,22 @@ public class Agency : IPlatePrefixable, IGeneratesDispatchables
     public Color Color => Color.FromName(ColorString);
     public ResponseType ResponseType => Classification == Classification.EMS ? ResponseType.EMS : Classification == Classification.Fire ? ResponseType.Fire : Classification == Classification.Security ? ResponseType.Security : ResponseType.LawEnforcement;
 
-    public float CorruptMemberPercentage { get; set; } = 30f;
-
-    public string CorruptMenuGroup { get; set; } = StaticStrings.CorruptDealerMenuGroupID;
-
-
 
 
 
     public int MoneyMin { get; set; } = 20;
     public int MoneyMax { get; set; } = 900;
-    public int CorruptMoneyMin { get; set; } = 400;
-    public int CorruptMoneyMax { get; set; } = 8000;
 
 
 
+    public bool CanCurrentlySpawnAnywhere(int wantedLevel)
+    {
+        if (wantedLevel == 0)
+        {
+            return CanSpawnAnywhere || CanAmbientlySpawnAnywhere;
+        }
+        return CanSpawnAnywhere;
+    }
     public bool CanSpawn(int wantedLevel) => wantedLevel >= MinWantedLevelSpawn && wantedLevel <= MaxWantedLevelSpawn;
     public DispatchablePerson GetSpecificPed(Ped ped)// List<string> RequiredModels)
     {
@@ -133,10 +135,10 @@ public class Agency : IPlatePrefixable, IGeneratesDispatchables
         {
             ToPickFrom = Personnel.Where(b => Game.GetHashKey(b.ModelName.ToLower()) == modelHash).ToList();
         }
-        if(!ToPickFrom.Any())
+        if (!ToPickFrom.Any())
         {
             ToPickFrom = Personnel.Where(b => b.ModelName.ToLower() == ped.Model.Name.ToLower()).ToList();
-        }     
+        }
         if (ToPickFrom.Any())
         {
             return ToPickFrom.PickRandom();
@@ -152,7 +154,7 @@ public class Agency : IPlatePrefixable, IGeneratesDispatchables
         }
         List<DispatchablePerson> ToPickFrom = OffDutyPersonnel.Where(x => wantedLevel >= x.MinWantedLevelSpawn && wantedLevel <= x.MaxWantedLevelSpawn && x.IsAnimal == false).ToList();
 
-        if(!ToPickFrom.Any())
+        if (!ToPickFrom.Any())
         {
             EntryPoint.WriteToConsole("OFF DUTY NO PERSONNEL 2!");
         }
@@ -224,6 +226,43 @@ public class Agency : IPlatePrefixable, IGeneratesDispatchables
     }
 
 
+    public DispatchablePerson GetRandomAssaultPed(int wantedLevel, string RequiredPedGroup, bool forceAnimal)// List<string> RequiredModels)
+    {
+        if (Personnel == null || !Personnel.Any())
+            return null;
+
+        List<DispatchablePerson> ToPickFrom = Personnel.Where(x => wantedLevel >= x.MinWantedLevelSpawn && wantedLevel <= x.MaxWantedLevelSpawn && x.IsAnimal == forceAnimal).ToList();
+        if (RequiredPedGroup != "" && !string.IsNullOrEmpty(RequiredPedGroup))
+        {
+            ToPickFrom = ToPickFrom.Where(x => x.GroupName == RequiredPedGroup).ToList();
+        }
+
+        if(!ToPickFrom.Any())
+        {
+            int personaellMaxSpawn = Personnel.Max(x => x.MaxWantedLevelSpawn);
+            ToPickFrom = Personnel.Where(x => personaellMaxSpawn >= x.MinWantedLevelSpawn && personaellMaxSpawn <= x.MaxWantedLevelSpawn && x.IsAnimal == forceAnimal).ToList();
+        }
+
+        int Total = ToPickFrom.Sum(x => x.CurrentSpawnChance(wantedLevel));
+        int RandomPick = RandomItems.MyRand.Next(0, Total);
+        foreach (DispatchablePerson Cop in ToPickFrom)
+        {
+            int SpawnChance = Cop.CurrentSpawnChance(wantedLevel);
+            if (RandomPick < SpawnChance)
+            {
+                return Cop;
+            }
+            RandomPick -= SpawnChance;
+        }
+        if (ToPickFrom.Any())
+        {
+            //EntryPoint.WriteToConsole($"RequiredPedGroup: {RequiredPedGroup} TOPICKFROM {string.Join(",",ToPickFrom.ToList())}");
+            return ToPickFrom.PickRandom();
+        }
+        return null;
+    }
+
+
     public DispatchablePerson GetRandomPed(int wantedLevel, string RequiredPedGroup) => GetRandomPed(wantedLevel, RequiredPedGroup, false);
     public DispatchablePerson GetRandomPed(int wantedLevel, string RequiredPedGroup, bool forceAnimal)// List<string> RequiredModels)
     {
@@ -283,7 +322,7 @@ public class Agency : IPlatePrefixable, IGeneratesDispatchables
     }
     public DispatchableVehicle GetRandomVehicle(int wantedLevel, bool includeHelicopters, bool includeBoats, bool includeMotorcycles, string requiredGroup, ISettingsProvideable settings, bool forceGroup)
     {
-        if(Vehicles == null || !Vehicles.Any())
+        if (Vehicles == null || !Vehicles.Any())
         {
             return null;
         }
@@ -307,7 +346,7 @@ public class Agency : IPlatePrefixable, IGeneratesDispatchables
                 //EntryPoint.WriteToConsole($"FORCE GROUP RAN FOR AGENCY {requiredGroup}");
 
                 ToPickFrom = Vehicles.Where(x => x.GroupName == requiredGroup).ToList();
-                if(!ToPickFrom.Any(x=> x.CurrentSpawnChance(wantedLevel, settings.SettingsManager.PlayerOtherSettings.AllowDLCVehicles) > 0))
+                if (!ToPickFrom.Any(x => x.CurrentSpawnChance(wantedLevel, settings.SettingsManager.PlayerOtherSettings.AllowDLCVehicles) > 0))
                 {
                     return ToPickFrom.PickRandom();
                 }
@@ -327,7 +366,7 @@ public class Agency : IPlatePrefixable, IGeneratesDispatchables
                 return Vehicle;
             }
             RandomPick -= SpawnChance;
-        }      
+        }
         return null;
     }
     public DispatchableVehicle GetRandomAdjustedVehicle(int wantedLevel, bool includeHelicopters, bool includeBoats, bool includeMotorcycles, string requiredGroup, ISettingsProvideable settings, eSpawnAdjustment eSpawnAdjustment)
@@ -372,7 +411,7 @@ public class Agency : IPlatePrefixable, IGeneratesDispatchables
 
     public IssuableWeapon GetRandomWeapon(bool isSidearm, IWeapons weapons)
     {
-        List<IssuableWeapon> PossibleWeapons;     
+        List<IssuableWeapon> PossibleWeapons;
         if (isSidearm)
         {
             PossibleWeapons = SideArms;
@@ -443,7 +482,7 @@ public class Agency : IPlatePrefixable, IGeneratesDispatchables
     public int GetNextBeatNumber()
     {
         beatNumber++;
-        if(beatNumber > 24)
+        if (beatNumber > 24)
         {
             beatNumber = 1;
         }
@@ -553,7 +592,7 @@ public class Agency : IPlatePrefixable, IGeneratesDispatchables
             }
             EntryPoint.WriteToConsole($"ADDED {issuableWeapon.ModelName} TO MENU");
         }
-        return new ShopMenu(ID + "Menu", ID + "Menu", menuItems);    
+        return new ShopMenu(ID + "Menu", ID + "Menu", menuItems);
     }
 
     public void Setup(IHeads heads, IDispatchableVehicles dispatchableVehicles, IDispatchablePeople dispatchablePeople, IIssuableWeapons issuableWeapons)
@@ -576,7 +615,7 @@ public class Agency : IPlatePrefixable, IGeneratesDispatchables
     {
         PercentageWithLongGuns = 100f;
         PercentageUsingLongGunsWheneverPossible = 40f;
-        CorruptMemberPercentage = 30f;
-        EntryPoint.WriteToConsole("Agency SetValuesOnDeserialized");
+        //CorruptMemberPercentage = 30f;
+        //EntryPoint.WriteToConsole("Agency SetValuesOnDeserialized");
     }
 }

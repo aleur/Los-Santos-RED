@@ -54,5 +54,10 @@ public class RollingPapersItem : ModItem
         actionable.ActivityManager.StartUpperBodyActivity(activity);
         return true;
     }
+    public override void AddToList(PossibleItems possibleItems)
+    {
+        possibleItems?.RollingPapersItems.RemoveAll(x => x.Name == Name);
+        possibleItems?.RollingPapersItems.Add(this);
+    }
 }
 

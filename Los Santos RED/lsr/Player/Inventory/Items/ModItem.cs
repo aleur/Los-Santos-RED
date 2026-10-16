@@ -14,6 +14,7 @@ using static DispatchScannerFiles;
 using LosSantosRED.lsr.Player;
 using System.ComponentModel;
 using System.Collections.Generic;
+using Microsoft.VisualBasic;
 
 [Serializable()]
 [XmlInclude(typeof(ClothingItem))]
@@ -42,6 +43,7 @@ using System.Collections.Generic;
 [XmlInclude(typeof(WeaponItem))]
 [XmlInclude(typeof(EquipmentItem))]
 [XmlInclude(typeof(BodyArmorItem))]
+[XmlInclude(typeof(TrophyItem))]
 public class ModItem
 {
     private UIMenuNumericScrollerItem<int> sellScroller;
@@ -449,7 +451,7 @@ public class ModItem
                     Position = StoreCam.Position + (StoreCam.Direction.ToNormalized() * 3f);
                 }
             }
-            else if (Transaction.PersonTransaction != null && Transaction.PersonTransaction.TransactionPed != null && Transaction.PersonTransaction.TransactionPed.Pedestrian.Exists())
+            else if (Transaction.PersonTransaction != null && Transaction.PersonTransaction.TransactionPed != null && Transaction.PersonTransaction.TransactionPed.Pedestrian.Exists() && !Transaction.PersonTransaction.TransactionPed.Pedestrian.IsInAnyVehicle(false))
             {
                 Position = Transaction.PersonTransaction.TransactionPed.Pedestrian.GetOffsetPosition(new Vector3(settings.SettingsManager.PlayerOtherSettings.PersonTransactionItemOffsetX, settings.SettingsManager.PlayerOtherSettings.PersonTransactionItemOffsetY, settings.SettingsManager.PlayerOtherSettings.PersonTransactionItemOffsetZ));
                 EntryPoint.WriteToConsole($"CREATE WEAPON PREVIEW PERSONTRANSACTION DOING ABOVE PED");
@@ -474,7 +476,7 @@ public class ModItem
             {
                 try
                 {
-                   Transaction.SellingProp = new Rage.Object(ModelToSpawn, Position);
+                   Transaction.SellingProp = new Rage.Object(ModelToSpawn, Position + new Vector3(0f,0f,10f));
                 }
                 catch (Exception ex)
                 {
@@ -482,11 +484,13 @@ public class ModItem
                 }
                 if (Transaction.SellingProp.Exists())
                 {
+                    Transaction.SellingProp.Position = Position;
                     Transaction.SellingProp.SetRotationYaw(Transaction.SellingProp.Rotation.Yaw + 45f);
                     if (Transaction.SellingProp != null && Transaction.SellingProp.Exists())
                     {
                         NativeFunction.Natives.SET_ENTITY_HAS_GRAVITY(Transaction.SellingProp, false);
                     }
+                    Transaction.SellingProp.IsCollisionEnabled = false;
                 }
                 //EntryPoint.WriteToConsole("SIMPLE TRANSACTION: PREVIEW ITEM RAN");
             }
@@ -821,8 +825,21 @@ public class ModItem
         player.Inventory.Add(this, quantity * this.AmountPerPackage);
     }
 
+    public virtual void AddToList(PossibleItems possibleItems)
+    {
+        possibleItems?.ModItems.RemoveAll(x => x.Name == Name);
+        possibleItems?.ModItems.Add(this);
+    }
 
 
 
+    public virtual Rage.Object SpawnObject(Vector3 position, float heading)
+    {
+        if(ModelItem == null)
+        {
+            return null;
+        }
+        return new Rage.Object(ModelItem.ModelName, position, heading);
+    }
 }
 

@@ -1,5 +1,6 @@
 ﻿using ExtensionsMethods;
 using LosSantosRED.lsr.Interface;
+using LSR.Vehicles;
 using Mod;
 using Rage;
 using System;
@@ -31,9 +32,12 @@ public class LocationDispatcher
     private ITimeControllable Time;
     private IModItems ModItems;
     private IInteriors Interiors;
+    private IDispatchablePeople DispatchablePeople;
+    private IDispatchableVehicles DispatchableVehicles;
 
     public LocationDispatcher(IEntityProvideable world, IDispatchable player, IGangs gangs, ISettingsProvideable settings, IStreets streets, IZones zones, IGangTerritories gangTerritories, IWeapons weapons, INameProvideable names, 
-        IPedGroups pedGroups, ICrimes crimes, IShopMenus shopMenus, IPlacesOfInterest placesOfInterest, IAgencies agencies, IJurisdictions jurisdictions, IWeatherReportable weatherReporter, ITimeControllable time, IModItems modItems, IInteriors interiors)
+        IPedGroups pedGroups, ICrimes crimes, IShopMenus shopMenus, IPlacesOfInterest placesOfInterest, IAgencies agencies, IJurisdictions jurisdictions, IWeatherReportable weatherReporter, 
+        ITimeControllable time, IModItems modItems, IInteriors interiors, IDispatchablePeople dispatchablePeople, IDispatchableVehicles dispatchableVehicles)
     {
         Player = player;
         World = world;
@@ -54,7 +58,62 @@ public class LocationDispatcher
         Time = time;
         ModItems = modItems;
         Interiors = interiors;
+        DispatchablePeople = dispatchablePeople;
+        DispatchableVehicles = dispatchableVehicles;
     }
+
+
+    public void DispatchInterior(Interior interior)
+    {
+        if (interior.PossibleGroupSpawns != null)
+        {
+            foreach (ConditionalGroup cg in interior.PossibleGroupSpawns)
+            {
+                EntryPoint.WriteToConsole($"ATTEMPTING GROUP SPAWN AT {interior.Name}");
+                cg.AttemptSpawn(Player, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World, interior.GameLocation.AssociationID, Weapons, Names, Crimes, PedGroups, ShopMenus,
+                    WeatherReporter, Time, ModItems, interior.GameLocation, DispatchablePeople, DispatchableVehicles, interior);
+                GameFiber.Yield();
+            }
+        }
+        if (interior.PossiblePedSpawns != null)
+        {
+            foreach (ConditionalLocation cl in interior.PossiblePedSpawns)
+            {
+                EntryPoint.WriteToConsole($"ATTEMPTING PED SPAWN AT {interior.Name}");
+                cl.AttemptSpawn(Player, true, false, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World, interior.GameLocation.AssociationID, Weapons, Names, Crimes, PedGroups, ShopMenus,
+                    WeatherReporter, Time, ModItems, interior.GameLocation, DispatchablePeople, DispatchableVehicles, interior);
+                GameFiber.Yield();
+            }
+        }
+        if (interior.PossibleVehicleSpawns != null)
+        {
+            foreach (ConditionalLocation cl in interior.PossibleVehicleSpawns)
+            {
+                EntryPoint.WriteToConsole($"ATTEMPTING VEHICLE SPAWN AT {interior.Name} {interior.GameLocation.AssociationID}");
+
+
+                cl.AttemptSpawn(Player, false, false, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World, interior.GameLocation.AssociationID, Weapons, Names, Crimes, PedGroups, ShopMenus,
+                    WeatherReporter, Time, ModItems, interior.GameLocation, DispatchablePeople, DispatchableVehicles,interior);
+                GameFiber.Yield();
+            }
+        }
+        interior.IsDispatchFilled = true;
+        GameFiber.Yield();
+    }
+    public void RecallInterior(Interior interior)
+    {
+        
+        foreach(PedExt pedExt in interior.LocationSpawnedPedExts)
+        {
+            pedExt.FullyDelete();
+        }
+        foreach (VehicleExt vehicleExt in interior.LocationSpawnedVehicleExts)
+        {
+            vehicleExt.FullyDelete();
+        }
+        interior.IsDispatchFilled = false;
+    }
+
 
     public void Dispatch()
     {
@@ -65,27 +124,29 @@ public class LocationDispatcher
                 foreach (ConditionalGroup cg in ps.PossibleGroupSpawns)
                 {
                     EntryPoint.WriteToConsole($"ATTEMPTING GROUP SPAWN AT {ps.Name}");
-                    cg.AttemptSpawn(Player, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World, ps.AssociationID, Weapons, Names, Crimes, PedGroups, ShopMenus, WeatherReporter, Time, ModItems, ps);
+                    cg.AttemptSpawn(Player, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World, ps.AssociationID, Weapons, Names, Crimes, PedGroups, ShopMenus, 
+                        WeatherReporter, Time, ModItems, ps, DispatchablePeople, DispatchableVehicles, null);
                     GameFiber.Yield();
                 }
             }
-            if (Settings.SettingsManager.PerformanceSettings.EnablePerformanceUpdateMode)
-            {
-                GameFiber.Yield();
-            }
+            //if (Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
+            //{
+            //    GameFiber.Yield();
+            //}
             if (ps.PossiblePedSpawns != null)
             {
                 foreach (ConditionalLocation cl in ps.PossiblePedSpawns)
                 {
                     EntryPoint.WriteToConsole($"ATTEMPTING PED SPAWN AT {ps.Name}");
-                    cl.AttemptSpawn(Player, true, false, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World, ps.AssociationID, Weapons, Names, Crimes, PedGroups,ShopMenus, WeatherReporter, Time, ModItems, ps);
+                    cl.AttemptSpawn(Player, true, false, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World, ps.AssociationID, Weapons, Names, Crimes, PedGroups,ShopMenus,
+                        WeatherReporter, Time, ModItems, ps, DispatchablePeople, DispatchableVehicles, null);
                     GameFiber.Yield();
                 }
             }
-            if (Settings.SettingsManager.PerformanceSettings.EnablePerformanceUpdateMode)
-            {
-                GameFiber.Yield();
-            }
+            //if (Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
+            //{
+            //    GameFiber.Yield();
+            //}
             if (ps.PossibleVehicleSpawns != null)
             {
                 foreach (ConditionalLocation cl in ps.PossibleVehicleSpawns)
@@ -93,29 +154,29 @@ public class LocationDispatcher
                     EntryPoint.WriteToConsole($"ATTEMPTING VEHICLE SPAWN AT {ps.Name} {ps.AssociationID}");
 
 
-                    cl.AttemptSpawn(Player, false, false, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World, ps.AssociationID, Weapons, Names, Crimes, PedGroups, ShopMenus, WeatherReporter, Time, ModItems, ps);
+                    cl.AttemptSpawn(Player, false, false, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World, ps.AssociationID, Weapons, Names, Crimes, PedGroups, ShopMenus, 
+                        WeatherReporter, Time, ModItems, ps, DispatchablePeople, DispatchableVehicles,null);
                     GameFiber.Yield();
                 }
             }
             ps.IsDispatchFilled = true;
             GameFiber.Yield();
         }
-        if (Settings.SettingsManager.PerformanceSettings.EnablePerformanceUpdateMode)
-        {
-            GameFiber.Yield();
-        }
+        //if (Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
+        //{
+        //    GameFiber.Yield();
+        //}
         foreach (GameLocation ps in PlacesOfInterest.InteractableLocations().Where(x => x.IsEnabled && !x.IsNearby && x.IsDispatchFilled).ToList())
         {
             //EntryPoint.WriteToConsole($"Location Dispatcher, CLEARED AT {ps.Name}");
             ps.IsDispatchFilled = false;
         }
-        if (Settings.SettingsManager.PerformanceSettings.EnablePerformanceUpdateMode)
-        {
-            GameFiber.Yield();
-        }
+        //if (Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
+        //{
+        //    GameFiber.Yield();
+        //}
         HandleServiceWorkerSpawns();
     }
-
     public void Reset()
     {
         foreach (GameLocation ps in PlacesOfInterest.InteractableLocations().Where(x => x.IsDispatchFilled).ToList())
@@ -129,26 +190,38 @@ public class LocationDispatcher
     }
     private void HandleServiceWorkerSpawns()
     {
-        foreach (GameLocation ps in World.Places.ActiveLocations.ToList().Where(x => x.IsEnabled && x.DistanceToPlayer <= x.ActivateDistance && x.IsNearby && !x.IsServiceFilled).ToList())
+
+        foreach (GameLocation ps in World.Places.ActiveLocations.ToList().Where(x => x.IsEnabled && x.DistanceToPlayer <= x.ActivateDistance && x.IsNearby && x.VendorLocations.Any() && x.IsOpen(Time.CurrentHour) && !x.IsServiceFilled
+        
+        && (x.Interior == null || !x.Interior.IsTeleportEntry)
+        ).ToList())
         {
             ps.AttemptVendorSpawn(ps.IsOpen(Time.CurrentHour),Interiors,Settings,Crimes,Weapons,Time,World, false);
             ps.IsServiceFilled = true;
+            EntryPoint.WriteToConsole($"VENDOR SPAWN AT {ps.Name} IsServiceFilled:{ps.IsServiceFilled} HandleServiceWorkerSpawns");
             GameFiber.Yield();
         }
         GameFiber.Yield();
-        foreach (GameLocation ps in PlacesOfInterest.InteractableLocations().Where(x => x.IsEnabled && !x.IsNearby && x.IsServiceFilled).ToList())
+        foreach (GameLocation ps in PlacesOfInterest.InteractableLocations().Where(x => x.IsEnabled && (!x.IsNearby || !x.IsOpen(Time.CurrentHour)) && x.VendorLocations.Any() && x.IsServiceFilled
+        
+        
+        && (x.Interior == null || !x.Interior.IsTeleportEntry)
+
+        ).ToList())
         {
             ps.AttemptVendorDespawn();
-            //EntryPoint.WriteToConsole($"VENDOR DESPAWN AT {ps.Name} ");
+            EntryPoint.WriteToConsole($"VENDOR DESPAWN AT {ps.Name} HandleServiceWorkerSpawns");
             ps.IsServiceFilled = false;
         }
     }
     public void SpawnInteriorServiceWorker(GameLocation ps)
     {
+        
         if(ps == null)
         {
             return;
         }
+        EntryPoint.WriteToConsole($"SpawnInteriorServiceWorker RAN {ps.Name}");
         ps.AttemptVendorSpawn(ps.IsOpen(Time.CurrentHour), Interiors, Settings, Crimes, Weapons, Time, World, true);
     }
     public void ForceSpawnAllVehicles(GameLocation ps)
@@ -172,20 +245,19 @@ public class LocationDispatcher
                 return;
             }
             cl.SetVehicle(selected);
-            cl.ForceSpawn(Player, false, true, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World,ps.AssociationID, Weapons, Names, Crimes, PedGroups, ShopMenus, WeatherReporter, Time, ModItems, ps);
+            cl.ForceSpawn(Player, false, true, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World,ps.AssociationID, Weapons, Names, Crimes, PedGroups, ShopMenus, WeatherReporter, Time, ModItems, ps, null);
             GameFiber.Yield();
             priorityList.Remove(selected);
         }
     }
-
     public void ForceSpawnAllVehicles(List<ConditionalLocation> conditionalLocations, Agency agency)
     {
         if (conditionalLocations == null || agency== null)
         {
             return;
         }
-        List<DispatchableVehicle> priorityList = agency.Vehicles.Where(x => x.ModelName == "dune5" || x.ModelName == "marshall" || x.ModelName == "jester2" || x.ModelName == "blazer5" || x.ModelName == "tampa3").OrderByDescending(x => x.AmbientSpawnChance).ToList();
-        //List<DispatchableVehicle> priorityList = agency.Vehicles.OrderByDescending(x => x.AmbientSpawnChance).ToList();
+        //List<DispatchableVehicle> priorityList = agency.Vehicles.Where(x => x.ModelName == "dune5" || x.ModelName == "marshall" || x.ModelName == "jester2" || x.ModelName == "blazer5" || x.ModelName == "tampa3").OrderByDescending(x => x.AmbientSpawnChance).ToList();
+        List<DispatchableVehicle> priorityList = agency.Vehicles.OrderByDescending(x => x.AmbientSpawnChance).ToList();
         if (!priorityList.Any())
         {
             return;
@@ -200,7 +272,7 @@ public class LocationDispatcher
             }
             cl.SetVehicle(selected);
 
-            cl.ForceSpawn(Player, true, true, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World, agency.ID, Weapons, Names, Crimes, PedGroups, ShopMenus, WeatherReporter, Time, ModItems, null);
+            cl.ForceSpawn(Player, true, true, Agencies, Gangs, Zones, Jurisdictions, GangTerritories, Settings, World, agency.ID, Weapons, Names, Crimes, PedGroups, ShopMenus, WeatherReporter, Time, ModItems, null, null);
             GameFiber.Yield();
             //priorityList.Remove(selected);
             spawns++;

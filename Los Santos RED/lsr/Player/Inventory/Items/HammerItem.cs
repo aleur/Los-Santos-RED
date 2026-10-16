@@ -29,5 +29,10 @@ public class HammerItem : ModItem
         }
         return false;
     }
+    public override void AddToList(PossibleItems possibleItems)
+    {
+        possibleItems?.HammerItems.RemoveAll(x => x.Name == Name);
+        possibleItems?.HammerItems.Add(this);
+    }
 }
 

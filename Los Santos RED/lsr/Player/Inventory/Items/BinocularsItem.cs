@@ -36,5 +36,10 @@ public class BinocularsItem : ModItem
         }
         return false;
     }
+    public override void AddToList(PossibleItems possibleItems)
+    {
+        possibleItems?.BinocularsItems.RemoveAll(x => x.Name == Name);
+        possibleItems?.BinocularsItems.Add(this);
+    }
 }
 

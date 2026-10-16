@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+[Serializable]
 public class WeaponComponent
 {
     public uint Hash { get; set; }
@@ -23,5 +23,9 @@ public class WeaponComponent
     public WeaponComponent(string _Name)
     {
         Name = _Name;
+    }
+    public override string ToString()
+    {
+        return Name;
     }
 }

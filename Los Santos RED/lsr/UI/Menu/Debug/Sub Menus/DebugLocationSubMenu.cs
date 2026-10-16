@@ -53,6 +53,12 @@ public class DebugLocationSubMenu : DebugSubMenu
         Debug.MenuItems[Debug.MenuItems.Count() - 1].Description = "Change various location items.";
 
 
+
+
+
+
+
+
         PossibleLocations PossibleLocations = new PossibleLocations();
         PropertyInfo[] properties = typeof(PossibleLocations).GetProperties();
 
@@ -188,7 +194,7 @@ public class DebugLocationSubMenu : DebugSubMenu
                         Function.Call((Hash)0x5E1460624D194A38, true);//SET_USE_ISLAND_MAP*/
 
 
-
+        LocationItemsMenu.AddItem(FreeCamMenu);
         LocationItemsMenu.AddItem(LogSpecificLocationType);
 
         LocationItemsMenu.AddItem(LogInteriorPositionMenu);
@@ -198,7 +204,7 @@ public class DebugLocationSubMenu : DebugSubMenu
         LocationItemsMenu.AddItem(logVector2);
         LocationItemsMenu.AddItem(LogInteriorMenu);
         LocationItemsMenu.AddItem(LogCameraPositionMenu);
-        LocationItemsMenu.AddItem(FreeCamMenu);
+        
         LocationItemsMenu.AddItem(AddAllBlips);
         LocationItemsMenu.AddItem(RemoveAllBlips);
         LocationItemsMenu.AddItem(TurnOffInterior);
@@ -252,6 +258,23 @@ public class DebugLocationSubMenu : DebugSubMenu
             }
         };
         LocationItemsMenu.AddItem(OpenCloseDoors);
+
+
+
+        UIMenuItem LockDoors = new UIMenuItem("Lock Doors", "Force locked all nearby doors");
+        LockDoors.Activated += (menu, item) =>
+        {
+            menu.Visible = false;
+            foreach (GameLocation gameLocation in World.Places.ActiveLocations.ToList())
+            {
+                if (gameLocation.DistanceToPlayer <= 100f)
+                {
+                    gameLocation.Interior?.DebugLockDoors();
+                }
+            }
+        };
+        LocationItemsMenu.AddItem(LockDoors);
+
 
 
         UIMenuItem EnableScenarios = new UIMenuItem("Enable Scenarios", "Enable some scenarios groups");
@@ -324,7 +347,7 @@ public class DebugLocationSubMenu : DebugSubMenu
                         {
                             FreeCam.Position = NativeHelper.GetOffsetPosition(FreeCam.Position, FreeCam.Rotation.Yaw, 1.0f * FreeCamScale);
                         }
-                        FreeCam.Rotation += new Rotator(NativeFunction.Natives.GET_CONTROL_NORMAL<float>(2, 221) * -4f, 0, NativeFunction.Natives.GET_CONTROL_NORMAL<float>(2, 220) * -5f) * FreeCamScale;
+                        FreeCam.Rotation += new Rotator(NativeFunction.Natives.GET_CONTROL_NORMAL<float>(2, 221) * -4f, 0, NativeFunction.Natives.GET_CONTROL_NORMAL<float>(2, 220) * -5f) * 1.0f;// FreeCamScale;
 
                         NativeFunction.Natives.SET_FOCUS_POS_AND_VEL(FreeCam.Position.X, FreeCam.Position.Y, FreeCam.Position.Z, 0f, 0f, 0f);
 
@@ -374,11 +397,13 @@ public class DebugLocationSubMenu : DebugSubMenu
                         {
                             if (!isSlowMode)
                             {
-                                Game.TimeScale = 0.1f;
+                                //Game.TimeScale = 0.1f;
+                                NativeFunction.Natives.SET_TIME_SCALE(0.1f);
                             }
                             else
                             {
-                                Game.TimeScale = 1.0f;
+                                //Game.TimeScale = 1.0f;
+                                NativeFunction.Natives.SET_TIME_SCALE(1.0f);
                             }
                             isSlowMode = !isSlowMode;
                             GameFiber.Sleep(200);
@@ -386,20 +411,20 @@ public class DebugLocationSubMenu : DebugSubMenu
     
 
 
-                        if (Game.IsKeyDownRightNow(Keys.Up))
+                        if (Game.IsKeyDownRightNow(Keys.LControlKey) && Game.IsKeyDownRightNow(Keys.Left))
                         {
                             FreeCam.FOV += 1.0f;
                             Game.DisplaySubtitle($"FOV: {FreeCam.FOV}");
                             GameFiber.Sleep(100);
                         }
-                        if (Game.IsKeyDownRightNow(Keys.Down))
+                        if (Game.IsKeyDownRightNow(Keys.LControlKey) && Game.IsKeyDownRightNow(Keys.Right))
                         {
                             FreeCam.FOV -= 1.0f;
                             Game.DisplaySubtitle($"FOV: {FreeCam.FOV}");
                             GameFiber.Sleep(100);
                         }
 
-                        if (Game.IsKeyDownRightNow(Keys.Left))
+                        if (Game.IsKeyDownRightNow(Keys.LShiftKey) && Game.IsKeyDownRightNow(Keys.Left))
                         {
 
                             DepthOfField += 0.1f;
@@ -408,7 +433,7 @@ public class DebugLocationSubMenu : DebugSubMenu
                             Game.DisplaySubtitle($"DepthOfField: {DepthOfField}");
                             GameFiber.Sleep(100);
                         }
-                        if (Game.IsKeyDownRightNow(Keys.Right))
+                        if (Game.IsKeyDownRightNow(Keys.LShiftKey) && Game.IsKeyDownRightNow(Keys.Right))
                         {
                             DepthOfField -= 0.1f;
                             DepthOfField.Clamp(0.0f, 1.0f);
@@ -457,10 +482,8 @@ public class DebugLocationSubMenu : DebugSubMenu
         IsWritingPosition = true;
         Vector3 pos = Game.LocalPlayer.Character.Position;
         float Heading = Game.LocalPlayer.Character.Heading;
-        string text1 = NativeHelper.GetKeyboardInput("LocationType");
-        string text2 = NativeHelper.GetKeyboardInput("Name");
-        string text3 = NativeHelper.GetKeyboardInput("Description");
-        WriteToLogLocations($"new Vector3({pos.X}f, {pos.Y}f, {pos.Z}f), {Heading}f, \"{text2}\", \"{text3}\"),  //{text1}");
+        string text1 = NativeHelper.GetKeyboardInput("Description");
+        WriteToLogLocations($"new Vector3({pos.X}f, {pos.Y}f, {pos.Z}f), {Heading}f),  //{text1}");
         IsWritingPosition = false;
     }
 

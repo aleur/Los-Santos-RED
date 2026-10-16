@@ -21,7 +21,7 @@ namespace LosSantosRED.lsr
         private Dispatcher Dispatcher;
         private Input Input;   
         private PedSwap PedSwap;   
-        private Mod.Player Player;
+        
         private Police Police;  
         private Mod.Tasker Tasker;
         private Mod.Time Time;
@@ -33,6 +33,7 @@ namespace LosSantosRED.lsr
         private Mod.World World;
         private Mod.Crafting Crafting;
         public ModDataFileManager ModDataFileManager { get; private set; }
+        public Mod.Player Player { get; private set; }
         private WeatherManager WeatherManager;
 
         public ModController()
@@ -46,7 +47,7 @@ namespace LosSantosRED.lsr
         public bool RunVanilla { get; set; } = true;
         public bool RunMenuOnly { get; set; } = true;
         public bool IsDisplayingAlertScreen { get; set; } = false;
-        public void Setup(GameConfig Config)
+        public void Setup()
         {
             IsRunning = true;
             EntryPoint.IsLoadingAltConfig = false;
@@ -58,8 +59,11 @@ namespace LosSantosRED.lsr
 
 
             ModDataFileManager = new ModDataFileManager();
-            ModDataFileManager.Setup(Config);
+            ModDataFileManager.Setup();
             GameFiber.Yield();
+
+
+
 
             NAudioPlayer = new NAudioPlayer(ModDataFileManager.Settings);
             NAudioPlayer.Setup();
@@ -74,11 +78,16 @@ namespace LosSantosRED.lsr
                 ModDataFileManager.Names, ModDataFileManager.RelationshipGroups, ModDataFileManager.Weapons, ModDataFileManager.Crimes, Time, ModDataFileManager.ShopMenus, ModDataFileManager.Interiors, NAudioPlayer,
                 ModDataFileManager.Gangs, ModDataFileManager.GangTerritories, ModDataFileManager.Streets, ModDataFileManager.ModItems, ModDataFileManager.RelationshipGroups, ModDataFileManager.LocationTypes,
                 ModDataFileManager.Organizations, ModDataFileManager.Contacts, ModDataFileManager);
+
+
+
+
+
             Player = new Mod.Player(Game.LocalPlayer.Character.Model.Name, Game.LocalPlayer.Character.IsMale, ModDataFileManager.Names.GetRandomName(Game.LocalPlayer.Character.Model.Name, Game.LocalPlayer.Character.IsMale), World, Time,
                 ModDataFileManager.Streets, ModDataFileManager.Zones, ModDataFileManager.Settings, ModDataFileManager.Weapons, ModDataFileManager.RadioStations, ModDataFileManager.Scenarios, ModDataFileManager.Crimes, NAudioPlayer,
                 NAudioPlayer2, ModDataFileManager.PlacesOfInterest, ModDataFileManager.Interiors, ModDataFileManager.ModItems, ModDataFileManager.Intoxicants, ModDataFileManager.Gangs, ModDataFileManager.Jurisdictions,
                 ModDataFileManager.GangTerritories, ModDataFileManager.GameSaves, ModDataFileManager.Names, ModDataFileManager.ShopMenus, ModDataFileManager.RelationshipGroups, ModDataFileManager.DanceList, ModDataFileManager.SpeechList,
-                ModDataFileManager.Seats, ModDataFileManager.Agencies, ModDataFileManager.SavedOutfits, ModDataFileManager.VehicleSeatDoorData, ModDataFileManager.Cellphones, ModDataFileManager.Contacts, ModDataFileManager.VehicleRaces);
+                ModDataFileManager.Seats, ModDataFileManager.Agencies, ModDataFileManager.SavedOutfits, ModDataFileManager.VehicleSeatDoorData, ModDataFileManager.Cellphones, ModDataFileManager.Contacts, ModDataFileManager.VehicleRaces, ModDataFileManager.DispatchableVehicles, ModDataFileManager.DispatchablePeople);
             World.Setup(Player, Player);
             GameFiber.Yield();
             Player.Setup();
@@ -88,7 +97,7 @@ namespace LosSantosRED.lsr
             Civilians = new Civilians(World, Player, Player, ModDataFileManager.Settings, ModDataFileManager.Gangs);
             GameFiber.Yield();
             PedSwap = new PedSwap(Time, Player, ModDataFileManager.Settings, World, ModDataFileManager.Weapons, ModDataFileManager.Crimes, ModDataFileManager.Names, ModDataFileManager.ModItems, World, ModDataFileManager.RelationshipGroups,
-                ModDataFileManager.ShopMenus, ModDataFileManager.DispatchablePeople, ModDataFileManager.Heads, ModDataFileManager.ClothesNames, ModDataFileManager.Gangs, ModDataFileManager.Agencies, ModDataFileManager.TattooNames, ModDataFileManager.GameSaves, ModDataFileManager.SavedOutfits, Player);
+                ModDataFileManager.ShopMenus, ModDataFileManager.DispatchablePeople, ModDataFileManager.Heads, ModDataFileManager.ClothesNames, ModDataFileManager.Gangs, ModDataFileManager.Agencies, ModDataFileManager.TattooNames, ModDataFileManager.GameSaves, ModDataFileManager.SavedOutfits, Player, Player);
             GameFiber.Yield();
             Player.PedSwap = PedSwap;
             Tasker = new Mod.Tasker(World, Player, ModDataFileManager.Weapons, ModDataFileManager.Settings, ModDataFileManager.PlacesOfInterest);
@@ -98,7 +107,8 @@ namespace LosSantosRED.lsr
             Weather.Setup();
             GameFiber.Yield();
             Dispatcher = new Dispatcher(World, Player, ModDataFileManager.Agencies, ModDataFileManager.Settings, ModDataFileManager.Streets, ModDataFileManager.Zones, ModDataFileManager.Jurisdictions, ModDataFileManager.Weapons, ModDataFileManager.Names, ModDataFileManager.Crimes,
-                ModDataFileManager.RelationshipGroups, ModDataFileManager.Gangs, ModDataFileManager.GangTerritories, ModDataFileManager.ShopMenus, ModDataFileManager.PlacesOfInterest, Weather, Time, ModDataFileManager.ModItems, ModDataFileManager.Organizations, ModDataFileManager.Interiors);
+                ModDataFileManager.RelationshipGroups, ModDataFileManager.Gangs, ModDataFileManager.GangTerritories, ModDataFileManager.ShopMenus, ModDataFileManager.PlacesOfInterest, Weather, 
+                Time, ModDataFileManager.ModItems, ModDataFileManager.Organizations, ModDataFileManager.Interiors, ModDataFileManager.DispatchablePeople, ModDataFileManager.DispatchableVehicles);
             Dispatcher.Setup();
             Player.Dispatcher = Dispatcher;
             Player.Weather = Weather;
@@ -140,12 +150,25 @@ namespace LosSantosRED.lsr
 #endif
 
             UI.SetupDebugMenu();
+
+
+            if (ModDataFileManager.Settings.SettingsManager.WorldSettings.AutoLoadMPMap && !World.IsMPMapLoaded)
+            {
+                World.LoadMPMap();
+            }
+
+
             Game.FadeScreenIn(500, true);
             DisplayLoadSuccessfulMessage();
 
-            string ConfigName = string.IsNullOrEmpty(Config.ConfigName) ? "No Config" : Config.ConfigName + " Config";
-            Game.DisplayNotification($"~s~Los Santos ~r~RED~s~ {ConfigName} Loaded");
-            EntryPoint.WriteToConsole($"Loaded {ConfigName}", 0);
+            //string ConfigName = string.IsNullOrEmpty(Config.ConfigName) ? "No Config" : Config.ConfigName + " Config";
+            
+
+            //if (!string.IsNullOrEmpty(Config.ConfigName))
+            //{
+            //    Game.DisplayNotification($"~s~Los Santos ~r~RED~s~ {ConfigName} Loaded");
+            //    EntryPoint.WriteToConsole($"Loaded {ConfigName}", 0); 
+            //}
         }
         public void SetupFileOnly()
         {
@@ -154,7 +177,7 @@ namespace LosSantosRED.lsr
                 GameFiber.Yield();
             }
             ModDataFileManager = new ModDataFileManager();
-            ModDataFileManager.Setup(new GameConfig("Default"));
+            ModDataFileManager.Setup();
         }
         public void Dispose()
         {
@@ -169,6 +192,8 @@ namespace LosSantosRED.lsr
             Weather.Dispose();
             Debug.Dispose();
             WeatherManager.Dispose();
+
+
 
             Game.DisplayNotification("~s~Los Santos ~r~RED ~s~Deactivated");
             EntryPoint.WriteToConsole($"Has Been Deactivated", 0);
@@ -438,10 +463,33 @@ namespace LosSantosRED.lsr
                 $"~s~Los Santos ~r~RED ~s~v{fvi.FileVersion} " +
                 $"~n~By ~g~Greskrendtregk ~s~Has Loaded Successfully.");
 
+            if (EntryPoint.IsEnhancedVersion)
+            {
+                DisplayControlStringsEnhanced();
+            }
+            else
+            {
+                DisplayControlStrings();
+            }
+            EntryPoint.WriteToConsole($"Has Loaded Successfully",0);
+        }
+        private void DisplayControlStringsEnhanced()
+        {
+
             string controlString =
-                $"Main Menu (Keyboard): ~{ModDataFileManager.Settings.SettingsManager.KeySettings.MenuKey.GetInstructionalId()}~" +
-                $"~n~Action Wheel (Mouse): {FormatKeys(ModDataFileManager.Settings.SettingsManager.KeySettings.ActionPopUpDisplayKeyModifier, ModDataFileManager.Settings.SettingsManager.KeySettings.ActionPopUpDisplayKey)}" +
-                $"~n~Action Wheel (Keyboard): {FormatKeys(ModDataFileManager.Settings.SettingsManager.KeySettings.AltActionPopUpDisplayKeyModifier, ModDataFileManager.Settings.SettingsManager.KeySettings.AltActionPopUpDisplayKey)}";
+                            $"Main Menu (Keyboard): [F10]" +
+                            $"~n~Action Wheel (Mouse): [Mouse-4]" +
+                            $"~n~Action Wheel (Keyboard): [Alt + N]" +
+                            $"~n~Action Wheel + Menu (Controller): [Controller Button Back]";
+            Game.DisplayHelp(controlString);
+        }
+        private void DisplayControlStrings()
+        {
+
+            string controlString =
+    $"Main Menu (Keyboard): ~{NativeHelper.GetKeyBoxCode(ModDataFileManager.Settings.SettingsManager.KeySettings.MenuKey)}~" + //$"Main Menu (Keyboard): ~{ModDataFileManager.Settings.SettingsManager.KeySettings.MenuKey.GetInstructionalId()}~" +
+    $"~n~Action Wheel (Mouse): {FormatKeys(ModDataFileManager.Settings.SettingsManager.KeySettings.ActionPopUpDisplayKeyModifier, ModDataFileManager.Settings.SettingsManager.KeySettings.ActionPopUpDisplayKey)}" +
+    $"~n~Action Wheel (Keyboard): {FormatKeys(ModDataFileManager.Settings.SettingsManager.KeySettings.AltActionPopUpDisplayKeyModifier, ModDataFileManager.Settings.SettingsManager.KeySettings.AltActionPopUpDisplayKey)}";
             controlString += $"~n~Action Wheel + Menu (Controller): ";
             if (ModDataFileManager.Settings.SettingsManager.KeySettings.ControllerActionModifier == -1 && ModDataFileManager.Settings.SettingsManager.KeySettings.ControllerAction == 236)
             {
@@ -452,7 +500,6 @@ namespace LosSantosRED.lsr
                 controlString += FormatControls(ModDataFileManager.Settings.SettingsManager.KeySettings.ControllerActionModifier, ModDataFileManager.Settings.SettingsManager.KeySettings.ControllerAction);
             }
             Game.DisplayHelp(controlString);
-            EntryPoint.WriteToConsole($"Has Loaded Successfully",0);
         }
         public string FormatButtons(ControllerButtons modifier, ControllerButtons key)
         {

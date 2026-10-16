@@ -52,7 +52,6 @@ public class DebugMapSubMenu : DebugSubMenu
         CreateLSItems();
         CreateLCItems();
         CreateCayoPericoItems();
-        CreateSunShineDreamItems();  
     }
     private void CreateGeneralItems()
     {
@@ -69,12 +68,15 @@ public class DebugMapSubMenu : DebugSubMenu
             menu.Visible = false;
         };
         GeneralSubMenu.AddItem(SetBigMap);//CreateDisableLSItem()
-        UIMenuItem RevealMap = new UIMenuItem("Reveal Map", "Reveal the enitre map and remove fog of war");
+        UIMenuItem RevealMap = new UIMenuItem("Reveal Map", "Toggle fog of war on/off");
         RevealMap.Activated += (menu, item) =>
         {
-            NativeFunction.Natives.SET_MINIMAP_HIDE_FOW(true);
+            Settings.SettingsManager.VanillaSettings.RevealMap =
+                !Settings.SettingsManager.VanillaSettings.RevealMap;
+
             menu.Visible = false;
         };
+
         GeneralSubMenu.AddItem(RevealMap);
 
 
@@ -113,12 +115,7 @@ public class DebugMapSubMenu : DebugSubMenu
         LSSubMenu.SetBannerType(EntryPoint.LSRedColor);
         LSSubMenu.AddItem(CreateDisableLSItem());
     }
-    private void CreateSunShineDreamItems()
-    {
-        UIMenu SunShineDreamSubMenu = MenuPool.AddSubMenu(MapMenuItem, "Sunshine Dream Menu");
-        SunShineDreamSubMenu.SetBannerType(EntryPoint.LSRedColor);
-        SunShineDreamSubMenu.AddItem(CreateDisableLSItem());
-    }
+
     private void CreateLCItems()
     {
         UIMenu LibertyCitySubMenu = MenuPool.AddSubMenu(MapMenuItem, "Liberty City Menu");

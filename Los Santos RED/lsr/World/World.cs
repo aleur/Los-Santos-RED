@@ -21,7 +21,7 @@ namespace Mod
         private IJurisdictions Jurisdictions;
         private ISettingsProvideable Settings;
         private ICrimes Crimes;
-        private IWeapons Weapons;     
+        private IWeapons Weapons;
         private ITimeControllable Time;
         private IInteriors Interiors;
         private IShopMenus ShopMenus;
@@ -32,6 +32,7 @@ namespace Mod
         private Blip TotalWantedBlip;
         private float CurrentSpawnMultiplier;
         private bool isSettingDensity;
+        private bool isTrafficDisabled;
 
         public World(IAgencies agencies, IZones zones, IJurisdictions jurisdictions, ISettingsProvideable settings, IPlacesOfInterest placesOfInterest, IPlateTypes plateTypes, INameProvideable names, IPedGroups relationshipGroups,
             IWeapons weapons, ICrimes crimes, ITimeControllable time, IShopMenus shopMenus, IInteriors interiors, IAudioPlayable audio, IGangs gangs, IGangTerritories gangTerritories, IStreets streets, IModItems modItems, IPedGroups pedGroups, ILocationTypes locationTypes,
@@ -71,7 +72,16 @@ namespace Mod
         public ILocationInteractable LocationInteractable { get; private set; }
         public bool IsFEJInstalled { get; private set; }
         public bool IsFMTInstalled { get; private set; }
+        public bool IsFEWInstalled { get; private set; }
+        public bool IsFMLPInstalled { get; private set; }
+
+        public bool IsFERSInstalled { get; private set; }
+        public bool IsEUPInstalled { get; private set; }
+        public bool IsEUPSUPInstalled { get; private set; }
         public string DebugString => "";
+
+
+        public bool IsTrafficDisabled => isTrafficDisabled;
         public void Setup(IInteractionable player, ILocationInteractable locationInteractable)
         {
             DetermineMap();
@@ -86,11 +96,24 @@ namespace Mod
         private void CheckSpecialCircumstances()
         {
             IsFEJInstalled = NativeFunction.Natives.IS_DLC_PRESENT<bool>(Game.GetHashKey("greskfej"));
-            EntryPoint.WriteToConsole($"FEJ Installed: {IsFEJInstalled}",0);
+            EntryPoint.WriteToConsole($"FEJ Installed: {IsFEJInstalled}", 0);
 
             IsFMTInstalled = NativeFunction.Natives.IS_DLC_PRESENT<bool>(Game.GetHashKey("greskfmt"));
             EntryPoint.WriteToConsole($"FMT Installed: {IsFMTInstalled}", 0);
 
+            IsFEWInstalled = NativeFunction.Natives.IS_DLC_PRESENT<bool>(Game.GetHashKey("greskfew"));
+            EntryPoint.WriteToConsole($"FEW Installed: {IsFEWInstalled}", 0);
+
+            IsFMLPInstalled = NativeFunction.Natives.IS_DLC_PRESENT<bool>(Game.GetHashKey("greskfmlp"));
+            EntryPoint.WriteToConsole($"FMLP Installed: {IsFMLPInstalled}", 0);
+
+            IsFERSInstalled = NativeFunction.Natives.IS_DLC_PRESENT<bool>(Game.GetHashKey("greskfers"));
+            EntryPoint.WriteToConsole($"FERS Installed: {IsFERSInstalled}", 0);
+
+            IsEUPInstalled = NativeFunction.Natives.IS_DLC_PRESENT<bool>(Game.GetHashKey("eup"));
+            EntryPoint.WriteToConsole($"EUP Installed: {IsEUPInstalled}", 0);
+            IsEUPSUPInstalled = NativeFunction.Natives.IS_DLC_PRESENT<bool>(Game.GetHashKey("sup"));
+            EntryPoint.WriteToConsole($"EUP:S&P Installed: {IsEUPSUPInstalled}", 0);
             //if (Settings.SettingsManager.WorldSettings.SetMissionFlagOn)
             //{
             //    NativeFunction.Natives.SET_MINIGAME_IN_PROGRESS(true);
@@ -100,15 +123,21 @@ namespace Mod
         {
             if (Settings.SettingsManager.PlayerOtherSettings.AllowDLCVehicles)
             {
-                NativeMemory.SetMPGlobals();
+                if (EntryPoint.IsEnhancedVersion)
+                {
+                    NativeMemoryEnhanced.SetMPGlobals();
+                }
+                else
+                {
+                    NativeMemory.SetMPGlobals();
+                }
             }
         }
         public void Update()
         {
-            if(Settings.SettingsManager.WorldSettings.LowerPedSpawnsAtHigherWantedLevels)
-            {
-                SetDensity();
-            }
+
+            SetDensity();
+
             if (Settings.SettingsManager.WorldSettings.AllowPoliceBackupBlip)
             {
                 if (PoliceBackupPoint == Vector3.Zero)
@@ -137,7 +166,7 @@ namespace Mod
                     TotalWantedBlip.Delete();
                 }
             }
-            if(TotalWantedLevel != totalWantedLevel)
+            if (TotalWantedLevel != totalWantedLevel)
             {
                 OnTotalWantedLevelChanged();
             }
@@ -171,6 +200,7 @@ namespace Mod
                 Game.FadeScreenOut(1500, true);
                 NativeFunction.Natives.SET_INSTANCE_PRIORITY_MODE(1);
                 NativeFunction.Natives.x0888C3502DBBEEF5();// ON_ENTER_MP();
+                LoadMansionIPLs();
                 Game.FadeScreenIn(1500, true);
                 IsMPMapLoaded = true;
             }
@@ -180,10 +210,12 @@ namespace Mod
             if (IsMPMapLoaded)
             {
                 Game.FadeScreenOut(1500, true);
+                UnloadMansionIPLs();
                 NativeFunction.Natives.SET_INSTANCE_PRIORITY_MODE(0);
                 NativeFunction.Natives.xD7C10C4A637992C9();// ON_ENTER_SP();
                 Game.FadeScreenIn(1500, true);
                 IsMPMapLoaded = false;
+
             }
         }
         public void AddBlip(Blip myBlip)
@@ -214,33 +246,40 @@ namespace Mod
         public void SetDensity()
         {
             CurrentSpawnMultiplier = Settings.SettingsManager.WorldSettings.DefaultSpawnMultiplier;// 1.0f;
-            if (TotalWantedLevel >= 10)
+            if (Settings.SettingsManager.WorldSettings.LowerPedSpawnsAtHigherWantedLevels)
             {
-                CurrentSpawnMultiplier = Settings.SettingsManager.WorldSettings.LowerPedSpawnsAtHigherWantedLevels_Wanted10Multiplier;
+                if (TotalWantedLevel >= 10)
+                {
+                    CurrentSpawnMultiplier = Settings.SettingsManager.WorldSettings.LowerPedSpawnsAtHigherWantedLevels_Wanted10Multiplier;
+                }
+                else if (TotalWantedLevel >= 9)
+                {
+                    CurrentSpawnMultiplier = Settings.SettingsManager.WorldSettings.LowerPedSpawnsAtHigherWantedLevels_Wanted9Multiplier;
+                }
+                else if (TotalWantedLevel >= 8)
+                {
+                    CurrentSpawnMultiplier = Settings.SettingsManager.WorldSettings.LowerPedSpawnsAtHigherWantedLevels_Wanted8Multiplier;
+                }
+                else if (TotalWantedLevel >= 7)
+                {
+                    CurrentSpawnMultiplier = Settings.SettingsManager.WorldSettings.LowerPedSpawnsAtHigherWantedLevels_Wanted7Multiplier;
+                }
+                else if (TotalWantedLevel >= 6)
+                {
+                    CurrentSpawnMultiplier = Settings.SettingsManager.WorldSettings.LowerPedSpawnsAtHigherWantedLevels_Wanted6Multiplier;
+                }
+                else if (TotalWantedLevel == 5)
+                {
+                    CurrentSpawnMultiplier = Settings.SettingsManager.WorldSettings.LowerPedSpawnsAtHigherWantedLevels_Wanted5Multiplier;
+                }
+                else if (TotalWantedLevel == 4)
+                {
+                    CurrentSpawnMultiplier = Settings.SettingsManager.WorldSettings.LowerPedSpawnsAtHigherWantedLevels_Wanted4Multiplier;
+                }
             }
-            else if (TotalWantedLevel >= 9)
+            if (isTrafficDisabled)
             {
-                CurrentSpawnMultiplier = Settings.SettingsManager.WorldSettings.LowerPedSpawnsAtHigherWantedLevels_Wanted9Multiplier;
-            }
-            else if (TotalWantedLevel >= 8)
-            {
-                CurrentSpawnMultiplier = Settings.SettingsManager.WorldSettings.LowerPedSpawnsAtHigherWantedLevels_Wanted8Multiplier;
-            }
-            else if (TotalWantedLevel >= 7)
-            {
-                CurrentSpawnMultiplier = Settings.SettingsManager.WorldSettings.LowerPedSpawnsAtHigherWantedLevels_Wanted7Multiplier;
-            }
-            else if (TotalWantedLevel >= 6)
-            {
-                CurrentSpawnMultiplier = Settings.SettingsManager.WorldSettings.LowerPedSpawnsAtHigherWantedLevels_Wanted6Multiplier;
-            }
-            else if (TotalWantedLevel == 5)
-            {
-                CurrentSpawnMultiplier = Settings.SettingsManager.WorldSettings.LowerPedSpawnsAtHigherWantedLevels_Wanted5Multiplier;
-            }
-            else if(TotalWantedLevel == 4)
-            {
-                CurrentSpawnMultiplier = Settings.SettingsManager.WorldSettings.LowerPedSpawnsAtHigherWantedLevels_Wanted4Multiplier;
+                CurrentSpawnMultiplier = 0.0f;
             }
             if (CurrentSpawnMultiplier != 1.0f && !isSettingDensity)
             {
@@ -252,6 +291,10 @@ namespace Mod
                     {
                         while (CurrentSpawnMultiplier != 1.0f && EntryPoint.ModController?.IsRunning == true)
                         {
+                            if (CurrentSpawnMultiplier == 0.0f)
+                            {
+                                NativeFunction.Natives.SET_AMBIENT_VEHICLE_RANGE_MULTIPLIER_THIS_FRAME(CurrentSpawnMultiplier);
+                            }
                             NativeFunction.Natives.SET_PARKED_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME(CurrentSpawnMultiplier);
                             NativeFunction.Natives.SET_PED_DENSITY_MULTIPLIER_THIS_FRAME(CurrentSpawnMultiplier);
                             NativeFunction.Natives.SET_RANDOM_VEHICLE_DENSITY_MULTIPLIER_THIS_FRAME(CurrentSpawnMultiplier);
@@ -260,7 +303,7 @@ namespace Mod
                             GameFiber.Yield();
                         }
                         isSettingDensity = false;
-                        //EntryPoint.WriteToConsoleTestLong($"World - DONE Setting Population Density {CurrentSpawnMultiplier}");
+                        EntryPoint.WriteToConsole($"World - DONE Setting Population Density {CurrentSpawnMultiplier}");
                     }
                     catch (Exception ex)
                     {
@@ -297,11 +340,11 @@ namespace Mod
         }
         private void OnTotalWantedLevelChanged()
         {
-            if(TotalWantedLevel == 0)
+            if (TotalWantedLevel == 0)
             {
                 OnTotalWantedLevelRemoved();
             }
-            else if(totalWantedLevel == 0)
+            else if (totalWantedLevel == 0)
             {
                 OnTotalWantedLevelAdded();
             }
@@ -322,15 +365,86 @@ namespace Mod
         private void OnTotalWantedLevelAdded()
         {
             //EntryPoint.WriteToConsoleTestLong($"OnTotalWantedLevelAdded {TotalWantedLevel}");
-        }
 
-        //public void StoreEntities()
-        //{
-        //    //EntryPoint.ModController.AllObjects = Rage.World.GetAllObjects().ToList();
-        //    //GameFiber.Yield();
-        //    //EntryPoint.ModController.AllPeds = Rage.World.GetAllPeds().ToList();
-        //    //GameFiber.Yield();
-        //   // EntryPoint.ModController.AllVehicles = Rage.World.GetAllVehicles().ToList();
-        //}
+
+
+        }
+        public void SetTrafficDisabled()
+        {
+            isTrafficDisabled = true;
+            Vehicles.ClearPolice();
+            Pedestrians.ClearPolice();
+        }
+        public void SetTrafficEnabled()
+        {
+            isTrafficDisabled = false;
+        }
+        private void LoadMansionIPLs()
+        {
+            foreach (string ipl in mansionMPIPLs)
+            {
+                NativeFunction.Natives.REQUEST_IPL(ipl);
+            }
+            foreach (string ipl in mansionSPIPLs)
+            {
+                NativeFunction.Natives.REMOVE_IPL(ipl);
+            }
+        }
+        private void UnloadMansionIPLs()
+        {
+            foreach (string ipl in mansionMPIPLs)
+            {
+                NativeFunction.Natives.REMOVE_IPL(ipl);
+            }
+            foreach (string ipl in mansionSPIPLs)
+            {
+                NativeFunction.Natives.REQUEST_IPL(ipl);
+            }
+        }
+        private List<string> mansionMPIPLs = new List<string>()
+        {
+        // VineWood Mansion
+        "m25_2_ch2_04_mansion_interior_a",
+        "apa_ch2_04_mansion_shared",
+        "apa_ch2_04_mansion_private",
+        "apa_ch2_04_mansion_railings_p",
+        "apa_ch2_04_mansion_grass",
+        "apa_ch2_04_mansion_shared_distantlights",
+        "apa_ch2_04_mansion_shared_lodlights",
+        // Richman Mansion
+        "m25_2_ch1_06e_mansion_interior_a",
+        "hei_ch1_06e_mansion_shared",
+        "hei_ch1_06f_mansion_shared",
+        "hei_ch1_06e_mansion_private",
+        "hei_ch1_06e_mansion_railings_p",
+        "hei_ch1_roads_mansion",
+        "hei_ch1_06e_mansion_shared_distantlights",
+        "hei_ch1_06e_mansion_shared_lodlights",
+        // Tongva Mansion
+        "m25_2_ch1_09_mansion_interior_a",
+        "hei_ch1_09_mansion_shared",
+        "hei_ch1_09_mansion_private",
+        "hei_ch1_09_mansion_railings_p",
+        "m25_2_mansion_props",
+        "hei_ch1_09_mansion_shared_distantlights",
+        "hei_ch1_09_mansion_shared_lodlights",
+        };
+        private List<string> mansionSPIPLs = new List<string>()
+        {
+        // VineWood Mansion
+        "apa_ch2_04_mansion_original",
+        "apa_ch2_04_props_original",
+        // Richman Mansion
+        "hei_ch1_06e_mansion_original",
+        "hei_ch1_06f_mansion_original",
+        "hei_ch1_06e_props_original",
+        // Tongva Mansion
+        "hei_ch1_roads_original",
+        "hei_ch1_09_mansion_original",
+        "hei_ch1_09_props_original"
+        };
+
+
+
     }
 }

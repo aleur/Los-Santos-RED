@@ -63,10 +63,14 @@ namespace LosSantosRED.lsr.Interface
 
         void SetWantedLevel(int v1, string v2, bool v3);
         void OnInteractionMenuCreated(GameLocation gameLocation, MenuPool menuPool, UIMenu interactionMenu);
+        void SetDefaultCop();
+        void RemoveAgencyStatus();
 
         ICasinoGamePlayable CasinoGamePlayer { get; }
         Mod.Crafting Crafting { get; set; }
 
         bool IsInWantedActiveMode { get; }
+        bool IsSetDisabledControls { get; set; }
+        HealthState HealthState { get; }
     }
 }

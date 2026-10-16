@@ -224,7 +224,8 @@ public class CivilianSettings : ISettingsDefaultable
     public float PercentageTrustingOfPlayer { get; set; }
 
 
-
+    [Description("Percentage of civilians that will race you if challenged. Needs to be in a sport car.")]
+    public float PercentageWillRacePlayer { get; set; }
 
 
 
@@ -260,11 +261,24 @@ public class CivilianSettings : ISettingsDefaultable
     public int TotalSpawnedServiceMembersLimit { get; set; }
 
 
+    [Description("Total limit of spawned regular peds.")]
+    public int TotalSpawnedCiviliansLimit { get; set; }
     public int PossibleSurrenderPercentage { get; set; } = 40;
     public int WantedPossibleSurrenderPercentage { get; set; } = 10;
     public float NeverSeenPlayerSightDecreasePercentage { get; set; }
     public uint NeverSeenPlayerRecognizeIncreaseTime { get; set; }
     public uint SeenPlayerRecognizeDecreaseTime { get; set; }
+
+    public uint VisiblyArmedRecognizeDecreaseTime { get; set; }
+
+
+
+
+    public bool InjureOnVehicleCrash { get; set; }
+    public float VehicleCrashInjureScalar { get; set; }
+    public int VehicleCrashInjureMinVehicleDamageTrigger { get; set; }
+    public float VehicleCrashInjureRandomizePercentage { get; set; }
+
 
     [OnDeserialized()]
     private void SetValuesOnDeserialized(StreamingContext context)
@@ -282,8 +296,8 @@ public class CivilianSettings : ISettingsDefaultable
         ManageCivilianTasking = true;
         SecurityFightPercentage = 30f;//70f
         OverrideHealth = true;
-        MinHealth = 70;
-        MaxHealth = 100;
+        MinHealth = 100;// 70;
+        MaxHealth = 150;// 100;
         OverrideAccuracy = true;
         GeneralAccuracy = 5;//10
         SightDistance = 60f;//70f;//90f
@@ -309,9 +323,9 @@ public class CivilianSettings : ISettingsDefaultable
         DrugCustomerPercentageMiddleZones = 35f;// 7f;
         DrugCustomerPercentagePoorZones = 40f;// 10f;
 
-        CallPolicePercentageRichZones = 25f;// 50f;
-        CallPolicePercentageMiddleZones = 10f;// 30f;
-        CallPolicePercentagePoorZones = 5f;// 20f;
+        CallPolicePercentageRichZones = 30f;// 25f;// 50f;
+        CallPolicePercentageMiddleZones = 20f;// 10f;// 30f;
+        CallPolicePercentagePoorZones = 10f;// 5f;// 20f;
 
 
         CallPoliceForSeriousCrimesPercentageRichZones = 45f;// 80f;
@@ -370,6 +384,7 @@ public class CivilianSettings : ISettingsDefaultable
         DisableWritheShooting = true;
 
         TotalSpawnedServiceMembersLimit = 9;
+        TotalSpawnedCiviliansLimit = 10;
 
         PossibleSurrenderPercentage = 40;
         WantedPossibleSurrenderPercentage = 10;
@@ -386,21 +401,30 @@ public class CivilianSettings : ISettingsDefaultable
         HidingInUnknownVehicleSightDecreasePercentage = 0.9f;
         NeverSeenPlayerSightDecreasePercentage = 0.9f;
 
-        BaseRecognizeTime = 1200;
+        BaseRecognizeTime = 3000;// 1200;
 
 
         HidingInVehicleRecognizeIncreaseTime = 750;
 
-        NightTimeRecognizeIncreaseTime = 500;
-        PoorWeatherRecognizeIncreaseTime = 500;
+        NightTimeRecognizeIncreaseTime = 300;
+        PoorWeatherRecognizeIncreaseTime = 300;
 
         ActivityWithoutViolationRecognizeIncreaseTime = 500;
 
         HidingInUnknownVehicleRecognizeIncreaseTime = 500;
         NeverSeenPlayerRecognizeIncreaseTime = 500;
-        SeenPlayerRecognizeDecreaseTime = 1000;
-            
+        SeenPlayerRecognizeDecreaseTime = 500;// 1000;
+        VisiblyArmedRecognizeDecreaseTime = 2500;
 
+        InjureOnVehicleCrash = true;
+
+        VehicleCrashInjureScalar = 0.4f;
+
+        VehicleCrashInjureMinVehicleDamageTrigger = 35;
+        VehicleCrashInjureRandomizePercentage = 0.4f;
+
+
+        PercentageWillRacePlayer = 45f;
 
     }
 

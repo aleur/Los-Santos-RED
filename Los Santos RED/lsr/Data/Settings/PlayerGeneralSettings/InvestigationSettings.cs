@@ -14,6 +14,11 @@ public class InvestigationSettings : ISettingsDefaultable
     public uint TimeLimit { get; set; }
     [Description("Min Time before an investigation times out. Will only happen when no active suspects are around the investigation area.")]
     public uint MinTimeLimit { get; set; }
+
+
+    [Description("Additional time before an investigation times out based on the wanted level. Will only happen when no active suspects are around the investigation area.")]
+    public uint AdditionalTimeLimitScalar { get; set; }
+
     [Description("Cops outside of this range will ignore the investigation.")]
     public float MaxDistance { get; set; }
     [Description("How close you need to be to the center of the investigation position to trigger a suspicious person violation if they have your description.")]
@@ -43,7 +48,8 @@ public class InvestigationSettings : ISettingsDefaultable
         MaxDistance = 1000f;// 1500f;
         SuspiciousDistance = 250f;
         CreateBlip = true;
-        ExtraTimeAfterReachingInvestigationCenterBeforeExpiring = 15000;
+        ExtraTimeAfterReachingInvestigationCenterBeforeExpiring = 25000;// 15000;
+        AdditionalTimeLimitScalar = 20000;
     }
 
 }

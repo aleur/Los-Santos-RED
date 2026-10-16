@@ -370,22 +370,22 @@ public class PoliceSpawnSettings : ISettingsDefaultable
         PedSpawnLimit_Default_Industrial = 5;
         PedSpawnLimit_Default_Downtown = 9;// 6;
 
-        LocationSpawnedPedLimit = 8;// 6;
-        LocationSpawnedVehicleLimit = 8;// 6;
+        LocationSpawnedPedLimit = 9;// 8;// 6;
+        LocationSpawnedVehicleLimit = 9;// 8;// 6;
 
 
-        PedSpawnLimit_Investigation = 7;
+        PedSpawnLimit_Investigation = 9;// 7;
         PedSpawnLimit_Wanted1 = 8;// 7;// 8;
-        PedSpawnLimit_Wanted2 = 9;// 8;// 9;// 9;
-        PedSpawnLimit_Wanted3 = 12;// 10;// 12;// 14;
-        PedSpawnLimit_Wanted4 = 14;// 13;// 16;// 18;
-        PedSpawnLimit_Wanted5 = 15;// 20;// 22;
-        PedSpawnLimit_Wanted6 = 17;// 22;// 24;
+        PedSpawnLimit_Wanted2 = 10;// 9;// 8;// 9;// 9;
+        PedSpawnLimit_Wanted3 = 13;// 12;// 10;// 12;// 14;
+        PedSpawnLimit_Wanted4 = 16;// 14;// 13;// 16;// 18;
+        PedSpawnLimit_Wanted5 = 17;// 15;// 20;// 22;
+        PedSpawnLimit_Wanted6 = 20;// 17;// 22;// 24;
 
-        PedSpawnLimit_Wanted7 = 17;// 24;// 26;
-        PedSpawnLimit_Wanted8 = 17;//24;//26;
-        PedSpawnLimit_Wanted9 = 17;//24;//26;
-        PedSpawnLimit_Wanted10 = 17;//24;//26;
+        PedSpawnLimit_Wanted7 = 20;//17;// 24;// 26;
+        PedSpawnLimit_Wanted8 = 20;//17;//24;//26;
+        PedSpawnLimit_Wanted9 = 20;//17;//24;//26;
+        PedSpawnLimit_Wanted10 = 20;//17;//24;//26;
 
 
 
@@ -396,10 +396,10 @@ public class PoliceSpawnSettings : ISettingsDefaultable
         VehicleSpawnLimit_Default_Industrial = 4;
         VehicleSpawnLimit_Default_Downtown = 7;// 5;
 
-        VehicleSpawnLimit_Investigation = 6;
+        VehicleSpawnLimit_Investigation = 9;// 6;
         VehicleSpawnLimit_Wanted1 = 8;// 7;// 8;
-        VehicleSpawnLimit_Wanted2 = 9;// 7;// 8;// 9;
-        VehicleSpawnLimit_Wanted3 = 10;// 9;// 10;// 13;
+        VehicleSpawnLimit_Wanted2 = 9;// 10;// 9;// 7;// 8;// 9;
+        VehicleSpawnLimit_Wanted3 = 11;// 12;// 10;// 9;// 10;// 13;
         VehicleSpawnLimit_Wanted4 = 14;// 12;// 14;// 15;
         VehicleSpawnLimit_Wanted5 = 14;// 13;// 15;// 16;
         VehicleSpawnLimit_Wanted6 = 15;// 16;// 18;
@@ -443,9 +443,9 @@ public class PoliceSpawnSettings : ISettingsDefaultable
         K9SpawnLimit_Default = 0;
         K9SpawnLimit_Investigation = 0;
         K9SpawnLimit_Wanted1 = 0;
-        K9SpawnLimit_Wanted2 = 1;
+        K9SpawnLimit_Wanted2 = 0;
         K9SpawnLimit_Wanted3 = 2;
-        K9SpawnLimit_Wanted4 = 3;
+        K9SpawnLimit_Wanted4 = 0;
         K9SpawnLimit_Wanted5 = 0;
         K9SpawnLimit_Wanted6 = 0;
 
@@ -489,7 +489,7 @@ public class PoliceSpawnSettings : ISettingsDefaultable
         AmbientSpawnPercentage = 70;
         AmbientSpawnPercentage_Wanted = 95;
 
-        AmbientSpawnPercentage_Investigation = 75;
+        AmbientSpawnPercentage_Investigation = 90;// 75;
         AmbientSpawnPercentage_Wilderness = 55;// 25;
         AmbientSpawnPercentage_Rural = 65;// 45;
         AmbientSpawnPercentage_Suburb = 75;// 55;

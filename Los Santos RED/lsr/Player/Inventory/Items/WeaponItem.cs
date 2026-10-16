@@ -64,25 +64,26 @@ public class WeaponItem : ModItem
 
     public override string GetTypeDescription()
     {
-        string description;
+        string descriptionToShow;
         if (Description.Length >= 200)
         {
-            description = Description.Substring(0, 200) + "...";//menu cant show more than 225?, need some for below
+            descriptionToShow = Description.Substring(0, 200) + "...";//menu cant show more than 225?, need some for below
         }
         else
         {
-            description = Description;
+            descriptionToShow = Description;
         }
         if (!string.IsNullOrEmpty(VanillaName))
         {
-            description += $"~n~Alias: {VanillaName}"; //LOWER CASE OR IT ERRORS!
+            descriptionToShow += $"~n~Alias: ~p~{VanillaName}~s~"; //LOWER CASE OR IT ERRORS!
         }
-        description += $"~n~Category: {MenuCategory}";
+        descriptionToShow += $"~n~Category: ~y~{MenuCategory}~s~";
         if (RequiresDLC)
         {
-            description += $"~n~~b~DLC Weapon";
+            descriptionToShow += $"~n~~b~DLC Weapon~s~";
         }
-        return Description;
+        EntryPoint.WriteToConsole($"GET TYPE DESCRIPTION RAN FOR {ModelName} VanillaName:{VanillaName} MenuCategory:{MenuCategory}");
+        return descriptionToShow;
     }
 
     public override void CreateSellMenuItem(Transaction Transaction, MenuItem menuItem, UIMenu sellMenuRNUI, ISettingsProvideable settings, ILocationInteractable player, bool isStealing, IEntityProvideable world)
@@ -799,7 +800,7 @@ public class WeaponItem : ModItem
                     Position = StoreCam.Position + StoreCam.Direction / 2f;
                     EntryPoint.WriteToConsole($"CREATE WEAPON PREVIEW STORECAM EXISTS {StoreCam.Position}");
                 }
-                else if (Transaction.PersonTransaction != null && Transaction.PersonTransaction.TransactionPed != null && Transaction.PersonTransaction.TransactionPed.Pedestrian.Exists())
+                else if (Transaction.PersonTransaction != null && Transaction.PersonTransaction.TransactionPed != null && Transaction.PersonTransaction.TransactionPed.Pedestrian.Exists() && !Transaction.PersonTransaction.TransactionPed.Pedestrian.IsInAnyVehicle(false))
                 {
                     Position = Transaction.PersonTransaction.TransactionPed.Pedestrian.GetOffsetPosition(new Vector3(settings.SettingsManager.PlayerOtherSettings.PersonTransactionItemOffsetX, settings.SettingsManager.PlayerOtherSettings.PersonTransactionItemOffsetY, settings.SettingsManager.PlayerOtherSettings.PersonTransactionItemOffsetZ));
                     EntryPoint.WriteToConsole($"CREATE WEAPON PREVIEW PERSONTRANSACTION DOING ABOVE PED");
@@ -839,7 +840,7 @@ public class WeaponItem : ModItem
                         Position = StoreCam.Position + (StoreCam.Direction.ToNormalized() * 0.5f) + (StoreCam.Direction.ToNormalized() * LargestSideLength / 2f);//
                         EntryPoint.WriteToConsole($"CREATE WEAPON PREVIEW STORECAM EXISTS {StoreCam.Position} 1");
                     }
-                    else if (Transaction.PersonTransaction != null && Transaction.PersonTransaction.TransactionPed != null && Transaction.PersonTransaction.TransactionPed.Pedestrian.Exists())
+                    else if (Transaction.PersonTransaction != null && Transaction.PersonTransaction.TransactionPed != null && Transaction.PersonTransaction.TransactionPed.Pedestrian.Exists() && !Transaction.PersonTransaction.TransactionPed.Pedestrian.IsInAnyVehicle(false))
                     {
                         Position = Transaction.PersonTransaction.TransactionPed.Pedestrian.GetOffsetPosition(new Vector3(settings.SettingsManager.PlayerOtherSettings.PersonTransactionItemOffsetX, settings.SettingsManager.PlayerOtherSettings.PersonTransactionItemOffsetY, settings.SettingsManager.PlayerOtherSettings.PersonTransactionItemOffsetZ));
                         EntryPoint.WriteToConsole($"CREATE WEAPON PREVIEW PERSONTRANSACTION DOING ABOVE PED");
@@ -961,6 +962,30 @@ public class WeaponItem : ModItem
     public override void AddToPlayerInventory(Mod.Player player, int quantity)
     {
         Game.LocalPlayer.Character.Inventory.GiveNewWeapon(this.WeaponInformation.ModelName,this.WeaponInformation.AmmoAmount, false);
+    }
+    public override void AddToList(PossibleItems possibleItems)
+    {
+        possibleItems?.WeaponItems.RemoveAll(x => x.ModelName == ModelName);
+        possibleItems?.WeaponItems.Add(this);
+    }
+
+    public override Rage.Object SpawnObject(Vector3 position, float heading)
+    {
+        if(ModelItem == null || ModelItem.ModelHash == 0)
+        {
+            return null;
+        }
+        NativeFunction.Natives.REQUEST_WEAPON_ASSET(ModelItem.ModelHash, 31, 0);
+        if (!NativeFunction.Natives.HAS_WEAPON_ASSET_LOADED<bool>(ModelItem.ModelHash))
+        {
+            return null;       
+        }
+        Rage.Object toReturn = NativeFunction.Natives.CREATE_WEAPON_OBJECT<Rage.Object>(ModelItem.ModelHash, 60, position.X, position.Y, position.Z, true, 1.0f, 0, 0, 1);
+        if(toReturn.Exists())
+        {
+            toReturn.Heading = heading;
+        }
+        return toReturn;
     }
 }
 

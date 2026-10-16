@@ -112,7 +112,17 @@ public class WeaponSway
         {
             AdjustPitchInVehicle();
             AdjustHeadingInVehicle();
-            NativeFunction.Natives.FORCE_CAMERA_RELATIVE_HEADING_AND_PITCH(CurrentPitch + AdjustedPitch, CurrentHeading + AdjustedHeading, Settings.SettingsManager.SwaySettings.SmoothRate);
+            //NativeFunction.Natives.FORCE_CAMERA_RELATIVE_HEADING_AND_PITCH(CurrentPitch + AdjustedPitch, CurrentHeading + AdjustedHeading, Settings.SettingsManager.SwaySettings.SmoothRate);
+
+            if (Math.Abs(AdjustedPitch) > 0f)
+            {
+                NativeFunction.Natives.SET_GAMEPLAY_CAM_RELATIVE_PITCH(CurrentPitch + AdjustedPitch + Settings.SettingsManager.RecoilSettings.InVehicleVerticalScalar, Settings.SettingsManager.SwaySettings.SmoothRate);
+            }
+            if (Math.Abs(AdjustedHeading) > 0f)
+            {
+                NativeFunction.Natives.SET_GAMEPLAY_CAM_RELATIVE_HEADING(CurrentHeading + AdjustedHeading);
+            }
+
         }
         else
         {

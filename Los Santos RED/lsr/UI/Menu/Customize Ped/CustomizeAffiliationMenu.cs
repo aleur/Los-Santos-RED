@@ -59,11 +59,12 @@ public class CustomizeAffiliationMenu
 
         AffiliationSubMenu.OnMenuOpen += (sender) =>
         {
-            PedCustomizer.CameraCycler.SetDefault();
+            //PedCustomizer.CameraCycler.SetDefault();
+
         };
         AffiliationSubMenu.OnMenuClose += (sender) =>
         {
-            PedCustomizer.CameraCycler.SetDefault();
+            //PedCustomizer.CameraCycler.SetDefault();
         };
 
 
@@ -98,7 +99,7 @@ public class CustomizeAffiliationMenu
             PedCustomizer.AssignedAgency = LEMenu.SelectedItem;
             SetCurrent();
         };
-        AffiliationSubMenu.AddItem(LEMenu);
+        
 
         SecurityMenu = new UIMenuListScrollerItem<Agency>("Set Security", "Join a security agency. ~r~WIP Most Features TBD~s~", Agencies.GetAgencies().Where(x => x.ResponseType == ResponseType.Security));
         SecurityMenu.Activated += (sender, selectedItem) =>
@@ -107,7 +108,7 @@ public class CustomizeAffiliationMenu
             PedCustomizer.AssignedAgency = SecurityMenu.SelectedItem;
             SetCurrent();
         };
-        AffiliationSubMenu.AddItem(SecurityMenu);
+        
 
 
         EMSMenu = new UIMenuListScrollerItem<Agency>("Set EMS", "Join an EMS agency. ~r~WIP Most Features TBD~s~", Agencies.GetAgencies().Where(x => x.ResponseType == ResponseType.EMS));
@@ -116,7 +117,7 @@ public class CustomizeAffiliationMenu
             PedCustomizer.AssignedAgency = EMSMenu.SelectedItem;
             SetCurrent();
         };
-        AffiliationSubMenu.AddItem(EMSMenu);
+        
 
         FireMenu = new UIMenuListScrollerItem<Agency>("Set Fire", "Join a fire fighting agency. ~r~WIP Most Features TBD~s~", Agencies.GetAgencies().Where(x => x.ResponseType == ResponseType.Fire));
         FireMenu.Activated += (sender, selectedItem) =>
@@ -124,8 +125,12 @@ public class CustomizeAffiliationMenu
             PedCustomizer.AssignedAgency = FireMenu.SelectedItem;
             SetCurrent();
         };
+#if DEBUG
+        AffiliationSubMenu.AddItem(LEMenu);
+        AffiliationSubMenu.AddItem(SecurityMenu);
+        AffiliationSubMenu.AddItem(EMSMenu);
         AffiliationSubMenu.AddItem(FireMenu);
-
+#endif
         SetCurrent();
     }
     private void SetCurrent()

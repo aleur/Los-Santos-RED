@@ -6,6 +6,7 @@ using Rage;
 using Rage.Native;
 using System;
 using System.Collections.Generic;
+using System.Drawing.Text;
 using System.Linq;
 
 public class LEDispatcher
@@ -22,6 +23,7 @@ public class LEDispatcher
     private readonly IPlacesOfInterest PlacesOfInterest;
     private readonly IModItems ModItems;
     private readonly IShopMenus ShopMenus;
+    private readonly ICrimes Crimes;
 
     private readonly float MinimumDeleteDistance = 150f;//200f
     private readonly uint MinimumExistingTime = 20000;
@@ -55,6 +57,100 @@ public class LEDispatcher
 
     private uint GameTimeLastSpawnedOrRecalledCanineUnit;
 
+
+    private int SpikeStripPercentageCurrentWantedLevel(int wantedLevel)
+    {
+        if (wantedLevel == 1)
+        {
+            return Settings.SettingsManager.RoadblockSettings.RoadblockSpikeStripSpawnPercentage_Wanted1;
+        }
+        else if (wantedLevel == 2)
+        {
+            return Settings.SettingsManager.RoadblockSettings.RoadblockSpikeStripSpawnPercentage_Wanted2;
+        }
+        else if (wantedLevel == 3)
+        {
+            return Settings.SettingsManager.RoadblockSettings.RoadblockSpikeStripSpawnPercentage_Wanted3;
+        }
+        else if (wantedLevel == 4)
+        {
+            return Settings.SettingsManager.RoadblockSettings.RoadblockSpikeStripSpawnPercentage_Wanted4;
+        }
+        else if (wantedLevel == 5)
+        {
+            return Settings.SettingsManager.RoadblockSettings.RoadblockSpikeStripSpawnPercentage_Wanted5;
+        }
+        else if (wantedLevel >= 6)
+        {
+            return Settings.SettingsManager.RoadblockSettings.RoadblockSpikeStripSpawnPercentage_Wanted6;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    private int CarBlocksPercentageCurrentWantedLevel(int wantedLevel)
+    {
+        if (wantedLevel == 1)
+        {
+            return Settings.SettingsManager.RoadblockSettings.RoadblockCarBlockSpawnPercentage_Wanted1;
+        }
+        else if (wantedLevel == 2)
+        {
+            return Settings.SettingsManager.RoadblockSettings.RoadblockCarBlockSpawnPercentage_Wanted2;
+        }
+        else if (wantedLevel == 3)
+        {
+            return Settings.SettingsManager.RoadblockSettings.RoadblockCarBlockSpawnPercentage_Wanted3;
+        }
+        else if (wantedLevel == 4)
+        {
+            return Settings.SettingsManager.RoadblockSettings.RoadblockCarBlockSpawnPercentage_Wanted4;
+        }
+        else if (wantedLevel == 5)
+        {
+            return Settings.SettingsManager.RoadblockSettings.RoadblockCarBlockSpawnPercentage_Wanted5;
+        }
+        else if (wantedLevel >= 6)
+        {
+            return Settings.SettingsManager.RoadblockSettings.RoadblockCarBlockSpawnPercentage_Wanted6;
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    private int OtherRoadblockBarriersPercentageCurrentWantedLevel(int wantedLevel)
+    {
+        if (wantedLevel == 1)
+        {
+            return Settings.SettingsManager.RoadblockSettings.RoadblockOtherBarrierSpawnPercentage_Wanted1;
+        }
+        else if (wantedLevel == 2)
+        {
+            return Settings.SettingsManager.RoadblockSettings.RoadblockOtherBarrierSpawnPercentage_Wanted2;
+        }
+        else if (wantedLevel == 3)
+        {
+            return Settings.SettingsManager.RoadblockSettings.RoadblockOtherBarrierSpawnPercentage_Wanted3;
+        }
+        else if (wantedLevel == 4)
+        {
+            return Settings.SettingsManager.RoadblockSettings.RoadblockOtherBarrierSpawnPercentage_Wanted4;
+        }
+        else if (wantedLevel == 5)
+        {
+            return Settings.SettingsManager.RoadblockSettings.RoadblockOtherBarrierSpawnPercentage_Wanted5;
+        }
+        else if (wantedLevel >= 6)
+        {
+            return Settings.SettingsManager.RoadblockSettings.RoadblockOtherBarrierSpawnPercentage_Wanted6;
+        }
+        else
+        {
+            return 0;
+        }
+    }
 
     private uint DelayBetweenHeliSpawnAfterSpawnOrRecall
     {
@@ -162,7 +258,7 @@ public class LEDispatcher
     private bool HasNeedToSpawnBoat => (Player.CurrentVehicle?.IsBoat == true || Player.IsSwimming) && World.Vehicles.PoliceBoatsCount < SpawnedBoatLimit;
     private bool TotalIsWanted => World.TotalWantedLevel > 0;
     public LEDispatcher(IEntityProvideable world, IDispatchable player, IAgencies agencies, ISettingsProvideable settings, IStreets streets, IZones zones, IJurisdictions jurisdictions, IWeapons weapons,
-        INameProvideable names, IPlacesOfInterest placesOfInterest, IModItems modItems, IShopMenus shopMenus)
+        INameProvideable names, IPlacesOfInterest placesOfInterest, IModItems modItems, IShopMenus shopMenus, ICrimes crimes)
     {
         Player = player;
         World = world;
@@ -176,7 +272,8 @@ public class LEDispatcher
         PlacesOfInterest = placesOfInterest;
         ModItems = modItems;
         ShopMenus = shopMenus;
-        MarshalDispatcher = new MarshalDispatcher(Player, this, Settings, World, Weapons, Names, PlacesOfInterest, ModItems, Agencies, ShopMenus);
+        Crimes = crimes;
+        MarshalDispatcher = new MarshalDispatcher(Player, this, Settings, World, Weapons, Names, PlacesOfInterest, ModItems, Agencies, ShopMenus, Crimes);
     }
     private float LikelyHoodOfAnySpawn
     {
@@ -280,8 +377,8 @@ public class LEDispatcher
         }
     }
     private bool HasNeedToAmbientCanineDispatch => World.Pedestrians.TotalSpawnedAmbientPoliceCanines < SpawnedK9Limit && (GameTimeLastSpawnedOrRecalledCanineUnit == 0 || Game.GameTime - GameTimeLastSpawnedOrRecalledCanineUnit >= DelayBetweenCanineSpawnAfterSpawnOrRecall);
-    public float ClosestPoliceSpawnToOtherPoliceAllowed => TotalIsWanted ? 200f : 500f;
-    public float ClosestPoliceSpawnToSuspectAllowed => TotalIsWanted ? 200f : 250f;//150f : 250f;
+    public float ClosestPoliceSpawnToOtherPoliceAllowed => 50f;// TotalIsWanted ? 200f : 500f;
+    public float ClosestPoliceSpawnToSuspectAllowed => TotalIsWanted ? 175f : 250f;//200f : 250f;//150f : 250f;
     private List<Cop> DeletableCops => World.Pedestrians.AllPoliceList.Where(x => (x.RecentlyUpdated && x.DistanceToPlayer >= MinimumDeleteDistance && x.HasBeenSpawnedFor >= MinimumExistingTime && x.Handle != Player.Handle) || x.CanRemove).ToList();//NEED TO ADD WAS MOD SPAWNED HERE, LET THE REST OF THE FUCKERS MANAGE THEIR OWN STUFF?
     private float DistanceToDelete => TotalIsWanted ? Settings.SettingsManager.PoliceSpawnSettings.DistanceToRecallInVehicle_Wanted : Settings.SettingsManager.PoliceSpawnSettings.DistanceToRecallInVehicle_NotWanted;
     private float DistanceToDeleteOnFoot => TotalIsWanted ? Settings.SettingsManager.PoliceSpawnSettings.DistanceToRecallOnFoot_Wanted : Settings.SettingsManager.PoliceSpawnSettings.DistanceToRecallOnFoot_NotWanted;
@@ -900,7 +997,7 @@ public class LEDispatcher
     {
         //EntryPoint.WriteToConsole("LE DISPATCHER HAS DISPATCHED RAN1");
         HasDispatchedThisTick = false;
-        if (!Settings.SettingsManager.PoliceSpawnSettings.ManageDispatching)
+        if (!Settings.SettingsManager.PoliceSpawnSettings.ManageDispatching || EntryPoint.IsLSPDFRIntegrationEnabled)
         {
             return HasDispatchedThisTick;
         }
@@ -971,7 +1068,7 @@ public class LEDispatcher
         {
             return;
         }
-        LESpawnTask spawnTask = new LESpawnTask(Agency, SpawnLocation, vehicleExt.DispatchableVehicle, null, Settings.SettingsManager.PoliceSpawnSettings.ShowSpawnedBlips, Settings, Weapons, Names, false, World, ModItems, false, ShopMenus);
+        LESpawnTask spawnTask = new LESpawnTask(Agency, SpawnLocation, vehicleExt.DispatchableVehicle, null, Settings.SettingsManager.PoliceSpawnSettings.ShowSpawnedBlips, Settings, Weapons, Names, false, World, ModItems, false, ShopMenus, Crimes);
         spawnTask.SpawnWithAllWeapons = true;
         EntryPoint.WriteToConsole($"DEBUG LE DISPATCH RESPAWNING RAPPELLED PED VehicleType:{vehicleExt?.DispatchableVehicle} PersonType:{null} RequiredPedGroup:{vehicleExt?.DispatchableVehicle?.RequiredPedGroup} GroupName:{null}");
         spawnTask.SpawnAsPassenger(vehicleExt, seatIndex);
@@ -1011,11 +1108,11 @@ public class LEDispatcher
             //EntryPoint.WriteToConsole("Assault Spawn failed too many spawns already");
             return;
         }
-        if (!ClosestStation.AssignedAgency.CanSpawn(World.TotalWantedLevel))
-        {
-            //EntryPoint.WriteToConsole("Assault Spawn failed cantspawn");
-            return;
-        }
+        //if (!ClosestStation.AssignedAgency.CanSpawn(World.TotalWantedLevel))
+        //{
+        //    //EntryPoint.WriteToConsole("Assault Spawn failed cantspawn");
+        //    return;
+        //}
         if (!GetAssaultSpawnTypes(ClosestStation.AssignedAgency))
         {
             //EntryPoint.WriteToConsole("Assault Spawn failed type");
@@ -1093,7 +1190,7 @@ public class LEDispatcher
         {
             return false;
         }
-        PersonType = Agency.GetRandomPed(World.TotalWantedLevel, "");
+        PersonType = Agency.GetRandomAssaultPed(World.TotalWantedLevel, "",false);
         return PersonType != null;
     }
     public void Dispose()
@@ -1302,55 +1399,52 @@ public class LEDispatcher
         //EntryPoint.WriteToConsole($"AMBIENT COP SPAWN RunAmbientDispatch ShouldRunAmbientDispatch{ShouldRunAmbientDispatch}: %{PercentageOfAmbientSpawn} TimeBetween:{TimeBetweenSpawn} SpawnedCopLimit:{SpawnedCopLimit}");
         bool getspawnLocation = GetSpawnLocation();
         GameFiber.Yield();
+
+
+        if(!getspawnLocation)
+        {
+            EntryPoint.WriteToConsole("LE DISPATCHER CAN NOT GET SPAWN LOCATION");
+            return;
+        }
+
         bool getSpawnTypes = GetSpawnTypes();
+
+
+        if (!getSpawnTypes)
+        {
+            EntryPoint.WriteToConsole("LE DISPATCHER CAN NOT GET SPAWN TYPES");
+            return;
+        }
+
         //EntryPoint.WriteToConsole($"Attempt {Agency?.ShortName}  {VehicleType?.ModelName} {VehicleType?.DebugName} HasNeedToSpawnBoat {HasNeedToSpawnBoat} {getspawnLocation} {getSpawnTypes}");
         //EntryPoint.WriteToConsole($"getspawnLocation:{getspawnLocation} getSpawnTypes:{getSpawnTypes}");
-        if (getspawnLocation && getSpawnTypes)
+
+        GameFiber.Yield();
+        GameTimeAttemptedDispatch = Game.GameTime;
+        //EntryPoint.WriteToConsoleTestLong($"AMBIENT COP CALLED SPAWN TASK");
+
+        bool allowAny = false;
+        if(IsTunnelSpawn)
         {
-            GameFiber.Yield();
-            GameTimeAttemptedDispatch = Game.GameTime;
-            //EntryPoint.WriteToConsoleTestLong($"AMBIENT COP CALLED SPAWN TASK");
-
-            bool allowAny = false;
-            if(IsTunnelSpawn)
-            {
-                allowAny = true;
-            }
-
-            if (CallSpawnTask(allowAny, true, false, false, TaskRequirements.None, false, IsOffDutySpawn, false))
-            {
-                //EntryPoint.WriteToConsoleTestLong($"AMBIENT COP SPAWN TASK RAN");
-                ShouldRunAmbientDispatch = false;
-                //GameTimeAttemptedDispatch = Game.GameTime;
-            }
+            allowAny = true;
         }
+
+        if (CallSpawnTask(allowAny, true, false, false, TaskRequirements.None, false, IsOffDutySpawn, false))
+        {
+            //EntryPoint.WriteToConsoleTestLong($"AMBIENT COP SPAWN TASK RAN");
+            ShouldRunAmbientDispatch = false;
+            //GameTimeAttemptedDispatch = Game.GameTime;
+        }
+        
     }
     private void HandleRoadblockSpawns()
     {
         if (IsTimeToDispatchRoadblock && HasNeedToDispatchRoadblock)
         {
             GameFiber.Yield();
-            bool enableCarBlocks = true;
-            if(!Settings.SettingsManager.RoadblockSettings.RoadblockCarBlocksEnabled)
-            {
-                enableCarBlocks = false;
-            }
-            bool enableSpikeStrips = true;
-            if(!Settings.SettingsManager.RoadblockSettings.RoadblockSpikeStripsEnabled)
-            {
-                enableSpikeStrips = false;
-            }
-            bool enableOtherBarriers = true;
-            if (!Settings.SettingsManager.RoadblockSettings.RoadblockOtherBarriersEnabled)
-            {
-                enableOtherBarriers = false;
-            }
-
-            if(Player.WantedLevel <= 2)
-            {
-                enableCarBlocks = false;
-            }
-
+            bool enableCarBlocks = Settings.SettingsManager.RoadblockSettings.RoadblockCarBlocksEnabled && RandomItems.RandomPercent(CarBlocksPercentageCurrentWantedLevel(World.TotalWantedLevel));
+            bool enableSpikeStrips = Settings.SettingsManager.RoadblockSettings.RoadblockSpikeStripsEnabled && RandomItems.RandomPercent(SpikeStripPercentageCurrentWantedLevel(World.TotalWantedLevel));
+            bool enableOtherBarriers = Settings.SettingsManager.RoadblockSettings.RoadblockOtherBarriersEnabled && RandomItems.RandomPercent(OtherRoadblockBarriersPercentageCurrentWantedLevel(World.TotalWantedLevel));
             if (RandomItems.RandomPercent(CurrentRoadblockSpawnChance()))
             {
                 SpawnRoadblock(false, enableCarBlocks, enableSpikeStrips, enableOtherBarriers, Settings.SettingsManager.RoadblockSettings.RoadblockSpawnDistance);// 225f);//300f
@@ -1385,7 +1479,7 @@ public class LEDispatcher
 
             }
 
-            LESpawnTask spawnTask = new LESpawnTask(Agency, SpawnLocation, VehicleType, PersonType, Settings.SettingsManager.PoliceSpawnSettings.ShowSpawnedBlips, Settings, Weapons, Names, addOptionalPassengers, World, ModItems, addCanine, ShopMenus);
+            LESpawnTask spawnTask = new LESpawnTask(Agency, SpawnLocation, VehicleType, PersonType, Settings.SettingsManager.PoliceSpawnSettings.ShowSpawnedBlips, Settings, Weapons, Names, addOptionalPassengers, World, ModItems, addCanine, ShopMenus, Crimes);
             spawnTask.AllowAnySpawn = allowAny;
             spawnTask.AllowBuddySpawn = allowBuddy && !isOffDuty;
             spawnTask.ClearVehicleArea = clearArea;
@@ -1563,6 +1657,12 @@ public class LEDispatcher
                         addedAdjustment = true;
                         EntryPoint.WriteToConsole("LE DISPATCHER ADDED AIR VEHICLE ADJUSTMENT");
                     }
+                    if(Player.IsInArmedMilitaryVehicle)
+                    {
+                        addedSpawnAdjustments |= eSpawnAdjustment.InArmedMilitaryVehicle;
+                        addedAdjustment = true;
+                        EntryPoint.WriteToConsole("LE DISPATCHER ADDED ARMED MILITARY VEHICLE ADJUSTMENT");
+                    }
 
                     if (HasNeedToAmbientCanineDispatch)
                     {
@@ -1692,6 +1792,7 @@ public class LEDispatcher
         if (positionZone == null)
         {
             ToReturn.AddRange(Agencies.GetSpawnableAgencies(WantedLevel, ResponseType.LawEnforcement));
+            EntryPoint.WriteToConsole("GETAGENCIES POSITIONZONE IS NULL");
             return ToReturn;
         }
         Agency ZoneAgency = Jurisdictions.GetRandomAgency(positionZone.InternalGameName, WantedLevel, ResponseType.LawEnforcement);
@@ -1701,17 +1802,18 @@ public class LEDispatcher
         }
         if (!ToReturn.Any() || RandomItems.RandomPercent(LikelyHoodOfCountySpawn))
         {
+            EntryPoint.WriteToConsole($"GETAGENCIES FALLBACK TO COUNTY SPAWN HAS ANY YET:{ToReturn.Any()} CountyID:{positionZone.CountyID} {positionZone.DisplayName}");
             Agency CountyAgency = Jurisdictions.GetRandomCountyAgency(positionZone.CountyID, WantedLevel, ResponseType.LawEnforcement);
             if (CountyAgency != null)//randomly spawn the county agency
             {
                 ToReturn.Add(CountyAgency); //Zone Jurisdiciton Random
             }
-            //EntryPoint.WriteToConsole("ATTEMPING TO ADD COUNTY AGENCY!");
+            EntryPoint.WriteToConsole("GETAGENCIES ATTEMPING TO ADD COUNTY AGENCY!");
         }
         if (!ToReturn.Any() || RandomItems.RandomPercent(LikelyHoodOfAnySpawn))//fall back to anybody
         {
             ToReturn.AddRange(Agencies.GetSpawnableAgencies(WantedLevel, ResponseType.LawEnforcement));
-            //EntryPoint.WriteToConsole("ATTEMPING TO ADD ANY AGENCY!");
+            EntryPoint.WriteToConsole("GETAGENCIES FALLBACK ATTEMPING TO ADD ANY AGENCY!");
         }
         return ToReturn;
     }
@@ -1737,6 +1839,7 @@ public class LEDispatcher
                 Position = Player.Position;
             }
         }
+        EntryPoint.WriteToConsole($"LE DISTPACHER WantedLevel{Player.WantedLevel} MinDistanceToSpawn:{MinDistanceToSpawn} MaxDistanceToSpawn:{MaxDistanceToSpawn}");
         Position = Position.Around2D(MinDistanceToSpawn, MaxDistanceToSpawn);
         return Position;
     }
@@ -1751,12 +1854,12 @@ public class LEDispatcher
         {
             return agency;
         }
-        agency = PossibleAgencies.Where(x=>x.Personnel.Any(y =>y.CanCurrentlySpawn(World.TotalWantedLevel))).PickRandom();
-        EntryPoint.WriteToConsole($"LEDIS GetRandomAgency 2 SELECTED {agency?.FullName}");
+        agency = PossibleAgencies.Where(x=> x.Personnel != null && x.Personnel.Any(y =>y.CanCurrentlySpawn(World.TotalWantedLevel))).PickRandom();
+        //EntryPoint.WriteToConsole($"LEDIS GetRandomAgency 2 SELECTED {agency?.FullName}");
         if (agency == null)
         {
-            agency = GetAgencies(spawnLocation.InitialPosition, World.TotalWantedLevel, spawnZone, spawnStreet).Where(x => x.Personnel.Any(y => y.CanCurrentlySpawn(World.TotalWantedLevel))).PickRandom();
-            EntryPoint.WriteToConsole($"LEDIS GetRandomAgency 3 SELECTED {agency?.FullName}");
+            agency = GetAgencies(spawnLocation.InitialPosition, World.TotalWantedLevel, spawnZone, spawnStreet).Where(x => x.Personnel != null && x.Personnel.Any(y => y.CanCurrentlySpawn(World.TotalWantedLevel))).PickRandom();
+            //EntryPoint.WriteToConsole($"LEDIS GetRandomAgency 3 SELECTED {agency?.FullName}");
         }
         if (agency == null)
         {
@@ -1766,7 +1869,7 @@ public class LEDispatcher
     }
     private bool AreSpawnsValidSpawn(SpawnLocation spawnLocation)
     {
-        if (spawnLocation.FinalPosition.DistanceTo2D(Player.Position) < ClosestPoliceSpawnToSuspectAllowed || World.Pedestrians.AnyCopsNearPosition(spawnLocation.FinalPosition, ClosestPoliceSpawnToOtherPoliceAllowed))
+        if (spawnLocation.FinalPosition.DistanceTo2D(Player.Position) < ClosestPoliceSpawnToSuspectAllowed)// || World.Pedestrians.AnyCopsNearPosition(spawnLocation.FinalPosition, ClosestPoliceSpawnToOtherPoliceAllowed))
         {
             return false;
         }
@@ -1778,7 +1881,7 @@ public class LEDispatcher
     }
     private bool IsValidSpawn(Vector3 location)
     {
-        if (location.DistanceTo2D(Player.Position) < ClosestPoliceSpawnToSuspectAllowed || World.Pedestrians.AnyCopsNearPosition(location, ClosestPoliceSpawnToOtherPoliceAllowed))
+        if (location.DistanceTo2D(Player.Position) < ClosestPoliceSpawnToSuspectAllowed)// || World.Pedestrians.AnyCopsNearPosition(location, ClosestPoliceSpawnToOtherPoliceAllowed))
         {
             return false;
         }
@@ -1876,7 +1979,7 @@ public class LEDispatcher
             Roadblock.Dispose();
             GameFiber.Yield();
         }
-        Roadblock = new Roadblock(Player, World, ToSpawn, VehicleToUse, OfficerType, RoadblockFinalPosition, RoadblockFinalHeading, Settings, Weapons, Names, force, ModItems, enableCarBlocks,enableSpikeStrips,enableOtherBarriers, ShopMenus);
+        Roadblock = new Roadblock(Player, World, ToSpawn, VehicleToUse, OfficerType, RoadblockFinalPosition, RoadblockFinalHeading, Settings, Weapons, Names, force, ModItems, enableCarBlocks,enableSpikeStrips,enableOtherBarriers, ShopMenus, Crimes);
         Roadblock.SpawnRoadblock();
         GameFiber.Yield();
         GameTimeLastSpawnedRoadblock = Game.GameTime;    

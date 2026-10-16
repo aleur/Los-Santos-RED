@@ -56,14 +56,15 @@ public class SecurityGuardBrain : PedBrain
     }
     protected override void UpdateCurrentTask()
     {
-        if (PedExt.DistanceToPlayer <= 150f)//50f
+        if (PedExt.DistanceToPlayer <= 250f)//50f
         {
+            bool shouldAttackOrApprehend = SecurityGuard.PlayerPerception.HasSeenTargetWithin(30000) || (Player.IsWanted && !Player.IsInSearchMode);
             PedExt.PedReactions.Update(Player);
-            if(PedExt.PedReactions.ReactionTier == ReactionTier.Intense)
+            if(PedExt.PedReactions.ReactionTier == ReactionTier.Intense || (Player.WantedLevel >= 3 && !Player.IsInSearchMode))
             {
                 if (SecurityGuard.WeaponInventory.IsArmed)
                 {
-                    if (SecurityGuard.PlayerPerception.HasSeenTargetWithin(30000))
+                    if (shouldAttackOrApprehend)
                     {
                         SetFight();
                     }
@@ -79,7 +80,7 @@ public class SecurityGuardBrain : PedBrain
             }
             else if (PedExt.PedReactions.ReactionTier == ReactionTier.Alerted)
             {
-                if (SecurityGuard.PlayerPerception.HasSeenTargetWithin(30000))
+                if (shouldAttackOrApprehend)
                 {
                     SetApprehend();
                 }
@@ -90,7 +91,7 @@ public class SecurityGuardBrain : PedBrain
             }
             else if (PedExt.CanAttackPlayer)
             {
-                if (SecurityGuard.PlayerPerception.HasSeenTargetWithin(30000))
+                if (shouldAttackOrApprehend)
                 {
                     SetChase();// SetFight();
                 }

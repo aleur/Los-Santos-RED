@@ -18,6 +18,7 @@ public class BlankLocationsData
     public List<BlankLocation> BlankLocationPlaces { get; set; } = new List<BlankLocation>();
     public void DefaultConfig()
     {
+        RailroadPolice();
         SpeedTraps();
         Checkpoints();
         RooftopSnipers();
@@ -29,6 +30,7 @@ public class BlankLocationsData
         DiablosGang();
         GambettiGang();
         KhangpaeGang();
+        LostGang();
         LupisellaGang();
         MarabuntaGang();
         MessinaGang();
@@ -36,8 +38,571 @@ public class BlankLocationsData
         TriadGang();
         YardiesGang();
         RedneckGang();
+        VagosGang();
         VarriosGang();
+        RandomPeds();
+        LoadHelpers();
     }
+
+    private void LoadHelpers()
+    {
+        BlankLocationPlaces.AddRange(new List<BlankLocation>()
+        {
+            new BlankLocation(new Vector3(935.4767f, 47.33501f, 81.09575f), 137.8167f,"Diamond Casino Exterior","") { IsOnSPMap =false,IsOnMPMap = true,InteriorID = -3232 },
+        });
+    }
+
+    private void RailroadPolice()
+    {
+        BlankLocation railroad1 = new BlankLocation(new Vector3(1508.027f, 3373.598f, 35.9004f), 116.1617f, "railroad1", "")
+        {
+            OpenTime = 0,
+            CloseTime = 24,
+            AssignedAssociationID = "GLRP",
+            
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+                {
+                    new LEConditionalLocation(new Vector3(1508.027f, 3373.598f, 35.9004f), 116.1617f, 35f){ IsEmpty = false, },
+                },
+        };
+        BlankLocationPlaces.Add(railroad1);
+        BlankLocation railroad2 = new BlankLocation(new Vector3(262.6646f, 3315.036f, 39.55537f), 231.6474f, "railroad2", "")
+        {
+            OpenTime = 0,
+            CloseTime = 24,
+            AssignedAssociationID = "GLRP",
+
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+                {
+                    new LEConditionalLocation(new Vector3(262.6646f, 3315.036f, 39.55537f), 231.6474f, 35f){ IsEmpty = false, },
+                },
+        };
+        BlankLocationPlaces.Add(railroad2);
+
+
+        BlankLocation railroad3 = new BlankLocation(new Vector3(1196.498f, 3266.45f, 38.64182f), 25.32101f, "railroad3", "")
+        {
+            OpenTime = 0,
+            CloseTime = 24,
+            AssignedAssociationID = "GLRP",
+
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+                {
+                    new LEConditionalLocation(new Vector3(1196.498f, 3266.45f, 38.64182f), 25.32101f, 35f){ IsEmpty = false, TaskRequirements = TaskRequirements.Guard },
+                },
+        };
+        BlankLocationPlaces.Add(railroad3);
+
+        BlankLocation railroad4 = new BlankLocation(new Vector3(562.358f, 3194.734f, 39.82635f), 330.7249f, "railroad4", "")
+        {
+            OpenTime = 0,
+            CloseTime = 24,
+            AssignedAssociationID = "GLRP",
+
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+                {
+                    new LEConditionalLocation(new Vector3(562.358f, 3194.734f, 39.82635f), 330.7249f, 35f){ IsEmpty = false, TaskRequirements = TaskRequirements.Guard },
+                },
+        };
+        BlankLocationPlaces.Add(railroad4);
+
+    }
+
+    private void RandomPeds()
+    {
+        float defaultCarSpawnPercentage = 15f;
+        BlankLocation civSpawn1 = new BlankLocation(new Vector3(872.4106f, -1662.971f, 30.41852f), 86.49644f, "civspawntest1", "")
+        {
+            OpenTime = 0,
+            CloseTime = 24,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+                {
+                    new CivilianConditionalLocation(new Vector3(876.3956f, -1656.16f, 30.24174f), 87.00474f, defaultCarSpawnPercentage){ OverrideDispatchableVehicleGroupID = "ImportExportVehicles", },
+                },
+        };
+        BlankLocationPlaces.Add(civSpawn1);
+
+        BlankLocation civSpawn2 = new BlankLocation(new Vector3(374.5302f, -1684.06f, 32.10686f), 49.03024f, "civspawntest2", "")
+        {
+            OpenTime = 0,
+            CloseTime = 24,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+                {
+                    new CivilianConditionalLocation(new Vector3(374.5302f, -1684.06f, 32.10686f), 49.03024f, defaultCarSpawnPercentage){ OverrideDispatchableVehicleGroupID = "HighEndVehicles", },
+                },
+        };
+        BlankLocationPlaces.Add(civSpawn2);
+
+        BlankLocation civSpawn3 = new BlankLocation(new Vector3(45.54034f, -599.029f, 31.20548f), 339.7761f, "civspawntest3", "")
+        {
+            OpenTime = 0,
+            CloseTime = 24,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+                {
+                    new CivilianConditionalLocation(new Vector3(45.54034f, -599.029f, 31.20548f), 339.7761f, defaultCarSpawnPercentage){ OverrideDispatchableVehicleGroupID = "HighEndVehicles", },
+                    new CivilianConditionalLocation(new Vector3(49.34833f, -651.6259f, 31.14247f), 249.8727f, defaultCarSpawnPercentage){ OverrideDispatchableVehicleGroupID = "ImportExportVehicles", },
+                },
+        };
+        BlankLocationPlaces.Add(civSpawn3);
+
+        BlankLocation civSpawn4 = new BlankLocation(new Vector3(-164.0425f, -616.879f, 31.93717f), 66.90916f, "civspawntest4", "")
+        {
+            OpenTime = 0,
+            CloseTime = 24,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+                {
+                    new CivilianConditionalLocation(new Vector3(-164.0425f, -616.879f, 31.93717f), 66.90916f, defaultCarSpawnPercentage){ OverrideDispatchableVehicleGroupID = "ImportExportVehicles", },
+                    new CivilianConditionalLocation(new Vector3(-175.1993f, -604.7968f, 31.93656f), 65.09174f, defaultCarSpawnPercentage){ OverrideDispatchableVehicleGroupID = "HighEndVehicles", },
+                    new CivilianConditionalLocation(new Vector3(-168.7697f, -588.9867f, 31.93661f), 249.6325f, defaultCarSpawnPercentage){ OverrideDispatchableVehicleGroupID = "HighEndVehicles", },
+                },
+        };
+        BlankLocationPlaces.Add(civSpawn4);
+
+
+        BlankLocation civSpawn5 = new BlankLocation(new Vector3(-490.6508f, -608.6321f, 30.68605f), 178.2197f, "civspawntest5", "")
+        {
+            OpenTime = 0,
+            CloseTime = 24,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+                {
+                    new CivilianConditionalLocation(new Vector3(-490.6508f, -608.6321f, 30.68605f), 178.2197f, defaultCarSpawnPercentage){ OverrideDispatchableVehicleGroupID = "HighEndVehicles", },
+                    new CivilianConditionalLocation(new Vector3(-467.157f, -624.3224f, 30.68664f), 183.026f, defaultCarSpawnPercentage){ OverrideDispatchableVehicleGroupID = "ImportExportVehicles", },
+                    new CivilianConditionalLocation(new Vector3(-460.5147f, -613.7951f, 30.68679f), 177.9763f, defaultCarSpawnPercentage){ OverrideDispatchableVehicleGroupID = "HighEndVehicles", },
+                },
+        };
+        BlankLocationPlaces.Add(civSpawn5);
+
+        BlankLocation ChopShopSpawn = new BlankLocation(new Vector3(970.872f, -2987.221f, -39.64696f), 0f, "ChopShoptest", "")
+        {
+            OpenTime = 0,
+            CloseTime = 24,
+            IsOnSPMap = false,
+            InteriorID = 252673,
+            ActivateDistance = 75f,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+                {
+                    new CivilianConditionalLocation(new Vector3(998.5114f, -3000.00562f, -39.9687233f), -87.88121f, defaultCarSpawnPercentage + 60){ OverrideDispatchableVehicleGroupID = "ImportExportVehicles", },
+                    new CivilianConditionalLocation(new Vector3(978.865356f, -3001.82935f, -39.9684448f), -92.09672f, defaultCarSpawnPercentage + 60){ OverrideDispatchableVehicleGroupID = "ImportExportVehicles", },
+                    new CivilianConditionalLocation(new Vector3(961.840942f, -3025.47559f, -39.96845f), 89.4656754f, defaultCarSpawnPercentage + 60){ OverrideDispatchableVehicleGroupID = "ImportExportVehicles", },
+                    new CivilianConditionalLocation(new Vector3(961.8632f, -3021.789f, -39.9684677f), 89.15911f, defaultCarSpawnPercentage + 60){ OverrideDispatchableVehicleGroupID = "ImportExportVehicles", },
+                    new CivilianConditionalLocation(new Vector3(955.0f, -3028.615f, -37.2079735f), -89.31444f, defaultCarSpawnPercentage + 60){ OverrideDispatchableVehicleGroupID = "ImportExportVehicles", },
+                    new CivilianConditionalLocation(new Vector3(998.2715f, -3008.85f, -39.9684525f), -90.70057f, defaultCarSpawnPercentage + 60){ OverrideDispatchableVehicleGroupID = "ImportExportVehicles", },
+                },
+        };
+        BlankLocationPlaces.Add(ChopShopSpawn);
+
+
+
+
+        //Rivals Spawn Test
+        BlankLocation RivalSpawn1 = new BlankLocation(new Vector3(137.4143f, 6649.704f, 30.82911f), 224.813f, "RivalSpawn1", "Paleto Bay")
+        {
+            OpenTime = 20,
+            CloseTime = 4,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+            {
+                    new CivilianConditionalLocation(new Vector3(137.4143f, 6649.704f, 30.82911f), 224.813f, 15f)
+                    {
+                        OverrideDispatchableVehicleGroupID = "RivalsVehicles",
+                        OverrideDispatchablePersonGroupID = "VehicleRacePeds",
+                        MinHourSpawn = 20,
+                        MaxHourSpawn = 4,
+                        IsEmpty = false
+                    },
+            },
+        };
+        BlankLocationPlaces.Add(RivalSpawn1);
+        BlankLocation RivalSpawn2 = new BlankLocation(new Vector3(1652.684f, 6418.776f, 28.14097f), 72.37399f, "RivalSpawn2", "Mount Chiliad")
+        {
+            OpenTime = 20,
+            CloseTime = 4,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+            {
+                    new CivilianConditionalLocation(new Vector3(1652.684f, 6418.776f, 28.14097f), 72.37399f, 35f)
+                    {
+                        OverrideDispatchableVehicleGroupID = "RivalsVehicles",
+                        OverrideDispatchablePersonGroupID = "VehicleRacePeds",
+                        MinHourSpawn = 20,
+                        MaxHourSpawn = 4,
+                        IsEmpty = false
+                    },
+            },
+        };
+        BlankLocationPlaces.Add(RivalSpawn2);
+        BlankLocation RivalSpawn3 = new BlankLocation(new Vector3(1699.937f, 4941.846f, 41.83414f), 40.49537f, "RivalSpawn3", "Grapeseed")
+        {
+            OpenTime = 20,
+            CloseTime = 4,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+            {
+                    new CivilianConditionalLocation(new Vector3(1699.937f, 4941.846f, 41.83414f), 40.49537f, 10f)
+                    {
+                        OverrideDispatchableVehicleGroupID = "RivalsVehicles",
+                        OverrideDispatchablePersonGroupID = "VehicleRacePeds",
+                        MinHourSpawn = 20,
+                        MaxHourSpawn = 4,
+                        IsEmpty = false
+                    },
+            },
+        };
+        BlankLocationPlaces.Add(RivalSpawn3);
+        BlankLocation RivalSpawn4 = new BlankLocation(new Vector3(2009.984f, 3791.645f, 31.4666f), 304.8076f, "RivalSpawn4", "Sandy Shores")
+        {
+            OpenTime = 20,
+            CloseTime = 4,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+            {
+                    new CivilianConditionalLocation(new Vector3(2009.984f, 3791.645f, 31.4666f), 304.8076f, 10f)
+                    {
+                        OverrideDispatchableVehicleGroupID = "RivalsVehicles",
+                        OverrideDispatchablePersonGroupID = "VehicleRacePeds",
+                        MinHourSpawn = 20,
+                        MaxHourSpawn = 4,
+                        IsEmpty = false
+                    },
+            },
+        };
+        BlankLocationPlaces.Add(RivalSpawn4);
+        BlankLocation RivalSpawn5 = new BlankLocation(new Vector3(1764.111f, 3339.005f, 40.51173f), 303.1112f, "RivalSpawn5", "Sandy Shores - Grand Senora Desert - Next to Airfield")
+        {
+            OpenTime = 20,
+            CloseTime = 4,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+            {
+                    new CivilianConditionalLocation(new Vector3(1764.111f, 3339.005f, 40.51173f), 303.1112f, 25f)
+                    {
+                        OverrideDispatchableVehicleGroupID = "RivalsVehicles",
+                        OverrideDispatchablePersonGroupID = "VehicleRacePeds",
+                        MinHourSpawn = 20,
+                        MaxHourSpawn = 4,
+                        IsEmpty = false
+                    },
+            },
+        };
+        BlankLocationPlaces.Add(RivalSpawn5);
+        BlankLocation RivalSpawn6 = new BlankLocation(new Vector3(1181.352f, 2651.572f, 37.09864f), 299.1061f, "RivalSpawn6", "Grand Senora Desert - Across from Fleeca")
+        {
+            OpenTime = 20,
+            CloseTime = 4,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+            {
+                    new CivilianConditionalLocation(new Vector3(1181.352f, 2651.572f, 37.09864f), 299.1061f, 10f)
+                    {
+                        OverrideDispatchableVehicleGroupID = "RivalsVehicles",
+                        OverrideDispatchablePersonGroupID = "VehicleRacePeds",
+                        MinHourSpawn = 20,
+                        MaxHourSpawn = 4,
+                        IsEmpty = false
+                    },
+            },
+        };
+        BlankLocationPlaces.Add(RivalSpawn6);
+        BlankLocation RivalSpawn7 = new BlankLocation(new Vector3(1057.286f, 2656.394f, 38.83929f), 357.3093f, "RivalSpawn7", "Grand Senora Desert - Truck Stop")  // halfway point inbetween rivalspawn6 and rivalspawn8, on the same road... Route 68 - This has priority 
+        {
+            OpenTime = 20,
+            CloseTime = 4,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+            {
+                    new CivilianConditionalLocation(new Vector3(1057.286f, 2656.394f, 38.83929f), 357.3093f, 35f)
+                    {
+                        OverrideDispatchableVehicleGroupID = "RivalsVehicles",
+                        OverrideDispatchablePersonGroupID = "VehicleRacePeds",
+                        MinHourSpawn = 20,
+                        MaxHourSpawn = 4,
+                        IsEmpty = false
+                    },
+            },
+        };
+        BlankLocationPlaces.Add(RivalSpawn7);
+        BlankLocation RivalSpawn8 = new BlankLocation(new Vector3(259.7416f, 2577.777f, 44.408f), 99.74284f, "RivalSpawn8", "Harmony")
+        {
+            OpenTime = 20,
+            CloseTime = 4,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+            {
+                    new CivilianConditionalLocation(new Vector3(259.7416f, 2577.777f, 44.408f), 99.74284f, 5f)
+                    {
+                        OverrideDispatchableVehicleGroupID = "RivalsVehicles",
+                        OverrideDispatchablePersonGroupID = "VehicleRacePeds",
+                        MinHourSpawn = 20,
+                        MaxHourSpawn = 4,
+                        IsEmpty = false
+
+                    },
+            },
+        };
+        BlankLocationPlaces.Add(RivalSpawn8);
+        BlankLocation RivalSpawn9 = new BlankLocation(new Vector3(-2568.003f, 2345.274f, 32.35818f), 154.4576f, "RivalSpawn9", "Lago Zancudo")
+        {
+            OpenTime = 20,
+            CloseTime = 4,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+            {
+                    new CivilianConditionalLocation(new Vector3(-2568.003f, 2345.274f, 32.35818f), 154.4576f, 35f)
+                    {
+                        OverrideDispatchableVehicleGroupID = "RivalsVehicles",
+                        OverrideDispatchablePersonGroupID = "VehicleRacePeds",
+                        MinHourSpawn = 20,
+                        MaxHourSpawn = 4,
+                        IsEmpty = false
+
+                    },
+            },
+        };
+        BlankLocationPlaces.Add(RivalSpawn9);
+        BlankLocation RivalSpawn10 = new BlankLocation(new Vector3(-2079.111f, -335.4148f, 12.42219f), 85.96442f, "RivalSpawn10", "Pacific Bluffs")
+        {
+            OpenTime = 20,
+            CloseTime = 4,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+            {
+                    new CivilianConditionalLocation(new Vector3(-2079.111f, -335.4148f, 12.42219f), 85.96442f, 25f)
+                    {
+                        OverrideDispatchableVehicleGroupID = "RivalsVehicles",
+                        OverrideDispatchablePersonGroupID = "VehicleRacePeds",
+                        MinHourSpawn = 20,
+                        MaxHourSpawn = 4,
+                        IsEmpty = false
+                    },
+            },
+        };
+        BlankLocationPlaces.Add(RivalSpawn10);
+        BlankLocation RivalSpawn11 = new BlankLocation(new Vector3(-1412.469f, -279.479f, 46.02576f), 131.3187f, "RivalSpawn11", "Morning Wood")
+        {
+            OpenTime = 20,
+            CloseTime = 4,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+            {
+                    new CivilianConditionalLocation(new Vector3(-1412.469f, -279.479f, 46.02576f), 131.3187f, 20f)
+                    {
+                        OverrideDispatchableVehicleGroupID = "RivalsVehicles",
+                        OverrideDispatchablePersonGroupID = "VehicleRacePeds",
+                        MinHourSpawn = 20,
+                        MaxHourSpawn = 4,
+                        IsEmpty = false
+                    },
+            },
+        };
+        BlankLocationPlaces.Add(RivalSpawn11);
+        BlankLocation RivalSpawn12 = new BlankLocation(new Vector3(-730.619f, -909.249f, 18.32507f), 178.6969f, "RivalSpawn12", "Little Seoul - Near Gang Steps")
+        {
+            OpenTime = 20,
+            CloseTime = 4,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+            {
+                    new CivilianConditionalLocation(new Vector3(-730.619f, -909.249f, 18.32507f), 178.6969f, 35f)
+                    {
+                        OverrideDispatchableVehicleGroupID = "RivalsVehicles",
+                        OverrideDispatchablePersonGroupID = "VehicleRacePeds",
+                        MinHourSpawn = 20,
+                        MaxHourSpawn = 4,
+                        IsEmpty = false
+                    },
+            },
+        };
+        BlankLocationPlaces.Add(RivalSpawn12);
+        BlankLocation RivalSpawn13 = new BlankLocation(new Vector3(-545.9062f, -1223.285f, 17.56532f), 334.6616f, "RivalSpawn13", "Little Seoul 2 - Near Highway")
+        {
+            OpenTime = 20,
+            CloseTime = 4,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+            {
+                    new CivilianConditionalLocation(new Vector3(-545.9062f, -1223.285f, 17.56532f), 334.6616f, 10f)
+                    {
+                        OverrideDispatchableVehicleGroupID = "RivalsVehicles",
+                        OverrideDispatchablePersonGroupID = "VehicleRacePeds",
+                        MinHourSpawn = 20,
+                        MaxHourSpawn = 4,
+                        IsEmpty = false
+                    },
+            },
+        };
+        BlankLocationPlaces.Add(RivalSpawn13);
+        BlankLocation RivalSpawn14 = new BlankLocation(new Vector3(-1822.418f, 783.5225f, 137.2784f), 222.004f, "RivalSpawn14", "Richman Glen")
+        {
+            OpenTime = 20,
+            CloseTime = 4,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+            {
+                    new CivilianConditionalLocation(new Vector3(-1822.418f, 783.5225f, 137.2784f), 222.004f, 35f)
+                    {
+                        OverrideDispatchableVehicleGroupID = "RivalsVehicles",
+                        OverrideDispatchablePersonGroupID = "VehicleRacePeds",
+                        MinHourSpawn = 20,
+                        MaxHourSpawn = 4,
+                        IsEmpty = false
+                    },
+            },
+        };
+        BlankLocationPlaces.Add(RivalSpawn14);
+        BlankLocation RivalSpawn15 = new BlankLocation(new Vector3(647.2967f, 280.8318f, 102.4465f), 151.2755f, "RivalSpawn15", "Downtown Vinewood")
+        {
+            OpenTime = 20,
+            CloseTime = 4,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+            {
+                    new CivilianConditionalLocation(new Vector3(647.2967f, 280.8318f, 102.4465f), 151.2755f, 15f)
+                    {
+                        OverrideDispatchableVehicleGroupID = "RivalsVehicles",
+                        OverrideDispatchablePersonGroupID = "VehicleRacePeds",
+                        MinHourSpawn = 20,
+                        MaxHourSpawn = 4,
+                        IsEmpty = false
+                    },
+            },
+        };
+        BlankLocationPlaces.Add(RivalSpawn15);
+        BlankLocation RivalSpawn16 = new BlankLocation(new Vector3(1153.686f, -331.9336f, 68.12624f), 190.49f, "RivalSpawn16", "Mirror Park")
+        {
+            OpenTime = 20,
+            CloseTime = 4,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+            {
+                    new CivilianConditionalLocation(new Vector3(1153.686f, -331.9336f, 68.12624f), 190.49f, 20f)
+                    {
+                        OverrideDispatchableVehicleGroupID = "RivalsVehicles",
+                        OverrideDispatchablePersonGroupID = "VehicleRacePeds",
+                        MinHourSpawn = 20,
+                        MaxHourSpawn = 4,
+                        IsEmpty = false
+                    },
+            },
+        };
+        BlankLocationPlaces.Add(RivalSpawn16);
+        BlankLocation RivalSpawn17 = new BlankLocation(new Vector3(2570.84f, 327.7289f, 107.7383f), 358.1566f, "RivalSpawn17", "Tataviam Mountains")
+        {
+            OpenTime = 20,
+            CloseTime = 4,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+            {
+                    new CivilianConditionalLocation(new Vector3(2570.84f, 327.7289f, 107.7383f), 358.1566f, 35f)
+                    {
+                        OverrideDispatchableVehicleGroupID = "RivalsVehicles",
+                        OverrideDispatchablePersonGroupID = "VehicleRacePeds",
+                        MinHourSpawn = 20,
+                        MaxHourSpawn = 4,
+                        IsEmpty = false
+                    },
+            },
+        };
+        BlankLocationPlaces.Add(RivalSpawn17);
+        BlankLocation RivalSpawn18 = new BlankLocation(new Vector3(1202.157f, -1384.399f, 34.907f), 181.6501f, "RivalSpawn18", "Murrieta Heights")
+        {
+            OpenTime = 20,
+            CloseTime = 4,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+            {
+                    new CivilianConditionalLocation(new Vector3(1202.157f, -1384.399f, 34.907f), 181.6501f, 10f)
+                    {
+                        OverrideDispatchableVehicleGroupID = "RivalsVehicles",
+                        OverrideDispatchablePersonGroupID = "VehicleRacePeds",
+                        MinHourSpawn = 20,
+                        MaxHourSpawn = 4,
+                        IsEmpty = false
+                    },
+            },
+        };
+        BlankLocationPlaces.Add(RivalSpawn18);
+        BlankLocation RivalSpawn19 = new BlankLocation(new Vector3(840.2212f, -1045.452f, 27.2919f), 91.31344f, "RivalSpawn19", "La Mesa")
+        {
+            OpenTime = 20,
+            CloseTime = 4,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+            {
+                    new CivilianConditionalLocation(new Vector3(840.2212f, -1045.452f, 27.2919f), 91.31344f, 35f)
+                    {
+                        OverrideDispatchableVehicleGroupID = "RivalsVehicles",
+                        OverrideDispatchablePersonGroupID = "VehicleRacePeds",
+                        MinHourSpawn = 20,
+                        MaxHourSpawn = 4,
+                        IsEmpty = false
+                    },
+            },
+        };
+        BlankLocationPlaces.Add(RivalSpawn19);
+        BlankLocation RivalSpawn20 = new BlankLocation(new Vector3(173.4291f, -1553.765f, 28.89501f), 314.7835f, "RivalSpawn20", "Davis")
+        {
+            OpenTime = 20,
+            CloseTime = 4,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+            {
+                    new CivilianConditionalLocation(new Vector3(173.4291f, -1553.765f, 28.89501f), 314.7835f, 10f)
+                    {
+                        OverrideDispatchableVehicleGroupID = "RivalsVehicles",
+                        OverrideDispatchablePersonGroupID = "VehicleRacePeds",
+                        MinHourSpawn = 20,
+                        MaxHourSpawn = 4,
+                        IsEmpty = false
+                    },
+            },
+        };
+        BlankLocationPlaces.Add(RivalSpawn20);
+        BlankLocation RivalSpawn21 = new BlankLocation(new Vector3(-336.7354f, -1495.114f, 29.90599f), 2.656341f, "RivalSpawn21", "LA Puerta")
+        {
+            OpenTime = 20,
+            CloseTime = 4,
+            //PossiblePedSpawns = new List<ConditionalLocation>()
+            //{
+            //new CivilianConditionalLocation(new Vector3(-342.6227f, -1495.767f, 29.35998f), 272.8359f, 75f)
+            //{
+            //            OverrideDispatchableVehicleGroupID = "RivalsVehicles",
+            //            OverrideDispatchablePersonGroupID = "VehicleRacePeds",
+            //            MinHourSpawn = 20,
+            //            MaxHourSpawn = 4,
+            //            TaskRequirements = TaskRequirements.Guard,
+            //            ForcedScenarios = new List<string>()
+            //            {
+            //                "WORLD_HUMAN_STAND_MOBILE_CLUBHOUSE",
+            //                "WORLD_HUMAN_HANG_OUT_STREET_CLUBHOUSE",
+            //            },
+            //},
+            //new CivilianConditionalLocation(new Vector3(-342.7641f, -1494.45f, 29.35643f), 264.6273f, 75f)
+            //        {
+            //            OverrideDispatchableVehicleGroupID = "RivalsVehicles",
+            //            OverrideDispatchablePersonGroupID = "VehicleRacePeds",
+            //            MinHourSpawn = 20,
+            //            MaxHourSpawn = 4,
+            //            TaskRequirements = TaskRequirements.Guard,
+            //            ForcedScenarios = new List<string>()
+            //            {
+            //                "WORLD_HUMAN_STAND_MOBILE_CLUBHOUSE",
+            //                "WORLD_HUMAN_SMOKING_POT_CLUBHOUSE",
+            //            },
+            //},
+
+            //},
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+                {
+                    new CivilianConditionalLocation(new Vector3(-336.7354f, -1495.114f, 29.90599f), 2.656341f, 35f)
+                    {
+                        OverrideDispatchableVehicleGroupID = "RivalsVehicles",
+                        OverrideDispatchablePersonGroupID = "VehicleRacePeds",
+                        MinHourSpawn = 20,
+                        MaxHourSpawn = 4,
+                        IsEmpty = false
+                    },
+            },
+        };
+        BlankLocationPlaces.Add(RivalSpawn21);
+        BlankLocation RivalSpawn22 = new BlankLocation(new Vector3(288.4239f, -1241.486f, 28.9176f), 181.6756f, "RivalSpawn22", "Strawberry")
+        {
+            OpenTime = 20,
+            CloseTime = 4,
+            PossibleVehicleSpawns = new List<ConditionalLocation>()
+                {
+                    new CivilianConditionalLocation(new Vector3(288.4239f, -1241.486f, 28.9176f), 181.6756f, 15f)
+                    {
+                        OverrideDispatchableVehicleGroupID = "RivalsVehicles",
+                        OverrideDispatchablePersonGroupID = "VehicleRacePeds",
+                        MinHourSpawn = 20,
+                        MaxHourSpawn = 4,
+                        IsEmpty = false
+                    },
+                },
+        };
+        BlankLocationPlaces.Add(RivalSpawn22);
+    }
+
     private void RooftopSnipers()
     {
         float sniperSpawnPercentage = 65f;
@@ -3716,7 +4281,7 @@ new List<ConditionalGroup>() {
             
             Name = "GambettiPower",
             Description = "3 Gambetti in a alley off Power Street",
-            EntrancePosition = new Vector3(443.7656f, 121.4294f, 98.95059f),
+            EntrancePosition = new Vector3(403.1715f, 58.50986f, 97.97793f),
             EntranceHeading = 69.60268f,
             OpenTime = 0,
             CloseTime = 24,
@@ -6522,8 +7087,8 @@ new List<ConditionalGroup>() {
             EntranceHeading = -141.6932f,
             OpenTime = 0,
             CloseTime = 24,
-            
-            
+            IsOnSPMap = false,//spawns in rubbish area
+
             AssignedAssociationID = "AMBIENT_GANG_MARABUNTE",
             MenuID = "",
 
@@ -7465,7 +8030,7 @@ new List<ConditionalGroup>() {
             
             Name = "PavanoFarmEggs",
             FullName = "",
-            Description = "5 Pavano outside derelict Farm Eggs building",
+            Description = "4 Pavano outside derelict Farm Eggs building",
             MapIcon = 267,
             EntrancePosition = new Vector3(2552.402f, 4673.885f, 33.6469f),
             EntranceHeading = 19.66658f,
@@ -7532,17 +8097,6 @@ new List<ConditionalGroup>() {
                             RequiredVehicleGroup = "",
                             TaskRequirements = TaskRequirements.Guard,
                             ForcedScenarios = new List<String>() { "WORLD_HUMAN_STAND_MOBILE", },
-                            MaxWantedLevelSpawn = 6,
-                        },
-                        new GangConditionalLocation()
-                        {
-                            Location = new Vector3(2550.346f, 4668.052f, 34.07679f),
-                            Heading = -125.7162f,
-                            AssociationID = "",
-                            RequiredPedGroup = "",
-                            RequiredVehicleGroup = "",
-                            TaskRequirements = TaskRequirements.Guard,
-                            ForcedScenarios = new List<String>() { "WORLD_HUMAN_SMOKING", },
                             MaxWantedLevelSpawn = 6,
                         },
                     },
@@ -11268,6 +11822,192 @@ new List<ConditionalGroup>() {
             VehicleDeliveryLocations = new List<SpawnPlace>() { },
         };
         BlankLocationPlaces.Add(VarriosArenaCP);
+
+    }
+
+    private void LostGang()
+    {
+        BlankLocation LostGangDen = new BlankLocation()
+        {
+
+            Name = "LOST GangDen",
+            FullName = "",
+            Description = "Gang Spawns For OIV Removal",
+            MapIcon = 47,
+            MapIconScale = 1f,
+            EntrancePosition = new Vector3(969.5936f, -126.7885f, 74.36127f),
+            EntranceHeading = 0f,
+            OpenTime = 0,
+            CloseTime = 24,
+            StateID = "SanAndreas",
+            AssignedAssociationID = "AMBIENT_GANG_LOST",
+            MenuID = "",
+            PossibleGroupSpawns =
+            new List<ConditionalGroup>()
+            {
+                new ConditionalGroup()
+                {
+                  Name = "Outside Den 0-24 Hours Spawns",
+                  Percentage = 100f,
+                  MinHourSpawn = 0,
+                  MaxHourSpawn = 24,
+                  PossiblePedSpawns =
+                  new List<ConditionalLocation>()
+                  {
+                    // Main Road Left
+                    new GangConditionalLocation(new Vector3(954.971f, -138.248611f, 72.47955f), 236.8577f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_SMOKING"}, },
+                    new GangConditionalLocation(new Vector3(954.913269f, -139.375977f, 72.4835052f), 262.0112f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_HANG_OUT_STREET"}, },
+                    new GangConditionalLocation(new Vector3(956.15564f, -140.305481f, 72.49005f), 6.630057f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_SMOKING"}, },
+                    new GangConditionalLocation(new Vector3(956.7951f, -138.784485f, 72.48616f), 155.062f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_LEANING"}, },
+                    // Main Road Right
+                    new GangConditionalLocation(new Vector3(962.2081f, -143.6709f, 72.4869156f), 285.6683f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_SMOKING"}, },
+                    new GangConditionalLocation(new Vector3(963.183044f, -142.681335f, 72.5071259f), 146.9276f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_LEANING"}, },
+                    new GangConditionalLocation(new Vector3(963.8963f, -143.359528f, 72.49819f), 86.70744f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_STAND_MOBILE"}, },
+                  },
+                },
+                new ConditionalGroup()
+                {
+                  Name = "Compound 16-24 Spawns",
+                  Percentage = 100f,
+                  MinHourSpawn = 16,
+                  MaxHourSpawn = 24,
+                  PossiblePedSpawns =
+                  new List<ConditionalLocation>()
+                  {
+                    // Inside Compound Left
+                    new GangConditionalLocation(new Vector3(952.960632f, -124.3555f, 72.35311f), 275.0123f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_SMOKING"}, },
+                    new GangConditionalLocation(new Vector3(952.7779f, -123.300346f, 72.35311f), 236.1046f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_STAND_MOBILE"}, },
+                    new GangConditionalLocation(new Vector3(953.9593f, -123.044624f, 72.35311f), 170.4291f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_HANG_OUT_STREET"}, },
+                    // Solo Outside Garage Door
+                    new GangConditionalLocation(new Vector3(969.6277f, -112.282951f, 72.35311f), 214.6107f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_STAND_MOBILE"}, },
+                    // Outside Den Door Solo
+                    new GangConditionalLocation(new Vector3(985.34845f, -105.944458f, 72.35307f), 134.2483f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_DRINKING"}, },
+                    // Side Of Den
+                    new GangConditionalLocation(new Vector3(986.025452f, -104.806992f, 72.85354f), 144.135f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_STAND_MOBILE"}, },
+                    // End Of Building Right Side
+                    new GangConditionalLocation(new Vector3(979.0191f, -140.051788f, 72.21262f), 176.084f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_SMOKING"}, },
+                    new GangConditionalLocation(new Vector3(978.131042f, -140.456375f, 72.2159348f), 237.3763f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_SMOKING"}, },
+                    new GangConditionalLocation(new Vector3(978.777649f, -141.837021f, 72.22805f), 1.293581f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_SMOKING"}, },
+                    new GangConditionalLocation(new Vector3(979.578552f, -140.924118f, 72.22024f), 90.19797f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_HANG_OUT_STREET"}, },
+                  },
+                },
+                new ConditionalGroup()
+                {
+                  Name = "Compound 0-8 Spawns",
+                  Percentage = 100f,
+                  MinHourSpawn = 0,
+                  MaxHourSpawn = 8,
+                  PossiblePedSpawns =
+                  new List<ConditionalLocation>()
+                  {
+                    // Stairs
+                    new GangConditionalLocation(new Vector3(962.2627f, -120.982506f, 72.35311f), 171.6968f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_SMOKING"}, },
+                    new GangConditionalLocation(new Vector3(963.389954f, -121.109177f, 72.35311f), 157.1102f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_SMOKING"}, },
+                    // Far side of Garage doors
+                    new GangConditionalLocation(new Vector3(972.0793f, -111.995018f, 72.35311f), 3.756682f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_SMOKING"}, },
+                    new GangConditionalLocation(new Vector3(972.3305f, -110.760757f, 72.35311f), 135.0347f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_LEANING"}, },
+                    // side of Den group
+                    new GangConditionalLocation(new Vector3(989.45f, -102.5812f, 74.8488f), 83.65113f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_SMOKING"}, },
+                    new GangConditionalLocation(new Vector3(988.7194f, -101.735565f, 72.8427658f), 212.1979f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_HANG_OUT_STREET"}, },
+                    new GangConditionalLocation(new Vector3(989.8182f, -101.489296f, 72.85354f), 133.2589f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_HANG_OUT_STREET"}, },
+                  },
+                },
+                new ConditionalGroup()
+                {
+                  Name = "Compound 8-16 Spawns",
+                  Percentage = 100f,
+                  MinHourSpawn = 8,
+                  MaxHourSpawn = 16,
+                  PossiblePedSpawns =
+                  new List<ConditionalLocation>()
+                  {
+                    // Outside Garages
+                    new GangConditionalLocation(new Vector3(966.5918f, -116.684212f, 73.35311f), 247.245f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_SMOKING"}, },
+                    new GangConditionalLocation(new Vector3(967.319153f, -115.917519f, 73.35311f), 161.8625f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_SMOKING"}, },
+                    new GangConditionalLocation(new Vector3(968.294067f, -116.869583f, 73.35311f), 61.27053f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_SMOKING"}, },
+                    // side of Den door
+                    new GangConditionalLocation(new Vector3(987.6134f, -102.786438f, 73.85352f), 270.2867f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_STAND_MOBILE"}, },
+                    // Inside Compound Right - Container
+                    new GangConditionalLocation(new Vector3(979.481445f, -121.03933f, 72.96307f), 109.6106f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_STAND_MOBILE"}, },
+                    new GangConditionalLocation(new Vector3(979.6543f, -122.155075f, 72.97419f), 83.61115f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_SMOKING"}, },
+
+                  },
+                },
+            },
+        };
+        BlankLocationPlaces.Add(LostGangDen);
+
+    }
+
+    private void VagosGang()
+    {
+        BlankLocation VagosGangDen = new BlankLocation()
+        {
+
+            Name = "Vagos GangDen",
+            FullName = "",
+            Description = "Gang Spawns For OIV Removal",
+            MapIcon = 47,
+            MapIconScale = 1f,
+            EntrancePosition = new Vector3(976.3761f, -1831.478f, 31.26991f),
+            EntranceHeading = 0f,
+            OpenTime = 0,
+            CloseTime = 24,
+            StateID = "SanAndreas",
+            AssignedAssociationID = "AMBIENT_GANG_VAGOS",
+            MenuID = "",
+            PossibleGroupSpawns =
+            new List<ConditionalGroup>()
+            {
+                new ConditionalGroup()
+                {
+                  Name = "",
+                  Percentage = 100f,
+                  MinHourSpawn = 0, // Using Default Scenario Min and Max Hours for this group.
+                  MaxHourSpawn = 24, // If issue arises (Loading Too Many) then this can be split into 4 groups similar to the Lost.
+                  PossiblePedSpawns =
+                  new List<ConditionalLocation>()
+                  {
+                    // Main Road
+                    new GangConditionalLocation(new Vector3(959.003967f, -1852.40869f, 29.2356987f), 86.02477f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_LEANING"}, },
+                    new GangConditionalLocation(new Vector3(959.0037f, -1851.52234f, 29.2274876f), 145.891f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_STAND_MOBILE"}, },
+
+                    new GangConditionalLocation(new Vector3(959.9241f, -1824.339f, 29.23476f), 341.544f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_HANG_OUT_STREET"}, },
+                    new GangConditionalLocation(new Vector3(960.8004f, -1823.645f, 29.23162f), 86.6598f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_SMOKING"}, },
+                    new GangConditionalLocation(new Vector3(960.0920f, -1822.9060f, 29.2345f), 184.0702f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_HANG_OUT_STREET"}, },
+
+                    new GangConditionalLocation(new Vector3(962.3967f, -1797.283f, 29.23568f), 64.59355f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_SMOKING"}, },
+                    new GangConditionalLocation(new Vector3(962.0249f, -1798.373f, 29.23447f), 133.7027f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_STAND_MOBILE"}, },
+                    //Outside Den
+                    new GangConditionalLocation(new Vector3(978.8489f, -1831.853f, 29.32465f), 352.7695f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_LEANING"}, },
+                    // Alley Entrance - Side Road
+                    new GangConditionalLocation(new Vector3(982.2084f, -1778.36047f, 29.3191261f), 356.3695f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_LEANING"}, },
+                    new GangConditionalLocation(new Vector3(983.0565f, -1778.01221f, 29.3407249f), 62.33862f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_SMOKING"}, },
+                    // Alley Stairs
+                    new GangConditionalLocation(new Vector3(998.157837f, -1785.30164f,  30.57005f), 86.29939f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_SMOKING"}, },
+                    new GangConditionalLocation(new Vector3(999.2848f, -1786.51868f, 30.4717827f), 86.29939f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_LEANING"}, },
+                    // Oppiste end
+                    new GangConditionalLocation(new Vector3(985.9877f, -1871.894f, 29.02093f), 109.3853f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_HANG_OUT_STREET"}, },
+                    new GangConditionalLocation(new Vector3(985.9783f, -1873.169f, 28.99829f), 47.0918f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_SMOKING"}, },
+                    // Across Main Road
+                    new GangConditionalLocation(new Vector3(941.9116f, -1863.472f, 29.15568f), 211.9332f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_SMOKING"}, },
+                    new GangConditionalLocation(new Vector3(940.8739f, -1862.098f, 29.17068f), 342.9316f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_HANG_OUT_STREET"}, },
+                    new GangConditionalLocation(new Vector3(940.5406f, -1861.095f, 29.17561f), 218.4662f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_STAND_MOBILE"}, },
+                    // Wall
+                    new GangConditionalLocation(new Vector3(942.6127f, -1836.403f, 29.2009f), 285.685f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_STAND_MOBILE"}, },
+                    new GangConditionalLocation(new Vector3(942.4352f, -1835.342f, 29.21433f), 266.6224f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_LEANING"}, },
+                    // building steps
+                    new GangConditionalLocation(new Vector3(932.0722f, -1808.961f, 28.71877f), 284.0031f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_SMOKING"}, },
+                    new GangConditionalLocation(new Vector3(931.8958f, -1807.802f, 28.70049f), 258.4308f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_HANG_OUT_STREET"}, },
+                    new GangConditionalLocation(new Vector3(933.2655f, -1807.691f, 28.75799f), 72.90257f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_HANG_OUT_STREET"}, },
+                    // Corner
+                    new GangConditionalLocation(new Vector3(944.2256f, -1782.076f, 29.23608f), 356.2364f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_LEANING"}, },
+                    new GangConditionalLocation(new Vector3(945.1646f, -1781.291f, 29.24301f), 40.03037f, 75f){ TaskRequirements = TaskRequirements.Guard, ForcedScenarios = new List<String>() {"WORLD_HUMAN_SMOKING"}, },
+                  },
+                },
+            },
+        };
+        BlankLocationPlaces.Add(VagosGangDen);
 
     }
 }

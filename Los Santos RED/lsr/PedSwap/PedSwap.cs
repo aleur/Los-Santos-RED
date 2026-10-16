@@ -52,9 +52,11 @@ public class PedSwap : IPedSwap
     private IInteractionable Interactionable;
     private bool HasSetOffset;
     private bool IsDisposed;
+    private ILocationInteractable LocationInteractable;
 
     public PedSwap(ITimeControllable time, IPedSwappable player, ISettingsProvideable settings, IEntityProvideable entities, IWeapons weapons, ICrimes crimes, INameProvideable names, IModItems modItems, IEntityProvideable world, 
-        IPedGroups pedGroups, IShopMenus shopMenus, IDispatchablePeople dispatchablePeople, IHeads heads, IClothesNames clothesNames, IGangs gangs, IAgencies agencies, ITattooNames tattooNames, IGameSaves gameSaves, ISavedOutfits savedOutfits, IInteractionable interactionable)
+        IPedGroups pedGroups, IShopMenus shopMenus, IDispatchablePeople dispatchablePeople, IHeads heads, IClothesNames clothesNames, IGangs gangs, IAgencies agencies, ITattooNames tattooNames, 
+        IGameSaves gameSaves, ISavedOutfits savedOutfits, IInteractionable interactionable, ILocationInteractable locationInteractable)
     {
         Time = time;
         Player = player;
@@ -76,6 +78,7 @@ public class PedSwap : IPedSwap
         GameSaves = gameSaves;
         SavedOutfits = savedOutfits;
         Interactionable = interactionable;
+        LocationInteractable = locationInteractable;
     }
     public int CurrentPedMoney { get; private set; }
     public void AddOffset()
@@ -126,7 +129,7 @@ public class PedSwap : IPedSwap
                     ResetOffsetForCurrentModel();
                     Player.IsCustomizingPed = true;
                     MenuPool menuPool = new MenuPool();
-                    PedCustomizer PedCustomizer = new PedCustomizer(menuPool, this, Names, Player, Entities, Settings, DispatchablePeople, Heads, ClothesNames, Gangs, Agencies, TattooNames, GameSaves, SavedOutfits, Interactionable);
+                    PedCustomizer PedCustomizer = new PedCustomizer(menuPool, this, Names, Player, Entities, Settings, DispatchablePeople, Heads, ClothesNames, Gangs, Agencies, TattooNames, GameSaves, SavedOutfits, Interactionable, LocationInteractable);
                     PedCustomizer.Setup();
                     PedCustomizer.Start();
                     GameFiber.Yield();
@@ -463,7 +466,7 @@ public class PedSwap : IPedSwap
                 vehicleSpawn.GetClosestStreet(false);
                 if (vehicleSpawn.HasSpawns)
                 {
-                    SpawnTask carSpawn = new LESpawnTask(agency, vehicleSpawn, agency.GetRandomVehicle(0, false, false, true, "", Settings)?.Copy(), toBecome, false, Settings, Weapons, Names, true, World, ModItems, false, ShopMenus);
+                    SpawnTask carSpawn = new LESpawnTask(agency, vehicleSpawn, agency.GetRandomVehicle(0, false, false, true, "", Settings)?.Copy(), toBecome, false, Settings, Weapons, Names, true, World, ModItems, false, ShopMenus, Crimes);
                     carSpawn.AllowAnySpawn = true;
                     carSpawn.WillAddDriver = false;
                     carSpawn.AttemptSpawn();
@@ -591,7 +594,7 @@ public class PedSwap : IPedSwap
             vehicleSpawn.GetClosestStreet(false);
             if (vehicleSpawn.HasSpawns)
             {
-                SpawnTask carSpawn = new EMTSpawnTask(agency, vehicleSpawn, agency.GetRandomVehicle(0, false, false, true, "", Settings), toBecome, false, Settings, Weapons, Names, true, World, ModItems, ShopMenus);
+                SpawnTask carSpawn = new EMTSpawnTask(agency, vehicleSpawn, agency.GetRandomVehicle(0, false, false, true, "", Settings), toBecome, false, Settings, Weapons, Names, true, World, ModItems, ShopMenus, Crimes);
                 carSpawn.AllowAnySpawn = true;
                 carSpawn.WillAddDriver = false;
                 carSpawn.AttemptSpawn();
@@ -653,7 +656,7 @@ public class PedSwap : IPedSwap
             vehicleSpawn.GetClosestStreet(false);
             if (vehicleSpawn.HasSpawns)
             {
-                SpawnTask carSpawn = new FireFighterSpawnTask(agency, vehicleSpawn, agency.GetRandomVehicle(0, false, false, true, "", Settings), toBecome, false, Settings, Weapons, Names, true, World, ModItems, ShopMenus);
+                SpawnTask carSpawn = new FireFighterSpawnTask(agency, vehicleSpawn, agency.GetRandomVehicle(0, false, false, true, "", Settings), toBecome, false, Settings, Weapons, Names, true, World, ModItems, ShopMenus, Crimes);
                 carSpawn.AllowAnySpawn = true;
                 carSpawn.WillAddDriver = false;
                 carSpawn.AttemptSpawn();
@@ -683,7 +686,8 @@ public class PedSwap : IPedSwap
             //Player.RemoveAgencyStatus();
             Player.ModelName = modelName;
             Player.CurrentModelVariation = variation.Copy();
-            Player.PlayerName = fullName;
+
+            Player.ChangeName(fullName);
             Player.BankAccounts.SetCash(money);
             if (Settings.SettingsManager.PedSwapSettings.AliasPedAsMainCharacter && !Player.CharacterModelIsPrimaryCharacter)
             {
@@ -698,7 +702,7 @@ public class PedSwap : IPedSwap
             }
             if (variation != null)
             {
-                variation.ApplyToPed(Game.LocalPlayer.Character);
+                variation.ApplyToPed(Game.LocalPlayer.Character, false);
             }
             Player.SetVoice(voiceName);
             Player.DisplayPlayerNotification();
@@ -761,7 +765,7 @@ public class PedSwap : IPedSwap
 
         if (InitialPlayerVariation != null)
         {
-            InitialPlayerVariation.ApplyToPed(Game.LocalPlayer.Character);
+            InitialPlayerVariation.ApplyToPed(Game.LocalPlayer.Character, true);
         }
         //if (Settings.SettingsManager.PedSwapSettings.AliasPedAsMainCharacter && !Player.CharacterModelIsPrimaryCharacter)
         //{
@@ -1102,7 +1106,7 @@ public class PedSwap : IPedSwap
             NativeHelper.ChangeModel(ModelToChange);
             Game.LocalPlayer.Character.ResetVariation();
         }
-        variation.ApplyToPed(Game.LocalPlayer.Character);
+        variation.ApplyToPed(Game.LocalPlayer.Character, false);
 
 
         if (setRandomDemographics)
@@ -1128,7 +1132,8 @@ public class PedSwap : IPedSwap
         Game.LocalPlayer.Character.Inventory.GiveNewWeapon(2725352035, 0, true);
         if (Settings.SettingsManager.PlayerOtherSettings.SetSlowMoOnDeath)
         {
-            Game.TimeScale = 1f;
+            //Game.TimeScale = 1f;
+            NativeFunction.Natives.SET_TIME_SCALE(1.0f);
         }
         NativeFunction.Natives.xB4EDDC19532BFB85();
         Game.HandleRespawn();
@@ -1164,7 +1169,7 @@ public class PedSwap : IPedSwap
         }
         if (!Game.LocalPlayer.Character.IsConsideredMainCharacter() && TargetPedVariation != null)
         {
-            TargetPedVariation.ApplyToPed(Game.LocalPlayer.Character);
+            TargetPedVariation.ApplyToPed(Game.LocalPlayer.Character, true);
         }
 
         VehicleExt NewVehicle = null;
@@ -1219,7 +1224,8 @@ public class PedSwap : IPedSwap
         Game.LocalPlayer.Character.Inventory.GiveNewWeapon(2725352035, 0, true);
         if (Settings.SettingsManager.PlayerOtherSettings.SetSlowMoOnDeath)
         {
-            Game.TimeScale = 1f;
+            //Game.TimeScale = 1f;
+            NativeFunction.Natives.SET_TIME_SCALE(1.0f);
         }
         NativeFunction.Natives.xB4EDDC19532BFB85();
         Game.HandleRespawn();
@@ -1254,6 +1260,10 @@ public class PedSwap : IPedSwap
         {
             return;
         }
+        if (EntryPoint.IsLSPDFRIntegrationEnabled)
+        {
+            return;
+        }
         //EntryPoint.WriteToConsoleTestLong($"PEDSWAP SetPlayerOffset RAN CurrentModelPlayerIs{CurrentModelPlayerIs.Name} {CurrentModelPlayerIs.Hash} CharacterModelIsPrimaryCharacter {Player.CharacterModelIsPrimaryCharacter} ModelName{Player.ModelName} ModelHash{ModelHash}");
         //bigbruh in discord, supplied the below, seems to work just fine
         unsafe
@@ -1266,6 +1276,10 @@ public class PedSwap : IPedSwap
     public void SetPlayerOffset()
     {
         if(!Settings.SettingsManager.PedSwapSettings.AliasPedAsMainCharacter)
+        {
+            return;
+        }
+        if(EntryPoint.IsLSPDFRIntegrationEnabled)
         {
             return;
         }
@@ -1444,7 +1458,7 @@ public class PedSwap : IPedSwap
     }
     public void NewPlayer(string modelName, bool isMale, string playerName, int moneyToSpawnWith, int speechSkill, string voiceName)//gotta go
     {
-        Player.Reset(true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true);
+        Player.Reset(true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true);
         Player.SetDemographics(
             modelName, 
             isMale, 

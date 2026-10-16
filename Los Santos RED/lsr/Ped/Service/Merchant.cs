@@ -1,6 +1,8 @@
 ﻿using LosSantosRED.lsr.Interface;
 using Rage;
 using Rage.Native;
+using RAGENativeUI;
+using RAGENativeUI.Elements;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +22,7 @@ public class Merchant : PedExt, IWeaponIssuable
     public override bool KnowsGangAreas => false;
     public override bool CanTransact => IsNearSpawnPosition && base.CanTransact;
     public override bool IsMerchant { get; set; } = true;
-    public override bool CanBeIdleTasked => !SetupMenus;
+    public override bool CanBeIdleTasked => true;//!SetupMenus;
     public IssuableWeapon GetRandomMeleeWeapon(IWeapons weapons) => AssociatedStore?.GetRandomMeleeWeapon(weapons);
     public IssuableWeapon GetRandomWeapon(bool v, IWeapons weapons)
     {
@@ -34,7 +36,7 @@ public class Merchant : PedExt, IWeaponIssuable
     public WeaponInventory WeaponInventory { get; private set; }
     public bool HasTaser { get; set; } = false;
     public bool IsUsingMountedWeapon { get; set; } = false;
-
+    public override float PickpocketDetectionMultiplier { get; set; } = 1.2f;
     public bool SetupMenus { get; set; } = true;
     public override bool HasWeapon => WeaponInventory.HasPistol || WeaponInventory.HasLongGun;
     public override string InteractPrompt(IButtonPromptable player)
@@ -56,9 +58,7 @@ public class Merchant : PedExt, IWeaponIssuable
             return;
         }
         Pedestrian.Money = 0;
-
         IsTrustingOfPlayer = RandomItems.RandomPercent(Settings.SettingsManager.CivilianSettings.PercentageTrustingOfPlayer);
-
         if(store == null || store.VendorMoneyMin == -1 || store.VendorMoneyMax == -1)
         {
             Money = RandomItems.GetRandomNumberInt(MerchantMoneyMin(), MerchantMoneyMax());
@@ -85,7 +85,6 @@ public class Merchant : PedExt, IWeaponIssuable
         {
             LocationTaskRequirements = new LocationTaskRequirements();
         }
-
         if (store != null && SetupMenus)
         {
             SetupTransactionItems(store.Menu, true);
@@ -108,7 +107,6 @@ public class Merchant : PedExt, IWeaponIssuable
             //EntryPoint.WriteToConsole("Merchant Issues Weapons");
             WeaponInventory.IssueWeapons(weapons, forceMelee || RandomItems.RandomPercent(store.VendorMeleePercent), forceSidearm || RandomItems.RandomPercent(store.VendorSidearmPercent), forceLongGun || RandomItems.RandomPercent(store.VendorLongGunPercent), dispatchablePerson, true, true);
         }
-
         if (Pedestrian.Exists() && Settings.SettingsManager.CivilianSettings.SightDistance > 60f)
         {
             NativeFunction.Natives.SET_PED_SEEING_RANGE(Pedestrian, Settings.SettingsManager.CivilianSettings.SightDistance);

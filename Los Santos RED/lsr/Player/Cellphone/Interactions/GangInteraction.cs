@@ -17,6 +17,7 @@ using System.Windows.Forms;
 public class GangInteraction : IContactMenuInteraction
 {
     private IContactInteractable Player;
+    private IGangTerritories GangTerritories;
     private UIMenu GangMenu;
     private IAgencies Agencies;
     private MenuPool MenuPool;
@@ -54,9 +55,19 @@ public class GangInteraction : IContactMenuInteraction
     private IModItems ModItems;
     private UIMenuItem RequestBackupMenu;
     private UIMenu BackupSubMenu;
+    private UIMenu DrugMeetSubMenu;
+    private UIMenu ReferencesSubMenu;
+    private IShopMenus ShopMenus;
+    private UIMenu WarfareSubmenu;
+    private UIMenu GangWarSubMenu;
+    private IZones Zones;
+    private UIMenuListScrollerItem<GangDisplay> GangWarTargetMenu;
+    private UIMenuListScrollerItem<ZoneDisplay> ZoneMenu;
 
     private string TargetGangDescription => $"Choose a target gang~n~~n~~r~RED~s~ Gangs are enemies~n~~o~ORANGE~s~ Gangs are hostile~n~~g~GREEN~s~ Gangs are friendly";
-    public GangInteraction(IContactInteractable player, IGangs gangs, IPlacesOfInterest placesOfInterest, GangContact gangContact, IEntityProvideable world, ISettingsProvideable settings, IAgencies agencies, IModItems modItems)
+    private string GangDescription => $"~r~RED~s~ Gangs are enemies~n~~o~ORANGE~s~ Gangs are hostile~n~~g~GREEN~s~ Gangs are friendly";
+    public GangInteraction(IContactInteractable player, IGangs gangs, IPlacesOfInterest placesOfInterest, GangContact gangContact, IEntityProvideable world, ISettingsProvideable settings, 
+        IAgencies agencies, IModItems modItems, IShopMenus shopMenus, IGangTerritories gangTerritories, IZones zones)
     {
         Player = player;
         Gangs = gangs;
@@ -67,6 +78,9 @@ public class GangInteraction : IContactMenuInteraction
         Settings = settings;
         Agencies = agencies;
         ModItems = modItems;
+        ShopMenus = shopMenus;
+        Zones = zones;
+        GangTerritories = gangTerritories;
     }
     public void Start(PhoneContact phoneContact)
     {
@@ -263,6 +277,9 @@ public class GangInteraction : IContactMenuInteraction
             Player.PlayerTasks.GangTasks.StartGangArson(ActiveGang, GangContact);
             sender.Visible = false;
         };
+
+        
+
         JobsSubMenu.AddItem(GangImpoundTheft);
         JobsSubMenu.AddItem(GangBodyDisposal);
         JobsSubMenu.AddItem(GangMoneyPickup);
@@ -274,6 +291,200 @@ public class GangInteraction : IContactMenuInteraction
         {
             JobsSubMenu.AddItem(GangPizza);
         }
+
+
+
+
+
+
+        ReferencesSubMenu = MenuPool.AddSubMenu(GangMenu, "References");
+        ReferencesSubMenu.RemoveBanner();
+
+
+        AddDrugMeetSubMenu();
+        AddDrugBuySubMenu();
+
+
+        if (ActiveGangReputation.IsMember)
+        {
+            WarfareSubmenu = MenuPool.AddSubMenu(GangMenu, "Warfare");
+            WarfareSubmenu.RemoveBanner();
+            AddGangWarSubMenu();
+        }
+
+
+    }
+    private void AddGangWarSubMenu()
+    {
+        GangWarSubMenu = MenuPool.AddSubMenu(WarfareSubmenu, "Gang War");
+        WarfareSubmenu.MenuItems[WarfareSubmenu.MenuItems.Count() - 1].Description = $"Takeover territory from a gang.";
+        GangWarSubMenu.RemoveBanner();
+
+
+
+        GangWarTargetMenu = new UIMenuListScrollerItem<GangDisplay>("Target Gang", TargetGangDescription, GetGangDisplay());    
+        ZoneMenu = new UIMenuListScrollerItem<ZoneDisplay>("Zone", 
+            "Select the zone to takeover. " +
+            "~n~~r~Red~s~ Zones Include a Den." +
+            "~n~~c~Greyed Out~s~ Zones cannot be captured." +
+            
+            "~n~~n~ Install the AlternateConfigs\\RemoveVanillaGangs oiv and set GangSettings.DisableVanillaGangZoneTakeover to false to allow taking over vanilla zones." +
+            "~n~ If using Full Modern Traffic use the novanillagang_addon oiv to remove vanilla gang spawns.", 
+            new List<ZoneDisplay> { });
+
+        UpdateGangWarZoneSelectorMenu();
+
+
+        UIMenuItem GangWarStart = new UIMenuItem("Start", $"Start the war.");
+        GangWarStart.Activated += (sender, selectedItem) =>
+        {
+            if(ZoneMenu.SelectedItem.IsDisabled)
+            {
+                Game.DisplaySubtitle("Zone cannot be captured");
+                return;
+            }
+            Player.GangTerritoryManager.StartGangWar(GangWarTargetMenu.SelectedItem?.Gang, ZoneMenu.SelectedItem?.Zone);
+            sender.Visible = false;
+        };
+        GangWarTargetMenu.IndexChanged += (sender, oldIndex, newIndex) =>
+        {
+            UpdateGangWarZoneSelectorMenu();
+        };
+
+        GangWarSubMenu.AddItem(GangWarTargetMenu);
+        GangWarSubMenu.AddItem(ZoneMenu);
+        GangWarSubMenu.AddItem(GangWarStart);
+
+    }
+    private void UpdateGangWarZoneSelectorMenu()
+    {
+        List<ZoneDisplay> zonesToSelect = new List<ZoneDisplay>();
+
+        if(GangWarTargetMenu == null || GangWarTargetMenu.SelectedItem == null || GangWarTargetMenu.SelectedItem.Gang == null)
+        {
+            return;
+        }
+
+        List<GangTerritory> existingTerritory = GangTerritories.GetGangTerritory(GangWarTargetMenu.SelectedItem?.Gang?.ID);
+        if (existingTerritory == null)
+        {
+            existingTerritory = new List<GangTerritory>();
+        }
+        foreach (GangTerritory gt in existingTerritory)
+        {
+            Zone toAdded = Zones.GetZone(gt.ZoneInternalGameName);
+            if (toAdded != null)
+            {
+                ZoneDisplay zed = new ZoneDisplay(toAdded);
+                if (PlacesOfInterest.PossibleLocations.GangDens.Any(x=> x.ZoneID.ToLower() == toAdded.InternalGameName.ToLower()))
+                {
+                    zed.HasDen = true;
+                }
+
+
+                bool addZone = true;
+
+                if(toAdded.DisableGangTakeover)
+                {
+                    addZone = false;
+                }
+                if(!Settings.SettingsManager.GangSettings.DisableVanillaGangZoneTakeover)
+                {
+                    addZone = true;
+                }
+
+
+                zed.IsDisabled = !addZone;
+
+                //if (addZone)
+                //{
+                    zonesToSelect.Add(zed);
+                //}
+                
+            }
+
+        }
+        ZoneMenu.Items.Clear();
+        ZoneMenu.Items = zonesToSelect;
+    }
+    private void AddDrugMeetSubMenu()
+    {
+        DrugMeetSubMenu = MenuPool.AddSubMenu(ReferencesSubMenu, "Drug Sale");
+        ReferencesSubMenu.MenuItems[ReferencesSubMenu.MenuItems.Count() - 1].Description = $"Sell a large quantity of drugs to a gang. Make sure you have the merchandise.";
+        DrugMeetSubMenu.RemoveBanner();
+        UIMenuListScrollerItem<GameLocation> LocationMenu = new UIMenuListScrollerItem<GameLocation>("Location", "Select the location for the meet", PlacesOfInterest.PossibleLocations.DrugMeetLocations().Where(x=> x.IsCorrectMap(World.IsMPMapLoaded) && x.IsSameState(Player.CurrentLocation?.CurrentZone?.GameState)));
+        UIMenuNumericScrollerItem<int> quantityScroller = new UIMenuNumericScrollerItem<int>("Quantity", $"Select the total amount to deal", Settings.SettingsManager.TaskSettings.DrugMeetMin, Settings.SettingsManager.TaskSettings.DrugMeetMax, 100) { Value = Settings.SettingsManager.TaskSettings.DrugMeetMin };
+        UIMenuListScrollerItem<ModItem> PossibleItemsMenu = new UIMenuListScrollerItem<ModItem>("Item","",ModItems.AllItems().Where(x=> x.ItemType == ItemType.Drugs && x.ItemSubType == ItemSubType.Narcotic));
+        UIMenuListScrollerItem<GangDisplay> DealingGangMenu = new UIMenuListScrollerItem<GangDisplay>("Dealing Gang", GangDescription, GetNonHostilGangDisplay());
+        UIMenuItem DrugMeetupStart = new UIMenuItem("Start", $"Start the task.") { RightLabel = $"~HUD_COLOUR_GREENDARK~?-?~s~" };
+        UpdatedDrugMeetSaleRightLabel(DrugMeetupStart, PossibleItemsMenu.SelectedItem, quantityScroller.Value);
+        DrugMeetupStart.Activated += (sender, selectedItem) =>
+        {
+            Player.PlayerTasks.GangTasks.StartDrugMeetTask(ActiveGang, GangContact, PossibleItemsMenu.SelectedItem, quantityScroller.Value,DealingGangMenu.SelectedItem?.Gang, true, LocationMenu.SelectedItem);//, WheelManAccomplices.Value, LocationType.SelectedItem, requireAllMembers.Checked);
+            sender.Visible = false;
+        };
+        PossibleItemsMenu.IndexChanged += (sender,oldIndex,newIndex) =>
+        {
+            UpdatedDrugMeetSaleRightLabel(DrugMeetupStart, PossibleItemsMenu.SelectedItem, quantityScroller.Value);
+        };
+        quantityScroller.IndexChanged += (sender, oldIndex, newIndex) =>
+        {
+            UpdatedDrugMeetSaleRightLabel(DrugMeetupStart, PossibleItemsMenu.SelectedItem, quantityScroller.Value);
+        };
+
+        DrugMeetSubMenu.AddItem(LocationMenu);
+        DrugMeetSubMenu.AddItem(PossibleItemsMenu);
+        DrugMeetSubMenu.AddItem(DealingGangMenu);
+        DrugMeetSubMenu.AddItem(quantityScroller);
+        DrugMeetSubMenu.AddItem(DrugMeetupStart);
+    }
+
+
+
+    private void UpdatedDrugMeetSaleRightLabel(UIMenuItem uiMenuItem, ModItem selectedItem, int quantity)
+    {
+        int AveragePrice = (int)Math.Round(ShopMenus.GetAverageStreetSalesPrice(selectedItem) * RandomItems.GetRandomNumber(Settings.SettingsManager.TaskSettings.DrugMeetPriceScalarMin, Settings.SettingsManager.TaskSettings.DrugMeetPriceScalarMax));
+        uiMenuItem.RightLabel = $"Sales Price: ~g~${AveragePrice * quantity}~s~";
+    }
+    private void UpdatedDrugMeetBuyRightLabel(UIMenuItem uiMenuItem, ModItem selectedItem, int quantity)
+    {
+        int AveragePrice = (int)Math.Round(ShopMenus.GetAverageStreetPurchasePrice(selectedItem) * RandomItems.GetRandomNumber(Settings.SettingsManager.TaskSettings.DrugMeetPriceScalarMin, Settings.SettingsManager.TaskSettings.DrugMeetPriceScalarMax));
+        uiMenuItem.RightLabel = $"Purchase Price: ~r~${AveragePrice * quantity}~s~";
+    }
+
+
+    private void AddDrugBuySubMenu()
+    {
+        DrugMeetSubMenu = MenuPool.AddSubMenu(ReferencesSubMenu, "Drug Buy");
+        ReferencesSubMenu.MenuItems[ReferencesSubMenu.MenuItems.Count() - 1].Description = $"Buy a large quantity of drugs from a gang. Make sure you have the cash.";
+        DrugMeetSubMenu.RemoveBanner();
+        UIMenuListScrollerItem<GameLocation> LocationMenu = new UIMenuListScrollerItem<GameLocation>("Location", "Select the location for the meet", PlacesOfInterest.PossibleLocations.DrugMeetLocations().Where(x => x.IsCorrectMap(World.IsMPMapLoaded) && x.IsSameState(Player.CurrentLocation?.CurrentZone?.GameState)));
+
+        UIMenuNumericScrollerItem<int> quantityScroller = new UIMenuNumericScrollerItem<int>("Quantity", $"Select the total amount to deal", Settings.SettingsManager.TaskSettings.DrugMeetMin, Settings.SettingsManager.TaskSettings.DrugMeetMax, 100) { Value = Settings.SettingsManager.TaskSettings.DrugMeetMin };
+        UIMenuListScrollerItem<ModItem> PossibleItemsMenu = new UIMenuListScrollerItem<ModItem>("Item", "", ModItems.AllItems().Where(x => x.ItemType == ItemType.Drugs && x.ItemSubType == ItemSubType.Narcotic));
+        UIMenuListScrollerItem<GangDisplay> DealingGangMenu = new UIMenuListScrollerItem<GangDisplay>("Dealing Gang", GangDescription, GetNonHostilGangDisplay());
+        UIMenuItem DrugMeetupStart = new UIMenuItem("Start", $"Start the task.") { RightLabel = $"~HUD_COLOUR_GREENDARK~?-?~s~" };
+
+        UpdatedDrugMeetBuyRightLabel(DrugMeetupStart, PossibleItemsMenu.SelectedItem, quantityScroller.Value);
+
+        DrugMeetupStart.Activated += (sender, selectedItem) =>
+        {
+            Player.PlayerTasks.GangTasks.StartDrugMeetTask(ActiveGang, GangContact, PossibleItemsMenu.SelectedItem, quantityScroller.Value, DealingGangMenu.SelectedItem?.Gang, false, LocationMenu.SelectedItem);//, WheelManAccomplices.Value, LocationType.SelectedItem, requireAllMembers.Checked);
+            sender.Visible = false;
+        };
+        PossibleItemsMenu.IndexChanged += (sender, oldIndex, newIndex) =>
+        {
+            UpdatedDrugMeetBuyRightLabel(DrugMeetupStart, PossibleItemsMenu.SelectedItem, quantityScroller.Value);
+        };
+        quantityScroller.IndexChanged += (sender, oldIndex, newIndex) =>
+        {
+            UpdatedDrugMeetBuyRightLabel(DrugMeetupStart, PossibleItemsMenu.SelectedItem, quantityScroller.Value);
+        };
+        DrugMeetSubMenu.AddItem(LocationMenu);
+        DrugMeetSubMenu.AddItem(PossibleItemsMenu);
+        DrugMeetSubMenu.AddItem(DealingGangMenu);
+        DrugMeetSubMenu.AddItem(quantityScroller);
+        DrugMeetSubMenu.AddItem(DrugMeetupStart);
     }
 
     private void AddWheelmanSubMenu()
@@ -403,6 +614,41 @@ public class GangInteraction : IContactMenuInteraction
         return toReturn;
 
     }
+
+
+    private List<GangDisplay> GetNonHostilGangDisplay()
+    {
+        List<GangDisplay> toReturn = new List<GangDisplay>();
+        List<Gang> possibleGangs = Gangs.AllGangs.Where(x => x.ID != ActiveGang.ID).ToList();
+        foreach (Gang gang in possibleGangs.OrderByDescending(x => Player.RelationshipManager.GangRelationships.GetReputation(x)?.ReputationLevel))
+        {
+            GangReputation gr = Player.RelationshipManager.GangRelationships.GetReputation(gang);
+            string extra = "";
+            bool shouldAdd = true;
+            if (gr != null)
+            {
+                if (gr.IsEnemy)
+                {
+                    shouldAdd = false;
+                }
+                else if (gr.GangRelationship == GangRespect.Hostile)
+                {
+                    shouldAdd = false;
+                }
+                else if (gr.GangRelationship == GangRespect.Friendly)
+                {
+                    extra = "~g~";
+                }
+            }
+            if (shouldAdd)
+            {
+                toReturn.Add(new GangDisplay(gang, $"{extra}{gang.ShortName}~s~"));
+            }
+        }
+        return toReturn;
+    }
+
+
     private void AddGangAmbushSubMenu()
     {
         GangAmbushSubMenu = MenuPool.AddSubMenu(JobsSubMenu, "Ambush");
@@ -659,6 +905,37 @@ public class GangInteraction : IContactMenuInteraction
             return CurrentFormattedName;
         }
     }
+    private class ZoneDisplay
+    {
+        public ZoneDisplay()
+        {
 
+        }
+
+        public ZoneDisplay(Zone zone)
+        {
+            Zone = zone;
+        }
+
+        public Zone Zone { get; set; }
+        public bool HasDen { get; set; }
+        public bool IsDisabled { get; set; }
+        public override string ToString()
+        {
+            if(IsDisabled)
+            {
+                return $"~c~{Zone.DisplayName}~s~";
+            }
+            else if(HasDen)
+            {
+                return $"~g~{Zone.DisplayName}~s~";
+            }
+            else if(Zone != null && Zone.DisableGangTakeover)
+            {
+                return $"~r~{Zone.DisplayName}~s~";
+            }
+            return Zone.DisplayName;
+        }
     }
+}
 

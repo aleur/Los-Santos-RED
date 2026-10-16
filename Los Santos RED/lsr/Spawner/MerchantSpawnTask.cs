@@ -101,6 +101,12 @@ public class MerchantSpawnTask : SpawnTask
                 return null;
             }
             PedExt Person = SetupMerchantPed(createdPed);
+
+            GameFiber.Yield();
+            if (!createdPed.Exists())
+            {
+                return null;
+            }
             PersonType.SetPedVariation(createdPed, PossibleHeads, true);
             GameFiber.Yield();
             CreatedPeople.Add(Person);
@@ -165,7 +171,7 @@ public class MerchantSpawnTask : SpawnTask
         {
             return null;
         }
-        EntryPoint.WriteToConsole($"SPAWNED WORKED VENDOR AT {Store?.Name}");
+        //EntryPoint.WriteToConsole($"SPAWNED WORKED VENDOR AT {Store?.Name}");
         return Vendor;
     }
     protected void SetupPed(Ped ped)
@@ -176,5 +182,20 @@ public class MerchantSpawnTask : SpawnTask
         ped.MaxHealth = DesiredHealth;
         ped.Health = DesiredHealth;
         ped.Armor = DesiredArmor;
+    }
+    public override void PostRun(ConditionalLocation conditionalLocation, GameLocation gameLocation, Interior interior)
+    {
+        base.PostRun(conditionalLocation, gameLocation, interior);
+        if(gameLocation == null)
+        {
+            return;
+        }
+        foreach (Merchant ped in CreatedPeople)
+        {
+            if (!gameLocation.Vendors.Any(x=> x.Handle == ped.Handle))
+            {
+                gameLocation.Vendors.Add(ped);
+            }
+        }
     }
 }

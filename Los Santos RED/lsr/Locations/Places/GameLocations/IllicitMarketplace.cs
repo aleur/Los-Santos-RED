@@ -68,6 +68,13 @@ public class IllicitMarketplace : GameLocation
     }
     public override void AttemptVendorSpawn(bool isOpen, IInteriors interiors, ISettingsProvideable settings, ICrimes crimes, IWeapons weapons, ITimeReportable time, IEntityProvideable world, bool isInterior)
     {
+        if(IsPlayerInterestedInLocation)//if player is already setting up a meet here, dont spawn anything
+        {
+            EntryPoint.WriteToConsole("VENDOR IS NOT APPEARING (Player Interested? Using as drug meet)");
+            IsVendorSpawned = false;
+            return;
+        }
+
         if(AppearPercentages != null && AppearPercentages.Any())
         {
             AppearPercentage appearPercentage = AppearPercentages.FirstOrDefault(x => x.Hour == time.CurrentHour);
@@ -92,6 +99,11 @@ public class IllicitMarketplace : GameLocation
             ShownWarning = true;
         }
         base.OnPlayerBecameClose();
+    }
+    public override void AddLocation(PossibleLocations possibleLocations)
+    {
+        possibleLocations.IllicitMarketplaces.Add(this);
+        base.AddLocation(possibleLocations);
     }
 }
 

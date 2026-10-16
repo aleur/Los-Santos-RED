@@ -19,7 +19,7 @@ public class SecurityConditionalLocation : ConditionalLocation
     }
     public override bool DetermineRun(bool force)
     {
-        if (!Settings.SettingsManager.SecuritySettings.ManageDispatching)
+        if (!Settings.SettingsManager.SecuritySettings.ManageDispatching || EntryPoint.IsLSPDFRIntegrationEnabled)
         {
             return false;
         }
@@ -51,7 +51,7 @@ public class SecurityConditionalLocation : ConditionalLocation
             securitySpawnTask.PlacePedOnGround = DispatchableVehicle == null; //true;
             securitySpawnTask.AttemptSpawn();
             //EntryPoint.WriteToConsole("SECUIRTY RUN SPAWN TASK PRE POST RUN");
-            securitySpawnTask.PostRun(this, GameLocation);
+            securitySpawnTask.PostRun(this, GameLocation, Interior);
 
             //securitySpawnTask.CreatedPeople.ForEach(x => { EntryPoint.WriteToConsole($"I CREATED SECURITY {x.Handle}"); });
 

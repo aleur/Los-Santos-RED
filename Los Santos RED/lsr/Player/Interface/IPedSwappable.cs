@@ -42,15 +42,18 @@ namespace LosSantosRED.lsr.Interface
         Gang CurrentGang { get; }
         LocationData CurrentLocation { get; }
         InteriorManager InteriorManager { get; }
+        bool IsSetDisabledControls { get; set; }
 
         void DisplayPlayerNotification();
         void Reset(bool v1, bool v2, bool v3, bool v4, bool v5, bool v6, bool v7, bool v8, bool v9, bool v10, bool v11, bool v12, bool resetNeeds, bool resetGroup, bool resetLicenses, bool resetACtivites, bool resetGracePeriod, bool resetBankAccounts, 
-            bool resetSavedGame, bool resetPendingMessages, bool resetInteriors, bool resetGambling, bool resetPersistVehicles);
+            bool resetSavedGame, bool resetPendingMessages, bool resetInteriors, bool resetGambling, bool resetPersistVehicles, bool resetGangTerritory);
         void SetDemographics(string modelName, bool isMale, string v1, int v2, int speechSkill, string voiceName);
         void SetWantedLevel(int v1, string v2, bool v3);
         void UpdateVehicleData();
         void RemoveAgencyStatus();
         void SetAgencyStatus(Agency assignedAgency);
         void SetVoice(string voiceName);
+        void OnBecamePedFromCustomzer();
+        void ChangeName(string fullName);
     }
 }

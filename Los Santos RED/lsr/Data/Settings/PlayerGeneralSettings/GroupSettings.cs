@@ -25,7 +25,10 @@ public class GroupSettings : ISettingsDefaultable
     public float PlayerMoveDistanceToUpdate { get; set; }
     public float MaxPlayerDistanceDuringCombatBeforeForceReturn { get; set; }
     public bool EnableGroupButtonPrompts { get; set; }
-
+    public float MinBrakingDistance { get; set; }
+    public float DecelerationValue { get; set; }
+    public float TeleportDistanceRequirement { get; set; }
+    public bool AllowTeleportingGroupMembersInOtherVehicles { get; set; }
 
     [OnDeserialized()]
     private void SetValuesOnDeserialized(StreamingContext context)
@@ -52,6 +55,11 @@ public class GroupSettings : ISettingsDefaultable
         MaxPlayerDistanceDuringCombatBeforeForceReturn = 35f;
 
         EnableGroupButtonPrompts = true;
+
+        DecelerationValue = 8f;
+        MinBrakingDistance = 8f;
+        TeleportDistanceRequirement = 20f;
+        AllowTeleportingGroupMembersInOtherVehicles = false;
     }
 
 }

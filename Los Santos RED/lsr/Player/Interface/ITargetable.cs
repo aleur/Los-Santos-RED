@@ -31,7 +31,7 @@ namespace LosSantosRED.lsr.Interface
         bool IsMoving { get; }
         bool AnyGangMemberRecentlySeenPlayer { get; }
 
-        void AddCrime(Crime CrimeInstance, bool ByPolice, Vector3 Location, VehicleExt VehicleObserved, WeaponInformation WeaponObserved, bool HaveDescription, bool AnnounceCrime, bool IsForPlayer);
+        void AddCrime(Crime CrimeInstance, bool ByPolice, Vector3 Location, VehicleExt VehicleObserved, WeaponInformation WeaponObserved, bool HaveDescription, bool AnnounceCrime, bool IsForPlayer, bool alwaysAddInstance);
         RelationshipManager RelationshipManager { get; }
         bool RecentlyShot { get; }
         float ClosestPoliceDistanceToPlayer { get; }
@@ -67,6 +67,11 @@ namespace LosSantosRED.lsr.Interface
         IntimidationManager IntimidationManager { get; }
         Vector3 Position { get; }
         bool IsInWantedActiveMode { get; }
+        float VehicleSpeedMPH { get; }
+        bool IsMovingSlowly { get; }
+        GPSManager GPSManager { get;  }
+        float VehicleSpeed { get; }
+        Violations Violations { get; }
         //bool IsHostile(Gang gang);
     }
 }

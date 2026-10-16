@@ -21,6 +21,8 @@ public class Organizations : IOrganizations
     private Organization LSRGuns;
     private TaxiFirm RydeMe;
     private TaxiFirm Schlecht;
+    private TaxiFirm KnoWay;
+    private Organization WezelNews;
 
     public PossibleOrganizations PossibleOrganizations { get; private set; }
 
@@ -30,10 +32,10 @@ public class Organizations : IOrganizations
     }
     public void ReadConfig(string configName)
     {
-        string fileName = string.IsNullOrEmpty(configName) ? "Organizations*.xml" : $"Organizations_{configName}.xml";
+        string fileName = string.IsNullOrEmpty(configName) ? "Organizations_*.xml" : $"Organizations_{configName}.xml";
 
         DirectoryInfo taskDirectory = new DirectoryInfo("Plugins\\LosSantosRED");
-        FileInfo ConfigFile = taskDirectory.GetFiles(fileName).OrderByDescending(x => x.Name).FirstOrDefault();
+        FileInfo ConfigFile = taskDirectory.GetFiles(fileName).Where(x => !x.Name.Contains("+")).OrderByDescending(x => x.Name).FirstOrDefault();
         if (ConfigFile != null && !configName.Equals("Default"))
         {
             EntryPoint.WriteToConsole($"Loaded Organizations Config: {ConfigFile.FullName}", 0);
@@ -51,6 +53,21 @@ public class Organizations : IOrganizations
             DefaultConfig_FullExpanded();
             DefaultConfig_LibertyCity();
             DefaultConfig();
+        }
+        foreach (FileInfo fileInfo in taskDirectory.GetFiles("Organizations+_*.xml").OrderByDescending(x => x.Name))
+        {
+            EntryPoint.WriteToConsole($"Loaded ADDITIVE Organizations config  {fileInfo.FullName}", 0);
+            PossibleOrganizations additivePossibleItems = Serialization.DeserializeParam<PossibleOrganizations>(fileInfo.FullName);
+            foreach (Organization newItem in additivePossibleItems.GeneralOrganizations)
+            {
+                PossibleOrganizations.GeneralOrganizations.RemoveAll(x => x.ID == newItem.ID);
+                PossibleOrganizations.GeneralOrganizations.Add(newItem);
+            }
+            foreach (TaxiFirm newItem in additivePossibleItems.TaxiFirms)
+            {
+                PossibleOrganizations.TaxiFirms.RemoveAll(x => x.ID == newItem.ID);
+                PossibleOrganizations.TaxiFirms.Add(newItem);
+            }
         }
     }
     public void Setup(IHeads heads, IDispatchableVehicles dispatchableVehicles, IDispatchablePeople dispatchablePeople, IIssuableWeapons issuableWeapons, IContacts contacts)
@@ -89,6 +106,14 @@ public class Organizations : IOrganizations
             return null;
         }
         return PossibleOrganizations.AllOrganizations().Where(x => x.ID.ToLower() == AgencyInitials.ToLower()).FirstOrDefault();
+    }
+    public Organization GetOrganization(string orgID)
+    {
+        if (string.IsNullOrEmpty(orgID))
+        {
+            return null;
+        }
+        return PossibleOrganizations.AllOrganizations().Where(x => x.ID.ToLower() == orgID.ToLower()).FirstOrDefault();
     }
     public Organization GetOrganizationByContact(string contactName)
     {
@@ -170,6 +195,30 @@ public class Organizations : IOrganizations
             CrazySpeedFee = 300,
             IsRideShare = true,
         };
+
+        WezelNews = new Organization("~r~","weazel","Weazel","Weazel News","Red","NewsPeds","WeazelVehicles","WN ","","","","Weazel Reporter")
+        {
+            Description = "Reporting the Right News",
+            HeadDataGroupID = "AllHeads",
+        };
+
+
+        KnoWay = new TaxiFirm("~w~","knoway","KnoWay","Knoway","White","knowaypeds","knowayvehicles","","","","","Robot")
+        {
+            Description = "Let us take you for a ride",
+            HeadDataGroupID = "AllHeads",
+            ContactName = StaticStrings.KnowayContactName,
+            IsDefault = true,
+            BannerImagePath = "stores\\knoway.png",
+            BaseFare = 12,
+            PricePerMile = 6,
+            FastSpeedFee = -1,
+            CrazySpeedFee = -1,
+            FightPercentage = 0f,
+            FightPolicePercentage = 0f,
+            CallPolicePercentage = 100f,
+            CallPoliceForSeriousCrimesPercentage = 100f,
+        };
     }
     private void DefaultConfig()
     {
@@ -179,12 +228,14 @@ public class Organizations : IOrganizations
         {     
             VehicleExports,
             UndergroundGuns,
+            WezelNews,
         };
         PossibleOrganizations.TaxiFirms = new List<TaxiFirm>
         {
             DowntownCabCoOld,
             RydeMe,
             Schlecht,
+            KnoWay,
         };
         Serialization.SerializeParam(PossibleOrganizations, ConfigFileName);
     }
@@ -231,11 +282,6 @@ public class Organizations : IOrganizations
             BannerImagePath = "stores\\sunderedtaxi.png",
         };
 
-        PossibleOrganizations_FullExpanded.GeneralOrganizations = new List<Organization>
-        {
-            VehicleExports,
-            UndergroundGuns,
-        };
         PossibleOrganizations_FullExpanded.TaxiFirms = new List<TaxiFirm>
         {
             DowntownCabCo,
@@ -243,17 +289,15 @@ public class Organizations : IOrganizations
             PurpleCabCo,
             ShitiCabCo,
             SunderedCab,
-            RydeMe,
-            Schlecht,
         };
-        Serialization.SerializeParam(PossibleOrganizations_FullExpanded, "Plugins\\LosSantosRED\\AlternateConfigs\\FullExpandedJurisdiction\\Variations\\Full\\Organizations_FullExpandedJurisdiction.xml");
-        Serialization.SerializeParam(PossibleOrganizations_FullExpanded, "Plugins\\LosSantosRED\\AlternateConfigs\\LosSantos2008\\Organizations_LosSantos2008.xml");
-        Serialization.SerializeParam(PossibleOrganizations_FullExpanded, "Plugins\\LosSantosRED\\AlternateConfigs\\FullExpandedJurisdiction\\Variations\\Vanilla Peds\\Organizations_FullExpandedJurisdiction.xml");
+        //Serialization.SerializeParam(PossibleOrganizations_FullExpanded, "Plugins\\LosSantosRED\\AlternateConfigs\\FullExpandedJurisdiction\\Variations\\Full\\Organizations+_FullExpandedJurisdiction.xml");
+        //Serialization.SerializeParam(PossibleOrganizations_FullExpanded, "Plugins\\LosSantosRED\\AlternateConfigs\\LosSantos2008\\Organizations+_LosSantos2008.xml");
+        Serialization.SerializeParam(PossibleOrganizations_FullExpanded, "Plugins\\LosSantosRED\\AlternateConfigs\\FullExpandedJurisdiction\\Variations\\Vanilla Peds\\Organizations+_FullExpandedJurisdiction.xml");
         //
     }
     private void DefaultConfig_LibertyCity()
     {
-        PossibleOrganizations PossibleOrganizations_LibertyCity = new PossibleOrganizations();
+        //PossibleOrganizations PossibleOrganizations_LibertyCity = new PossibleOrganizations();
 
 
         TaxiFirm NYCTaxiCo = new TaxiFirm("~o~", "LCTAXI", "LC Taxi", "LC Taxi", "Orange", "TaxiDrivers", "LCTaxiVehicles", "LC ", "MeleeWeapons", "TaxiSidearms", "TaxiLongGuns", "Cabbie")
@@ -266,33 +310,37 @@ public class Organizations : IOrganizations
         };
 
 
-        PossibleOrganizations_LibertyCity.GeneralOrganizations = new List<Organization>
-        {
-            VehicleExports,
-            UndergroundGuns,
-        };
-        PossibleOrganizations_LibertyCity.TaxiFirms = new List<TaxiFirm>
-        {
-            NYCTaxiCo,
-            RydeMe,
-            Schlecht
-        };
-        Serialization.SerializeParam(PossibleOrganizations_LibertyCity, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LibertyConfigFolder}\\Organizations_{StaticStrings.LibertyConfigSuffix}.xml");
+        //PossibleOrganizations_LibertyCity.GeneralOrganizations = new List<Organization>
+        //{
+        //    VehicleExports,
+        //    UndergroundGuns,
+        //    WezelNews,
+        //};
+        //PossibleOrganizations_LibertyCity.TaxiFirms = new List<TaxiFirm>
+        //{
+        //    NYCTaxiCo,
+        //    RydeMe,
+        //    Schlecht,
+        //    KnoWay,
+        //};
+        //Serialization.SerializeParam(PossibleOrganizations_LibertyCity, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LibertyConfigFolder}\\Organizations_{StaticStrings.LibertyConfigSuffix}.xml");
         //
 
         PossibleOrganizations PossibleOrganizations_LibertyCityPP = new PossibleOrganizations();
-        PossibleOrganizations_LibertyCityPP.GeneralOrganizations = new List<Organization>()
-        {
-            VehicleExports,
-            UndergroundGuns,
-        };
+        //PossibleOrganizations_LibertyCityPP.GeneralOrganizations = new List<Organization>()
+        //{
+        //    VehicleExports,
+        //    UndergroundGuns,
+        //    WezelNews,
+        //};
         PossibleOrganizations_LibertyCityPP.TaxiFirms = new List<TaxiFirm>
         {
-            DowntownCabCoOld,
+            //DowntownCabCoOld,
             NYCTaxiCo,
-            RydeMe,
-            Schlecht
+            //RydeMe,
+            //Schlecht,
+            //KnoWay,
         };
-        Serialization.SerializeParam(PossibleOrganizations_LibertyCityPP, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LPPConfigFolder}\\Organizations_{StaticStrings.LPPConfigSuffix}.xml");
+        Serialization.SerializeParam(PossibleOrganizations_LibertyCityPP, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LPPConfigFolder}\\Organizations+_{StaticStrings.LPPConfigSuffix}.xml");
     }
 }

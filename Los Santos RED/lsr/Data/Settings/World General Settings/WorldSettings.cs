@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 
 public class WorldSettings : ISettingsDefaultable
 {
+
+    [Description("If enabled the MP map will be auto loaded before LSR starts")]
+    public bool AutoLoadMPMap { get; set; }
+
     [Description("Updates vehicle plates for the given state, plate style, and number format given in PlateTypes.xml.")]
     public bool UpdateVehiclePlates { get; set; }
     [Description("Percentage of vehicles that will get a plate type to match your current state (if not San Andreas).")]
@@ -83,7 +87,6 @@ public class WorldSettings : ISettingsDefaultable
     public bool SetVanillaTaxiSuppressed { get; set; }
     public bool CreateObjectLocationsFromScanning { get; set; }
     public bool ShowMarkersInInteriors { get; set; }
-    public int InteriorMarkerType { get; set; }
     public float InteriorMarkerZOffset { get; set; }
     public float InteriorMarkerScale { get; set; }
     [Description("If enabled, LSR will cancel a vehicle spawn if there is a mission entity within a certain radius")]
@@ -93,6 +96,8 @@ public class WorldSettings : ISettingsDefaultable
     public bool ExtendedVehicleCleanup { get;  set; }
     public bool SuppressFEJVehiclesFromGenerators { get; set; }
     public bool SetMissionFlagOn { get; set; }
+
+
     //public int MaxPedsBeforeDispatchPause { get; set; }
     //public int MaxVehiclesBeforeDispatchPause { get; set; }
 
@@ -108,6 +113,7 @@ public class WorldSettings : ISettingsDefaultable
     }
     public void SetDefault()
     {
+        AutoLoadMPMap = true;
         UpdateVehiclePlates = true;
         CleanupVehicles = true;
         ReplaceVanillaShopKeepers = true;
@@ -165,7 +171,6 @@ public class WorldSettings : ISettingsDefaultable
         // SetReducedPropsOnMap = true;
         CreateObjectLocationsFromScanning = false;
         ShowMarkersInInteriors = true;
-        InteriorMarkerType = 0;
         InteriorMarkerZOffset = 0.2f;
         InteriorMarkerScale = 0.25f;
 

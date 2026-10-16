@@ -16,12 +16,14 @@ public class LESpawnTask : SpawnTask
     private string UnitCode;
     private bool AddCanine;
     private IShopMenus ShopMenus;
+    private ICrimes Crimes;
     public LESpawnTask(Agency agency, SpawnLocation spawnLocation, DispatchableVehicle vehicleType, DispatchablePerson personType, bool addBlip, ISettingsProvideable settings, IWeapons weapons, INameProvideable names, bool addOptionalPassengers,
-        IEntityProvideable world, IModItems modItems, bool addCanine, IShopMenus shopMenus) : base(spawnLocation, vehicleType, personType, addBlip, addOptionalPassengers, settings, weapons, names, world, modItems)
+        IEntityProvideable world, IModItems modItems, bool addCanine, IShopMenus shopMenus, ICrimes crimes) : base(spawnLocation, vehicleType, personType, addBlip, addOptionalPassengers, settings, weapons, names, world, modItems)
     {
         Agency = agency;
         AddCanine = addCanine;
         ShopMenus = shopMenus;
+        Crimes = crimes;
     }
 
     public List<Cop> SpawnedCops { get; set; } = new List<Cop>();
@@ -80,27 +82,27 @@ public class LESpawnTask : SpawnTask
         {
             return;
         }
-        EntryPoint.WriteToConsole($"SPAWN TASK: Add Canine Passengers {VehicleType.ModelName} START UnitCode {UnitCode}");
+        //EntryPoint.WriteToConsole($"SPAWN TASK: Add Canine Passengers {VehicleType.ModelName} START UnitCode {UnitCode}");
         foreach(int seatIndex in VehicleType.CaninePossibleSeats)
         {
-            EntryPoint.WriteToConsole($"LE SPAWN TASK CANINE SEAT {seatIndex}");
+            //EntryPoint.WriteToConsole($"LE SPAWN TASK CANINE SEAT {seatIndex}");
             if (!LastCreatedVehicleExists || !LastCreatedVehicle.Vehicle.IsSeatFree(seatIndex))
             {
-                EntryPoint.WriteToConsole("LE SPAWN TASK ATTEMPT VEHICLE SPAWN CANINE5");
+                //EntryPoint.WriteToConsole("LE SPAWN TASK ATTEMPT VEHICLE SPAWN CANINE5");
                 continue;
             }
             PersonType = Agency.GetRandomPed(World.TotalWantedLevel, VehicleType.RequiredPedGroup, true);
             if(PersonType == null || !PersonType.IsAnimal)
             {
-                EntryPoint.WriteToConsole("LE SPAWN TASK ATTEMPT VEHICLE SPAWN CANINE6");
+                //EntryPoint.WriteToConsole("LE SPAWN TASK ATTEMPT VEHICLE SPAWN CANINE6");
                 continue;
             }
-            EntryPoint.WriteToConsole($"LE SPAWN TASK CANINE SEAT {seatIndex} CREATE START");
+            //EntryPoint.WriteToConsole($"LE SPAWN TASK CANINE SEAT {seatIndex} CREATE START");
             PedExt Passenger = CreateCanine(seatIndex);
             if (Passenger != null && Passenger.Pedestrian.Exists() && LastCreatedVehicleExists)// && LastCreatedVehicle.Vehicle.IsSeatFree(seatIndex))
             {
                 PutPedInVehicle(Passenger, seatIndex);
-                EntryPoint.WriteToConsole($"SPAWN TASK: Add Canine {VehicleType.ModelName} ADDED ONE TO VEHICLE {seatIndex}");
+                //EntryPoint.WriteToConsole($"SPAWN TASK: Add Canine {VehicleType.ModelName} ADDED ONE TO VEHICLE {seatIndex}");
                 created = true;
             }
             else
@@ -119,7 +121,7 @@ public class LESpawnTask : SpawnTask
     }
     protected override void AttemptVehicleSpawn()
     {
-        EntryPoint.WriteToConsole("LE SPAWN TASK ATTEMPT VEHICLE SPAWN");
+        //EntryPoint.WriteToConsole("LE SPAWN TASK ATTEMPT VEHICLE SPAWN");
         LastCreatedVehicle = CreateVehicle();
         if (LastCreatedVehicleExists)
         {
@@ -127,7 +129,7 @@ public class LESpawnTask : SpawnTask
             {
                 if (WillAddDriver)
                 {
-                    EntryPoint.WriteToConsole("LE SPAWN TASK ATTEMPT VEHICLE SPAWN DRIVER1");
+                    //EntryPoint.WriteToConsole("LE SPAWN TASK ATTEMPT VEHICLE SPAWN DRIVER1");
                     PedExt Person = CreatePerson(-1);
                     if (Person != null && Person.Pedestrian.Exists() && LastCreatedVehicleExists)
                     {
@@ -136,7 +138,7 @@ public class LESpawnTask : SpawnTask
                         {
                             AddPassengers();
                         }
-                        if (AddCanine && VehicleType != null && VehicleType.CaninePossibleSeats.Any())
+                        if (AddCanine && VehicleType != null && VehicleType.CaninePossibleSeats != null && VehicleType.CaninePossibleSeats.Any())
                         {
                             EntryPoint.WriteToConsole("LE SPAWN TASK ATTEMPT VEHICLE SPAWN CANINE1");
                             AddCaninePassengers();
@@ -145,7 +147,7 @@ public class LESpawnTask : SpawnTask
                 }
                 else
                 {
-                    EntryPoint.WriteToConsole("LE SPAWN TASK ATTEMPT VEHICLE SPAWN DRIVER2" );
+                   // EntryPoint.WriteToConsole("LE SPAWN TASK ATTEMPT VEHICLE SPAWN DRIVER2" );
                     if (LastCreatedVehicleExists)
                     {
                         if (WillAddPassengers)
@@ -154,7 +156,7 @@ public class LESpawnTask : SpawnTask
                         }
                         if (AddCanine && VehicleType != null && VehicleType.CaninePossibleSeats.Any())
                         {
-                            EntryPoint.WriteToConsole("LE SPAWN TASK ATTEMPT VEHICLE SPAWN CANINE2");
+                            //EntryPoint.WriteToConsole("LE SPAWN TASK ATTEMPT VEHICLE SPAWN CANINE2");
                             AddCaninePassengers();
                         }
                     }
@@ -277,7 +279,7 @@ public class LESpawnTask : SpawnTask
                 //EntryPoint.WriteToConsole("ADDED HIEGHT TO SPAWN");
             }
 
-            EntryPoint.WriteToConsole($"LE SPAWN TASK CreateCanine 1");
+            //EntryPoint.WriteToConsole($"LE SPAWN TASK CreateCanine 1");
 
             World.Pedestrians.CleanupAmbient();
             Ped createdPed = null;// = new Ped(PersonType.ModelName, new Vector3(Position.X, Position.Y, Position.Z), SpawnLocation.Heading);
@@ -298,27 +300,27 @@ public class LESpawnTask : SpawnTask
             {
                 createdPed = new Ped(PersonType.ModelName, new Vector3(CreatePos.X, CreatePos.Y, CreatePos.Z), SpawnLocation.Heading);
             }
-            EntryPoint.WriteToConsole($"LE SPAWN TASK CreateCanine 2");
+           // EntryPoint.WriteToConsole($"LE SPAWN TASK CreateCanine 2");
             EntryPoint.SpawnedEntities.Add(createdPed);
             GameFiber.Yield();
             NativeFunction.Natives.SET_MODEL_AS_NO_LONGER_NEEDED(Game.GetHashKey(PersonType.ModelName));
             if (createdPed.Exists())
             {
-                EntryPoint.WriteToConsole($"LE SPAWN TASK CreateCanine 3");
+               // EntryPoint.WriteToConsole($"LE SPAWN TASK CreateCanine 3");
                 SetupPed(createdPed);
                 if (!createdPed.Exists())
                 {
                     return null;
                 }
                 PedExt Person = SetupAgencyAnimal(createdPed);
-                EntryPoint.WriteToConsole($"LE SPAWN TASK CreateCanine 4");
+               // EntryPoint.WriteToConsole($"LE SPAWN TASK CreateCanine 4");
                 PersonType.SetPedVariation(createdPed, null, true);//no head data for canines
                 GameFiber.Yield();
                 CreatedPeople.Add(Person);
-                EntryPoint.WriteToConsole($"LE SPAWN TASK CreateCanine 5");
+               // EntryPoint.WriteToConsole($"LE SPAWN TASK CreateCanine 5");
                 return Person;
             }
-            EntryPoint.WriteToConsole($"LE SPAWN TASK CreateCanine 6 FAIL");
+           // EntryPoint.WriteToConsole($"LE SPAWN TASK CreateCanine 6 FAIL");
             return null;
         }
         catch (Exception ex)
@@ -343,7 +345,7 @@ public class LESpawnTask : SpawnTask
                 return null;
             }
 
-            EntryPoint.WriteToConsole($"LE SPAWN TASK POSITION OF SPAWN {Position} WaterPosition:{SpawnLocation.WaterPosition} InitialPosition:{SpawnLocation.InitialPosition} ISWater:{SpawnLocation.IsWater} DebugWaterHeight{SpawnLocation.DebugWaterHeight}");
+            //EntryPoint.WriteToConsole($"LE SPAWN TASK POSITION OF SPAWN {Position} WaterPosition:{SpawnLocation.WaterPosition} InitialPosition:{SpawnLocation.InitialPosition} ISWater:{SpawnLocation.IsWater} DebugWaterHeight{SpawnLocation.DebugWaterHeight}");
             SpawnedVehicle = new Vehicle(VehicleType.ModelName, Position, SpawnLocation.Heading);
             EntryPoint.SpawnedEntities.Add(SpawnedVehicle);
             GameFiber.Yield();
@@ -436,7 +438,7 @@ public class LESpawnTask : SpawnTask
         Pedestrian.RelationshipGroup = rg;
         NativeFunction.CallByName<bool>("SET_PED_AS_COP", Pedestrian, true);
         bool isMale = PersonType.IsMale(Pedestrian);
-        Cop PrimaryCop = new Cop(Pedestrian, Settings, Pedestrian.Health, Agency, true, null, Weapons, Names.GetRandomName(isMale), PersonType.ModelName, World);
+        Cop PrimaryCop = new Cop(Pedestrian, Settings, Pedestrian.Health, Agency, true, Crimes, Weapons, Names.GetRandomName(isMale), PersonType.ModelName, World);
 
         if(IsMarshalMember)
         {
@@ -456,7 +458,11 @@ public class LESpawnTask : SpawnTask
         if(PersonType.OverrideSightDistance > 1.0f)
         {
             sightDistance = PersonType.OverrideSightDistance;
-            EntryPoint.WriteToConsole($"OverrideSightDistance {sightDistance} IN THE COPS");
+            //EntryPoint.WriteToConsole($"OverrideSightDistance {sightDistance} IN THE COPS");
+        }
+        if (SpawnRequirement != TaskRequirements.None)
+        {
+            PrimaryCop.LocationTaskRequirements.TaskRequirements = SpawnRequirement;
         }
         PrimaryCop.SetStats(PersonType, Weapons, AddBlip, UnitCode, sightDistance, ShopMenus);//TASKING IS BROKEN FOR ALL COPS FAR FROM PLAYER AND ALL OTHER PEDS
         if (Pedestrian.Exists())
@@ -477,7 +483,7 @@ public class LESpawnTask : SpawnTask
 
         RelationshipGroup rg = new RelationshipGroup("COP");
         ped.RelationshipGroup = rg;
-        //NativeFunction.CallByName<bool>("SET_PED_AS_COP", ped, true);
+        NativeFunction.CallByName<bool>("SET_PED_AS_COP", ped, true);
         bool isMale = true;
         CanineUnit PrimaryCop = new CanineUnit(ped, Settings, ped.Health, Agency, true, null, Weapons, Names.GetRandomDogName(isMale), PersonType.ModelName, World);
 
@@ -490,6 +496,10 @@ public class LESpawnTask : SpawnTask
         World.Pedestrians.AddEntity(PrimaryCop);
         PrimaryCop.SetStats(PersonType, Weapons, AddBlip, UnitCode, sightDistance, ShopMenus);
         //PrimaryCop.TaskRequirements = SpawnRequirement;
+        if (SpawnRequirement != TaskRequirements.None)
+        {
+            PrimaryCop.LocationTaskRequirements.TaskRequirements = SpawnRequirement;
+        }
         if (ped.Exists())
         {
             PrimaryCop.SpawnPosition = ped.Position;

@@ -26,11 +26,14 @@ namespace LosSantosRED.lsr.Interface
         IZones Zones { get; }
         IGangTerritories GangTerritories { get; }
         bool IsFEJInstalled { get; }
+        bool IsTrafficDisabled { get; }
 
         void LoadMPMap();
         void LoadSPMap();
         void ClearSpawned(bool includeCivilians);
         void AddBlip(Blip myBlip);
         void RemoveBlips();
+        void SetTrafficDisabled();
+        void SetTrafficEnabled();
     }
 }

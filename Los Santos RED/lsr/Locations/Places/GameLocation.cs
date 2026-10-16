@@ -8,6 +8,8 @@ using Mod;
 using Rage;
 using Rage.Native;
 using RAGENativeUI;
+using RAGENativeUI.Elements;
+using RAGENativeUI.PauseMenu;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -31,6 +33,7 @@ public class GameLocation : ILocationDispatchable
     protected IShopMenus ShopMenus;
     protected IPlateTypes PlateTypes;
     protected IOrganizations Associations;
+    protected ModDataFileManager ModDataFileManager;
     protected Transaction Transaction;
     protected uint NotificationHandle;
     protected readonly List<string> FallBackVendorModels = new List<string>() { "s_m_m_strvend_01", "s_m_m_linecook" };
@@ -46,6 +49,8 @@ public class GameLocation : ILocationDispatchable
     protected DateTime NextRestockTime;
     protected DateTime NextPriceRefreshTime;
     protected DateTime LastInteractTime;
+    protected string OriginalAssignedAssociationID;
+    protected bool HasBeenTakenOver;
 
     protected uint DistanceUpdateIntervalTime
     {
@@ -106,6 +111,7 @@ public class GameLocation : ILocationDispatchable
         Name = _Name;
         Description = _Description;
         FullName = Name;
+        OriginalAssignedAssociationID = AssignedAssociationID;
     }
     public string Name { get; set; }
     public string FullName { get; set; }
@@ -229,12 +235,6 @@ public class GameLocation : ILocationDispatchable
     [XmlIgnore]
     public List<Merchant> Vendors { get; set; } = new List<Merchant>();
 
-
-
-
-
-
-
     public Vector3 VehiclePreviewCameraPosition { get; set; } = Vector3.Zero;
     public Vector3 VehiclePreviewCameraDirection { get; set; } = Vector3.Zero;
     public Rotator VehiclePreviewCameraRotation { get; set; }
@@ -250,7 +250,7 @@ public class GameLocation : ILocationDispatchable
     public virtual int MaxRestockHours { get; set; }
 
     //public int MaxAssaultSpawns { get; set; } = 15;
-
+    public virtual bool AreMarkersDisabled => false;
     public float CloseRange { get; set; } = 10f;
 
 
@@ -276,6 +276,10 @@ public class GameLocation : ILocationDispatchable
     public string StreetAddress { get; set; }
     [XmlIgnore]
     public string ZoneName { get; set; }
+
+    [XmlIgnore]
+    public string ZoneID { get; set; }
+
     [XmlIgnore]
     public GameState GameState { get; set; }
     [XmlIgnore]
@@ -304,6 +308,9 @@ public class GameLocation : ILocationDispatchable
     public bool VendorAbandoned { get; set; } = false;
     [XmlIgnore]
     public Agency AssignedAgency { get; set; }
+
+    [XmlIgnore]
+    public Organization AssignedOrganization { get; set; }
     [XmlIgnore]
     public bool IsDispatchFilled { get; set; } = false;
     [XmlIgnore]
@@ -337,6 +344,24 @@ public class GameLocation : ILocationDispatchable
     public virtual bool ShowInteractPrompt => !IgnoreEntranceInteract && CanInteract;
     public string MapTeleportString => IsOnSPMap && !IsOnMPMap ? "(SP)" : IsOnMPMap && !IsOnSPMap ? "(MP)" : "";
 
+    #region Business Ownership
+    public virtual int PurchasePrice { get; set; }
+    public virtual int PayoutFrequency { get; set; } = 7;
+    public virtual int PayoutMin { get; set; }
+    public virtual int PayoutMax { get; set; }
+    public virtual int SalesPrice { get; set; }
+    public virtual int MaxSalesPrice { get; set; }
+    public int GrowthPercentage { get; set; } = 20;
+    [XmlIgnore]
+    public int CurrentSalesPrice { get; set; }
+    [XmlIgnore]
+    public DateTime DatePayoutDue { get; set; }
+    [XmlIgnore]
+    public DateTime DatePayoutPaid { get; set; }
+    [XmlIgnore]
+    public virtual bool IsOwned { get; set; } = false;
+
+    #endregion
 
     [OnDeserialized()]
     private void SetValuesOnDeserialized(StreamingContext context)
@@ -364,12 +389,14 @@ public class GameLocation : ILocationDispatchable
             CanInteract = false;
         }
         //World.Pedestrians.AddEntity(Vendor);
-        IsActivated = true;
+        //IsActivated = true;//moved down
         World = world;
         if (Interior != null && !Interior.IsTeleportEntry)
         {
             LoadInterior(isOpen);
         }
+
+
         if (!ShouldAlwaysHaveBlip && IsBlipEnabled)
         {
             ActivateBlip(time, world);
@@ -382,10 +409,13 @@ public class GameLocation : ILocationDispatchable
         }
         world.AddBlip(Blip);
         RestrictedAreas?.Activate(world);
+
+        IsActivated = true;
+
     }
     public virtual void AttemptVendorSpawn(bool isOpen, IInteriors interiors, ISettingsProvideable settings, ICrimes crimes, IWeapons weapons, ITimeReportable time, IEntityProvideable world, bool isInterior)
     {
-        //EntryPoint.WriteToConsole($"ATTEMPT VENDOR SPAWN AT {Name}");
+        EntryPoint.WriteToConsole($"ATTEMPT VENDOR SPAWN AT {Name} RAN FIRST");
         int VendorsSpawned = 0;
         List<SpawnPlace> spawns = new List<SpawnPlace>();
         if(isInterior)
@@ -406,13 +436,13 @@ public class GameLocation : ILocationDispatchable
                 //EntryPoint.WriteToConsole($"ATTEMPT VENDOR SPAWN AT {Name} START");
                 if (SpawnVendor(spawnPlace))
                 {
-                    EntryPoint.WriteToConsole($"VENDOR SPAWNED AT {Name}");
+                    EntryPoint.WriteToConsole($"VENDOR SPAWNED AT {Name} SECOND");
                     VendorsSpawned++;
                 }
             }
         }
     }
-    protected virtual bool ShouldSpawnVendor() => true;
+    protected virtual bool ShouldSpawnVendor() => !IsServiceFilled;
     protected virtual void LoadInterior(bool isOpen)
     {
         if (HasInterior && interior != null)
@@ -460,6 +490,17 @@ public class GameLocation : ILocationDispatchable
         return toreturn;
 
     }
+    public virtual string MapsInfo(int currentHour, float distanceTo)
+    {
+        string toReturn = Description;
+        toReturn += "~n~Currently: " + (IsTemporarilyClosed ? "~r~Temporarily Closed~s~" : IsOpen(currentHour) ? "~s~Open~s~" : "~m~Closed~s~");
+        toReturn += "~n~Hours: " + (Is247 ? "~g~24/7~s~" : $"{OpenTime}{(OpenTime <= 11 ? " am" : " pm")}-{CloseTime - 12}{(CloseTime <= 11 ? " am" : " pm")}");
+        toReturn += "~n~Address: " + StreetAddress;
+        toReturn += "~n~Location: " + "~p~" + ZoneName + "~s~";
+        toReturn += "~n~Distance: " + Math.Round(distanceTo * 0.000621371f, 2).ToString() + " Miles away";
+
+        return toReturn;
+    }
     public virtual string TaxiInfo(int currentHour, float distanceTo, TaxiFirm taxiFirm)
     {
         string toReturn = Description;
@@ -480,7 +521,8 @@ public class GameLocation : ILocationDispatchable
     }
     public virtual void StoreData(IShopMenus shopMenus, IAgencies agencies, IGangs gangs, IZones zones, IJurisdictions jurisdictions, IGangTerritories gangTerritories, INameProvideable names, ICrimes crimes, IPedGroups PedGroups,
         IEntityProvideable world, IStreets streets, ILocationTypes locationTypes, ISettingsProvideable settings, IPlateTypes plateTypes, IOrganizations associations, IContacts contacts, IInteriors interiors, 
-        ILocationInteractable player, IModItems modItems, IWeapons weapons, ITimeControllable time, IPlacesOfInterest placesOfInterest, IIssuableWeapons issuableWeapons, IHeads heads, IDispatchablePeople dispatchablePeople)
+        ILocationInteractable player, IModItems modItems, IWeapons weapons, ITimeControllable time, IPlacesOfInterest placesOfInterest, IIssuableWeapons issuableWeapons, IHeads heads, 
+        IDispatchablePeople dispatchablePeople, ModDataFileManager modDataFileManager)
     {
         ShopMenus = shopMenus;
         World = world;
@@ -493,6 +535,7 @@ public class GameLocation : ILocationDispatchable
         ModItems = modItems;
         Weapons = weapons;
         Time = time;
+        ModDataFileManager = modDataFileManager;
 
 
         VendorMeleeWeapons = issuableWeapons.GetWeaponData(VendorMeleeWeaponsID);
@@ -507,11 +550,19 @@ public class GameLocation : ILocationDispatchable
         if (AssignedAssociationID != null)
         {
             AssignedAgency = agencies.GetAgency(AssignedAssociationID);
+            if(AssignedAgency == null)
+            {
+                AssignedOrganization = Associations.GetOrganization(AssignedAssociationID);
+            }
         }
-        Menu = shopMenus.GetSpecificMenu(MenuID);
+        Menu = shopMenus.GetSpecificInstancedMenu(MenuID);
         if (HasInterior)
         {
             interior = interiors?.GetInteriorByLocalID(InteriorID);
+            if (interior != null)
+            {
+                interior.SetGameLocation(this);// interior.GameLocation = this;
+            }
         }  
     }
     public virtual void OnInteract()//ILocationInteractable player, IModItems modItems, IEntityProvideable world, ISettingsProvideable settings, IWeapons weapons, ITimeControllable time, IPlacesOfInterest placesOfInterest)
@@ -567,6 +618,37 @@ public class GameLocation : ILocationDispatchable
             }
         }, "StandardInteract");
     }
+    protected virtual bool Purchase()
+    {
+        if (Player.BankAccounts.GetMoney(true) >= PurchasePrice)
+        {
+            OnPurchased();
+            DisplayMessage("~g~Purchased", $"Thank you for purchasing {Name}");
+            return true;
+        }
+        DisplayMessage("~r~Purchased Failed", "We are sorry, we are unable to complete this purchase. Please make sure you have the funds.");
+        return false;
+    }
+    protected virtual void OnPurchased()
+    {
+        //Player.Properties.AddPayoutProperty(this);
+        AddOwnership();
+        Player.BankAccounts.GiveMoney(-1 * PurchasePrice, true);
+        IsOwned = true;
+        DatePayoutPaid = Time.CurrentDateTime;
+        DatePayoutDue = DatePayoutPaid.AddDays(PayoutFrequency);
+        CurrentSalesPrice = SalesPrice;
+    }
+    protected virtual void OnSold()
+    {
+        //Player.Properties.RemovePayoutProperty(this);
+        RemoveOwnership();
+        Player.BankAccounts.GiveMoney(CurrentSalesPrice, true);
+        MenuPool.CloseAllMenus();
+        Interior?.ForceExitPlayer(Player, this);
+        IsOwned = false;
+        DisplayMessage("~g~Sold", $"You have sold {Name} for {CurrentSalesPrice.ToString("C0")}");
+    }
     public virtual void HandleVariableItems()
     {
         HandlePriceRefreshes();
@@ -575,6 +657,10 @@ public class GameLocation : ILocationDispatchable
     protected virtual void HandlePriceRefreshes()
     {
         if (MinPriceRefreshHours <= 0 && MaxPriceRefreshHours <= 0)
+        {
+            return;
+        }
+        if(Menu == null)
         {
             return;
         }
@@ -598,6 +684,10 @@ public class GameLocation : ILocationDispatchable
         {
             return;
         }
+        if (Menu == null)
+        {
+            return;
+        }
         if (DateTime.Compare(Time.CurrentDateTime, NextRestockTime) == 1)
         {
             foreach (MenuItem menuItem in Menu.Items)
@@ -616,12 +706,24 @@ public class GameLocation : ILocationDispatchable
     {
         StoreCamera = new LocationCamera(this, Player, Settings, NoEntryCam);
         StoreCamera.SayGreeting = sayGreeting;
+
+        if(Player.IsInVehicle)
+        {
+            StoreCamera.StaysInVehicle = true;
+        }
+
         StoreCamera.DoEntranceOnly();
     }
     public void DoExitCamera(bool sayGreeting)
     {
         StoreCamera = new LocationCamera(this, Player, Settings, NoEntryCam);
         StoreCamera.SayGreeting = sayGreeting;
+
+        if (Player.IsInVehicle)
+        {
+            StoreCamera.StaysInVehicle = true;
+        }
+
         StoreCamera.Dispose();
     }
     public void StandardInteractWithNewCamera(Vector3 desiredPosition, Vector3 desiredDirection, Rotator desiredRotation)
@@ -706,11 +808,68 @@ public class GameLocation : ILocationDispatchable
         {
             AllLocation.AddRange(PossibleVehicleSpawns);
         }
+
+        if (PossibleGroupSpawns != null)
+        {
+
+            foreach (ConditionalGroup cd in PossibleGroupSpawns)
+            {
+                if (cd.PossiblePedSpawns != null)
+                {
+                    AllLocation.AddRange(cd.PossiblePedSpawns);
+                }
+                if (cd.PossibleVehicleSpawns != null)
+                {
+                    AllLocation.AddRange(cd.PossibleVehicleSpawns);
+                }
+            }
+
+        }
+
         foreach (ConditionalLocation cl in AllLocation)
         {
             cl.AddDistanceOffset(offsetToAdd);
         }
-        RestrictedAreas?.AddDistanceOffset(offsetToAdd);
+        if (RestrictedAreas != null)
+        {
+        foreach (var ra in RestrictedAreas.RestrictedAreasList)
+            {
+                // Offset the main boundary points (Vector2)
+                if (ra.Boundaries != null)
+                {
+                    for (int i = 0; i < ra.Boundaries.Length; i++)
+                    {
+                        ra.Boundaries[i] = new Vector2(
+                            ra.Boundaries[i].X + offsetToAdd.X,
+                            ra.Boundaries[i].Y + offsetToAdd.Y
+                        );
+                    }
+                }
+                // Offset all cameras in this restricted area
+                if (ra.SecurityCameras != null)
+                {
+                foreach (var cam in ra.SecurityCameras)
+                {
+                     cam.Position += offsetToAdd; 
+                }
+             }
+          }
+        }
+
+        //moved into base class since its base class items
+        VehiclePreviewLocation?.AddDistanceOffset(offsetToAdd);
+        foreach(SpawnPlace spawnPlace in VehicleDeliveryLocations)
+        {
+            spawnPlace.AddDistanceOffset(offsetToAdd);
+        }
+
+        if (VehiclePreviewCameraPosition != Vector3.Zero)
+        {
+            VehiclePreviewCameraPosition += offsetToAdd;
+        }
+
+        
+
     }
     public virtual void RemoveMessage()
     {
@@ -784,6 +943,7 @@ public class GameLocation : ILocationDispatchable
                 betweener = $"in";
             }
             zoneString = $"~p~{placeZone.DisplayName}~s~";
+            ZoneID = placeZone.InternalGameName;
             //stateString = placeZone.GameState?.StateName;
         }
         string streetName = streets.GetStreetNames(EntrancePosition, false);
@@ -861,7 +1021,7 @@ public class GameLocation : ILocationDispatchable
                /// UpdatePrompts();
                 if (IsActivated && HasInterior)
                 {
-                    Interior?.Update();
+                    Interior?.Update(IsOpen(time.CurrentHour));
                 }
                 if(DistanceToPlayer <= CloseRange)
                 {
@@ -1119,8 +1279,11 @@ public class GameLocation : ILocationDispatchable
         }
         
         HandleVariableItems();
+
+        GameFiber.Yield();
+
         EntryPoint.WriteToConsole($"ATTEMPTING VENDOR AT {Name} {VendorPersonType.ModelName}");
-        Vendors = new List<Merchant>();
+       // Vendors = new List<Merchant>();
         SpawnLocation sl = new SpawnLocation(spawnPlace.Position) { Heading = spawnPlace.Heading };
         MerchantSpawnTask merchantSpawnTask = new MerchantSpawnTask(sl, null,VendorPersonType,false,false,true,Settings,Crimes,Weapons,Names,World,ModItems,ShopMenus,this);
 
@@ -1129,12 +1292,12 @@ public class GameLocation : ILocationDispatchable
         merchantSpawnTask.SpawnWithAllWeapons = true;
         merchantSpawnTask.AllowBuddySpawn = false;
         merchantSpawnTask.AttemptSpawn();
-        EntryPoint.WriteToConsole($"ADDING VENDOR TO SPAWNED VENDORS LIST {Name} {VendorPersonType.ModelName}");
+        //EntryPoint.WriteToConsole($"ADDING VENDOR TO SPAWNED VENDORS LIST {Name} {VendorPersonType.ModelName}");
 
-        foreach(Merchant merchant in merchantSpawnTask.SpawnedVendors)
-        {
-            EntryPoint.WriteToConsole($"I HAVE CREATED {merchant.Handle}");
-        }
+        //foreach(Merchant merchant in merchantSpawnTask.SpawnedVendors)
+        //{
+        //    EntryPoint.WriteToConsole($"I HAVE CREATED {merchant.Handle}");
+        //}
 
         Vendors.AddRange(merchantSpawnTask.SpawnedVendors);
 
@@ -1207,9 +1370,22 @@ public class GameLocation : ILocationDispatchable
                 pedExt.DeleteBlip();
                 pedExt.Pedestrian.IsPersistent = false;
                 EntryPoint.WriteToConsole($"AttemptVendorDespawn MADE NON PERSIST");
+                pedExt.Pedestrian.Dismiss();
             }
+            SpawnedVendors.Clear();
         }
-        SpawnedVendors.Clear();
+
+        //foreach (PedExt pedExt in SpawnedMerchants.ToList()) 
+        //{
+        //    if (pedExt.Pedestrian.Exists())
+        //    {
+        //        pedExt.DeleteBlip();
+        //        pedExt.Pedestrian.IsPersistent = false;
+        //        EntryPoint.WriteToConsole($"AttemptMerchantDespawn MADE NON PERSIST MERCHANT");
+        //        pedExt.Pedestrian.Dismiss();
+        //    }
+        //    SpawnedMerchants.Clear();
+        //}
     }
 
     public IssuableWeapon GetRandomWeapon(bool isSidearm, IWeapons weapons)
@@ -1305,11 +1481,154 @@ public class GameLocation : ILocationDispatchable
     {
 
     }
+    
+    public virtual string GetInquireDescription()
+    {
+        return $"Earn between {PayoutMin:C0} and {PayoutMax:C0} every {PayoutFrequency} day(s)";
+    }
+
+    public virtual void HandleOwnedLocation(IPropertyOwnable player, ITimeReportable time)
+    {
+
+    }
+    public virtual void AddOwnership()
+    {
+        Player.Properties.AddOwnedLocation(this);
+    }
+    public virtual void RemoveOwnership()
+    {
+        Player.Properties.RemoveOwnedLocation(this);
+    }
+
+    public virtual SavedGameLocation GetSaveData()
+    {
+        SavedBusiness saveLocation = new SavedBusiness(Name, IsOwned);
+        if (IsOwned)
+        {
+            saveLocation.DateOfLastPayout = DatePayoutPaid;
+            saveLocation.PayoutDate = DatePayoutDue;
+            saveLocation.EntrancePosition = EntrancePosition;
+            saveLocation.CurrentSalesPrice = CurrentSalesPrice;
+        }
+        return saveLocation;
+    }
+    public virtual TabMissionSelectItem GetUIInformation()
+    {
+        MissionLogo missionLogo = null;
+        if (HasBannerImage)
+        {
+            missionLogo = new MissionLogo(Game.CreateTextureFromFile($"Plugins\\LosSantosRED\\images\\{BannerImagePath}"));
+        }
+        List<MissionInformation> propertyInfos = new List<MissionInformation>();
+        List<Tuple<string, string>> financialTuples = AddFinancials();
+        MissionInformation financialInformation = new MissionInformation("Financials", "", financialTuples);
+        financialInformation.Logo = missionLogo;
+        propertyInfos.Add(financialInformation);
+        List<Tuple<string, string>> gpsTuple = AddGPS();
+        MissionInformation gpsInformation = new MissionInformation("GPS", "", gpsTuple);
+        gpsInformation.Logo = missionLogo;
+        propertyInfos.Add(gpsInformation);
+        return new TabMissionSelectItem($"{Name} - {ZoneName}", propertyInfos);
+    }
+    public virtual List<Tuple<string, string>> AddFinancials()
+    {
+        List<Tuple<string, string>> toAdd = new List<Tuple<string, string>>();
+        toAdd.Add(Tuple.Create<string, string>("Sell Price", $"${CurrentSalesPrice}"));
+        toAdd.Add(Tuple.Create<string, string>("Payment Due", DatePayoutDue.ToString("dd-MMM-yyyy")));
+        return toAdd;
+    }
+    public virtual List<Tuple<string, string>> AddGPS()
+    {
+        List<Tuple<string, string>> toAdd = new List<Tuple<string, string>>();
+        toAdd.Add(Tuple.Create<string, string>("GPS", StreetAddress));
+        return toAdd;
+    }
+    public virtual void AddToLandLordMenu(LandlordMenu landlordMenu)
+    {
+
+    }
+
+    public virtual void OnStoredCashChanged(int storedCash)
+    {
+        Interior?.OnStoredCashChanged(storedCash);
+    }
 
 
-    //public virtual void UpdatePrompts()
-    //{
 
-    //}
+
+
+    public virtual void SetTakeoverGang(Gang newGang, Gang gangToReplace)
+    {
+        if(newGang == null)
+        {
+            return;
+        }
+
+        if(gangToReplace == null)
+        {
+            return;
+        }
+
+        if (gangToReplace.ID == OriginalAssignedAssociationID)
+        {
+            AssignedAssociationID = newGang.ID;
+            HasBeenTakenOver = true;
+        }
+        else
+        {
+            return;
+        }
+        if (PossibleGroupSpawns != null)
+        {
+            foreach (ConditionalGroup conditionalGroup in PossibleGroupSpawns)
+            {
+                conditionalGroup.UpdateAssociation(newGang.ID, gangToReplace.ID);
+            }
+        }
+        List<ConditionalLocation> totalList = new List<ConditionalLocation> { };
+        if (PossiblePedSpawns != null)
+        {
+
+            totalList.AddRange(PossiblePedSpawns.ToList());
+        }
+        if(PossibleVehicleSpawns != null)
+        {
+            totalList.AddRange(PossibleVehicleSpawns.ToList());
+        }
+        
+        foreach (ConditionalLocation conditionalLocation in totalList)
+        {
+            conditionalLocation.UpdateAssociation(newGang.ID, gangToReplace.ID);
+        }
+        EntryPoint.WriteToConsole($"SetTakeoverGang {Name} newGang{newGang.ShortName} gangToReplace{gangToReplace.ShortName}");
+    }
+
+    public virtual void ResetGangTakeover()
+    {
+        string currentAssignedAssociationID = AssignedAssociationID;
+        AssignedAssociationID = OriginalAssignedAssociationID;
+        HasBeenTakenOver = false;
+        if (PossibleGroupSpawns != null)
+        {
+            foreach (ConditionalGroup conditionalGroup in PossibleGroupSpawns)
+            {
+                conditionalGroup.ResetAssociation();
+            }
+        }
+        List<ConditionalLocation> totalList = new List<ConditionalLocation> { };
+        if (PossiblePedSpawns != null)
+        {
+            totalList.AddRange(PossiblePedSpawns.ToList());
+        }
+        if (PossibleVehicleSpawns != null)
+        {
+            totalList.AddRange(PossibleVehicleSpawns.ToList());
+        }
+        foreach (ConditionalLocation conditionalLocation in totalList)
+        {
+            conditionalLocation.ResetAssociation();
+        }
+        EntryPoint.WriteToConsole($"RESETGangTakeoverSetFor {Name} to {OriginalAssignedAssociationID} from {currentAssignedAssociationID}");
+    }
 }
 

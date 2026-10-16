@@ -15,6 +15,8 @@ using System.Windows.Forms;
 using System.Reflection;
 using NAudio.Wave;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
+using System.Collections;
+using Mod;
 
 public class ActivityManager
 {
@@ -32,6 +34,7 @@ public class ActivityManager
     private IPlacesOfInterest PlacesOfInterest;
     private IVehicleRaces VehicleRaces;
     private ITargetable Targetable;
+    private IBasicUseable BasicUseable;
 
     private ITimeControllable Time;
     private IRadioStations RadioStations;
@@ -49,7 +52,17 @@ public class ActivityManager
     private IGangTerritories GangTerritories;
     private ICellphones Cellphones;
     private IVehicleSeatAndDoorLookup VehicleSeatDoorData;
+    private IDispatchablePeople DispatchablePeople;
+    private IDispatchableVehicles DispatchableVehicles;
     private HideableObject HideableObject;
+    private InteriorDoor CurrentLookedAtDoor;
+    private InteriorDoor CurrentClosestDoor;
+
+    private Interior CurrentLookedAtDoorInterior;
+    private Interior CurrentClosestDoorInterior;
+
+    public Interior ActiveDoorInterior => CurrentLookedAtDoorInterior != null ? CurrentLookedAtDoorInterior : CurrentClosestDoorInterior;
+    private InteriorDoor ActiveDoor => CurrentLookedAtDoor != null ? CurrentLookedAtDoor : CurrentClosestDoor;
 
     private DynamicActivity LowerBodyActivity;
     private DynamicActivity UpperBodyActivity;
@@ -65,6 +78,7 @@ public class ActivityManager
     private bool IsDoingVehileAnim;
     private uint GameTimeLastStartedHotwiring;
     private uint GameTimeLastPressedHide;
+    private uint GameTimeLastPressedDoorInteract;
     private List<HideableObject> HideableObjects;
     public bool IsUsingToolAsWeapon { get; set; }
 
@@ -104,10 +118,25 @@ public class ActivityManager
         !Player.RelationshipManager.GangRelationships.IsHostile(Player.CurrentLookedAtGangMember?.Gang) && 
         (!Player.CurrentLookedAtPed.IsCop || (Player.IsNotWanted && !Player.Investigation.IsActive)) && 
         CanConverse;
-   
-    
 
 
+
+    public bool CanPickpocketLookedAtPed =>
+
+    Player.CurrentLookedAtPed != null &&
+    CanPerformActivitiesOnFoot &&
+    !IsPerformingActivity &&
+    !IsPickPocketing &&
+    !Player.CurrentLookedAtPed.IsInVehicle &&
+    Player.CurrentLookedAtPed.DistanceToPlayer <= Settings.SettingsManager.ActivitySettings.PickPocketDistance &&
+    Player.CurrentLookedAtPed.Pedestrian != null &&
+    Player.CurrentLookedAtPed.Pedestrian.Exists() &&
+    !Player.CurrentLookedAtPed.Pedestrian.IsRagdoll &&
+    !Player.IsVisiblyArmed &&
+    Settings.SettingsManager.ActivitySettings.AllowPedPickPockets &&
+    !Player.CurrentLookedAtPed.HasBeenMugged &&
+        Player.CurrentLookedAtPed.Pedestrian.IsThisPedInFrontOf(Player.Character) && 
+        !Player.Character.IsThisPedInFrontOf(Player.CurrentLookedAtPed.Pedestrian);
 
 
 
@@ -202,6 +231,7 @@ public class ActivityManager
     public bool IsDraggingBody { get; set; }
     public bool IsHoldingHostage { get; set; }
     public bool IsDancing { get; set; }
+    public bool IsCheering { get; set; }
     public bool IsConversing { get; set; }
     public bool IsHoldingUp { get; set; }
     public bool IsInteractingWithLocation { get; set; } = false;
@@ -229,11 +259,15 @@ public class ActivityManager
     public bool IsUrinatingDefectingOnToilet { get; set; }
     public bool IsUsingIllegalItem { get; set; }
     public bool IsHidingInObject { get; set; }
+    public bool IsPickPocketing { get; set; }
+    public bool IsManuallyHotwiringVehicle { get; private set; }
+
+    private bool isStartingPickpocket;
 
     public ActivityManager(IActivityManageable player, ISettingsProvideable settings, IActionable actionable, IIntoxicatable intoxicatable, IInteractionable interactionable, ICameraControllable cameraControllable, 
         ILocationInteractable locationInteractable,ITimeControllable time, IRadioStations radioStations, ICrimes crimes, IModItems modItems, IDances dances, IEntityProvideable world, IIntoxicants intoxicants, 
         IPlateChangeable plateChangeable, ISpeeches speeches, ISeats seats, IWeapons weapons, IPlacesOfInterest placesOfInterest, IZones zones, IShopMenus shopMenus, IGangs gangs, IGangTerritories gangTerritories,
-        IVehicleSeatAndDoorLookup vehicleSeatDoorData, ICellphones cellphones, IVehicleRaces vehicleRaces, ITargetable targetable)
+        IVehicleSeatAndDoorLookup vehicleSeatDoorData, ICellphones cellphones, IVehicleRaces vehicleRaces, ITargetable targetable, IDispatchableVehicles dispatchableVehicles, IDispatchablePeople dispatchablePeople, IBasicUseable basicUseable)
     {
         Player = player;
         Settings = settings;
@@ -262,6 +296,9 @@ public class ActivityManager
         Cellphones = cellphones;
         VehicleRaces = vehicleRaces;
         Targetable = targetable;
+        DispatchableVehicles = dispatchableVehicles;
+        DispatchablePeople = dispatchablePeople;
+        BasicUseable = basicUseable;
     }
     public void Setup()
     {
@@ -282,7 +319,16 @@ public class ActivityManager
             new HideableObject(0xf3ae2877,"Dumpster", "Hide inside Dumpster"),
             new HideableObject(0x5a1d76e4,"Dumpster", "Hide inside Dumpster"),
             new HideableObject(0x28b2940f,"Dumpster", "Hide inside Dumpster"),
-            new HideableObject(0xbea0821b,"Garbage Can", "Hide inside Garbage Can"),        
+            new HideableObject(0xbea0821b,"Garbage Can", "Hide inside Garbage Can"),  
+            new HideableObject(0x28a7a0b9,"Port-O-Potty","Hide inside Port-O-Potty") {IsDoor = true },
+            //LCPP Dumpsters
+            new HideableObject(0xe02fbd70,"Dumpster", "Hide inside Dumpster"),
+            new HideableObject(0xfbcd74ab,"Dumpster", "Hide inside Dumpster"),
+            new HideableObject(0xcd7e180d,"Dumpster", "Hide inside Dumpster"),
+            new HideableObject(0xe7536414,"Dumpster", "Hide inside Dumpster"),
+            new HideableObject(0xeb12d336,"Dumpster", "Hide inside Dumpster"),
+            new HideableObject(0xa2ab4268,"Dumpster", "Hide inside Dumpster"),
+            new HideableObject(0xca377456,"Garbage Can", "Hide inside Garbage Can"),
         };
 
 
@@ -623,6 +669,25 @@ public class ActivityManager
         }
     }
 
+
+    public void Cheer()
+    {
+        if (IsPerformingActivity)
+        {
+            Game.DisplayHelp("Cancel existing activity to start");
+            return;
+        }
+        CheerActivity cheerActivity = new CheerActivity(Actionable, Settings, Dances);
+        if (cheerActivity.CanPerform(Actionable))
+        {
+            ForceCancelAllActive();
+            LowerBodyActivity = cheerActivity;
+            LowerBodyActivity.Start();
+            EntryPoint.WriteToConsole("CHEER ACTIVITY STARTED RAN");
+        }
+    }
+
+
     public void Dance(DanceData danceData)
     {
         if (IsPerformingActivity)
@@ -763,27 +828,13 @@ public class ActivityManager
             Game.DisplayHelp("Cancel existing activity to start");
             return;
         }
-        if (!Settings.SettingsManager.DebugSettings.UseNewDrag)
+        Drag drag = new Drag(Interactionable, Player.CurrentLookedAtPed, Settings, Crimes, ModItems, World, VehicleSeatDoorData);
+        if (drag.CanPerform(Actionable))
         {
-            Drag drag = new Drag(Interactionable, Player.CurrentLookedAtPed, Settings, Crimes, ModItems, World, VehicleSeatDoorData);
-            if (drag.CanPerform(Actionable))
-            {
-                ForceCancelAllActive();
-                IsPerformingActivity = true;
-                LowerBodyActivity = drag;
-                LowerBodyActivity.Start();
-            }
-        }
-        else
-        {
-            NewDrag drag = new NewDrag(Interactionable, Player.CurrentLookedAtPed, Settings, Crimes, ModItems, World, VehicleSeatDoorData);
-            if (drag.CanPerform(Actionable))
-            {
-                ForceCancelAllActive();
-                IsPerformingActivity = true;
-                LowerBodyActivity = drag;
-                LowerBodyActivity.Start();
-            }
+            ForceCancelAllActive();
+            IsPerformingActivity = true;
+            LowerBodyActivity = drag;
+            LowerBodyActivity.Start();
         }
     }
     public void StartSleeping()
@@ -906,7 +957,7 @@ public class ActivityManager
             {
                 Interaction.Dispose();
             }
-            Interaction = new Conversation(Interactionable, Player.CurrentLookedAtPed, Settings, Crimes, ModItems, Zones, ShopMenus, PlacesOfInterest, Gangs, GangTerritories, Speeches, World, LocationInteractable, VehicleRaces, Targetable);
+            Interaction = new Conversation(Interactionable, Player.CurrentLookedAtPed, Settings, Crimes, ModItems, Zones, ShopMenus, PlacesOfInterest, Gangs, GangTerritories, Speeches, World, LocationInteractable, VehicleRaces, Targetable, DispatchableVehicles, DispatchablePeople);
             Interaction.Start();  
         }
     }
@@ -2018,7 +2069,7 @@ public class ActivityManager
 
     public void HotwireVehicle()
     {
-        if(Player.CurrentVehicle == null || !Player.CurrentVehicle.IsHotWireLocked)
+        if(Player.CurrentVehicle == null || !Player.CurrentVehicle.IsHotWireLocked || IsManuallyHotwiringVehicle)
         {
             return;
         }
@@ -2028,16 +2079,100 @@ public class ActivityManager
             Game.DisplayHelp("Screwdriver required to hotwire");
             return;
         }
-        Player.CurrentVehicle.IsHotWireLocked = false;
+        //Player.CurrentVehicle.IsHotWireLocked = false;
         GameTimeLastStartedHotwiring = Game.GameTime;
         if(!Player.CurrentVehicle.Vehicle.Exists())
         {
             return;
         }
-        Player.CurrentVehicle.Vehicle.MustBeHotwired = true;
-        Player.CurrentVehicle.Engine.SetState(true);
-        //GameFiber.Sleep(2500);
-        //Player.CurrentVehicle?.Engine.Synchronize();
+
+        if(Settings.SettingsManager.ActivitySettings.UseMinigameForHotwire)
+        {
+            GameFiber.StartNew(StartInteractiveHotwire);         
+        }
+        else
+        {
+            Player.CurrentVehicle.IsHotWireLocked = false;
+            Player.CurrentVehicle.Vehicle.MustBeHotwired = true;
+            Player.CurrentVehicle.Engine.SetState(true);
+            //GameFiber.Sleep(2500);
+            //Player.CurrentVehicle?.Engine.Synchronize();
+        }
+
+    }
+    private void StartInteractiveHotwire()
+    {
+        EntryPoint.WriteToConsole("StartInteractiveHotwire");
+        Player.ButtonPrompts.RemovePrompts("VehicleHotwire");
+        string dictionary = "veh@std@ds@base";
+        string anim = "hotwire";
+
+        IsManuallyHotwiringVehicle = true;
+        IsPerformingActivity = true;
+
+        StopDynamicActivity();
+        Player.ButtonPrompts.AttemptAddPrompt("hotwire", "Cancel Hotwire", "cancelhotwire", GameControl.Aim, 0);
+
+
+        AnimationDictionary.RequestAnimationDictionay(dictionary);
+        NativeFunction.CallByName<uint>("TASK_PLAY_ANIM", Player.Character, dictionary, anim, 4.0f, -4.0f, -1, (int)(eAnimationFlags.AF_UPPERBODY | eAnimationFlags.AF_SECONDARY | eAnimationFlags.AF_LOOPING), 0, false, false, false);//-1
+
+        int TotalPins = 2;
+        int TotalPinSteps = 2;
+        float ZoneWidth = 20f;
+        float FillSpeed = 1.0f;
+        Player.CurrentVehicle.GetHotwireStats(out TotalPins, out TotalPinSteps, out ZoneWidth, out FillSpeed);
+
+        LockpickMiniGame lockpickMiniGame = new LockpickMiniGame(Interactionable,true, TotalPins, TotalPinSteps, ZoneWidth, FillSpeed);
+        lockpickMiniGame.Start();
+
+        bool isLooping = false;
+        float LockpickAnimStopPercentage = 0.6f;
+        float LockpickAnimRestartPercentage = 0.5f;
+        float LockpickAnimAnimRate = 1.0f;// Settings.SettingsManager.DebugSettings.LockpickAnimAnimRate;
+        
+
+        while (lockpickMiniGame.IsActive && Player.IsAliveAndFree)
+        {
+
+            float pedAnimTime = NativeFunction.CallByName<float>("GET_ENTITY_ANIM_CURRENT_TIME", Game.LocalPlayer.Character, dictionary, anim);
+            if (pedAnimTime >= LockpickAnimStopPercentage)
+            {
+                isLooping = true;
+                NativeFunction.Natives.SET_ANIM_RATE(Player.Character, -1.0f * LockpickAnimAnimRate, 0, false);
+                NativeFunction.Natives.SET_ANIM_RATE(Player.Character, -1.0f * LockpickAnimAnimRate, 1, false);
+                NativeFunction.Natives.SET_ANIM_RATE(Player.Character, -1.0f * LockpickAnimAnimRate, 2, false);
+            }
+            else if (isLooping && pedAnimTime <= LockpickAnimRestartPercentage)
+            {
+                NativeFunction.Natives.SET_ANIM_RATE(Player.Character, LockpickAnimAnimRate, 0, false);
+                NativeFunction.Natives.SET_ANIM_RATE(Player.Character, LockpickAnimAnimRate, 1, false);
+                NativeFunction.Natives.SET_ANIM_RATE(Player.Character, LockpickAnimAnimRate, 2, false);
+            }
+            Player.WeaponEquipment.SetUnarmed();
+
+            if(Player.ButtonPrompts.IsPressed("cancelhotwire"))
+            {
+                break;
+            }
+
+
+
+
+            GameFiber.Yield();
+        }
+        IsManuallyHotwiringVehicle = false;
+        IsPerformingActivity = false;
+        EntryPoint.WriteToConsole("StartInteractiveHotwire END LOOP!!!");
+        lockpickMiniGame.Dispose();
+        Player.ButtonPrompts.RemovePrompts("hotwire");
+        NativeFunction.Natives.CLEAR_PED_TASKS(Player.Character);
+        if (lockpickMiniGame.HasPickedLock && Player.CurrentVehicle != null)
+        {
+            Player.CurrentVehicle.IsHotWireLocked = false;
+            ///Player.CurrentVehicle.Vehicle.MustBeHotwired = true;
+            ToggleVehicleEngine();
+        }
     }
 
     public void OnLookedAtObject(Rage.Object currentLookedAtObject)
@@ -2045,11 +2180,45 @@ public class ActivityManager
         if (currentLookedAtObject == null)
         {
             HideableObject = null;
+            CurrentLookedAtDoor = null;
             return;
         }
         uint currentHash = currentLookedAtObject.Model.Hash;
         HideableObject = HideableObjects.Where(x=> x.ModelHash == currentHash).FirstOrDefault();
+        CheckLocalDoors(currentLookedAtObject);
     }
+
+    private void CheckLocalDoors(Rage.Object currentLookedAtObject)
+    {
+        List<Interior> ActiveInteriors = World.Places.ActiveLocations.Where(x => x.HasInterior && x.Interior != null && x.Interior.Doors != null && x.Interior.Doors.Any()).Select(x=> x.Interior).ToList();
+        foreach(Interior interior in ActiveInteriors)
+        {
+            foreach (InteriorDoor door in interior.Doors)//only locked doors that can be broken open or picked?
+            {
+                if(!door.IsLocked || !door.CanBeForcedOpenByPlayer)
+                {
+                    continue;
+                }
+                if(door.ModelHash == currentLookedAtObject.Model.Hash && door.Position.DistanceTo2D(currentLookedAtObject.Position) <= 0.1f)
+                {
+                    CurrentLookedAtDoorInterior = interior;
+                    CurrentLookedAtDoor = door;
+                    EntryPoint.WriteToConsole($"YOU ARE LOOKING AT LOCKED DOOR {door.Position} IN {interior.Name} IsLocked:{door.IsLocked}");
+                    return;
+                }
+            }
+        }
+    }
+    public void SetCurrentDoor(InteriorDoor interiorDoor, Interior interior)
+    {
+        CurrentClosestDoor = interiorDoor;
+        CurrentClosestDoorInterior = interior;
+        //if (interiorDoor != null)
+        //{
+        //    EntryPoint.WriteToConsole($"SET CLOSEST DOOR ISNULL:{CurrentClosestDoor == null}");
+        //}
+    }
+
     public void CheckHidingButtonPrompts(ButtonPrompts buttonPrompts, Rage.Object currentLookedAtObject)
     {
         if(HideableObject == null || IsPerformingActivity)
@@ -2062,6 +2231,48 @@ public class ActivityManager
             buttonPrompts.AttemptAddPrompt("Hiding", $"{HideableObject.ButtonPrompt}", "HideInObject", Settings.SettingsManager.KeySettings.InteractStart, 999, () => { Hide(currentLookedAtObject); });
         }
     }
+    public void CheckDoorButtonPrompts(ButtonPrompts buttonPrompts, Rage.Object currentLookedAtObject)
+    {
+        //EntryPoint.WriteToConsole($"CheckDoorButtonPrompts ActiveDoor == null:{ActiveDoor == null}  IsPerformingActivity:{IsPerformingActivity}");
+        if (ActiveDoor == null || IsPerformingActivity || !ActiveDoor.IsLocked || !ActiveDoor.CanBeForcedOpenByPlayer)
+        {
+            buttonPrompts.RemovePrompts("DoorInteract");
+            return;
+        }
+        if (!buttonPrompts.HasPrompt("DoorInteract"))
+        {
+            buttonPrompts.AttemptAddPrompt("DoorInteract", $"{ActiveDoor.ButtonPrompt()}", "DoorInteract", Settings.SettingsManager.KeySettings.InteractStart, 999, () => { DoorInteract(currentLookedAtObject); });
+        }
+    }
+
+
+    public void DoorInteract(Rage.Object doorObject)
+    {
+        if (Game.GameTime - GameTimeLastPressedDoorInteract <= 500)
+        {
+            return;
+        }
+        GameTimeLastPressedDoorInteract = Game.GameTime;
+        if (IsPerformingActivity)
+        {
+            Game.DisplayHelp("Cancel existing activity to start");
+            return;
+        }
+        if(ActiveDoor == null)
+        {
+            Game.DisplayHelp("Cannot start interact");
+            return;
+        }
+        ForceDoorActivity forceDoorActivity = new ForceDoorActivity(Actionable, LocationInteractable, Settings, doorObject, ActiveDoor, BasicUseable, ActiveDoorInterior);
+        if (forceDoorActivity.CanPerform(Actionable))
+        {
+            ForceCancelAllActive();
+            IsPerformingActivity = true;
+            LowerBodyActivity = forceDoorActivity;
+            LowerBodyActivity.Start();
+        }
+    }
+
 
     public void SetFoundInObject()
     {
@@ -2070,6 +2281,155 @@ public class ActivityManager
             return;
         }
         CancelCurrentActivity();
+    }
+    public void StartPickpocket()
+    {
+        try
+        {
+            if (isStartingPickpocket || IsConversing)
+            {
+                Game.DisplayHelp("Cannot pickpocket: Already in progress or conversing");
+                EntryPoint.WriteToConsole($"StartPickpocket: Blocked, isStartingPickpocket={isStartingPickpocket}, IsConversing={IsConversing}");
+                return;
+            }
+            isStartingPickpocket = true;
+            if (!CanPickpocketLookedAtPed)
+            {
+                Game.DisplayHelp("Cannot pickpocket this target!");
+                isStartingPickpocket = false;
+                EntryPoint.WriteToConsole($"StartPickpocket: Blocked, CanPickpocketLookedAtPed={CanPickpocketLookedAtPed}");
+                return;
+            }
+            GameFiber.StartNew(() =>
+            {
+                try
+                {
+                    Interaction = new PickPocket(Interactionable, Targetable, Player.CurrentLookedAtPed, Settings, Crimes, World);
+                    Interaction.Start();
+                }
+                catch (Exception ex)
+                {
+                    EntryPoint.WriteToConsole($"StartPickpocket Error: {ex.Message} {ex.StackTrace}");
+                }
+                finally
+                {
+                    isStartingPickpocket = false;
+                }
+            }, $"StartPickpocket_{Player.CurrentLookedAtPed?.Handle:X8 ?? 0}");
+        }
+        catch (Exception ex)
+        {
+            EntryPoint.WriteToConsole($"StartPickpocket Error: {ex.Message} {ex.StackTrace}");
+            isStartingPickpocket = false;
+        }
+    }
+    public void CheckPickpocketButtonPrompts(ButtonPrompts buttonPrompts, PedExt currentLookedAtPed)
+    {
+        try
+        {
+            if (currentLookedAtPed == null || !currentLookedAtPed.Pedestrian.Exists() || Player.CurrentTargetedPed != null)
+            {
+                if (buttonPrompts.Prompts.Any(p => p.Text.StartsWith("Pickpocket")))
+                {
+                    buttonPrompts.RemovePrompts("Pickpocket");
+                }
+                return;
+            }
+
+            IsPickPocketing = false;
+            isStartingPickpocket = false;
+            if (!CanPickpocketLookedAtPed || IsInteractingWithLocation || IsConversing || Player.IsCop || EntryPoint.IsLSPDFRIntegrationEnabled)
+            {
+                if (buttonPrompts.Prompts.Any(p => p.Text.StartsWith("Pickpocket")))
+                {
+                    buttonPrompts.RemovePrompts("Pickpocket");
+                }
+                return;
+            }
+            if (!buttonPrompts.HasPrompt($"Pickpocket {currentLookedAtPed.Handle:X8}"))
+            {
+                buttonPrompts.RemovePrompts("Pickpocket");
+                buttonPrompts.AttemptAddPrompt("Pickpocket", $"Pickpocket {currentLookedAtPed.FormattedName}",
+                    $"Pickpocket {currentLookedAtPed.Handle:X8}",
+                    (GameControl)Settings.SettingsManager.KeySettings.GrabPedGameControl, 3, () => StartPickpocket());
+                EntryPoint.WriteToConsole($"CheckPickpocketButtonPrompts: Added prompt for ped {currentLookedAtPed.Handle:X8}");
+            }
+        }
+        catch (Exception ex)
+        {
+            EntryPoint.WriteToConsole($"CheckPickpocketButtonPrompts: Error - {ex.Message} {ex.StackTrace}");
+            buttonPrompts.RemovePrompts("Pickpocket");
+            IsPickPocketing = false;
+            isStartingPickpocket = false;
+        }
+    }
+
+
+
+
+    public void SetTransmissionState(eTransmissionState eTransmissionState)
+    {
+        if(!Settings.SettingsManager.VehicleSettings.AllowSetTransmissionState)
+        {
+            return;
+        }
+        if (Player.CurrentVehicle == null)
+        {
+            return;
+        }
+        if (Player.CurrentVehicle.IsHotWireLocked)
+        {
+            return;
+        }
+        if (!Player.CurrentVehicle.Engine.IsRunning)
+        {
+            return;
+        }
+        if (!Player.IsDriver)
+        {
+            Game.DisplayHelp("Cannot change transmission status from current seat");
+            return;
+        }
+        if (IsPerformingActivity || !Settings.SettingsManager.VehicleSettings.PlayControlAnimations)
+        {
+            Player.CurrentVehicle?.Transmission.Set(eTransmissionState);
+        }
+        else
+        {
+            DoSimpleVehicleAnimation(new Action(() => Player.CurrentVehicle?.Transmission.Set(eTransmissionState)), "veh@std@ds@base", "start_engine", 200);
+        }
+    }
+    public void ToggleTransmissionState()
+    {
+        if (!Settings.SettingsManager.VehicleSettings.AllowSetTransmissionState)
+        {
+            return;
+        }
+        if (Player.CurrentVehicle == null)
+        {
+            return;
+        }
+        if (Player.CurrentVehicle.IsHotWireLocked)
+        {
+            return;
+        }
+        if (!Player.CurrentVehicle.Engine.IsRunning)
+        {
+            return;
+        }
+        if (!Player.IsDriver)
+        {
+            Game.DisplayHelp("Cannot change transmission status from current seat");
+            return;
+        }
+        if (IsPerformingActivity || !Settings.SettingsManager.VehicleSettings.PlayControlAnimations)
+        {
+            Player.CurrentVehicle?.Transmission.ShiftTransmissionDown();
+        }
+        else
+        {
+            DoSimpleVehicleAnimation(new Action(() => Player.CurrentVehicle?.Transmission.ShiftTransmissionDown()), "veh@std@ds@base", "start_engine", 200);
+        }
     }
 }
 

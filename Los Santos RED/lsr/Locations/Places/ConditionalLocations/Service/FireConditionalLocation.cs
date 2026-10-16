@@ -19,7 +19,7 @@ public class FireConditionalLocation : ConditionalLocation
     }
     public override bool DetermineRun(bool force)
     {
-        if (!Settings.SettingsManager.FireSettings.ManageDispatching)
+        if (!Settings.SettingsManager.FireSettings.ManageDispatching || EntryPoint.IsLSPDFRIntegrationEnabled)
         {
             return false;
         }
@@ -46,14 +46,14 @@ public class FireConditionalLocation : ConditionalLocation
     {
         try
         {
-            FireFighterSpawnTask fireFighterSpawnTask = new FireFighterSpawnTask(Agency, SpawnLocation, DispatchableVehicle, DispatchablePerson, Settings.SettingsManager.FireSettings.ShowSpawnedBlips, Settings, Weapons, Names, true, World, ModItems, ShopMenus);
+            FireFighterSpawnTask fireFighterSpawnTask = new FireFighterSpawnTask(Agency, SpawnLocation, DispatchableVehicle, DispatchablePerson, Settings.SettingsManager.FireSettings.ShowSpawnedBlips, Settings, Weapons, Names, true, World, ModItems, ShopMenus, Crimes);
             fireFighterSpawnTask.AllowAnySpawn = true;
             fireFighterSpawnTask.AllowBuddySpawn = false;
             fireFighterSpawnTask.SpawnRequirement = TaskRequirements;
             fireFighterSpawnTask.ClearVehicleArea = true;
             fireFighterSpawnTask.PlacePedOnGround = DispatchableVehicle == null;// true;
             fireFighterSpawnTask.AttemptSpawn();
-            fireFighterSpawnTask.PostRun(this, GameLocation);
+            fireFighterSpawnTask.PostRun(this, GameLocation, Interior);
             //fireFighterSpawnTask.CreatedPeople.ForEach(x => { World.Pedestrians.AddEntity(x); x.IsLocationSpawned = true; AddLocationRequirements(x); });
             //fireFighterSpawnTask.CreatedVehicles.ForEach(x => x.AddVehicleToList(World));//World.Vehicles.AddEntity(x, ResponseType.Fire));
         }

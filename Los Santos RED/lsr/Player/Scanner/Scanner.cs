@@ -34,6 +34,7 @@ namespace LosSantosRED.lsr
         private bool ReportedLethalForceAuthorized;
         private bool ReportedRequestAirSupport;
         private bool ReportedWeaponsFree;
+        private bool ReportedIdentified;
         private bool canHearScanner;
         private bool ExecutingAmbientQueue;
 
@@ -122,6 +123,7 @@ namespace LosSantosRED.lsr
             DispatchQueue.Clear();
             ReportedLethalForceAuthorized = false;
             ReportedWeaponsFree = false;
+            ReportedIdentified = true;
             ReportedRequestAirSupport = false;
             HighestCivilianReportedPriority = 99;
             HighestOfficerReportedPriority = 99;
@@ -497,7 +499,7 @@ namespace LosSantosRED.lsr
         {
             if (Player.IsWanted && !ReportedRequestAirSupport && !SDI.RequestAirSupport.HasBeenPlayedThisWanted && !SDI.RequestSwatAirSupport.HasBeenPlayedThisWanted && World.Pedestrians.AnyHelicopterUnitsSpawned)
             {
-                if (World.Pedestrians.AnyNooseUnitsSpawned && Player.WantedLevel >= 4)
+                if (Player.WantedLevel >= 4)
                 {
                     AddToQueue(SDI.RequestSwatAirSupport);
                 }
@@ -547,7 +549,7 @@ namespace LosSantosRED.lsr
         }
         public void OnNooseDeployed()
         {
-            if (Player.IsWanted && Player.WantedLevel >= 4 && !SDI.RequestNooseUnitsAlt.HasBeenPlayedThisWanted && !SDI.RequestNooseUnitsAlt2.HasBeenPlayedThisWanted && World.Pedestrians.AnyNooseUnitsSpawned)
+            if (Player.IsWanted && Player.WantedLevel >= 4 && !SDI.RequestSWATUnits.HasBeenPlayedThisWanted && !SDI.RequestNooseUnitsAlt.HasBeenPlayedThisWanted && !SDI.RequestNooseUnitsAlt2.HasBeenPlayedThisWanted && World.Pedestrians.AnyNooseUnitsSpawned)
             {
                 if (RandomItems.RandomPercent(50))
                 {
@@ -557,6 +559,14 @@ namespace LosSantosRED.lsr
                 {
                     AddToQueue(SDI.RequestNooseUnitsAlt2);
                 }
+            }
+        }
+        public void OnSWATDeployed()
+        {
+            if (Player.IsWanted && Player.WantedLevel >= 4 && !SDI.RequestSWATUnits.HasBeenPlayedThisWanted && !SDI.RequestNooseUnitsAlt.HasBeenPlayedThisWanted && !SDI.RequestNooseUnitsAlt2.HasBeenPlayedThisWanted)
+            {
+                AddToQueue(SDI.RequestSWATUnits);
+               
             }
         }
         public void OnPaidFine()
@@ -708,6 +718,16 @@ namespace LosSantosRED.lsr
             }
             //EntryPoint.WriteToConsole($"SCANNER EVENT: OnWeaponsFree", 3);
             //MILITARY
+        }
+
+
+
+        public void OnPlayerIdentified()
+        {
+            if (!ReportedIdentified & !SDI.PlayerIdentified.HasBeenPlayedThisWanted)
+            {
+                AddToQueue(SDI.PlayerIdentified);
+            }
         }
 
         //Builder
@@ -1642,6 +1662,7 @@ namespace LosSantosRED.lsr
             new CrimeDispatch(StaticStrings.FicticiousLicensePlateCrimeID,SDI.FicticiousPlates),
             new CrimeDispatch(StaticStrings.FiringWeaponCrimeID,SDI.ShotsFired),
             new CrimeDispatch(StaticStrings.FiringSilencedWeaponCrimeID,SDI.ShotsFired),
+            new CrimeDispatch(StaticStrings.StreetRacingCrimeID,SDI.StreetRacing),
             new CrimeDispatch("FiringWeaponNearPolice",SDI.ShotsFiredAtAnOfficer),
             new CrimeDispatch("GotInAirVehicleDuringChase",SDI.StealingAirVehicle),
             new CrimeDispatch("GrandTheftAuto",SDI.GrandTheftAuto),
@@ -1660,12 +1681,17 @@ namespace LosSantosRED.lsr
 
             new CrimeDispatch(StaticStrings.TrespassingOnMilitaryBaseCrimeID,SDI.TrespassingOnMilitaryBase),
 
+
+            new CrimeDispatch(StaticStrings.StolenArmedMilitaryVehicleCrimeID,SDI.StolenArmedMilitaryVehicle),
+            new CrimeDispatch(StaticStrings.StolenArmedMilitaryVehicleCrimeID,SDI.StolenArmedMilitaryVehicle),
+
             new CrimeDispatch(StaticStrings.TrespessingCrimeID,SDI.Trespassing),
             new CrimeDispatch(StaticStrings.CivilianTrespessingCrimeID,SDI.Trespassing),
             new CrimeDispatch(StaticStrings.VehicleInvasionCrimeID,SDI.SuspiciousActivity),
 
             new CrimeDispatch(StaticStrings.SuspiciousVehicleCrimeID,SDI.SuspiciousActivity),
-
+            new CrimeDispatch(StaticStrings.BreakingEnteringAudibleCrimeID,SDI.BreakingAndEntering),
+            new CrimeDispatch(StaticStrings.BreakingEnteringCrimeID,SDI.BreakingAndEntering),
             new CrimeDispatch("DrivingStolenVehicle",SDI.DrivingAtStolenVehicle),
             new CrimeDispatch("TerroristActivity",SDI.TerroristActivity),
             new CrimeDispatch("BrandishingCloseCombatWeapon",SDI.CarryingWeapon),
@@ -1694,6 +1720,9 @@ namespace LosSantosRED.lsr
 
             new CrimeDispatch(StaticStrings.TheftCrimeID,SDI.TheftDispatch),
             new CrimeDispatch(StaticStrings.ShopliftingCrimeID,SDI.Shoplifting),
+
+            new CrimeDispatch(StaticStrings.PickPocketingCrimeID, SDI.PickPocketing),
+
         };
             DispatchList = new List<Dispatch>
         {
@@ -1701,9 +1730,11 @@ namespace LosSantosRED.lsr
             ,SDI.ShotsFiredAtAnOfficer
             ,SDI.AssaultingOfficer
             ,SDI.ThreateningOfficerWithFirearm
+            ,SDI.StolenArmedMilitaryVehicle
             ,SDI.TrespassingOnGovernmentProperty
             ,SDI.TrespassingOnMilitaryBase
             ,SDI.Trespassing
+            ,SDI.BreakingAndEntering
             ,SDI.StealingAirVehicle
             ,SDI.ShotsFired
             ,SDI.CarryingWeapon
@@ -1742,6 +1773,7 @@ namespace LosSantosRED.lsr
             ,SDI.RequestBackup
             ,SDI.RequestBackupSimple
             ,SDI.WeaponsFree
+            ,SDI.PlayerIdentified
             ,SDI.LethalForceAuthorized
             ,SDI.RunningARedLight
             ,SDI.DrunkDriving
@@ -1765,6 +1797,7 @@ namespace LosSantosRED.lsr
             ,SDI.GotOnFreeway
             ,SDI.GotOffFreeway
             ,SDI.WentInTunnel
+            ,SDI.RequestSWATUnits
             ,SDI.TamperingWithVehicle
             ,SDI.VehicleCrashed
             ,SDI.VehicleStartedFire
@@ -1785,6 +1818,8 @@ namespace LosSantosRED.lsr
             ,SDI.TheftDispatch
             ,SDI.Shoplifting
             ,SDI.FicticiousPlates
+            ,SDI.PickPocketing
+            ,SDI.StreetRacing
         };
         }
         private Dispatch DetermineDispatchFromCrime(Crime crimeAssociated)
@@ -1855,28 +1890,28 @@ namespace LosSantosRED.lsr
                         AbortedAudio = false;
                         GameFiber.Sleep(1000);
                     }
-                    EntryPoint.WriteToConsole($"PLAY AUDIO LIST TEST 1", 5);
+                    //EntryPoint.WriteToConsole($"PLAY AUDIO LIST TEST 1", 5);
                     uint GameTimeStartedWaitingForAudio = Game.GameTime;
                     while (AudioPlayer.IsAudioPlaying && Game.GameTime - GameTimeStartedWaitingForAudio <= 15000)
                     {
                         GameFiber.Yield();
                     }
-                    EntryPoint.WriteToConsole($"PLAY AUDIO LIST TEST 2", 5);
+                    //EntryPoint.WriteToConsole($"PLAY AUDIO LIST TEST 2", 5);
                     if (MyAudioEvent.NotificationTitle != "" && Settings.SettingsManager.ScannerSettings.EnableNotifications)
                     {
                         RemoveAllNotifications();
                         NotificationHandles.Add(Game.DisplayNotification("CHAR_CALL911", "CHAR_CALL911", MyAudioEvent.NotificationTitle, MyAudioEvent.NotificationSubtitle, MyAudioEvent.NotificationText));
                     }
-                    EntryPoint.WriteToConsole($"PLAY AUDIO LIST TEST 3", 5);
+                    //EntryPoint.WriteToConsole($"PLAY AUDIO LIST TEST 3", 5);
                     CurrentlyPlaying = MyAudioEvent;
                     CurrentlyPlayingCallIn = dispatchDescription;
                     CurrentlyPlayingDispatch = dispatchToPlay;
-                    EntryPoint.WriteToConsole($"PLAY AUDIO LIST TEST 4", 5);
+                    //EntryPoint.WriteToConsole($"PLAY AUDIO LIST TEST 4", 5);
                     if (Settings.SettingsManager.ScannerSettings.EnableAudio)
                     {
                         foreach (string audioname in soundsToPlayer)
                         {
-                            EntryPoint.WriteToConsole($"Scanner Playing. ToAudioPlayer: {audioname} isblank {audioname == ""}", 5);
+                            //EntryPoint.WriteToConsole($"Scanner Playing. ToAudioPlayer: {audioname} isblank {audioname == ""}", 5);
                             if (audioname != "" && audioname != null && audioname.Length > 2 && EntryPoint.ModController.IsRunning)
                             {
                                 if (Settings.SettingsManager.ScannerSettings.SetVolume)
@@ -2082,5 +2117,16 @@ namespace LosSantosRED.lsr
             SDI = new ScannerDispatchInformation();
             SDI.Setup();
         }
+
+        public List<Dispatch> GetDispatchList()
+        {
+            return DispatchList;
+        }
+
+        internal void PlayDispatchDebug(Dispatch selectedItem)
+        {
+            BuildDispatch(selectedItem,false,false);
+        }
     }
+
 }

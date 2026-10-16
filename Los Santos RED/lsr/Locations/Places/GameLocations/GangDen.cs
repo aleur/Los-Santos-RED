@@ -24,6 +24,8 @@ public class GangDen : GameLocation, IRestableLocation, IAssaultSpawnable
     private UIMenuItem LayLowMenuItem;
     private UIMenuItem dropoffKick;
     private UIMenu LoanSubMenu;
+    
+
 
     public GangDen() : base()
     {
@@ -58,6 +60,8 @@ public class GangDen : GameLocation, IRestableLocation, IAssaultSpawnable
     [XmlIgnore]
     public Gang AssociatedGang { get; set; }
     [XmlIgnore]
+    public Gang OriginalGang { get; set; }
+    [XmlIgnore]
     public Blip TerritoryBlip { get; set; }
     public GangDen(Vector3 _EntrancePosition, float _EntranceHeading, string _Name, string _Description, string menuID, string assignedAssociationID) : base(_EntrancePosition, _EntranceHeading, _Name, _Description)
     {
@@ -71,11 +75,12 @@ public class GangDen : GameLocation, IRestableLocation, IAssaultSpawnable
     }
     public override void StoreData(IShopMenus shopMenus, IAgencies agencies, IGangs gangs, IZones zones, IJurisdictions jurisdictions, IGangTerritories gangTerritories, INameProvideable names, ICrimes crimes, IPedGroups PedGroups, IEntityProvideable world,
     IStreets streets, ILocationTypes locationTypes, ISettingsProvideable settings, IPlateTypes plateTypes, IOrganizations associations, IContacts contacts, IInteriors interiors,
-    ILocationInteractable player, IModItems modItems, IWeapons weapons, ITimeControllable time, IPlacesOfInterest placesOfInterest, IIssuableWeapons issuableWeapons, IHeads heads, IDispatchablePeople dispatchablePeople)
+    ILocationInteractable player, IModItems modItems, IWeapons weapons, ITimeControllable time, IPlacesOfInterest placesOfInterest, IIssuableWeapons issuableWeapons, IHeads heads, IDispatchablePeople dispatchablePeople, ModDataFileManager modDataFileManager)
     {
-        base.StoreData(shopMenus, agencies, gangs, zones, jurisdictions, gangTerritories, names, crimes, PedGroups, world, streets, locationTypes, settings, plateTypes, associations, contacts, interiors, player, modItems, weapons, time, placesOfInterest, issuableWeapons, heads, dispatchablePeople);
-        Menu = ShopMenus.GetSpecificMenu(MenuID);
+        base.StoreData(shopMenus, agencies, gangs, zones, jurisdictions, gangTerritories, names, crimes, PedGroups, world, streets, locationTypes, settings, plateTypes, associations, contacts, interiors, player, modItems, weapons, time, placesOfInterest, issuableWeapons, heads, dispatchablePeople, modDataFileManager);
+        //Menu = ShopMenus.GetSpecificMenu(MenuID);
         AssociatedGang = gangs.GetGang(AssignedAssociationID);
+        OriginalGang = AssociatedGang;
         ButtonPromptText = $"Enter {AssociatedGang?.ShortName} {AssociatedGang?.DenName}";
         if (HasInterior)
         {
@@ -95,7 +100,15 @@ public class GangDen : GameLocation, IRestableLocation, IAssaultSpawnable
         }
         if (!IsAvailableForPlayer)
         {
-            Game.DisplayHelp($"{Name} is only available to associates and members");
+            if (OriginalAssignedAssociationID != AssignedAssociationID)
+            {
+                Game.DisplayHelp($"{Name} is contested");
+            }
+            else
+            {
+                Game.DisplayHelp($"{Name} is only available to associates and members");
+            }
+            
             return;
         }
         if (!CanInteract)
@@ -117,7 +130,14 @@ public class GangDen : GameLocation, IRestableLocation, IAssaultSpawnable
     {
         if (!IsAvailableForPlayer)
         {
-            Game.DisplayHelp($"{Name} is only available to associates and members");
+            if (OriginalAssignedAssociationID != AssignedAssociationID)
+            {
+                Game.DisplayHelp($"{Name} is contested");
+            }
+            else
+            {
+                Game.DisplayHelp($"{Name} is only available to associates and members");
+            }
             StoreCamera = locationCamera;
             DisposeCamera(isInside);
             DisposeInterior();
@@ -474,15 +494,15 @@ public class GangDen : GameLocation, IRestableLocation, IAssaultSpawnable
         Game.RemoveNotification(NotificationHandle);
         NotificationHandle = Game.DisplayNotification(AssociatedGang.Contact.IconName, AssociatedGang.Contact.IconName, AssociatedGang.Contact.Name, header, message);
     }
-    public override void AddDistanceOffset(Vector3 offsetToAdd)
-    {
-        foreach (SpawnPlace sp in VehicleDeliveryLocations)
-        {
-            sp.AddDistanceOffset(offsetToAdd);
-        }
-        VehiclePreviewLocation?.AddDistanceOffset(offsetToAdd);
-        base.AddDistanceOffset(offsetToAdd);
-    }
+    //public override void AddDistanceOffset(Vector3 offsetToAdd)
+    //{
+    //    foreach (SpawnPlace sp in VehicleDeliveryLocations)
+    //    {
+    //        sp.AddDistanceOffset(offsetToAdd);
+    //    }
+    //    VehiclePreviewLocation?.AddDistanceOffset(offsetToAdd);
+    //    base.AddDistanceOffset(offsetToAdd);
+    //}
     private void CreateGangTerritoryBlip(IEntityProvideable world)
     {
         if (!Settings.SettingsManager.GangSettings.ShowGangTerritoryBlip || AssociatedGang == null)
@@ -557,6 +577,38 @@ public class GangDen : GameLocation, IRestableLocation, IAssaultSpawnable
     {
         possibleLocations.GangDens.Add(this);
         base.AddLocation(possibleLocations);
+    }
+
+    public override void SetTakeoverGang(Gang currentGang, Gang gangToReplace)
+    {
+        if(currentGang == null || gangToReplace == null)
+        {
+            return;
+        }
+        AssociatedGang = currentGang;
+        AssignedAssociationID = currentGang.ID;
+        IsAvailableForPlayer = false;
+        DeactivateBlip();
+        ActivateBlip(Time, World);
+        base.SetTakeoverGang(currentGang, gangToReplace);
+    }
+    public override void ResetGangTakeover()
+    {
+        bool shouldBeAvailable = false;
+        if (OriginalGang != null)
+        {
+            AssociatedGang = OriginalGang;
+            AssignedAssociationID = OriginalGang.ID;
+            GangReputation gr = Player.RelationshipManager.GangRelationships.GetReputation(OriginalGang);
+            if (gr != null)
+            {
+                shouldBeAvailable = gr.IsMember || gr.GangRelationship == GangRespect.Friendly;
+            }
+        }
+        IsAvailableForPlayer = shouldBeAvailable;
+        DeactivateBlip();
+        ActivateBlip(Time, World);
+        base.ResetGangTakeover();
     }
 }
 

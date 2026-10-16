@@ -23,16 +23,31 @@ public class PoliceTaskSettings : ISettingsDefaultable
     public float DriveBySightDuringChaseDistance { get; set; }
 
 
-    [Description("Enable or disable chase assists to allow the police to better keep up with the player")]
-    public bool AllowChaseAssists { get; set; }
+    //[Description("Enable or disable chase assists to allow the police to better keep up with the player")]
+    //public bool AllowChaseAssists { get; set; }
+
     [Description("Enable or disable clearing or offscreen non-mission vehicles that are blocking police vehicles")]
     public bool AllowFrontVehicleClearAssist { get; set; }
-    [Description("Enable or disable collision proffing for police vehicles")]
+    [Description("Enable or disable collision proofing for police vehicles")]
     public bool AllowReducedCollisionPenaltyAssist { get; set; }
-    [Description("Enable or disable increased power for police vehicles")]
-    public bool AllowPowerAssist { get; set; }
     [Description("Enable or disable police vehicles being repaired when off screen")]
     public bool AllowFixOffScreenVehiclesAssist { get; set; }
+    //[Description("Enable or disable increased power for police vehicles")]
+    //public bool AllowPowerAssist { get; set; }
+    public bool AllowStabilityForceAssist { get; set; }
+    public bool AllowHarderBikeKnockoffAssist { get; set; }
+    public bool AllowOverrideAIHandlingAssist { get; set; }
+    public bool AllowOverrideMaxSpeedAssist { get; set; }
+    public float OverrideMaxSpeedAssistSpeed { get; set; }
+
+
+
+
+
+
+
+
+
 
     [Description("Maximum amount of police that can respawn to an investigation when the most serious crime reported is 1 star.")]
     public int InvestigationRespondingOfficers_Wanted1 { get; set; }
@@ -138,6 +153,14 @@ public class PoliceTaskSettings : ISettingsDefaultable
     public float K9KnowLocationDistance { get; set; }
     public int ALwaysUseLongGunCopKillLimit { get; set; }
     public int AlwaysUseLongGunWantedLevelLimit { get; set; }
+    public bool EnableConfigFlagPoliceTakeCrashDamage { get; set; }
+    public bool AllowFlyThroughWindshield { get; set; }
+    public int ChaseDefaultMission { get; set; }
+    public int ChaseRecklessMission { get; set; }
+    public int ChaseVeryRecklessMission { get; set; }
+    public float FlyThroughWindshieldPercentage { get; set; }
+
+
 
     [OnDeserialized()]
     private void SetValuesOnDeserialized(StreamingContext context)
@@ -153,11 +176,19 @@ public class PoliceTaskSettings : ISettingsDefaultable
     {
         ManageTasking = true;
 
-        AllowChaseAssists = true;
+        //AllowChaseAssists = true;
         AllowFrontVehicleClearAssist = true;
         AllowReducedCollisionPenaltyAssist = true;
-        AllowPowerAssist = true;
+        //AllowPowerAssist = false;// true;
         AllowFixOffScreenVehiclesAssist = true;
+        AllowHarderBikeKnockoffAssist = true;
+        AllowStabilityForceAssist = true;
+        AllowOverrideAIHandlingAssist = false;
+        AllowOverrideMaxSpeedAssist = false;
+        OverrideMaxSpeedAssistSpeed = 45f;
+
+
+        
 
         AllowDriveBySightDuringChase = true;
         DriveBySightDuringChaseDistance = 100f;//150f;
@@ -171,10 +202,10 @@ public class PoliceTaskSettings : ISettingsDefaultable
 
         InvestigationRespondingOfficers_Wanted1 = 2;
         InvestigationRespondingOfficers_Wanted2 = 4;
-        InvestigationRespondingOfficers_Wanted3 = 6;
-        InvestigationRespondingOfficers_Wanted4 = 8;
-        InvestigationRespondingOfficers_Wanted5 = 10;
-        InvestigationRespondingOfficers_Wanted6 = 14;
+        InvestigationRespondingOfficers_Wanted3 = 8;// 6;
+        InvestigationRespondingOfficers_Wanted4 = 10;// 8;
+        InvestigationRespondingOfficers_Wanted5 = 12;// 10;
+        InvestigationRespondingOfficers_Wanted6 = 16;// 14;
 
 
 
@@ -261,6 +292,22 @@ public class PoliceTaskSettings : ISettingsDefaultable
 
         ALwaysUseLongGunCopKillLimit = 3;
         AlwaysUseLongGunWantedLevelLimit = 4;
+        EnableConfigFlagPoliceTakeCrashDamage = true;
+        AllowFlyThroughWindshield = true;
+        FlyThroughWindshieldPercentage = 45f;
+        ChaseDefaultMission = 7;
+        ChaseVeryRecklessMission = 3;
+        ChaseRecklessMission = 2;
+
+
+        //AllowForceAssist = false;
+        //ForceAssistAmount = 10.0f;
+        //ForceAssistSpeedChangeThreshold = 0.2f;
+        //ForceAssistTurningRadiusLimit = 10.0f;
+        //ForceAssistMinimumSpeedMetersPerSecond = 15.0f;
+
+
+
 
     }
 }

@@ -1,4 +1,5 @@
 ﻿using ExtensionsMethods;
+using LosSantosRED.lsr.Data.Interface;
 using LosSantosRED.lsr.Helper;
 using LosSantosRED.lsr.Interface;
 using LSR.Vehicles;
@@ -8,6 +9,7 @@ using Rage;
 using Rage.Native;
 using RAGENativeUI;
 using RAGENativeUI.Elements;
+using RAGENativeUI.PauseMenu;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -19,7 +21,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
 
-public class Residence : GameLocation, ILocationSetupable, IRestableLocation, IInventoryableLocation, IOutfitableLocation
+public class Residence : GameLocation, ILocationSetupable, IRestableLocation, IInventoryableLocation, IOutfitableLocation, ICraftable
 {
     private UIMenu OfferSubMenu;
     private UIMenuNumericScrollerItem<int> RestMenuItem;
@@ -43,8 +45,6 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
 
     }
     [XmlIgnore]
-    public bool IsOwned { get; set; } = false;
-    [XmlIgnore]
     public bool IsRented { get; set; } = false;
     [XmlIgnore]
     public DateTime DateRentalPaymentDue { get; set; }
@@ -58,13 +58,15 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
     public CashStorage CashStorage { get; set; }
     [XmlIgnore]
     public ResidenceInterior ResidenceInterior { get; set; }
+    [XmlIgnore]
+    public List<DisplayPlacement> DisplayPlacements { get; set; } = new List<DisplayPlacement>();
+
+    public override bool AreMarkersDisabled => !IsOwnedOrRented;
     public bool CanRent => !IsOwned && !IsRented && RentalFee > 0;
     public bool CanBuy => !IsOwned && PurchasePrice > 0;
     public bool IsOwnedOrRented => IsOwned || IsRented;
     public int RentalDays { get; set; }
     public int RentalFee { get; set; }
-    public int PurchasePrice { get; set; }
-    public int SalesPrice { get; set; }
     public int ResidenceID { get; set; } = -999;
     public bool HasHeaderApartmentBuilding { get; set; } = false;
     public bool DisableInteractAfterPurchase { get; set; } = false;
@@ -76,6 +78,9 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
     public override bool ShowInteractPrompt => !IgnoreEntranceInteract && CanInteract && !HasHeaderApartmentBuilding && (!IsOwnedOrRented || (IsOwnedOrRented && !DisableInteractAfterPurchase));
     public override bool IsBlipEnabled => base.IsBlipEnabled && !HasHeaderApartmentBuilding;
     public GameLocation GameLocation => this;
+
+    public string CraftingFlag { get; set; } = null;
+
     public Residence(Vector3 _EntrancePosition, float _EntranceHeading, string _Name, string _Description) : base(_EntrancePosition, _EntranceHeading, _Name, _Description)
     {
         ButtonPromptText = GetButtonPromptText();
@@ -84,9 +89,9 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
     }
     public override void StoreData(IShopMenus shopMenus, IAgencies agencies, IGangs gangs, IZones zones, IJurisdictions jurisdictions, IGangTerritories gangTerritories, INameProvideable Names, ICrimes Crimes, IPedGroups PedGroups, IEntityProvideable world,
     IStreets streets, ILocationTypes locationTypes, ISettingsProvideable settings, IPlateTypes plateTypes, IOrganizations associations, IContacts contacts, IInteriors interiors,
-        ILocationInteractable player, IModItems modItems, IWeapons weapons, ITimeControllable time, IPlacesOfInterest placesOfInterest, IIssuableWeapons issuableWeapons, IHeads heads, IDispatchablePeople dispatchablePeople)
+        ILocationInteractable player, IModItems modItems, IWeapons weapons, ITimeControllable time, IPlacesOfInterest placesOfInterest, IIssuableWeapons issuableWeapons, IHeads heads, IDispatchablePeople dispatchablePeople, ModDataFileManager modDataFileManager)
     {
-        base.StoreData(shopMenus, agencies, gangs, zones, jurisdictions, gangTerritories, Names, Crimes, PedGroups, world, streets, locationTypes, settings, plateTypes, associations, contacts, interiors, player, modItems, weapons, time, placesOfInterest, issuableWeapons, heads, dispatchablePeople);
+        base.StoreData(shopMenus, agencies, gangs, zones, jurisdictions, gangTerritories, Names, Crimes, PedGroups, world, streets, locationTypes, settings, plateTypes, associations, contacts, interiors, player, modItems, weapons, time, placesOfInterest, issuableWeapons, heads, dispatchablePeople, modDataFileManager);
         if (HasInterior)
         {
             ResidenceInterior = interiors.PossibleInteriors.ResidenceInteriors.Where(x => x.LocalID == InteriorID).FirstOrDefault();
@@ -161,6 +166,7 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
             {
                 SetupLocationCamera(locationCamera, isInside, false);
                 CreateInteractionMenu();
+                
                 InteractionMenu.Visible = true;
                 if (!HasBannerImage)
                 {
@@ -311,7 +317,10 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
         SimpleInventory.Reset();
         UpdateStoredData();
         CashStorage.Reset();
-
+        foreach(DisplayPlacement tp in DisplayPlacements)
+        {
+            tp.DespawnDisplay();
+        }
     }
     public void ReRent(IPropertyOwnable player, ITimeReportable time)
     {
@@ -431,6 +440,8 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
                 };
                 OfferSubMenu.AddItem(RentResidenceMenuItem);
             }
+            RentResidenceMenuItem.Description += "~n~~n~" + GetInquireDescription();
+            PurchaseResidenceMenuItem.Description += "~n~~n~" + GetInquireDescription();
         }
     }
     private void AddInteractionItems(bool isInside)
@@ -445,7 +456,11 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
             CreateRestInteractionMenu();
         }
         CreateOutfitInteractionMenu(isInside, isInside);
-
+        if (!string.IsNullOrEmpty(CraftingFlag))
+        {
+            UIMenu subMenu = MenuPool.AddSubMenu(InteractionMenu, "Crafting");
+            Player.Crafting.CraftingMenu.AddToMenu(subMenu, CraftingFlag, MenuPool);
+        }
 
         bool withAnimations = Interior?.IsTeleportEntry == true;
 
@@ -502,7 +517,7 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
             outfitsSubMenu.SetBannerType(EntryPoint.LSRedColor);
         }
         InteractionMenu.MenuItems[InteractionMenu.MenuItems.Count() - 1].Description = "Set an outfit.";
-        Player.OutfitManager.CreateOutfitMenu(MenuPool, outfitsSubMenu, isInside, removeBanner);
+        Player.OutfitManager.CreateOutfitMenu(MenuPool, outfitsSubMenu, isInside, removeBanner, true, false);
     }
     private void OnRentedOrPurchased()
     {
@@ -534,7 +549,7 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
         DisplayMessage("~r~Rental Failed", "We are sorry, we are unable to complete this rental. Please make sure you have the funds.");
         return false;
     }
-    private bool Purchase()
+    protected override bool Purchase()
     {
         if (CanBuy && Player.BankAccounts.GetMoney(true) >= PurchasePrice)
         {
@@ -600,19 +615,19 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
         IsRented = true;
         DateRentalPaymentDue = DateRentalPaymentPaid.AddDays(RentalDays);
         UpdateStoredData();
-        Player.Properties.AddResidence(this);
+        Player.Properties.AddOwnedLocation(this);
         AddInteractionItems(false);
         OfferSubMenu.Close(true);
         PlaySuccessSound();
         DisplayMessage("~g~Rented", $"Thank you for renting {Name}");
     }
-    private void OnPurchased()
+    protected override void OnPurchased()
     {
         Player.BankAccounts.GiveMoney(-1 * PurchasePrice, true);
         IsOwned = true;
         IsRented = false;
         UpdateStoredData();
-        Player.Properties.AddResidence(this);
+        Player.Properties.AddOwnedLocation(this);
         if (!IsRented)
         {
             AddInteractionItems(false);
@@ -624,14 +639,14 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
     private void OnStopRenting()
     {
         Reset();
-        Player.Properties.RemoveResidence(this);
+        Player.Properties.RemoveOwnedLocation(this);
         PlaySuccessSound();
         DisplayMessage("~y~Rental", $"You have stopped renting {Name}");
     }
-    private void OnSold()
+    protected override void OnSold()
     {
         Reset();
-        Player.Properties.RemoveResidence(this);
+        Player.Properties.RemoveOwnedLocation(this);
         Player.BankAccounts.GiveMoney(SalesPrice, true);
         PlaySuccessSound();
         DisplayMessage("~g~Sold", $"You have sold {Name} for {SalesPrice.ToString("C0")}");
@@ -766,4 +781,97 @@ public class Residence : GameLocation, ILocationSetupable, IRestableLocation, II
         possibleLocations.Residences.Add(this);
         base.AddLocation(possibleLocations);
     }
+    public override string GetInquireDescription()
+    {
+        List<CraftInteriorInteract> craftingInteracts = ResidenceInterior?.InteractPoints.OfType<CraftInteriorInteract>().ToList();
+        if (craftingInteracts !=null && craftingInteracts.Count > 0)
+        {
+            return "Can craft using: ~n~" +string.Join(", ", craftingInteracts.Select(x => x.Name));
+        }
+        else
+        {
+            return "";
+        }
+    }
+    public override void HandleOwnedLocation(IPropertyOwnable player, ITimeReportable time)
+    {
+        if (!IsOwned && IsRented && DateRentalPaymentDue != null && DateTime.Compare(Time.CurrentDateTime, DateRentalPaymentDue) >= 0)
+        {
+            ReRent(player, Time);
+        }
+    }
+    public override SavedGameLocation GetSaveData()
+    {
+        SavedResidence myRes = new SavedResidence(Name, IsOwned, IsRented);
+        if (IsOwned || IsRented)
+        {
+            if (IsRented)
+            {
+                myRes.DateOfLastRentalPayment = DateRentalPaymentPaid;
+                myRes.RentalPaymentDate = DateRentalPaymentDue;
+            }
+            if (WeaponStorage != null)
+            {
+                myRes.WeaponInventory = new List<StoredWeapon>();
+                foreach (StoredWeapon storedWeapon in WeaponStorage.StoredWeapons)
+                {
+                    myRes.WeaponInventory.Add(storedWeapon.Copy());
+                }
+            }
+            if (SimpleInventory != null)
+            {
+                myRes.InventoryItems = new List<InventorySave>();
+                foreach (InventoryItem ii in SimpleInventory.ItemsList)
+                {
+                    myRes.InventoryItems.Add(new InventorySave(ii.ModItem?.Name, ii.RemainingPercent));
+                }
+            }
+            if (CashStorage != null)
+            {
+                myRes.StoredCash = CashStorage.StoredCash;
+            }
+            if(DisplayPlacements != null)
+            {
+                myRes.TrophyPlacements = new List<DisplayPlacement>();
+                foreach(DisplayPlacement trophyPlacements in DisplayPlacements)
+                {
+                    myRes.TrophyPlacements.Add(new DisplayPlacement(trophyPlacements.SlotID, trophyPlacements.ModItemName));
+                }
+            }
+        }
+        return myRes;
+    }
+    public override void AddToLandLordMenu(LandlordMenu landlordMenu)
+    {
+        if (landlordMenu.ResidencesTab.items == null)
+        {
+            landlordMenu.ResidencesTab.items = new List<TabItem>();
+        }
+        TabTextItem ttx = new TabTextItem(Name, "", GetResidenceInformation());
+        ttx.Activated += (s, e) =>
+        {
+            Player.GPSManager.AddGPSRoute(Name, EntrancePosition, true);
+        };
+        landlordMenu.ResidencesTab.items.Add(ttx);
+    }
+    private string GetResidenceInformation()
+    {
+        StringBuilder residenceInformation = new StringBuilder();
+        if (IsOwned)
+        {
+            residenceInformation.AppendLine("~w~Status: ~g~Owned");
+        }
+        else
+        {
+            residenceInformation.AppendLine("~w~Status: ~o~Rented");
+        }
+        return residenceInformation.ToString();
+    }
+
+    public void OnPlayerLoadedSave()
+    {
+        ResidenceInterior?.OnPlayerLoadedSave();
+    }
+
 }
+

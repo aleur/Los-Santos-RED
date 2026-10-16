@@ -14,6 +14,7 @@ using System.Xml.Serialization;
 [XmlInclude(typeof(EMSConditionalLocation))]
 [XmlInclude(typeof(FireConditionalLocation))]
 [XmlInclude(typeof(MerchantConditionalLocation))]
+[XmlInclude(typeof(CivilianConditionalLocation))]
 public class ConditionalLocation
 {
     protected IAgencies Agencies;
@@ -39,6 +40,11 @@ public class ConditionalLocation
     protected string MasterAssociationID;
     protected bool IsPerson;
     protected GameLocation GameLocation;
+    protected Interior Interior;
+    protected IDispatchablePeople DispatchablePeople;
+    protected IDispatchableVehicles DispatchableVehicles;
+    protected string OriginalAssociationID;
+
     public ConditionalLocation()
     {
     }
@@ -107,7 +113,7 @@ public class ConditionalLocation
     //}
     public virtual void AttemptSpawn(IDispatchable player, bool isPerson, bool force, IAgencies agencies, IGangs gangs, IZones zones, IJurisdictions jurisdictions, IGangTerritories gangTerritories, ISettingsProvideable settings, 
         IEntityProvideable world, string masterAssociationID, IWeapons weapons, INameProvideable names, ICrimes crimes, IPedGroups pedGroups, IShopMenus shopMenus, IWeatherReportable weatherReporter, ITimeControllable time,
-        IModItems modItems, GameLocation gameLocation)
+        IModItems modItems, GameLocation gameLocation, IDispatchablePeople dispatchablePeople, IDispatchableVehicles dispatchableVehicles, Interior interior)
     {
         Player = player;
         IsPerson = isPerson;
@@ -128,6 +134,9 @@ public class ConditionalLocation
         Time = time;
         ModItems = modItems;
         GameLocation = gameLocation;
+        Interior = interior;
+        DispatchablePeople = dispatchablePeople;
+        DispatchableVehicles = dispatchableVehicles;
         AttemptedSpawn = DetermineRun(force);
         if (!AttemptedSpawn)
         {
@@ -141,7 +150,7 @@ public class ConditionalLocation
 
     public virtual void ForceSpawn(IDispatchable player, bool isPerson, bool force, IAgencies agencies, IGangs gangs, IZones zones, IJurisdictions jurisdictions, IGangTerritories gangTerritories, ISettingsProvideable settings,
     IEntityProvideable world, string masterAssociationID, IWeapons weapons, INameProvideable names, ICrimes crimes, IPedGroups pedGroups, IShopMenus shopMenus, IWeatherReportable weatherReporter, ITimeControllable time,
-    IModItems modItems, GameLocation gameLocation)
+    IModItems modItems, GameLocation gameLocation, Interior interior)
     {
         Player = player;
         IsPerson = isPerson;
@@ -162,6 +171,7 @@ public class ConditionalLocation
         Time = time;
         ModItems = modItems;
         GameLocation = gameLocation;
+        Interior = interior;
         GenerateSpawnLocation();
         GetDispatchableGenerator();
 
@@ -274,7 +284,8 @@ public class ConditionalLocation
         {
             ped.LocationTaskRequirements.ForcedScenarios.AddRange(ForcedScenarios.ToList());
         }
-        //EntryPoint.WriteToConsoleTestLong("ADDED LOCATION REQUIREMENTS");
+        //ped.PedBrain.ClearTask();
+        EntryPoint.WriteToConsole($"ADDED LOCATION REQUIREMENTS {ped.Handle}");
     }
 
     public void AddDistanceOffset(Vector3 offsetToAdd)
@@ -284,6 +295,25 @@ public class ConditionalLocation
     public void SetVehicle(DispatchableVehicle dv)
     {
         DispatchableVehicle = dv;
+    }
+
+    public void UpdateAssociation(string updateToID, string toReplaceID)
+    {
+        if(string.IsNullOrEmpty(toReplaceID) || string.IsNullOrEmpty(updateToID))
+        {
+            return;
+        }
+        if(AssociationID != toReplaceID)
+        {
+            return;
+        }
+        OriginalAssociationID = AssociationID;
+        AssociationID = updateToID;
+    }
+
+    public void ResetAssociation()
+    {
+        OriginalAssociationID = AssociationID;
     }
 }
 

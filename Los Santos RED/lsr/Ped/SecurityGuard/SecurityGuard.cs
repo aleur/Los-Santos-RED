@@ -52,7 +52,7 @@ public class SecurityGuard : PedExt, IWeaponIssuable, IPlayerChaseable, IAIChase
     public override int TaserAccuracy { get; set; } = 30;
     public override int TaserShootRate { get; set; } = 100;
     public override int VehicleAccuracy { get; set; } = 10;
-    public override int VehicleShootRate { get; set; } = 20;
+    public override int VehicleShootRate { get; set; } = 60;
     public override int TurretAccuracy { get; set; } = 10;
     public override int TurretShootRate { get; set; } = 1000;
     public CopVoice Voice { get; private set; }
@@ -69,6 +69,7 @@ public class SecurityGuard : PedExt, IWeaponIssuable, IPlayerChaseable, IAIChase
     public override bool WillCallPolice { get; set; } = true;
     public override bool WillCallPoliceIntense { get; set; } = true;
     public override bool HasWeapon => WeaponInventory.HasPistol || WeaponInventory.HasLongGun;
+    public override bool CanCurrentlyRacePlayer => false;
     public override bool NeedsFullUpdate
     {
         get
@@ -109,9 +110,6 @@ public class SecurityGuard : PedExt, IWeaponIssuable, IPlayerChaseable, IAIChase
             }
         }
     }
-
-    public bool IsCorrupt { get; private set; }
-
     public void UpdateSpeech(IPoliceRespondable currentPlayer)
     {
         Voice.Speak(currentPlayer);
@@ -128,12 +126,6 @@ public class SecurityGuard : PedExt, IWeaponIssuable, IPlayerChaseable, IAIChase
             return;
         }
         Money = RandomItems.GetRandomNumberInt(AssignedAgency.MoneyMin, AssignedAgency.MoneyMax);
-        if (RandomItems.RandomPercent(AssignedAgency.CorruptMemberPercentage))
-        {
-            IsCorrupt = true;
-            SetupTransactionItems(shopMenus.GetWeightedRandomMenuFromGroup(AssignedAgency.CorruptMenuGroup), false);
-            Money = RandomItems.GetRandomNumberInt(AssignedAgency.CorruptMoneyMin, AssignedAgency.CorruptMoneyMax);
-        }
         dispatchablePerson.SetPedExtPermanentStats(this, Settings.SettingsManager.SecuritySettings.OverrideHealth, Settings.SettingsManager.SecuritySettings.OverrideArmor, Settings.SettingsManager.SecuritySettings.OverrideAccuracy);
         if (!Pedestrian.Exists())
         {
@@ -216,13 +208,13 @@ public class SecurityGuard : PedExt, IWeaponIssuable, IPlayerChaseable, IAIChase
                 UpdateVehicleState();
                 if (!IsUnconscious && PlayerPerception.DistanceToTarget <= 200f)//was 150 only care in a bubble around the player, nothing to do with the player tho
                 {
-                    if (!PlayerPerception.RanSightThisUpdate && Settings.SettingsManager.PerformanceSettings.EnablePerformanceUpdateMode)
+                    if (!PlayerPerception.RanSightThisUpdate && Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
                     {
                         GameFiber.Yield();
                     }
                     if (ShouldCheckCrimes)
                     {
-                        PedViolations.Update(policeRespondable, true);//possible yield in here!, REMOVED FOR NOW
+                        PedViolations.Update(policeRespondable);//possible yield in here!, REMOVED FOR NOW
                     }
                     PedPerception.Update();
                     if (Settings.SettingsManager.SecuritySettings.AllowAlerts)
@@ -234,7 +226,7 @@ public class SecurityGuard : PedExt, IWeaponIssuable, IPlayerChaseable, IAIChase
                 GameTimeLastUpdated = Game.GameTime;
             }
         }
-        CurrentHealthState.Update(policeRespondable);//has a yield if they get damaged, seems ok
+        CurrentHealthState.Update(policeRespondable, world);//has a yield if they get damaged, seems ok
     }
 
     protected override string GetPedInfoForDisplay()

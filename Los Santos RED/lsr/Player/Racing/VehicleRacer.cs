@@ -17,25 +17,25 @@ public class VehicleRacer
     protected uint GameTimeStartedRace;
     protected uint GameTimeFinishedRace;
     protected VehicleRace VehicleRace;
+
     public VehicleRacer()
     {
-    }
 
+    }
     public VehicleRacer(VehicleExt vehicleExt)
     {
         VehicleExt = vehicleExt;
     }
     public float DistanceToCheckpoint { get; private set; }
-
+    public int CurrentLap { get; protected set; } = 1;
     public VehicleExt VehicleExt { get; set; }
     public virtual string RacerName => "Racer";
     public bool HasFinishedRace => GameTimeFinishedRace > 0;
-    public virtual bool IsPlayer => false;
+    public virtual bool IsPlayer => false; 
     public virtual void Dispose()
     {
 
     }
-
     public virtual void SetupRace(VehicleRace vehicleRace)
     {
         if(vehicleRace == null)
@@ -43,57 +43,63 @@ public class VehicleRacer
             return;
         }
         VehicleRace = vehicleRace;
-        TargetCheckpoint = vehicleRace.RaceCheckpoints.Where(x => x.Order == 0).FirstOrDefault();
+        TargetCheckpoint = vehicleRace.VehicleRaceTrack.RaceCheckpoints.Where(x => x.Order == 0).FirstOrDefault();
         if(TargetCheckpoint == null)
         {
             return;
         }
-        AfterTargetCheckpoint = vehicleRace.RaceCheckpoints.Where(x => x.Order == 1).FirstOrDefault();
+        AfterTargetCheckpoint = vehicleRace.VehicleRaceTrack.RaceCheckpoints.Where(x => x.Order == 1).FirstOrDefault();
     }
     public virtual void Update(VehicleRace vehicleRace)
-    { 
-        if(TargetCheckpoint == null || VehicleExt == null || !VehicleExt.Vehicle.Exists() || GameTimeFinishedRace > 0)
+    {
+        if (TargetCheckpoint == null || VehicleExt == null || !VehicleExt.Vehicle.Exists() || GameTimeFinishedRace > 0)
         {
             return;
         }
-        DistanceToCheckpoint = TargetCheckpoint.Position.DistanceTo(VehicleExt.Vehicle);
+
+        // Use DistanceTo2D to completely ignore Z-axis (height) differences
+        DistanceToCheckpoint = TargetCheckpoint.Position.DistanceTo2D(VehicleExt.Vehicle);
+
+        // Increase the detection radius slightly (e.g., 20f -> 30f) to account for high speeds
         if (DistanceToCheckpoint <= 20f)
         {
-            //EntryPoint.WriteToConsole($"{PedExt?.Handle} have reached checkpoint {TargetCheckpoint.Order} at {TargetCheckpoint.Position}");
             if (TargetCheckpoint.IsFinish)
             {
-                //EntryPoint.WriteToConsole($"{PedExt?.Handle} HAVE FINISHED THE RACE");
-                //OnFinishedRace();
-                GameTimeFinishedRace = Game.GameTime;
-                vehicleRace.OnRacerFinishedRace(this);
-                //TargetCheckpoint = null;
+                if (vehicleRace.NumberOfLaps == CurrentLap)
+                {
+                    GameTimeFinishedRace = Game.GameTime;
+                    vehicleRace.OnRacerFinishedRace(this);
+                }
+                else
+                {
+                    CurrentLap++;
+                    int nextOrder = 0;
+                    TargetCheckpoint = vehicleRace.VehicleRaceTrack.RaceCheckpoints.Where(x => x.Order == nextOrder).FirstOrDefault();
+                    AfterTargetCheckpoint = vehicleRace.VehicleRaceTrack.RaceCheckpoints.Where(x => x.Order == nextOrder + 1).FirstOrDefault();
+                    OnReachedCheckpoint(vehicleRace);
+                    EntryPoint.WriteToConsole($"RACER HAS PASSED FINAL LAP RESETTING CurrentLap{CurrentLap}");
+                }
             }
             else
             {
-                //EntryPoint.WriteToConsole($"Looking for {TargetCheckpoint.Order + 1}");
                 int nextOrder = TargetCheckpoint.Order + 1;
-                TargetCheckpoint = vehicleRace.RaceCheckpoints.Where(x => x.Order == nextOrder).FirstOrDefault();
-                AfterTargetCheckpoint = vehicleRace.RaceCheckpoints.Where(x => x.Order == nextOrder + 1).FirstOrDefault();
-                //EntryPoint.WriteToConsole($"Assigned Next checkpoint {TargetCheckpoint.Order} at {TargetCheckpoint.Position}");
-                OnReachedCheckpoint();
+                TargetCheckpoint = vehicleRace.VehicleRaceTrack.RaceCheckpoints.Where(x => x.Order == nextOrder).FirstOrDefault();
+                AfterTargetCheckpoint = vehicleRace.VehicleRaceTrack.RaceCheckpoints.Where(x => x.Order == nextOrder + 1).FirstOrDefault();
+                OnReachedCheckpoint(vehicleRace);
             }
-        }        
+        }
     }
     public string GetTotalTimeAsString()
     {
         return ConvertMSToTime(GameTimeFinishedRace - GameTimeStartedRace);
     }
-    private string ConvertMSToTime(uint TotalGameTime)
+    private string ConvertMSToTime(uint totalMS)
     {
-        TimeSpan t = TimeSpan.FromMilliseconds(TotalGameTime);
-        string answer = string.Format("{0:00}:{1:00}.{2:000}",
-                                t.Minutes,
-                                t.Seconds,
-                                t.Milliseconds);
-
-        return answer;
+        TimeSpan t = TimeSpan.FromMilliseconds(totalMS);
+        // Correctly pads Minutes to 2 digits, Seconds to 2 digits, and Milliseconds to 3 digits
+        return $"{t.Minutes:00}:{t.Seconds:00}.{t.Milliseconds:000}";
     }
-    public virtual void OnReachedCheckpoint()
+    public virtual void OnReachedCheckpoint(VehicleRace vehicleRace)
     {
 
     }
@@ -106,7 +112,7 @@ public class VehicleRacer
         GameTimeStartedRace = Game.GameTime;
     }
 
-    public virtual void HandleWinningBet(int betAmount)
+    public virtual void GiveAIBetMoney(int betAmount)
     {
  
     }

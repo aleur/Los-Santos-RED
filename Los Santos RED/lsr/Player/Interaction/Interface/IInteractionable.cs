@@ -47,12 +47,21 @@ namespace LosSantosRED.lsr.Interface
         bool IsAlive { get; }
         Dispatcher Dispatcher { get; }
         VehicleExt CurrentVehicle { get; }
-        RacingManager RacingManager { get; }
+        VehicleRaceManager VehicleRaceManager { get; }
+        bool CharacterModelIsPrimaryCharacter { get; }
+        bool IsSetDisabledControls { get; set; }
+        string ModelName { get; }
+        bool IsUsingController { get; }
+        bool IsRagdoll { get; }
+        bool IsStunned { get; }
+        GroupManager GroupManager { get; }
 
+        void HasSetOffAlarm(GameLocation gameLocation);
         void OnStartedBreakingIntoGangCar(Gang associatedGang, GangVehicleExt gangVehicleExt);
 
         // void OnDamagedVehicle();
         void PlaySpeech(string v1, bool v2);
         void SetAngeredCop();
+        void SetCarBreakIn();
     }
 }

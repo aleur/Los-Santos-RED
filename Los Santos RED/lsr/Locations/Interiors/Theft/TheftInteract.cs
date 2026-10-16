@@ -37,7 +37,7 @@ public class TheftInteract : InteriorInteract
     public virtual bool HasPreInteractRequirement { get; set; } = false;
     public virtual ItemUsePreInteract ItemUsePreInteract { get; set; }
 
-
+    public override int MarkerType { get; set; } = 29;
     public TheftInteract()
     {
 
@@ -63,7 +63,7 @@ public class TheftInteract : InteriorInteract
         }
         if (!WithWarp)
         {
-            if (!MoveToPosition(3.0f))
+            if (!MoveToPosition(4.0f))
             {
                 Interior.IsMenuInteracting = false;
                 Game.DisplayHelp("Interact Failed");

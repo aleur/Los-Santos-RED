@@ -29,5 +29,10 @@ public class PliersItem : ModItem
         }
         return false;
     }
+    public override void AddToList(PossibleItems possibleItems)
+    {
+        possibleItems?.PliersItems.RemoveAll(x => x.Name == Name);
+        possibleItems?.PliersItems.Add(this);
+    }
 }
 

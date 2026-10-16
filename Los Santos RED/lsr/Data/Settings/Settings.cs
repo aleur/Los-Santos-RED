@@ -183,7 +183,14 @@ public class Settings : ISettingsProvideable
 
         SettingsManager.TaskSettings.ShowEntityBlips = false;
         SettingsManager.TaskSettings.DisplayHelpPrompts = false;
-        
+
+
+        SettingsManager.VehicleSettings.ModifyVehicleHandlingValues = false;
+        SettingsManager.VehicleSettings.VehicleTractionLossMultiplier = 4.0f;
+        SettingsManager.VehicleSettings.VehicleDeformationMultiplier = 3.0f;
+
+        SettingsManager.VehicleSettings.AllowSetTransmissionState = true;
+
     }
     public void SetHard()
     {
@@ -304,6 +311,7 @@ public class Settings : ISettingsProvideable
         SettingsManager.PoliceSettings.DrivingWithoutLicenseFineAmount = 2000;
         SettingsManager.PoliceSettings.BribeCorruptCopsOnly = true;
 
+
         SettingsManager.PoliceSettings.RecentlySeenTime = 10000;
         SettingsManager.PoliceSettings.KillLimit_Wanted4 = 3;
         SettingsManager.PoliceSettings.KillLimit_Wanted5 = 5;
@@ -326,6 +334,15 @@ public class Settings : ISettingsProvideable
         SettingsManager.ScannerSettings.ShowPoliceVehicleBlipsWithScanner = false;
 
         SettingsManager.GangSettings.AllowNonEnemyTargets = false;
+
+
+        SettingsManager.VehicleSettings.ModifyVehicleHandlingValues = false;
+        SettingsManager.VehicleSettings.VehicleTractionLossMultiplier = 5.0f;
+        SettingsManager.VehicleSettings.VehicleDeformationMultiplier = 4.0f;
+
+
+        SettingsManager.VehicleSettings.AllowSetTransmissionState = true;
+
 
     }
     public void SetLC()
@@ -378,6 +395,9 @@ public class Settings : ISettingsProvideable
 
         //Vendor
         SettingsManager.CivilianSettings.TotalSpawnedServiceMembersLimit = 10;
+
+
+
 
         //TAXI 
 

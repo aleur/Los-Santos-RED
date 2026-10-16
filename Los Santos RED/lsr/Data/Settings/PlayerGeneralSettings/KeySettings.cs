@@ -69,6 +69,12 @@ public class KeySettings : ISettingsDefaultable
     public Keys GroupModeToggleKey { get; set; }
     public Keys GroupModeToggleKeyModifier { get; set; }
 
+
+
+    public Keys TransmissionToggle { get; set; }
+    public Keys TransmissionToggleModifier { get; set; }
+
+
     [OnDeserialized()]
     private void SetValuesOnDeserialized(StreamingContext context)
     {
@@ -146,5 +152,11 @@ public class KeySettings : ISettingsDefaultable
         VehicleInteractModifier = Keys.LShiftKey;
         HoldUpPedGameControl = 46;
         GrabPedGameControl = 46;
+
+
+
+        TransmissionToggle = Keys.B;
+        TransmissionToggleModifier = Keys.LShiftKey;
+
     }
 }

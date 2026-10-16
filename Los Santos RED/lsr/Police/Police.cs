@@ -27,6 +27,8 @@ namespace LosSantosRED.lsr
         private Vector3 prevPlacePoliceShouldSearchForPlayer;
         private Vector3 prevPlacePoliceLastSeenPlayer;
         private List<Cop> CloseDriverCops = new List<Cop>();
+        private uint GameTimeLastTimePoliceSeenPlayer;
+        private bool SeenPoliceWithinTime => GameTimeLastTimePoliceSeenPlayer > 0 && Game.GameTime - GameTimeLastTimePoliceSeenPlayer <= Settings.SettingsManager.PoliceSettings.RecentlySeenTime;
 
         public Police(IEntityProvideable world, IPoliceRespondable currentPlayer, IPerceptable perceptable, ISettingsProvideable settings, IItemEquipable itemEquipablePlayer, ITimeReportable time)
         {
@@ -41,10 +43,15 @@ namespace LosSantosRED.lsr
         public List<Cop> CloseVehicleChasingCops { get; private set; } = new List<Cop>();
         public void Update()
         {
+            if (EntryPoint.IsLSPDFRIntegrationEnabled)
+            {
+                return; 
+            }
+
             UpdateCops();
             GameFiber.Yield();
             UpdateRecognition();
-            if (Player.IsBustable && (Player.IsIncapacitated || Player.WantedLevel == 1 || (Player.WantedLevel > 1 && Player.IsDangerouslyArmed && Player.IsStill)) && Player.IsInWantedActiveMode && Player.AnyPoliceCanSeePlayer && World.Pedestrians.PoliceList.Any(x => x.ShouldBustPlayer))
+            if (Player.IsBustable && (Player.IsIncapacitated || Player.WantedLevel == 1 || (Player.WantedLevel > 1 && Player.IsDangerouslyArmed && Player.IsMovingSlowly)) && Player.IsInWantedActiveMode && Player.AnyPoliceCanSeePlayer && World.Pedestrians.PoliceList.Any(x => x.ShouldBustPlayer))
             {
                 GameFiber.Yield();
                 Player.Arrest();
@@ -87,21 +94,28 @@ namespace LosSantosRED.lsr
                         {
                             Cop.UpdateSpeech(Player);
                         }
-                        if (Settings.SettingsManager.PoliceTaskSettings.AllowChaseAssists)
+
+                        if (Settings.SettingsManager.PoliceTaskSettings.AllowReducedCollisionPenaltyAssist)
                         {
-                            if (Settings.SettingsManager.PoliceTaskSettings.AllowReducedCollisionPenaltyAssist)
-                            {
-                                Cop.AssistManager.UpdateCollision(Player.IsWanted);
-                            }
-                            if (Settings.SettingsManager.PoliceTaskSettings.AllowFrontVehicleClearAssist)
-                            {
-                                Cop.AssistManager.ClearFront(Player.IsWanted);
-                            }
-                            if (Settings.SettingsManager.PoliceTaskSettings.AllowPowerAssist)
-                            {
-                                Cop.AssistManager.PowerAssist(Player.IsWanted);
-                            }
+                            Cop.AssistManager.UpdateCollision(Player.IsWanted);
                         }
+                        if (Settings.SettingsManager.PoliceTaskSettings.AllowFrontVehicleClearAssist)
+                        {
+                            Cop.AssistManager.ClearFront(Player.IsWanted);
+                        }
+                        //if (Settings.SettingsManager.PoliceTaskSettings.AllowPowerAssist)
+                        //{
+                        //    Cop.AssistManager.PowerAssist(Player.WantedLevel, Player.VehicleSpeedMPH);
+                        //}
+                        //if (Settings.SettingsManager.PoliceTaskSettings.AllowForceAssist)
+                        //{
+                        //    Cop.AssistManager.ForceApplier(Player.IsWanted, Settings);
+                        //}
+                        if (Settings.SettingsManager.PoliceTaskSettings.AllowStabilityForceAssist)
+                        {
+                            Cop.AssistManager.StabilityForceApplier(Player.WantedLevel, Player.VehicleSpeedMPH);
+                        }
+                        
                         if (Cop.DistanceToPlayer <= closestDistanceToPlayer && Cop.Pedestrian.Exists() && Cop.Pedestrian.IsAlive)
                         {
                             closestDistanceToPlayer = Cop.DistanceToPlayer;
@@ -216,6 +230,7 @@ namespace LosSantosRED.lsr
             bool anyPoliceRecentlySeenPlayer = false;
             bool anyPoliceSawPlayerViolating = false;
             bool anyPoliceInHeliCanSeePlayer = false;
+            
             int tested = 0;
             foreach (Cop cop in World.Pedestrians.AllPoliceList.OrderBy(x=>x.DistanceToPlayer))
             {
@@ -262,13 +277,23 @@ namespace LosSantosRED.lsr
                 }
                 //GameFiber.Yield();
             }
+
+
+            if(anyPoliceCanSeePlayer)
+            {
+                GameTimeLastTimePoliceSeenPlayer = Game.GameTime;
+            }
+
+
             Player.AnyPoliceCanSeePlayer = anyPoliceCanSeePlayer;
             Player.AnyPoliceCanHearPlayer = anyPoliceCanHearPlayer;
             Player.AnyPoliceCanRecognizePlayer = anyPoliceCanRecognizePlayer;
 
 
 
-            Player.AnyPoliceRecentlySeenPlayer = anyPoliceRecentlySeenPlayer;
+
+
+            Player.AnyPoliceRecentlySeenPlayer = anyPoliceRecentlySeenPlayer || SeenPoliceWithinTime;
 
 
 

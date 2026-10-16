@@ -42,6 +42,8 @@ public static class EntryPoint
     public static uint NotificationID { get; set; }
     public static GameConfig LoadedConfig { get; set; } = new GameConfig("");
     public static bool IsLoadingAltConfig { get; set; } = false;
+    public static bool IsLSPDFRIntegrationEnabled { get; set; } = false;
+    public static bool IsEnhancedVersion { get; set; } = false;
     public static void Main()
     {
 
@@ -58,23 +60,32 @@ public static class EntryPoint
     }
     private static void Startup()
     {
+        GetEnhancedGTAStatus();
         GetVersionInfo();
         CheckDependencies();
         CheckForUpdates();
         NotificationID = Game.DisplayNotification($"{PreStartMessage}");
     }
+
+    private static void GetEnhancedGTAStatus()
+    {
+        if(File.Exists("GTA5_Enhanced.exe"))
+        {
+            IsEnhancedVersion = true;
+        }
+    }
+
     private static void Loop()
     {
         while (true)
         {
             if (ModController == null || !ModController.IsRunning)
             {
-                if ((Game.IsKeyDown(Keys.F10) && Game.IsShiftKeyDownRightNow) || IsLoadingAltConfig)
+                if ((Game.IsKeyDown(Keys.F10) && Game.IsShiftKeyDownRightNow))
                 {
                     RemoveNotification();
-
                     ModController = new ModController();
-                    ModController.Setup(LoadedConfig);
+                    ModController.Setup();
                 }
             }
 
@@ -116,8 +127,22 @@ public static class EntryPoint
         string receivedData = string.Empty;
         try
         {
-            receivedData = webClient.DownloadString("https://www.lcpdfr.com/applications/downloadsng/interface/api.php?do=checkForUpdates&fileId=36665&textOnly=1").Trim();
+            string token = "";
+            //webClient.Headers.Add("Authorization", $"Bearer {token}");
+            //receivedData = webClient.DownloadString("https://api-prod.lcpdfr.com/api/downloadsng/files/36665/version").Trim();
+            //EntryPoint.WriteToConsole(receivedData, 0);
+
+            //APIResponse deserializedPerson = JsonSerializer.Deserialize<APIResponse>(receivedData);
+            //EntryPoint.WriteToConsole(deserializedPerson.version, 0);
+
+
+
+             receivedData = webClient.DownloadString("https://www.lcpdfr.com/applications/downloadsng/interface/api.php?do=checkForUpdates&fileId=36665&textOnly=1").Trim();
             string WebLatestVersionFixed = FixWebVersionString(receivedData);
+
+            //WebLatestVersionFixed = deserializedPerson.version;
+
+
             if (WebLatestVersionFixed != LSRInstalledVersionInfo.FileVersion)
             {
                 Version webLatest = new Version(WebLatestVersionFixed);
@@ -131,6 +156,7 @@ public static class EntryPoint
         {
             PreStartMessage = $"{PreStartMessage} ~n~~n~~r~UPDATE CHECK FAILED~s~";
             WriteToConsole($"Failed to check for updates", 0);
+            WriteToConsole($"{ex.Message}", 0);
         }
     }
     private static string FixWebVersionString(string webVersionString)
@@ -193,4 +219,10 @@ public static class EntryPoint
         ModController.SetupFileOnly();
     }
 #endif
+
+    private class APIResponse
+    {
+        public string version { get; set; }
+        public string url { get; set; }
+    }
 }

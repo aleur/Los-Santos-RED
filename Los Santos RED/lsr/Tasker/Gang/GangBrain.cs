@@ -32,6 +32,10 @@ public class GangBrain : PedBrain
             }
             return;
         }
+        //else if(!GangMember.CanBeTasked)
+        //{
+        //    return;
+        //}
         else
         {
             if (!GangMember.IsBusted && !GangMember.CanBeTasked)
@@ -108,7 +112,7 @@ public class GangBrain : PedBrain
             bool SeenOtherReactiveCrime = GangMember.OtherCrimesWitnessed.Any(x => (x.Crime.ScaresCivilians || x.Crime.AngersCivilians) && x.Crime.CanBeReactedToByCivilians);
 
 
-            WitnessedCrime HighestPriorityOtherCrime = GangMember.OtherCrimesWitnessed.OrderBy(x => x.Crime.Priority).ThenByDescending(x => x.GameTimeLastWitnessed).FirstOrDefault();
+            WitnessedCrime HighestPriorityOtherCrime = GangMember.OtherCrimesWitnessed.OrderByDescending(x=> x.Crime.ResultingWantedLevel).ThenBy(x => x.Crime.Priority).ThenByDescending(x => x.GameTimeLastWitnessed).FirstOrDefault();
             int PlayerCrimePriority = 99;
             foreach (WitnessedCrime playerCrime in GangMember.PlayerCrimesWitnessed.Where(x => x.Crime.CanBeReactedToByCivilians))
             {
@@ -133,18 +137,8 @@ public class GangBrain : PedBrain
             }
             else
             {
-                if (SeenPlayerReactiveCrime)
-                {
-                    if (GangMember.WillFight && !arePoliceNearby && Player.IsNotWanted && isNearHomeTerritory)
-                    {
-                        WillAttackPlayer = true;
-                    }
-                    else
-                    {
-                        WillFleeFromPlayer = true;
-                    }
-                }
-                else if (GangMember.HasBeenHurtByPlayer || GangMember.HasBeenCarJackedByPlayer || gr.RecentlyAttacked || (GangMember.IsHitSquad && GangMember.CanSeePlayer))
+                
+                if (GangMember.HasBeenHurtByPlayer || GangMember.HasBeenCarJackedByPlayer || gr.RecentlyAttacked || (GangMember.IsHitSquad && GangMember.EverSeenPlayer))
                 {
                     if (GangMember.WillFight)
                     {
@@ -166,7 +160,7 @@ public class GangBrain : PedBrain
                         WillFleeFromPlayer = true;
                     }
                 }
-                else if (GangMember.IsFedUpWithPlayer && !arePoliceNearby)
+                else if (GangMember.CanAttackPlayer && !arePoliceNearby)
                 {
                     IsFedUp = true;
                     if (GangMember.WillFight)
@@ -178,7 +172,25 @@ public class GangBrain : PedBrain
                         WillFleeFromPlayer = true;
                     }
                 }
+                else if (SeenPlayerReactiveCrime)
+                {
+                    if (GangMember.WillFight && !arePoliceNearby && Player.IsNotWanted && isNearHomeTerritory)
+                    {
+                        WillAttackPlayer = true;
+                    }
+                    else
+                    {
+                        WillFleeFromPlayer = true;
+                    }
+                }
             }
+
+            //if(GangMember.IsHitSquad)
+            //{
+            //    WillAttackPlayer = true;
+            //    WillFleeFromPlayer = false;
+            //}
+
             if (WillAttackPlayer)
             {
                 if (IsFedUp)
@@ -207,9 +219,6 @@ public class GangBrain : PedBrain
             }
             else
             {
-
-
-
                 if (GangMember.IsBackupSquad && !GangMember.PlayerPerception.EverSeenTarget && GangMember.ClosestDistanceToPlayer >= 20f)
                 {
                     SetLocate(GangMember);

@@ -37,7 +37,7 @@ public class MainMenu : ModUIMenu
     private IGameConfigs GameConfigs;
 
     public MainMenu(MenuPool menuPool, IActionable actionablePlayer, ILocationInteractable player, ISaveable saveablePlayer, IGameSaves gameSaves, IWeapons weapons, IPedSwap pedswap, IEntityProvideable world, ISettingsProvideable settings, ITaskerable tasker, 
-        IInventoryable playerinventory, IModItems modItems, UI ui, IGangs gangs, ITimeControllable time, IPlacesOfInterest placesOfInterest, IDances dances, IGestures gestures, IActivityPerformable activityPerformable, IAgencies agencies, ICrimes crimes, IIntoxicants intoxicants, IShopMenus shopMenus, IGameConfigs gameConfigs)
+        IInventoryable playerinventory, IModItems modItems, UI ui, IGangs gangs, ITimeControllable time, IPlacesOfInterest placesOfInterest, IDances dances, IGestures gestures, IActivityPerformable activityPerformable, IAgencies agencies, ICrimes crimes, IIntoxicants intoxicants, IShopMenus shopMenus)
     {
         MenuPool = menuPool;
         ActionablePlayer = actionablePlayer;
@@ -62,7 +62,6 @@ public class MainMenu : ModUIMenu
         Main = new UIMenu("Los Santos RED", "Select an Option");
         SettingsMenu = new SettingsMenu(MenuPool, Main, Settings, Crimes, intoxicants, shopMenus);
         PedSwapMenu = new PedSwapMenu(MenuPool, Main, PedSwap, Gangs, agencies, ActionablePlayer);
-        ConfigMenu = new ConfigMenu(MenuPool, Main, ui,gameConfigs);
     }
 
     public void Setup()
@@ -71,7 +70,7 @@ public class MainMenu : ModUIMenu
         MenuPool.Add(Main);
         SettingsMenu.Setup();    
         PedSwapMenu.Setup();
-        ConfigMenu.Setup();
+        //ConfigMenu.Setup();
         CreateMainMenu();
     }
 
@@ -155,6 +154,27 @@ public class MainMenu : ModUIMenu
             Main.Visible = false;
         };
         VehicleItems.AddItem(RemoveVehicleOwnership);
+
+
+
+
+        UIMenuCheckboxItem SetLSPDFRIntegrationMenu = new UIMenuCheckboxItem("LSPDFR Integration",EntryPoint.IsLSPDFRIntegrationEnabled,"Enable to set LSR into LSPDFR Compatibility Mode.");
+
+        SetLSPDFRIntegrationMenu.CheckboxEvent += (sender, Checked) =>
+        {
+            EntryPoint.IsLSPDFRIntegrationEnabled = Checked;
+
+            Settings.SettingsManager.ViolationSettings.TreatAsCop = Checked;
+            if (Checked)
+            {
+                Player.SetDefaultCop();
+            }
+            else
+            {
+                Player.RemoveAgencyStatus();
+            }
+        };
+        Main.AddItem(SetLSPDFRIntegrationMenu);
 
         UIMenuItem UnloadMod = new UIMenuItem("Deactivate Mod", "Deactivate mod and change back to vanilla. Use Shift+F10 to restart. Does not unload from RPH. ~r~Load Game~s~ required at minimum, ~r~Restart~s~ for best results.");
         UnloadMod.RightBadge = UIMenuItem.BadgeStyle.Star;

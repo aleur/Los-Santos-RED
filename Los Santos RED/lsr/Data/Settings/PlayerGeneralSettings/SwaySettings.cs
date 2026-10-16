@@ -40,7 +40,7 @@ public class SwaySettings : ISettingsDefaultable
     public int FramesBetweenRecoil { get; set; }
     public float SmoothRate { get; set; }
     public float ExcessivePitch { get; set; }
-
+    public float InVehicleVerticalScalar { get; set; }
     public SwaySettings()
     {
         SetDefault();
@@ -67,6 +67,7 @@ public class SwaySettings : ISettingsDefaultable
         ApplySwayWithController = false;
         SmoothRate = 1.0f;
         ExcessivePitch = 0.001f;
+        InVehicleVerticalScalar = 2.75f;
     }
 
 }

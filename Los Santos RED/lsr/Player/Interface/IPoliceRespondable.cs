@@ -84,8 +84,12 @@ namespace LosSantosRED.lsr.Interface
         Cop ClosestCopDriverToPlayer { get; set; }
         Inventory Inventory { get; }
         bool IsInWantedActiveMode { get; }
+        float VehicleSpeedMPH { get; }
+        bool IsWearingMask { get; }
+        bool IsMovingSlowly { get; }
+        GangTerritoryManager GangTerritoryManager { get; }
 
-        void AddCrime(Crime crime, bool ByPolice, Vector3 positionLastSeenCrime, VehicleExt vehicleLastSeenPlayerIn, WeaponInformation weaponLastSeenPlayerWith, bool HaveDescription, bool announceCrime, bool IsForPlayer);
+        void AddCrime(Crime crime, bool ByPolice, Vector3 positionLastSeenCrime, VehicleExt vehicleLastSeenPlayerIn, WeaponInformation weaponLastSeenPlayerWith, bool HaveDescription, bool announceCrime, bool IsForPlayer, bool alwaysAddInstance);
         void AddMedicalEvent(Vector3 positionLastSeenDistressedPed);
         void AddOfficerMIACall(Vector3 positionLastReported);
         void Arrest();

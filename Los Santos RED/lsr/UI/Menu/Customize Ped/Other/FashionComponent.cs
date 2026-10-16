@@ -21,6 +21,8 @@ public class FashionComponent
     private UIMenuItem filterItems;
     private UIMenuItem goToDrawable;
     private UIMenuItem ResetMenu;
+    private bool IsDefaultApplied = false;
+    private UIMenuCheckboxItem NotAppliedMenu;
 
     public FashionComponent()
     {
@@ -32,6 +34,10 @@ public class FashionComponent
     }
     public int ComponentID { get; set; }
     public string ComponentName { get; set; }
+
+
+    public bool AllowDefaultNotApplied { get; set; }
+
     public void CombineCustomizeMenu(MenuPool MenuPool, UIMenu topMenu, Ped ped, PedCustomizer pedCustomizer)
     {
         Ped = ped;
@@ -62,7 +68,33 @@ public class FashionComponent
         AddTextureItem(componentMenu);
         AddGoToMenuItem(componentMenu);
         AddSearchMenuItem(componentMenu);
+
+        if(AllowDefaultNotApplied)
+        {
+            AddDefaultNotAppliedMenuItem(componentMenu);
+        }
+
     }
+
+    private void AddDefaultNotAppliedMenuItem(UIMenu componentMenu)
+    {
+        NotAppliedMenu = new UIMenuCheckboxItem("Default Not Applied", IsDefaultApplied, "If enabled the componenet will not be applied by default and will need to be toggled using the clothing/accessories/outfit menus.");
+        PedComponent initialComponentStart = PedCustomizer.WorkingVariation.Components.FirstOrDefault(x => x.ComponentID == ComponentID);
+        NotAppliedMenu.Checked = initialComponentStart?.IsDefaultNotApplied == true;
+        NotAppliedMenu.CheckboxEvent += (sender, Checked) =>
+        {
+            PedComponent foundComponent = PedCustomizer.WorkingVariation.Components.FirstOrDefault(x => x.ComponentID == ComponentID);
+            if(foundComponent == null)
+            {
+                Game.DisplaySubtitle("No Component found to set default");
+                return;
+            }
+            foundComponent.IsDefaultNotApplied = Checked;
+        };
+        componentMenu.AddItem(NotAppliedMenu);
+    }
+
+
     private void AddResetMenuItem(UIMenu componentMenu)
     {
         ResetMenu = new UIMenuItem("Reset", "Reset the item back to the initial value");
@@ -88,10 +120,20 @@ public class FashionComponent
         SetDrawableValue(false);
         DrawableMenuScroller.IndexChanged += (Sender, oldIndex, newIndex) =>
         {
-            OnComponentChanged(DrawableMenuScroller.SelectedItem.ID);
+            OnComponentChanged(DrawableMenuScroller.SelectedItem.ID,false);
         };
+
+        DrawableMenuScroller.Activated += (sender,selectedItem) =>
+        {
+            OnComponentChanged(DrawableMenuScroller.SelectedItem.ID, true);
+        };
+
+
         componentMenu.AddItem(DrawableMenuScroller);
     }
+
+
+
     private void AddTextureItem(UIMenu componentMenu)
     {
         PedComponent pedComponent = PedCustomizer.WorkingVariation.Components.FirstOrDefault(x => x.ComponentID == ComponentID);
@@ -202,7 +244,7 @@ public class FashionComponent
         }
         //EntryPoint.WriteToConsoleTestLong($"SetDrawableValue End {ComponentID} canGo {canGo}");
     }
-    private void OnComponentChanged(int newDrawableID)
+    private void OnComponentChanged(int newDrawableID, bool force)
     {
         if (PedCustomizer.PedCustomizerMenu.IsProgramicallySettingFieldValues)
         {
@@ -211,9 +253,9 @@ public class FashionComponent
         }
 
 
-        if(PedCustomizer.IsDrawableBlacklisted(ComponentID,newDrawableID,PedCustomizer.PedModelIsFreeMode && !PedCustomizer.PedModelIsFreeModeFemale))
+        if(!force && PedCustomizer.IsDrawableBlacklisted(ComponentID,newDrawableID,PedCustomizer.PedModelIsFreeMode && !PedCustomizer.PedModelIsFreeModeFemale))
         {
-            Game.DisplaySubtitle($"{ComponentID}-{newDrawableID} cannot be set");
+            Game.DisplaySubtitle($"{ComponentID}-{newDrawableID} may cause crashes. Press ENTER to force set");
             return;
         }
 
@@ -370,7 +412,7 @@ public class FashionComponent
         else
         {
             SetDrawableValue(true);
-            OnComponentChanged(DrawableMenuScroller.SelectedItem.ID);
+            OnComponentChanged(DrawableMenuScroller.SelectedItem.ID, false);
         }
         //EntryPoint.WriteToConsoleTestLong($"SetFiltering End {ComponentID}");
     }

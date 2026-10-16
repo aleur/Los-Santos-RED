@@ -16,6 +16,36 @@ namespace LosSantosRED.lsr.Helper
 {
     public static class NativeHelper
     {
+        public static string GetControlBoxCode(ControllerButtons key)
+        {
+            switch (key)
+            {
+                // Everything else (J, K, O, P, etc.) gets the "White Box" look
+                default:
+                    // This creates "t_J", "t_K", etc., which GTA turns into the box keys
+                    // dumb ai leaves "t_" remove t_ and leave "" and it doesn't show t_hotkey, who knew..
+                    string keyName = key.ToString().Replace("Key", "");
+                    return "" + keyName;
+            }
+        }
+        public static string GetKeyBoxCode(Keys key)
+        {
+            switch (key)
+            {
+                // Special icons that look better as native icons
+                case Keys.LShiftKey: return "Shift"; // The Shift Arrow icon
+                case Keys.LMenu: return "Alt";     // The Alt icon
+                case Keys.LControlKey: return "Ctrl"; // The Ctrl icon
+                case Keys.Space: return "Space";     // The Spacebar icon
+
+                // Everything else (J, K, O, P, etc.) gets the "White Box" look
+                default:
+                    // This creates "t_J", "t_K", etc., which GTA turns into the box keys
+                    // dumb ai leaves "t_" remove t_ and leave "" and it doesn't show t_hotkey, who knew..
+                    string keyName = key.ToString().Replace("Key", "");
+                    return "" + keyName;
+            }
+        }
         public static void AddLongString(string str)//https://github.com/alexguirre/RAGENativeUI/blob/fa32a06b84b3ff33f4988b7ba6fb4d3bb158b134/Source/Elements/ResText.cs
         {
             const int strLen = 99;
@@ -90,7 +120,15 @@ namespace LosSantosRED.lsr.Helper
             }
             return uint.TryParse(hex, NumberStyles.HexNumber, CultureInfo.CurrentCulture, out hash);
         }
-
+        //public static string ConvertMSToTime(uint TotalGameTime)
+        //{
+        //    TimeSpan t = TimeSpan.FromMilliseconds(TotalGameTime);
+        //    string answer = string.Format("{0:00}:{1:00}.{2:000}",
+        //                            t.Minutes,
+        //                            t.Seconds,
+        //                            t.Milliseconds);
+        //    return answer;
+        //}
 
         public static string AddOrdinal(int num)
         {
@@ -431,6 +469,18 @@ namespace LosSantosRED.lsr.Helper
             Game.DisableControlAction(0, GameControl.MoveLeftRight, true);
             Game.DisableControlAction(0, GameControl.VehicleAccelerate, true);
             Game.DisableControlAction(0, GameControl.VehicleBrake, true);
+
+
+            Game.DisableControlAction(0, GameControl.VehicleAccelerate, true);
+            Game.DisableControlAction(0, GameControl.VehicleMoveLeftRight, true);
+            Game.DisableControlAction(0, GameControl.VehicleMoveUpDown, true);
+
+            Game.DisableControlAction(0, GameControl.WeaponWheelNext, true);
+
+            Game.DisableControlAction(0, GameControl.VehicleSelectNextWeapon, true);
+
+            Game.DisableControlAction(0, GameControl.WeaponWheelPrev, true);
+            Game.DisableControlAction(0, GameControl.WeaponWheelUpDown, true);
             Game.DisableControlAction(0, GameControl.Jump, true);
 
 
@@ -981,7 +1031,30 @@ namespace LosSantosRED.lsr.Helper
             }
         }
 
+        public static void AddDecal(Vector3 pos, int decalType, float width = 1f, float height = 1f, float rCoef = 0.1f, float gCoef = 0.1f, float bCoef = 0.1f, float opacity = 1f, float timeout = 20f)
+        {
+            NativeFunction.Natives.ADD_DECAL<int>((int)decalType,
+                pos.X, pos.Y, GetGroundZ(pos),
+                0, 0, -1f,
+                0, 1f, 0,
+                width, height,
+                rCoef, gCoef, bCoef, opacity,
+                timeout, 0, 0, 0);
+            // ADD_DECAL (DECAL_RENDERSETTING_ID renderSettingsId,
+            // VECTOR pos, VECTOR dir, VECTOR side, FLOAT width, FLOAT height,
+            // FLOAT colR, FLOAT colG, FLOAT colB, FLOAT colA,
+            //
+            //
+            // FLOAT life, BOOL isLongRange=false, BOOL isDynamic=false, BOOL useComplexColn=false) = "0x20f895e512ec5db6"
 
+
+        }
+
+        private static float GetGroundZ(Vector3 pos)
+        {
+            NativeFunction.Natives.GET_GROUND_Z_FOR_3D_COORD<bool>(pos.X, pos.Y, pos.Z, out float result, false);
+            return result;
+        }
 
         public static MaterialHash GroundMaterialAtPosition(Vector3 position, Entity ignoredEntity)
         {
@@ -1051,15 +1124,6 @@ namespace LosSantosRED.lsr.Helper
 
         }
 
-        internal static Vector3 GetOffsetPosition(Vector3 posI, float v, object barberXOffset)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal static Vector3 GetOffsetPosition(Vector3 posI, object value, float barberXOffset)
-        {
-            throw new NotImplementedException();
-        }
     }
     [StructLayout(LayoutKind.Explicit, Size = 80)]
     public struct HeadBlendDataStruct

@@ -31,9 +31,7 @@ public class Firefighter : PedExt, IWeaponIssuable
     public bool IsUsingMountedWeapon { get; set; } = false;
     public bool IsRespondingToInvestigation { get; set; }
     public override bool HasWeapon => WeaponInventory.HasPistol || WeaponInventory.HasLongGun;
-
-    public bool IsCorrupt { get; private set; }
-
+    public override bool CanCurrentlyRacePlayer => false;
     public override void Update(IPerceptable perceptable, IPoliceRespondable policeRespondable, Vector3 placeLastSeen, IEntityProvideable world)
     {
         PlayerToCheck = policeRespondable;
@@ -52,13 +50,13 @@ public class Firefighter : PedExt, IWeaponIssuable
                 UpdateVehicleState();
                 if (!IsUnconscious && PlayerPerception.DistanceToTarget <= 200f)
                 {
-                    if (!PlayerPerception.RanSightThisUpdate && Settings.SettingsManager.PerformanceSettings.EnablePerformanceUpdateMode)
+                    if (!PlayerPerception.RanSightThisUpdate && Settings.SettingsManager.PerformanceSettings.EnableHighPerformanceMode)
                     {
                         GameFiber.Yield();
                     }
                     if (ShouldCheckCrimes)
                     {
-                        PedViolations.Update(policeRespondable, true);//possible yield in here!, REMOVED FOR NOW
+                        PedViolations.Update(policeRespondable);//possible yield in here!, REMOVED FOR NOW
                     }
                     PedPerception.Update();
                     if (Settings.SettingsManager.FireSettings.AllowAlerts)
@@ -69,7 +67,7 @@ public class Firefighter : PedExt, IWeaponIssuable
                 GameTimeLastUpdated = Game.GameTime;
             }
         }
-        CurrentHealthState.Update(policeRespondable);//has a yield if they get damaged, seems ok 
+        CurrentHealthState.Update(policeRespondable, world);//has a yield if they get damaged, seems ok 
     }
     public void SetStats(DispatchablePerson dispatchablePerson, IShopMenus shopMenus, IWeapons Weapons, bool addBlip)
     {
@@ -88,16 +86,6 @@ public class Firefighter : PedExt, IWeaponIssuable
             GroupName = AssignedAgency.MemberName;
         }
         Money = RandomItems.GetRandomNumberInt(AssignedAgency.MoneyMin, AssignedAgency.MoneyMax);
-        if (RandomItems.RandomPercent(AssignedAgency.CorruptMemberPercentage))
-        {
-            IsCorrupt = true;
-            SetupTransactionItems(shopMenus.GetWeightedRandomMenuFromGroup(AssignedAgency.CorruptMenuGroup), false);
-            Money = RandomItems.GetRandomNumberInt(AssignedAgency.CorruptMoneyMin, AssignedAgency.CorruptMoneyMax);
-        }
-        if (IsCorrupt)
-        {
-            WillCallPolice = false;
-        }
         if (addBlip)
         {
             AddBlip();

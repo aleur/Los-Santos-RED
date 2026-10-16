@@ -80,10 +80,24 @@ namespace LosSantosRED.lsr.Data
         public List<StoredWeapon> WeaponInventory { get; set; } = new List<StoredWeapon>();
         public List<InventorySave> InventoryItems { get; set; } = new List<InventorySave>();
         public List<VehicleSaveStatus> OwnedVehicleVariations { get; set; } = new List<VehicleSaveStatus>();
-        public List<SavedResidence> SavedResidences { get; set; } = new List<SavedResidence>();
+        public List<SavedGameLocation> SavedGameLocations { get; set; } = new List<SavedGameLocation>();
         public CellPhoneSave CellPhoneSave { get; set; } = new CellPhoneSave();
 
         public List<GangLoanSave> GangLoanSaves { get; set; } = new List<GangLoanSave>();
+
+
+        public List<PedClothingShopMenuItem> SavedPurchasedClothingItems { get; set; } = new List<PedClothingShopMenuItem>();
+
+
+        public List<GangWarSave> GangWarSaves { get; set; } = new List<GangWarSave>();
+        public List<GangRetaliationSave> GangRetaliationSaves { get; set; } = new List<GangRetaliationSave>();
+
+
+        ////LEGACY TO BE REMOVED
+        //public List<SavedResidence> SavedResidences { get; set; } = new List<SavedResidence>();//LEGACY TO BE REMOVED
+        //public List<SavedBusiness> SavedBusinesses { get; set; } = new List<SavedBusiness>();//LEGACY TO BE REMOVED
+
+
 
         [OnDeserialized()]
         private void SetValuesOnDeserialized(StreamingContext context)
@@ -107,9 +121,63 @@ namespace LosSantosRED.lsr.Data
             SavePostition(player);
             SaveHumanState(player);
             SaveLicenses(player);
-            SaveResidences(player);
             SaveAgencies(player);
             SaveCellPhone(player); 
+            SaveOwnedProperties(player);
+            SavePurchasedClothingItem(player);
+            SaveGangWarfare(player);
+        }
+
+        private void SaveGangWarfare(ISaveable player)
+        {
+            GangWarSaves.Clear();
+            foreach(GangWar gw in player.GangTerritoryManager.GangWars)
+            {
+                GangWarSave gws = new GangWarSave();
+                gws.TargetGangID = gw.TargetGang.ID;
+                gws.ZoneIds = new List<string>();
+                gws.CenterPoint = gw.CenterPoint;
+                foreach(Zone zone in gw.ZonesToAttack)
+                {
+                    gws.ZoneIds.Add(zone.InternalGameName);
+                }
+                GangWarSaves.Add(gws);
+            }
+            GangRetaliationSaves.Clear();
+            foreach (GangRetaliation gw in player.GangTerritoryManager.Retaliations)
+            {
+                if(gw.TargetGang == null || gw.ZonesToAttack == null)
+                {
+                    continue;
+                }
+                GangRetaliationSave grs = new GangRetaliationSave();
+                grs.ZoneIds = gw.ZonesToAttack.Select(x=>x.InternalGameName).ToList();
+                grs.TargetGangID = gw.TargetGang.ID;
+                grs.CenterPoint = gw.CenterPoint;
+                GangRetaliationSaves.Add(grs);
+            }
+            
+
+
+        }
+
+        private void SavePurchasedClothingItem(ISaveable player)
+        {
+            SavedPurchasedClothingItems.Clear();
+            foreach(PedClothingShopMenuItem pedClothingShopMenuItem in player.OutfitManager.PurchasedPedClothingShopMenuItems)
+            {
+                SavedPurchasedClothingItems.Add(pedClothingShopMenuItem);
+            }
+        }
+
+        private void SaveOwnedProperties(ISaveable player)
+        {
+            SavedGameLocations.Clear();
+            foreach(GameLocation gameLocation in player.Properties.PropertyList)
+            {
+                SavedGameLocation myLocation = gameLocation.GetSaveData();
+                SavedGameLocations.Add(myLocation);
+            }
         }
         private void SaveDemographics(ISaveable player)
         {
@@ -260,52 +328,30 @@ namespace LosSantosRED.lsr.Data
         {
             if (player.Licenses.HasDriversLicense)
             {
-                DriversLicense = new DriversLicense() { ExpirationDate = player.Licenses.DriversLicense.ExpirationDate, IssueDate = player.Licenses.DriversLicense.IssueDate, IssueStateID = player.Licenses.DriversLicense.IssueStateID };
+                DriversLicense = new DriversLicense() { 
+                    ExpirationDate = player.Licenses.DriversLicense.ExpirationDate, 
+                    IssueDate = player.Licenses.DriversLicense.IssueDate, 
+                    IssueStateID = player.Licenses.DriversLicense.IssueStateID 
+                };
             }
             if (player.Licenses.HasCCWLicense)
             {
-                CCWLicense = new CCWLicense() { ExpirationDate = player.Licenses.CCWLicense.ExpirationDate, IssueDate = player.Licenses.CCWLicense.IssueDate, IssueStateID = player.Licenses.DriversLicense.IssueStateID };
+                CCWLicense = new CCWLicense() { 
+                    ExpirationDate = player.Licenses.CCWLicense.ExpirationDate, 
+                    IssueDate = player.Licenses.CCWLicense.IssueDate,
+                    IssueStateID = player.Licenses.DriversLicense.IssueStateID 
+                };
             }
             if (player.Licenses.HasPilotsLicense)
             {
-                PilotsLicense = new PilotsLicense() { ExpirationDate = player.Licenses.PilotsLicense.ExpirationDate, IssueDate = player.Licenses.PilotsLicense.IssueDate, IssueStateID = player.Licenses.DriversLicense.IssueStateID, IsFixedWingEndorsed = player.Licenses.PilotsLicense.IsFixedWingEndorsed, IsRotaryEndorsed = player.Licenses.PilotsLicense.IsRotaryEndorsed, IsLighterThanAirEndorsed = player.Licenses.PilotsLicense.IsLighterThanAirEndorsed };
-            }
-        }
-        private void SaveResidences(ISaveable player)
-        {
-            SavedResidences.Clear();
-            foreach (Residence res in player.Properties.Residences)//placesOfInterest.PossibleLocations.Residences)
-            {
-                if (res.IsOwned || res.IsRented)
-                {
-                    SavedResidence myRes = new SavedResidence(res.Name, res.IsOwned, res.IsRented);
-                    if (res.IsRented)
-                    {
-                        myRes.DateOfLastRentalPayment = res.DateRentalPaymentPaid;
-                        myRes.RentalPaymentDate = res.DateRentalPaymentDue;
-                    }
-                    if (res.WeaponStorage != null)
-                    {
-                        myRes.WeaponInventory = new List<StoredWeapon>();
-                        foreach (StoredWeapon storedWeapon in res.WeaponStorage.StoredWeapons)
-                        {
-                            myRes.WeaponInventory.Add(storedWeapon.Copy());
-                        }
-                    }
-                    if (res.SimpleInventory != null)
-                    {
-                        myRes.InventoryItems = new List<InventorySave>();
-                        foreach (InventoryItem ii in res.SimpleInventory.ItemsList)
-                        {
-                            myRes.InventoryItems.Add(new InventorySave(ii.ModItem?.Name, ii.RemainingPercent));
-                        }
-                    }
-                    if(res.CashStorage != null)
-                    {
-                        myRes.StoredCash = res.CashStorage.StoredCash;
-                    }
-                    SavedResidences.Add(myRes);
-                }
+                PilotsLicense = new PilotsLicense() { 
+                    ExpirationDate = player.Licenses.PilotsLicense.ExpirationDate, 
+                    IssueDate = player.Licenses.PilotsLicense.IssueDate, 
+                    IssueStateID = player.Licenses.DriversLicense.IssueStateID, 
+                    IsFixedWingEndorsed = player.Licenses.PilotsLicense.IsFixedWingEndorsed, 
+                    IsRotaryEndorsed = player.Licenses.PilotsLicense.IsRotaryEndorsed, 
+                    IsLighterThanAirEndorsed = player.Licenses.PilotsLicense.IsLighterThanAirEndorsed 
+                };
             }
         }
         private void SaveAgencies(ISaveable player)
@@ -321,27 +367,48 @@ namespace LosSantosRED.lsr.Data
             CellPhoneSave = new CellPhoneSave(player.CellPhone.CustomRingtone, player.CellPhone.CustomTextTone, player.CellPhone.CustomTheme, player.CellPhone.CustomBackground, player.CellPhone.CustomVolume, player.CellPhone.SleepMode, player.CellPhone.CustomPhoneType, player.CellPhone.CustomPhoneOS);
         }
         //Load
-        public void Load(IWeapons weapons,IPedSwap pedSwap, IInventoryable player, ISettingsProvideable settings, IEntityProvideable world, IGangs gangs, IAgencies agencies, ITimeControllable time, IPlacesOfInterest placesOfInterest, IModItems modItems, IContacts contacts, IInteractionable interactionable)
+        public void Load(IWeapons weapons,IPedSwap pedSwap, IInventoryable player, ISettingsProvideable settings, IEntityProvideable world, IGangs gangs, 
+            IAgencies agencies, ITimeControllable time, IPlacesOfInterest placesOfInterest, IModItems modItems, IContacts contacts, IInteractionable interactionable, IShopMenus shopMenus, IZones zones)
         {
             try
             {
                 Game.FadeScreenOut(1000, true);
+                EntryPoint.WriteToConsole("Load 1");
                 time.SetDateTime(CurrentDateTime);
                 pedSwap.BecomeSavedPed(PlayerName, ModelName, Money, CurrentModelVariation, SpeechSkill, VoiceName);//, CurrentHeadBlendData, CurrentPrimaryHairColor, CurrentSecondaryColor, CurrentHeadOverlays);
+                EntryPoint.WriteToConsole("Load 2");
                 LoadMoney(player);
+                EntryPoint.WriteToConsole("Load 2a");
                 LoadWeapons(weapons);
+                EntryPoint.WriteToConsole("Load 2b");
                 LoadInventory(player, modItems);
+                EntryPoint.WriteToConsole("Load 2c");
                 LoadLicenses(player);
+                EntryPoint.WriteToConsole("Load 3");
                 LoadVehicles(player, world,settings, modItems, placesOfInterest, time, weapons);
                 LoadPosition(player, placesOfInterest, world, interactionable);
                 LoadRelationships(player, gangs, contacts, time);
-                LoadContacts(player, gangs);    
-                LoadResidences(player, placesOfInterest, modItems, settings);
+                LoadContacts(player, gangs);
+                EntryPoint.WriteToConsole("Load 4");
+
+
                 LoadDebt(player);
                 LoadHumanState(player);
                 LoadCellPhoneSettings(player);
                 LoadAgencies(agencies, player);
                 LoadHealth(player);
+                EntryPoint.WriteToConsole("Load 5");
+
+                ////LEGACY TO BE REMOVED
+                //LoadResidences(player, placesOfInterest, modItems, settings);//LEGACY TO BE REMOVED
+                //LoadBusinesses(player, placesOfInterest, modItems, settings);//LEGACY TO BE REMOVED
+
+                LoadOwnedProperties(player, placesOfInterest, modItems, settings, world);
+                LoadSavedClothingItems(player, shopMenus);
+
+                LoadGangWarfare(player, gangs, zones);
+
+                EntryPoint.WriteToConsole("Load 6");
                 GameFiber.Sleep(1000);
                 Game.FadeScreenIn(1500, true);
                 player.DisplayPlayerNotification();
@@ -353,6 +420,18 @@ namespace LosSantosRED.lsr.Data
                 Game.DisplayNotification("Error Loading Save");
             }
         }
+
+
+        private void LoadSavedClothingItems(IInventoryable player, IShopMenus shopMenus)
+        {
+            //do we really wnat to save the whole xml again each time? would make it easier
+            player.OutfitManager.PurchasedPedClothingShopMenuItems.Clear();
+            foreach (PedClothingShopMenuItem pedClothingShopMenuItem in SavedPurchasedClothingItems)
+            {
+                    player.OutfitManager.PurchasedPedClothingShopMenuItems.Add(pedClothingShopMenuItem);         
+            }
+        }
+
         private void LoadMoney(IInventoryable player)
         {
             player.BankAccounts.Reset();
@@ -420,6 +499,7 @@ namespace LosSantosRED.lsr.Data
             //WeaponDescriptorCollection PlayerWeapons = Game.LocalPlayer.Character.Inventory.Weapons;
             foreach (StoredWeapon MyOldGuns in WeaponInventory)
             {
+                //EntryPoint.WriteToConsole($"Load WEapons for {MyOldGuns.WeaponHash}");
                 MyOldGuns.GiveToPlayer(weapons);
 
 
@@ -590,6 +670,47 @@ namespace LosSantosRED.lsr.Data
             }
 
         }
+
+
+
+        private void LoadGangWarfare(IInventoryable player, IGangs gangs, IZones zones)
+        {
+            player.GangTerritoryManager.Reset();
+
+
+
+            foreach(GangWarSave gws in GangWarSaves)
+            {
+                Gang targetGang = gangs.GetGang(gws.TargetGangID);
+                List<Zone> toAttackZones = new List<Zone>();
+                foreach(string id in gws.ZoneIds)
+                {
+                    Zone zone = zones.GetZone(id);
+                    if (zone != null)
+                    {
+                        toAttackZones.Add(zone);
+                    }
+                }
+
+                player.GangTerritoryManager.LoadWar(targetGang, toAttackZones, gws.CasualityLimit, gws.CenterPoint);
+            }
+            foreach (GangRetaliationSave grs in GangRetaliationSaves)
+            {
+                Gang targetGang = gangs.GetGang(grs.TargetGangID);
+                List<Zone> toAttackZones = new List<Zone>();
+                foreach (string id in grs.ZoneIds)
+                {
+                    Zone zone = zones.GetZone(id);
+                    if (zone != null)
+                    {
+                        toAttackZones.Add(zone);
+                    }
+                }
+                player.GangTerritoryManager.LoadRetaliation(targetGang, toAttackZones, grs.TimesPlayerDefendedRetaliation, grs.CenterPoint);
+            }
+        }
+
+
         private void LoadContacts(IInventoryable player, IGangs gangs)
         {
             foreach (PhoneContact ifc in Contacts.OrderBy(x => x.Index))
@@ -616,40 +737,11 @@ namespace LosSantosRED.lsr.Data
                 player.Licenses.PilotsLicense = new PilotsLicense() { ExpirationDate = PilotsLicense.ExpirationDate, IssueDate = PilotsLicense.IssueDate, IssueStateID = DriversLicense.IssueStateID, IsFixedWingEndorsed = PilotsLicense.IsFixedWingEndorsed, IsRotaryEndorsed = PilotsLicense.IsRotaryEndorsed, IsLighterThanAirEndorsed = PilotsLicense.IsLighterThanAirEndorsed };
             }
         }
-        private void LoadResidences(IInventoryable player, IPlacesOfInterest placesOfInterest, IModItems modItems, ISettingsProvideable settings)
+        private void LoadOwnedProperties(IInventoryable player, IPlacesOfInterest placesOfInterest, IModItems modItems, ISettingsProvideable settings, IEntityProvideable world)
         {
-            foreach (SavedResidence res in SavedResidences)
+            foreach (SavedGameLocation savedLocation in SavedGameLocations)
             {
-                if (res.IsOwnedByPlayer || res.IsRentedByPlayer)
-                {
-                    Residence savedPlace = placesOfInterest.PossibleLocations.Residences.Where(x => x.Name == res.Name).FirstOrDefault();
-                    if (savedPlace != null)
-                    {
-                        player.Properties.AddResidence(savedPlace);
-                        savedPlace.IsOwned = res.IsOwnedByPlayer;
-                        savedPlace.IsRented = res.IsRentedByPlayer;
-                        savedPlace.DateRentalPaymentDue = res.RentalPaymentDate;
-                        savedPlace.DateRentalPaymentPaid = res.DateOfLastRentalPayment;
-                        if(savedPlace.WeaponStorage == null)
-                        {
-                            savedPlace.WeaponStorage = new WeaponStorage(settings);
-                        }
-                        if(savedPlace.SimpleInventory == null)
-                        {
-                            savedPlace.SimpleInventory = new SimpleInventory(settings);
-                        }
-                        foreach (StoredWeapon storedWeap in res.WeaponInventory)
-                        {
-                            savedPlace.WeaponStorage.StoredWeapons.Add(storedWeap.Copy());
-                        }
-                        foreach (InventorySave stest in res.InventoryItems)
-                        {
-                            savedPlace.SimpleInventory.Add(modItems.Get(stest.ModItemName), stest.RemainingPercent);
-                        }
-                        savedPlace.CashStorage.StoredCash = res.StoredCash;
-                        savedPlace.RefreshUI();
-                    }
-                }
+                savedLocation.LoadSavedData(player, placesOfInterest, modItems, settings, world);
             }
         }
         private void LoadDebt (IInventoryable player)
@@ -697,6 +789,88 @@ namespace LosSantosRED.lsr.Data
                 player.Character.Heading = PlayerHeading;   
             }
         }
+
+
+
+
+        ////LEGACY TO BE REMOVED
+        //private void LoadResidences(IInventoryable player, IPlacesOfInterest placesOfInterest, IModItems modItems, ISettingsProvideable settings)
+        //{
+        //    foreach (SavedResidence res in SavedResidences)
+        //    {
+        //        if (res.IsOwnedByPlayer || res.IsRentedByPlayer)
+        //        {
+        //            Residence savedPlace = placesOfInterest.PossibleLocations.Residences.Where(x => x.Name == res.Name).FirstOrDefault();
+        //            if (savedPlace != null)
+        //            {
+        //                player.Properties.AddOwnedLocation(savedPlace);
+        //                savedPlace.IsOwned = res.IsOwnedByPlayer;
+        //                savedPlace.IsRented = res.IsRentedByPlayer;
+        //                savedPlace.DateRentalPaymentDue = res.RentalPaymentDate;
+        //                savedPlace.DateRentalPaymentPaid = res.DateOfLastRentalPayment;
+        //                if (savedPlace.WeaponStorage == null)
+        //                {
+        //                    savedPlace.WeaponStorage = new WeaponStorage(settings);
+        //                }
+        //                if (savedPlace.SimpleInventory == null)
+        //                {
+        //                    savedPlace.SimpleInventory = new SimpleInventory(settings);
+        //                }
+        //                foreach (StoredWeapon storedWeap in res.WeaponInventory)
+        //                {
+        //                    savedPlace.WeaponStorage.StoredWeapons.Add(storedWeap.Copy());
+        //                }
+        //                foreach (InventorySave stest in res.InventoryItems)
+        //                {
+        //                    savedPlace.SimpleInventory.Add(modItems.Get(stest.ModItemName), stest.RemainingPercent);
+        //                }
+        //                savedPlace.IsRented = res.IsRentedByPlayer;
+        //                savedPlace.CashStorage.StoredCash = res.StoredCash;
+        //                savedPlace.RefreshUI();
+        //            }
+        //        }
+        //    }
+        //}
+        //LEGACY TO BE REMOVED
+        //private void LoadBusinesses(IInventoryable player, IPlacesOfInterest placesOfInterest, IModItems modItems, ISettingsProvideable settings)
+        //{
+        //    foreach (SavedBusiness biz in SavedBusinesses)
+        //    {
+        //        Business savedPlace = placesOfInterest.PossibleLocations.Businesses.Where(x => x.Name == biz.Name && x.EntrancePosition == biz.EntrancePosition).FirstOrDefault();
+        //        if (savedPlace != null)
+        //        {
+        //            player.Properties.AddOwnedLocation(savedPlace);
+        //            savedPlace.DatePayoutDue = biz.PayoutDate;
+        //            savedPlace.DatePayoutPaid = biz.DateOfLastPayout;
+        //            //savedPlace.IsPayoutInModItems = biz.IsPayoutInModItems;
+        //            savedPlace.ModItemToPayout = biz.ModItemToPayout;
+        //            //savedPlace.IsPayoutDepositedToBank = biz.IsPayoutDepositedToBank;
+        //            savedPlace.CurrentSalesPrice = biz.CurrentSalesPrice;
+        //            if (savedPlace.WeaponStorage == null)
+        //            {
+        //                savedPlace.WeaponStorage = new WeaponStorage(settings);
+        //            }
+        //            if (savedPlace.SimpleInventory == null)
+        //            {
+        //                savedPlace.SimpleInventory = new SimpleInventory(settings);
+        //            }
+        //            foreach (StoredWeapon storedWeap in biz.WeaponInventory)
+        //            {
+        //                savedPlace.WeaponStorage.StoredWeapons.Add(storedWeap.Copy());
+        //            }
+        //            foreach (InventorySave stest in biz.InventoryItems)
+        //            {
+        //                savedPlace.SimpleInventory.Add(modItems.Get(stest.ModItemName), stest.RemainingPercent);
+        //            }
+        //            savedPlace.CashStorage.StoredCash = biz.StoredCash;
+        //            savedPlace.RefreshUI();
+        //        }
+        //    }
+        //}
+
+
+
+
         ////Info
         //public TabMissionSelectItem SaveTabInfo(ITimeReportable time, IGangs gangs, IWeapons weapons, IModItems modItems)
         //{

@@ -22,7 +22,7 @@
 - Verify NAudio.dll and NAudio.xml along with RageNativeUI.dll and RageNativeUI.xml are in the root GTA V directory
 - Verify the Los Santos RED.dll, Los Santos RED.pdb, and LosSantosRED folder  are in the plugins folder (in the root GTA V directory)
 
-+ To update the mod, remove the Los Santos RED.dll, Los Santos RED.pdb, and LosSantosRED folder from your Plugins folder and replace with the newest version
++ To update the mod, remove the Los Santos RED.dll, Los Santos RED.pdb, and LosSantosRED folder from your Plugins folder and replace with the newest version. If you want to keep your Setting, SavedGames, and Outfits: You can backup the Settings.xml, SaveGames.xml, and SavedOutfits.xml and restore them after updating. LSR will automatically update them to include the new items after running.
 
 ## Features
 Enhanced Free Roam Mode
@@ -170,9 +170,26 @@ Enhanced Free Roam Mode
 [Greskrendtregk Mods](https://discord.gg/7zaZhKervU)
 
 ## License
-[![GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+Los Santos RED is Source Available software, not Open Source.
+
+Permissions:
+- You may view the source code.
+- You may submit Pull Requests for potential inclusion in the official project.
+
+Restrictions:
+- You may NOT redistribute the software or its source code (in whole or in part).
+- You may NOT create derivative works, forks, or modified versions for public release.
+- You may NOT re-upload, mirror, or host the code or compiled mod elsewhere.
+- You may NOT use this codebase as a base for other projects.
+
+Any modifications or contributions should be submitted via Pull Request to the official GitHub repository. This license supersedes any previous licensing (including any prior GPL references). Unauthorized use, distribution, or derivation will be considered a violation of copyright.
 
 ## Credits
+- [Peter Badoingy](https://github.com/PeterBadoingy)
+- [benzstar](https://github.com/aleur)
+- box
+- [huzzahsir](https://github.com/peeppeep-io)
+- [CPKS]((https://github.com/CPKS997))
 - [alexguirre](https://github.com/alexguirre)
 - [alloc8tor](https://github.com/alloc8or)
 - [pongo1231](https://github.com/pongo1231)
@@ -183,8 +200,6 @@ Enhanced Free Roam Mode
 - [Bob74](https://github.com/Bob74)
 - [DisapprovedByMe](https://github.com/DisapprovedByMe)
 - [Xinerki](https://github.com/Xinerki)
-- PeterBadoingy
-- box
 
 ## Compatibility
 - Incompatible with
@@ -194,7 +209,6 @@ Enhanced Free Roam Mode
 - Do not save and turn off autosave
   
 ## Complementary Mods
-[Add On Plates (AlternateConfigs\AddOnPlates_Wildbrick142)](https://www.gta5-mods.com/paintjobs/new-license-plates-add-on)  
 [True Realistic Driving V](https://www.gta5-mods.com/scripts/true-realistic-driving-v-realistic-mass-v0-1-beta)
 
 ## Issues
@@ -202,3 +216,27 @@ Enhanced Free Roam Mode
 - You will need to rebuy components if you remove them at the underground gunshops, gang dens, or drug dealers.
 - Vanilla taxi service is not available with LSR active (Downtown Cab Co on the vanilla cell will show Busy forever) use the burner cell to call the LSR taxi service.
 - Loading bodies in the trunk can fail or not attach properly.
+
+ ## Full Expanded Jurisdiction
+- Preview images of some of the new vehicles included in the FEJ pack. See LosSantosRED/AlternateConfigs/FullExpandedJurisdiction folder to install or learn more.
+![test](https://imgur.com/6e5BO2c.jpeg)
+
+ 
+## Full Modern Traffic
+- Preview images of some of the new vehicles included in the FMT pack. Updates traffic to use DLC vehicles along with other lore friendly vehicle edits. See LosSantosRED/AlternateConfigs/FullModernTraffic folder to install or learn more.
+![test2](https://i.imgur.com/zziAhEM.jpeg)
+ 
+
+## Full Expanded Weapons
+- Lore friendly weapon tweaks and additions. See LosSantosRED/AlternateConfigs/FullExpandedWeapons folder to install or learn more.
+![test3](https://s3-attachments.int-cdn.lcpdfrusercontent.com/monthly_2025_07/image.jpeg.9af99633d87e10d54bf34865f5afabef.jpeg)
+
+ 
+## Full Modern License Plates
+- Includes lore friendly modern license plates for EVERY state and lots of government/state/federal items. See LosSantosRED/AlternateConfigs/FullModernLicensePlates folder to install or learn more
+![test4](https://i.imgur.com/J4JYu0A.png)
+
+ 
+## Liberty City RED
+- Included in the LSR download is a full LSR config, peds/vehicles, and some LSR focused map fixes. Usable with Full Modern Traffic for that super modern feel. See LosSantosRED/AlternateConfigs/Liberty City folder to install or learn more. 
+![test5](https://i.imgur.com/yMtpzcE.jpeg)

@@ -278,7 +278,7 @@ public class Forger : GameLocation
         };
         UIMenuListScrollerItem<PlateType> customPlateTypeMenuItem = new UIMenuListScrollerItem<PlateType>("Plate Type", "Current chosen plate type.", PlateTypes.PlateTypeManager.PlateTypeList) { };
         CustomPlateSubMenu.AddItem(customPlateTypeMenuItem);
-        UIMenuItem buyCustomPlateMenuItem = new UIMenuItem("Purchase", "Buy a the customized plate.") { RightLabel = CustomPlateRightLabe };
+        UIMenuItem buyCustomPlateMenuItem = new UIMenuItem("Purchase", "Buy a customized plate.") { RightLabel = CustomPlateRightLabe };
         CustomPlateSubMenu.AddItem(buyCustomPlateMenuItem);
         buyCustomPlateMenuItem.Activated += (sender, e) =>
         {

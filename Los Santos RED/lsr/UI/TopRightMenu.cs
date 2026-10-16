@@ -47,6 +47,7 @@ public class TopRightMenu
     private uint GameTimeLastFlashedWantedStars;
     private bool isShowingGreyedWantedStars;
     private float GroupPosition;
+    private float TempBarPosition;
 
     public TopRightMenu(IDisplayable displayablePlayer, ITimeReportable time, ISettingsProvideable settings, UI uI)
     {
@@ -116,10 +117,17 @@ public class TopRightMenu
             && DisplayablePlayer.WeaponEquipment.CurrentWeapon.Category != WeaponCategory.Throwable;
 
         bool willShowCashChange = willShowCash && DisplayablePlayer.BankAccounts.RecentlyChangedMoney;
-        bool willShowNeeds = (UI.IsDrawingWheelMenu || DisplayablePlayer.HumanState.RecentlyChangedNeed || DisplayablePlayer.HealthManager.RecentlyDrainedHealth || DisplayablePlayer.HealthManager.RecentlyRegenedHealth || DisplayablePlayer.IsSleeping) && Settings.SettingsManager.NeedsSettings.ApplyNeeds;
+        bool willShowNeeds = (UI.IsDrawingWheelMenu || DisplayablePlayer.HumanState.RecentlyChangedNeed || DisplayablePlayer.HealthState.IsBleeding || DisplayablePlayer.HealthManager.RecentlyDrainedHealth || DisplayablePlayer.HealthManager.RecentlyRegenedHealth || DisplayablePlayer.IsSleeping) && Settings.SettingsManager.NeedsSettings.ApplyNeeds;
         willShowCustomStars =  (DisplayablePlayer.IsAlive || UI.IsDrawingWheelMenu) 
             && ((DisplayablePlayer.IsWanted && Settings.SettingsManager.UIGeneralSettings.UseCustomWantedLevelStars) || (DisplayablePlayer.Investigation.IsActive && DisplayablePlayer.Investigation.RequiresPolice && Settings.SettingsManager.UIGeneralSettings.UseCustomInvestigationMarks));
         willShowGroup = DisplayablePlayer.GroupManager.MemberCount > 0 && DisplayablePlayer.IsAliveAndFree;
+
+
+
+        
+        bool willshowStamina = DisplayablePlayer.IsAliveAndFree && DisplayablePlayer.Sprinting.StaminaPercentage < 1.0f && Settings.SettingsManager.LSRHUDSettings.ShowStaminaDisplay && DisplayablePlayer.Sprinting.CanSprint && DisplayablePlayer.Sprinting.CanRegainStamina;
+        bool willshowIntoxication = DisplayablePlayer.IsAliveAndFree && DisplayablePlayer.Intoxication.CurrentIntensityPercent > 0.0f && Settings.SettingsManager.LSRHUDSettings.ShowIntoxicationDisplay;
+        bool willShowTempBar = willshowStamina || willshowIntoxication;
 
         CustomStarsPosition = 0.0f;
         float WeaponPosition = 0.0f;
@@ -174,7 +182,11 @@ public class TopRightMenu
             GroupPosition = StartingPosition;
             StartingPosition += Settings.SettingsManager.LSRHUDSettings.TopDisplaySpacing;//0.035f;
         }
-
+        if(willShowTempBar)
+        {
+            TempBarPosition = StartingPosition;
+            StartingPosition += Settings.SettingsManager.LSRHUDSettings.TopDisplaySpacing;//0.035f;
+        }
 
 
 
@@ -212,6 +224,11 @@ public class TopRightMenu
             {
                 NeedsString += " ~g~+HP~s~";
             }
+
+            if(DisplayablePlayer.HealthState.IsBleeding)
+            {
+                NeedsString = "~r~-Bleeding~s~";
+            }
             DisplayTextOnScreen(NeedsString, NeedsPosition, Settings.SettingsManager.LSRHUDSettings.TopDisplayPositionY, Settings.SettingsManager.LSRHUDSettings.TopDisplayScale, Color.White, GTAFont.FontPricedown, (GTATextJustification)2, true);
         }
 
@@ -232,6 +249,21 @@ public class TopRightMenu
         else
         {
             isShowingGreyedWantedStars = false;
+        }
+
+
+        if(willShowTempBar)
+        {
+            string tempBarText = "";
+            if(willshowStamina)
+            {
+                tempBarText += $"Stamina: {DisplayablePlayer.Sprinting.StaminaPercentage:P0} ";
+            }
+            if(willshowIntoxication)
+            {
+                tempBarText += $"Intoxication: {DisplayablePlayer.Intoxication.CurrentIntensityPercent:P0}";
+            }
+            DisplayTextOnScreen(tempBarText, TempBarPosition, Settings.SettingsManager.LSRHUDSettings.TopDisplayPositionY, Settings.SettingsManager.LSRHUDSettings.TopDisplayScale, Color.White, GTAFont.FontPricedown, (GTATextJustification)2, true);
         }
 
     }

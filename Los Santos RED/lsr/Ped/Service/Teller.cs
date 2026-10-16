@@ -23,11 +23,12 @@ public class Teller : PedExt
     public override bool WillCallPolice { get; set; } = true;
     public override bool WillCallPoliceIntense { get; set; } = true;
     public override bool IsMerchant { get; set; } = false;
-    public override bool CanBeIdleTasked => false;
+    public override bool CanBeIdleTasked => true;//false;
     public override string InteractPrompt(IButtonPromptable player)
     {
         return $"Transact with {FormattedName}";
     }
+    public override float PickpocketDetectionMultiplier { get; set; } = 1.2f;
     public override void AddSpecificInteraction(ILocationInteractable player,MenuPool menuPool, UIMenu headerMenu, AdvancedConversation advancedConversation)
     {
         BankInteraction BankInteraction = new BankInteraction(player, AssociatedBank);

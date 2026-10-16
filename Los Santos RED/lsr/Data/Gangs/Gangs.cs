@@ -43,10 +43,10 @@ public class Gangs : IGangs
     public List<Gang> AllGangs => GangsList;
     public void ReadConfig(string configName)
     {
-        string fileName = string.IsNullOrEmpty(configName) ? "Gangs*.xml" : $"Gangs_{configName}.xml";
+        string fileName = string.IsNullOrEmpty(configName) ? "Gangs_*.xml" : $"Gangs_{configName}.xml";
 
         DirectoryInfo LSRDirectory = new DirectoryInfo("Plugins\\LosSantosRED");
-        FileInfo ConfigFile = LSRDirectory.GetFiles(fileName).OrderByDescending(x => x.Name).FirstOrDefault();
+        FileInfo ConfigFile = LSRDirectory.GetFiles(fileName).Where(x => !x.Name.Contains("+")).OrderByDescending(x => x.Name).FirstOrDefault();
         if (ConfigFile != null && !configName.Equals("Default"))
         {
             EntryPoint.WriteToConsole($"Loaded Gangs config: {ConfigFile.FullName}", 0);
@@ -64,6 +64,14 @@ public class Gangs : IGangs
             DefaultConfig_Simple();
             DefaultConfig();
             DefaultConfig_LibertyCity();
+        }
+        //Load Additive
+        foreach (FileInfo fileInfo in LSRDirectory.GetFiles("Gangs+_*.xml").OrderByDescending(x => x.Name))
+        {
+            EntryPoint.WriteToConsole($"Loaded ADDITIVE Gangs config  {fileInfo.FullName}", 0);
+            List<Gang> additivePossibleItems = Serialization.DeserializeParams<Gang>(fileInfo.FullName);
+            GangsList.RemoveAll(x => additivePossibleItems.Any(y => y.ID == x.ID));
+            GangsList.AddRange(additivePossibleItems);
         }
     }
     public void Setup(IHeads heads, IDispatchableVehicles dispatchableVehicles, IDispatchablePeople dispatchablePeople, IIssuableWeapons issuableWeapons, IContacts contacts)
@@ -449,6 +457,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMin = 650,
             DealerMemberMoneyMax = 2000,
             EnemyGangs = new List<string>() { "AMBIENT_GANG_LOST" },
+            FriendlyGangs = new List<string>() { "AMBIENT_GANG_MESSINA" },
             DealerMenuGroup = "CokeDealerMenu",
             HeadDataGroupID = "MafiaHeads",
 
@@ -557,6 +566,7 @@ public class Gangs : IGangs
             DealerMemberMoneyMin = 650,
             DealerMemberMoneyMax = 2000,
             EnemyGangs = new List<string>() { "AMBIENT_GANG_WEICHENG", "AMBIENT_GANG_SALVA" },
+            FriendlyGangs = new List<string>() { "AMBIENT_GANG_GAMBETTI" },
             DealerMenuGroup = "CokeDealerMenu",
             HeadDataGroupID = "MafiaHeads",
 
@@ -805,11 +815,11 @@ public class Gangs : IGangs
     }
     private void DefaultConfig_Simple()
     {
-        List<Gang>  SimpleGangsList = new List<Gang>
-        {
-            LOST,Vagos,Families,Ballas,Marabunte,Varrios,Triads,Redneck,Korean,Cartel,Armenian
-        };
-        Serialization.SerializeParams(SimpleGangsList, "Plugins\\LosSantosRED\\AlternateConfigs\\Simple\\Gangs_Simple.xml");
+        //List<Gang>  SimpleGangsList = new List<Gang>
+        //{
+        //    LOST,Vagos,Families,Ballas,Marabunte,Varrios,Triads,Redneck,Korean,Cartel,Armenian
+        //};
+        //Serialization.SerializeParams(SimpleGangsList, "Plugins\\LosSantosRED\\AlternateConfigs\\Simple\\Gangs_Simple.xml");
     }
 
     private void DefaultConfig_LibertyCity()
@@ -883,7 +893,46 @@ public class Gangs : IGangs
             PercentageWithLongGuns = 10f,
             MemberKickUpAmount = 2200,
             DrugDealerPercentage = 65f,
-            LicensePlatePrefix = "VAR ",
+            LicensePlatePrefix = "SL ",
+            LoanParameters = defaultLoanParameters,
+            GangClassification = GangClassification.Street,
+        };
+        Gang SpanishLordsLPP = new Gang("~b~", "AMBIENT_GANG_SPANISH", "The Spanish Lords", "Spanish Lords", "Blue",
+            "SpanishLordsPeds_LPP", "SpanishLordsVehicles", "",
+            "MeleeWeapons", "VarriosSidearms", "VarriosLongGuns",
+            "Spanish Lords", "CHAR_BLANK_ENTRY", "Lords Member")
+        {
+            DenName = "Hangout",
+            AmbientMemberMoneyMin = 100,
+            AmbientMemberMoneyMax = 300,
+            DealerMemberMoneyMin = 350,
+            DealerMemberMoneyMax = 1100,
+            HeadDataGroupID = "VarriosHeads",
+            EnemyGangs = new List<string>() { "AMBIENT_GANG_WEICHENG" },
+            DealerMenuGroup = "CrackDealerMenu",
+
+            PickupPaymentMin = 200,
+            PickupPaymentMax = 500,
+            TheftPaymentMin = 1000,
+            TheftPaymentMax = 3000,
+            HitPaymentMin = 2500,//5000,// 10000,
+            HitPaymentMax = 4000,//12000,//22000,
+            DeliveryPaymentMin = 1000,
+            DeliveryPaymentMax = 2500,//4000,
+
+            NeutralRepLevel = 0,
+            FriendlyRepLevel = 1500,
+            StartingRep = 0,
+            MaximumRep = 5000,
+            MinimumRep = -5000,
+            MemberOfferRepLevel = 4500,
+            HitSquadRep = -4500,
+            PercentageWithMelee = 25f,
+            PercentageWithSidearms = 25f,
+            PercentageWithLongGuns = 10f,
+            MemberKickUpAmount = 2200,
+            DrugDealerPercentage = 65f,
+            LicensePlatePrefix = "SL ",
             LoanParameters = defaultLoanParameters,
             GangClassification = GangClassification.Street,
         };
@@ -967,6 +1016,45 @@ public class Gangs : IGangs
             LoanParameters = defaultLoanParameters,
             GangClassification = GangClassification.Street,
         };//crack
+        Gang NorthHollandHusltersLPP = new Gang("~r~", "AMBIENT_GANG_HOLHUST", "The North Holland Hustlers", "N Hol Hustlers", "Red",
+            "NorthHollandPeds_LPP", "NorthHollandVehicles", "",
+            "MeleeWeapons", "FamiliesSidearms", "FamiliesLongGuns",
+            "North Holland Hustlers", "CHAR_BLANK_ENTRY", "Huslters Member")
+        {
+            DenName = "Hangout",
+            HeadDataGroupID = "NorthHollandHeads",
+            AmbientMemberMoneyMin = 100,
+            AmbientMemberMoneyMax = 300,
+            DealerMemberMoneyMin = 350,
+            DealerMemberMoneyMax = 1100,
+            EnemyGangs = new List<string>() { "AMBIENT_GANG_ARMENIAN" },
+            DealerMenuGroup = "CrackDealerMenu",
+
+            PickupPaymentMin = 200,
+            PickupPaymentMax = 700,
+            TheftPaymentMin = 1000,
+            TheftPaymentMax = 2500,//3000,
+            HitPaymentMin = 2500,//5000,// 10000,
+            HitPaymentMax = 3500,//12000,//22000,
+            DeliveryPaymentMin = 1000,
+            DeliveryPaymentMax = 1800,//2000,//4000,
+
+            NeutralRepLevel = 0,
+            FriendlyRepLevel = 1500,
+            StartingRep = 0,
+            MaximumRep = 5000,
+            MinimumRep = -5000,
+            MemberOfferRepLevel = 4500,
+            HitSquadRep = -4500,
+            PercentageWithMelee = 20f,
+            PercentageWithSidearms = 20f,
+            PercentageWithLongGuns = 5f,
+            MemberKickUpAmount = 2500,
+            DrugDealerPercentage = 65f,
+            LicensePlatePrefix = "NHH ",
+            LoanParameters = defaultLoanParameters,
+            GangClassification = GangClassification.Street,
+        };//crack
 
         Gang PetrovicMafia = new Gang("~w~", "AMBIENT_GANG_PETROVIC", "Petrovic Crime Syndicate", "Petrovic", "White",
             "PetrovicPeds", "PetrovicVehicles", "PET ",
@@ -980,6 +1068,47 @@ public class Gangs : IGangs
             DealerMemberMoneyMin = 400,
             DealerMemberMoneyMax = 1500,
             
+            EnemyGangs = new List<string>() { "AMBIENT_GANG_WEICHENG", "AMBIENT_GANG_PAVANO", "AMBIENT_GANG_ANGELS", "AMBIENT_GANG_KOREAN" },
+            DealerMenuGroup = "CokeDealerMenu",
+
+            PickupPaymentMin = 200,
+            PickupPaymentMax = 600,
+            TheftPaymentMin = 1000,
+            TheftPaymentMax = 2000,// 3000,
+            HitPaymentMin = 2000,//5000,// 10000,
+            HitPaymentMax = 3250,//12000,//22000,
+            DeliveryPaymentMin = 1000,
+            DeliveryPaymentMax = 2000,// 3000,
+
+            NeutralRepLevel = 0,
+            FriendlyRepLevel = 1500,
+            StartingRep = 0,
+            MaximumRep = 5000,
+            MinimumRep = -5000,
+            MemberOfferRepLevel = 4500,
+            HitSquadRep = -4500,
+            PercentageWithMelee = 40f,
+            PercentageWithSidearms = 30f,
+            PercentageWithLongGuns = 15f,
+            MemberKickUpAmount = 2500,
+            DrugDealerPercentage = 65f,
+            GangClassification = GangClassification.Generic,
+            MembersGetFreeVehicles = true,
+            MembersGetFreeWeapons = true,
+            LoanParameters = defaultLoanParameters,
+        };//Coke
+        Gang PetrovicMafiaLPP = new Gang("~w~", "AMBIENT_GANG_PETROVIC", "Petrovic Crime Syndicate", "Petrovic", "White",
+            "PetrovicPeds_LPP", "PetrovicVehicles", "PET ",
+            "MeleeWeapons", "MafiaSidearms", "MafiaLongGuns",
+            "Petrovic", "CHAR_BLANK_ENTRY", "Petrovic Associate")
+        {
+            DenName = "Safehouse",
+            HeadDataGroupID = "PetrovicHeads",
+            AmbientMemberMoneyMin = 100,
+            AmbientMemberMoneyMax = 250,
+            DealerMemberMoneyMin = 400,
+            DealerMemberMoneyMax = 1500,
+
             EnemyGangs = new List<string>() { "AMBIENT_GANG_WEICHENG", "AMBIENT_GANG_PAVANO", "AMBIENT_GANG_ANGELS", "AMBIENT_GANG_KOREAN" },
             DealerMenuGroup = "CokeDealerMenu",
 
@@ -1052,22 +1181,22 @@ public class Gangs : IGangs
             GangClassification = GangClassification.Biker,
         };//Meth
 
-        List<Gang> LCGangsList = new List<Gang>
-        {
-            LOST_LIB,
-            Triads_LIB,
-            Yardies_LIB,
-            Gambetti_LIB,Pavano_LIB,Lupisella_LIB,Messina_LIB,Ancelotti_LIB,
+        //List<Gang> LCGangsList = new List<Gang>
+        //{
+        //    LOST_LIB,
+        //    Triads_LIB,
+        //    Yardies_LIB,
+        //    Gambetti_LIB,Pavano_LIB,Lupisella_LIB,Messina_LIB,Ancelotti_LIB,
 
-            //New
-            PetrovicMafia,
-            NorthHollandHuslters,
-            SpanishLords,
-            KoreanMob,
-            AngelsOfDeath_LIB,
-            UptownRiders
-        };
-        Serialization.SerializeParams(LCGangsList, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LibertyConfigFolder}\\Gangs_{StaticStrings.LibertyConfigSuffix}.xml");
+        //    //New
+        //    PetrovicMafia,
+        //    NorthHollandHuslters,
+        //    SpanishLords,
+        //    KoreanMob,
+        //    AngelsOfDeath_LIB,
+        //    UptownRiders
+        //};
+        //Serialization.SerializeParams(LCGangsList, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LibertyConfigFolder}\\Gangs_{StaticStrings.LibertyConfigSuffix}.xml");
 
         List<Gang> LPPGangsList = new List<Gang>
         {
@@ -1077,18 +1206,18 @@ public class Gangs : IGangs
             Gambetti_LIB,Pavano_LIB,Lupisella_LIB,Messina_LIB,Ancelotti_LIB,
 
 
-            Vagos,Families,Ballas,Marabunte,Varrios,Redneck,Korean,Cartel,Armenian,Diablos,
+            //Vagos,Families,Ballas,Marabunte,Varrios,Redneck,Korean,Cartel,Armenian,Diablos,
 
 
             //New
-            PetrovicMafia,
-            NorthHollandHuslters,
-            SpanishLords,
+            PetrovicMafiaLPP,
+            NorthHollandHusltersLPP,
+            SpanishLordsLPP,
             KoreanMob,
             AngelsOfDeath_LIB,
             UptownRiders
         };
-        Serialization.SerializeParams(LPPGangsList, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LPPConfigFolder}\\Gangs_{StaticStrings.LPPConfigSuffix}.xml");
+        Serialization.SerializeParams(LPPGangsList, $"Plugins\\LosSantosRED\\AlternateConfigs\\{StaticStrings.LPPConfigFolder}\\Gangs+_{StaticStrings.LPPConfigSuffix}.xml");
 
     }
     public void CheckTerritory(GangTerritories gangTerritories)

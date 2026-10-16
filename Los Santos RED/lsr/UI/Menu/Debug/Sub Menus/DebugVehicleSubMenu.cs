@@ -255,7 +255,34 @@ public class DebugVehicleSubMenu : DebugSubMenu
         CreateBetterColorMenu();
         CreateInfoMenuItem();
         CreateModificationItem();
+        CreateOtherItem();
     }
+
+    private void CreateOtherItem()
+    {
+        UIMenuNumericScrollerItem<int> SetDoorOpenMenuItem = new UIMenuNumericScrollerItem<int>("Set Door Open", "Set the vehicle door", 0, 5, 1) { Value = 0 };
+        SetDoorOpenMenuItem.Activated += (menu, item) =>
+        {
+            if (Player.InterestedVehicle != null && Player.InterestedVehicle.Vehicle.Exists())
+            {
+                NativeFunction.Natives.SET_VEHICLE_DOOR_OPEN(Player.InterestedVehicle.Vehicle,SetDoorOpenMenuItem.Value,true,true);
+            }
+        };
+        vehicleItemsMenu.AddItem(SetDoorOpenMenuItem);
+
+
+
+        UIMenuNumericScrollerItem<int> SetInSeatMenuItem = new UIMenuNumericScrollerItem<int>("Set In Seat", "Set the player in the given seat", -1, 15, 1) { Value = -1 };
+        SetInSeatMenuItem.Activated += (menu, item) =>
+        {
+            if (Player.InterestedVehicle != null && Player.InterestedVehicle.Vehicle.Exists())
+            {
+                NativeFunction.Natives.SET_PED_INTO_VEHICLE(Player.Character, Player.InterestedVehicle.Vehicle, SetInSeatMenuItem.Value);
+            }
+        };
+        vehicleItemsMenu.AddItem(SetInSeatMenuItem);
+    }
+
     private void CreateModificationItem()
     {
 
@@ -275,6 +302,24 @@ public class DebugVehicleSubMenu : DebugSubMenu
             }
         };
         vehicleItemsMenu.AddItem(VehicleExtraMenuItem);
+
+
+
+
+        UIMenuNumericScrollerItem<int> VehicleWheelTypeMenuItem = new UIMenuNumericScrollerItem<int>("Set Wheel Type", "Set the vehicle wheel type", 0, 12, 1) { Value = 1 };
+        VehicleWheelTypeMenuItem.Activated += (menu, item) =>
+        {
+            if (Player.InterestedVehicle != null && Player.InterestedVehicle.Vehicle.Exists())
+            {
+                NativeFunction.Natives.SET_VEHICLE_WHEEL_TYPE(Player.InterestedVehicle.Vehicle, VehicleWheelTypeMenuItem.Value);
+                Game.DisplaySubtitle($"SET_VEHICLE_WHEEL_TYPE {VehicleWheelTypeMenuItem.Value} ");
+            }
+        };
+        vehicleItemsMenu.AddItem(VehicleWheelTypeMenuItem);
+
+
+
+        //NativeFunction.Natives.SET_VEHICLE_WHEEL_TYPE(vehicleExt.Vehicle, WheelType);
 
 
         List<int> possibleToggles = new List<int>() { 17,18,19,20,21,22 };
@@ -785,7 +830,55 @@ public class DebugVehicleSubMenu : DebugSubMenu
         vehicleItemsMenu.AddItem(plateIndex);
 
 
-        
+
+
+        UIMenuItem setRandomPlateType = new UIMenuItem("Set Random Plate Type", "Set random plate type");
+        setRandomPlateType.Activated += (menu, item) =>
+        {
+
+            if (Player.InterestedVehicle != null && Player.InterestedVehicle.Vehicle.Exists())
+            {
+                PlateType NewType = PlateTypes.GetRandomPlateType(Player.InterestedVehicle.IsMotorcycle);
+                if (NewType != null)
+                {
+                    string NewPlateNumber = NewType.GenerateNewLicensePlateNumber();
+                    if (NewPlateNumber != "")
+                    {
+                        Player.InterestedVehicle.Vehicle.LicensePlate = NewPlateNumber;
+                    }
+                    NativeFunction.CallByName<int>("SET_VEHICLE_NUMBER_PLATE_TEXT_INDEX", Player.InterestedVehicle.Vehicle, NewType.Index);
+                    Game.DisplaySubtitle($" PlateIndex: {plateIndex.SelectedItem.Index}, Index: {NewType.Index}, State: {NewType.StateID}, Description: {NewType.Description}");
+                }
+                else
+                {
+                    Game.DisplaySubtitle($" PlateIndex: {plateIndex.SelectedItem.Index} None Found");
+                }
+            }
+        };
+        vehicleItemsMenu.AddItem(setRandomPlateType);
+
+
+
+
+        UIMenuItem setPlateNumber = new UIMenuItem("Set Plate Number", "Set playe number from input");
+        setPlateNumber.Activated += (menu, item) =>
+        {
+
+            string newplateText = NativeHelper.GetKeyboardInput("");
+            if (string.IsNullOrEmpty(newplateText))
+            {
+                return;
+            }
+
+
+            if (Player.InterestedVehicle != null && Player.InterestedVehicle.Vehicle.Exists())
+            {
+                Player.InterestedVehicle.Vehicle.LicensePlate = newplateText;
+            }
+        };
+        vehicleItemsMenu.AddItem(setPlateNumber);
+
+
     }
     private void CreateInfoMenuItem()
     {
@@ -804,25 +897,7 @@ public class DebugVehicleSubMenu : DebugSubMenu
     }
 
 
-    private class ModKitDescription
-    {
-        public ModKitDescription()
-        {
-        }
 
-        public ModKitDescription(string name, int iD)
-        {
-            Name = name;
-            ID = iD;
-        }
-
-        public string Name { get; set; }
-        public int ID { get; set; }
-        public override string ToString()
-        {
-            return Name;
-        }
-    }
 }
 
 

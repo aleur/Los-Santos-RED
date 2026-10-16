@@ -12,26 +12,29 @@ public class Properties
     private IPropertyOwnable Player;
     private IPlacesOfInterest PlacesOfInterest;
     private ITimeReportable Time;
-    public Properties(IPropertyOwnable player, IPlacesOfInterest placesOfInterest, ITimeReportable time)
+    private IEntityProvideable World;
+    public Properties(IPropertyOwnable player, IPlacesOfInterest placesOfInterest, ITimeReportable time, IEntityProvideable world)
     {
         Player = player;
         PlacesOfInterest = placesOfInterest;
         Time = time;
+        World = world;
     }
-    public List<Residence> Residences { get; private set; } = new List<Residence>();
-
+    public List<GameLocation> PropertyList { get; private set; } = new List<GameLocation>();
+    //public List<Residence> Residences { get; private set; } = new List<Residence>();
+    //public List<Business> Businesses { get; private set; } = new List<Business>();
+    //public List<GameLocation> PayoutProperties { get; private set; } = new List<GameLocation>();
+    //public List<GameLocation> CraftingLocations { get; private set; } = new List<GameLocation>();
     public void Setup()
     {
 
     }
     public void Update()
     {
-        foreach (Residence residence in Residences)
+        //int businessesPayingOut = 0;
+        foreach (GameLocation property in PropertyList)
         {
-            if (!residence.IsOwned && residence.IsRented && residence.DateRentalPaymentDue != null && DateTime.Compare(Time.CurrentDateTime, residence.DateRentalPaymentDue) >= 0)
-            {
-                residence.ReRent(Player, Time);
-            }
+            property.HandleOwnedLocation(Player, Time);
         }
     }
     public void Dispose()
@@ -40,27 +43,25 @@ public class Properties
     }
     public void Reset()
     {
-        foreach (Residence residence in Residences)
+        foreach(GameLocation property in PropertyList)
         {
-            residence.Reset();
+            property.Reset();
         }
-        Residences.Clear();
+        PropertyList.Clear();
     }
-    public void AddResidence(Residence toAdd)
+    public void AddOwnedLocation(GameLocation toAdd)
     {
-        if(!Residences.Any(x=> x.Name == toAdd.Name))
+        if (!PropertyList.Any(x => x.Name == toAdd.Name && x.EntrancePosition == toAdd.EntrancePosition && x.IsCorrectMap(World.IsMPMapLoaded)))
         {
-            Residences.Add(toAdd);
+            PropertyList.Add(toAdd);
         }
     }
-    public void RemoveResidence(Residence toAdd)
+    public void RemoveOwnedLocation(GameLocation toRemove)
     {
-        if (!Residences.Any(x => x.Name == toAdd.Name))
+        if (PropertyList.Any(x => x.Name == toRemove.Name && x.EntrancePosition == toRemove.EntrancePosition && x.IsCorrectMap(World.IsMPMapLoaded)))
         {
-            toAdd.Reset();
-            Residences.Remove(toAdd);
+            PropertyList.Remove(toRemove);
         }
     }
-
 }
 
